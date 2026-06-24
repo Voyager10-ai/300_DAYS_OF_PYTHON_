@@ -1,1 +1,5 @@
-# 300_DAYS_OF_PYTHON_
+# 🐍 300 Days of Python
+
+Tracking my consistency and growth in Python problem solving — one problem a day, every day.
+
+## Progress
