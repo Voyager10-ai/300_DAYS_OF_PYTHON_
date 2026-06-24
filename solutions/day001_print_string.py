@@ -69,6 +69,27 @@ And so are you!"""
     print(r"Raw string: \n is not a newline here")
 
 
+# ---------- Creative & Artistic Printing ----------
+def creative_print():
+    """Demonstrate string repetition, centering, and artistic output."""
+    # String repetition
+    print("*" * 40)
+    print("Python".center(40, "-"))
+    print("*" * 40)
+    print()
+
+    # Box drawing
+    width = 30
+    print("+" + "-" * (width - 2) + "+")
+    print("|" + "300 Days of Python".center(width - 2) + "|")
+    print("|" + "Day 1: Print String".center(width - 2) + "|")
+    print("+" + "-" * (width - 2) + "+")
+    print()
+
+    # Emoji-style art with Unicode
+    print("\U0001F40D Python is amazing! \U0001F680")
+
+
 def main():
     print("=" * 50)
     print("  DAY 1: PRINT STRING")
@@ -85,6 +106,10 @@ def main():
 
     print(">>> Multi-line & Special Characters <<<")
     multiline_print()
+    print()
+
+    print(">>> Creative & Artistic <<<")
+    creative_print()
 
 
 if __name__ == "__main__":
