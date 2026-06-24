@@ -27,6 +27,27 @@ def basic_print():
     print("Done!")
 
 
+# ---------- String Formatting ----------
+def formatted_print():
+    """Demonstrate Python's three string formatting approaches."""
+    name = "Pradnyesh"
+    age = 21
+    gpa = 9.85
+
+    # f-string (Python 3.6+) — the modern, preferred way
+    print(f"Name: {name}, Age: {age}, GPA: {gpa:.1f}")
+
+    # .format() method
+    print("Name: {}, Age: {}, GPA: {:.1f}".format(name, age, gpa))
+
+    # % formatting (old-style, C-like)
+    print("Name: %s, Age: %d, GPA: %.1f" % (name, age, gpa))
+
+    # f-string with expressions
+    print(f"{name.upper()} will be {age + 5} in 5 years")
+
+
+
 def main():
     print("=" * 50)
     print("  DAY 1: PRINT STRING")
@@ -35,6 +56,10 @@ def main():
 
     print(">>> Basic Print <<<")
     basic_print()
+    print()
+
+    print(">>> Formatted Print <<<")
+    formatted_print()
 
 
 if __name__ == "__main__":
