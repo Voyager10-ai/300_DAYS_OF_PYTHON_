@@ -48,6 +48,27 @@ def formatted_print():
 
 
 
+# ---------- Multi-line & Special Characters ----------
+def multiline_print():
+    """Demonstrate multi-line strings and escape characters."""
+    # Triple-quoted multi-line string
+    poem = """Roses are red,
+Violets are blue,
+Python is great,
+And so are you!"""
+    print(poem)
+    print()
+
+    # Escape characters
+    print("Tab\tseparated\tvalues")
+    print("Line1\nLine2\nLine3")
+    print("She said, \"Hello!\"")
+    print('It\'s a beautiful day')
+
+    # Raw string (no escape processing)
+    print(r"Raw string: \n is not a newline here")
+
+
 def main():
     print("=" * 50)
     print("  DAY 1: PRINT STRING")
@@ -60,6 +81,10 @@ def main():
 
     print(">>> Formatted Print <<<")
     formatted_print()
+    print()
+
+    print(">>> Multi-line & Special Characters <<<")
+    multiline_print()
 
 
 if __name__ == "__main__":
