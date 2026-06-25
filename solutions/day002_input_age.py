@@ -125,6 +125,53 @@ def calculate_milestones(age):
             print(f"   ⏳ Age {milestone_age:>3}: {description} (in {years_left} years)")
 
 
+
+# ---------- Age Classification ----------
+def classify_age(age):
+    """Classify age into life stages using conditional logic."""
+    stages = [
+        (0, 0, "👶 Newborn"),
+        (1, 3, "🍼 Infant / Toddler"),
+        (4, 12, "🧒 Child"),
+        (13, 17, "🎮 Teenager"),
+        (18, 24, "🎓 Young Adult"),
+        (25, 39, "💼 Adult"),
+        (40, 59, "🏆 Middle-aged"),
+        (60, 74, "🌅 Senior"),
+        (75, 89, "👴 Elderly"),
+        (90, 150, "💎 Super Senior"),
+    ]
+
+    print(f"🏷️  Age Classification for {age}:")
+    for low, high, label in stages:
+        marker = " 👈 YOU" if low <= age <= high else ""
+        print(f"   {low:>3}-{high:<3} : {label}{marker}")
+
+
+def identify_generation(age):
+    """Identify which generation the user belongs to."""
+    current_year = datetime.now().year
+    birth_year = current_year - age
+
+    generations = [
+        (1928, 1945, "Silent Generation", "🤫"),
+        (1946, 1964, "Baby Boomers", "👶"),
+        (1965, 1980, "Generation X", "❌"),
+        (1981, 1996, "Millennials (Gen Y)", "📱"),
+        (1997, 2012, "Generation Z", "💻"),
+        (2013, 2025, "Generation Alpha", "🤖"),
+    ]
+
+    print(f"\n🌍 Generation Identifier (born ~{birth_year}):")
+    for start, end, name, emoji in generations:
+        if start <= birth_year <= end:
+            print(f"   {emoji} You are a {name} ({start}-{end})")
+            return name
+
+    print("   🔮 Generation not in database")
+    return "Unknown"
+
+
 def main():
     """Entry point for the program."""
     print("=" * 50)
@@ -150,7 +197,11 @@ def main():
 
     print(">>> Life Milestones <<<")
     calculate_milestones(age)
+    print()
 
+    print(">>> Age Classification <<<")
+    classify_age(age)
+    identify_generation(age)
 
 if __name__ == "__main__":
     main()
