@@ -4,3 +4,4 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 
 ## Progress
 - Day 1: Print String
+- Day 2: Input Age
