@@ -172,6 +172,58 @@ def identify_generation(age):
     return "Unknown"
 
 
+
+# ---------- Creative & Fun Display ----------
+def display_age_progress_bar(age, max_age=100):
+    """Show a visual progress bar for life progress."""
+    progress = min(age / max_age, 1.0)
+    bar_width = 30
+    filled = int(bar_width * progress)
+    empty = bar_width - filled
+
+    bar = "█" * filled + "░" * empty
+    percent = progress * 100
+
+    print(f"\n🎯 Life Progress (assuming {max_age} years):")
+    print(f"   [{bar}] {percent:.1f}%")
+    print(f"   {age} of {max_age} years")
+
+
+def fun_facts(age):
+    """Display fun and quirky facts based on the user's age."""
+    years_sleeping = round(age * 0.33, 1)
+    years_eating = round(age * 0.04, 1)
+    years_on_phone = round(age * 0.05, 1) if age >= 10 else 0
+    words_spoken = age * 16_000 * 365  # avg 16,000 words/day
+
+    print(f"\n🎲 Fun Facts About Your {age} Years:")
+    print(f"   😴 Time spent sleeping:    ~{years_sleeping} years")
+    print(f"   🍽️  Time spent eating:      ~{years_eating} years")
+    if years_on_phone > 0:
+        print(f"   📱 Time on phone:          ~{years_on_phone} years")
+    print(f"   💬 Words spoken:           ~{words_spoken:,}")
+    print(f"   🌍 Earth orbits completed: {age}")
+    print(f"   🚀 Distance through space: ~{age * 584_000_000:,} miles")
+    print(f"      (Earth travels ~584M miles/year around the Sun)")
+
+
+def display_age_art(age):
+    """Create a simple artistic display of the age."""
+    width = 36
+    print()
+    print("+" + "-" * (width - 2) + "+")
+    print("|" + " " * (width - 2) + "|")
+    print("|" + f"🎂 You are {age} years young! 🎂".center(width - 2) + "|")
+    print("|" + " " * (width - 2) + "|")
+    # Birthday candles
+    candles = "🕯️" * min(age, 10)
+    if age > 10:
+        candles += f" (+{age - 10} more)"
+    print("|" + candles.center(width - 2) + "|")
+    print("|" + " " * (width - 2) + "|")
+    print("+" + "-" * (width - 2) + "+")
+
+
 def main():
     """Entry point for the program."""
     print("=" * 50)
@@ -202,6 +254,11 @@ def main():
     print(">>> Age Classification <<<")
     classify_age(age)
     identify_generation(age)
+    print()
 
+    print(">>> Fun Facts & Visuals <<<")
+    display_age_progress_bar(age)
+    fun_facts(age)
+    display_age_art(age)
 if __name__ == "__main__":
     main()
