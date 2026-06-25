@@ -81,6 +81,50 @@ def demonstrate_validation():
         print(f"{repr(test):<10} {status:<8} {result}")
 
 
+
+# ---------- Age Calculations & Milestones ----------
+def calculate_age_stats(age):
+    """Calculate interesting statistics based on age."""
+    days_lived = age * 365 + (age // 4)  # accounting for leap years
+    hours_lived = days_lived * 24
+    heartbeats = hours_lived * 60 * 72  # avg 72 beats per minute
+    breaths = hours_lived * 60 * 16  # avg 16 breaths per minute
+
+    print(f"📊 Age Statistics for {age} years old:")
+    print(f"   Days lived:       ~{days_lived:,}")
+    print(f"   Hours lived:      ~{hours_lived:,}")
+    print(f"   Heartbeats:       ~{heartbeats:,}")
+    print(f"   Breaths taken:    ~{breaths:,}")
+
+
+def calculate_milestones(age):
+    """Show upcoming and past life milestones."""
+    milestones = {
+        1: "🎒 First birthday",
+        5: "🏫 Started school",
+        13: "🎮 Became a teenager",
+        16: "🛵 Can learn to drive (many countries)",
+        18: "🎓 Legal adult / Voting age",
+        21: "🍷 Legal drinking age (US)",
+        25: "🧠 Brain fully developed",
+        30: "💼 Career prime begins",
+        40: "🏆 Life begins at 40",
+        50: "🥇 Half-century milestone",
+        60: "🌅 Retirement approaching",
+        65: "🏖️  Retirement age (many countries)",
+        75: "💎 Diamond jubilee of life",
+        100: "💯 Centenarian!",
+    }
+
+    print(f"🏁 Life Milestones (age {age}):")
+    for milestone_age, description in milestones.items():
+        if milestone_age <= age:
+            print(f"   ✅ Age {milestone_age:>3}: {description}")
+        elif milestone_age <= age + 20:
+            years_left = milestone_age - age
+            print(f"   ⏳ Age {milestone_age:>3}: {description} (in {years_left} years)")
+
+
 def main():
     """Entry point for the program."""
     print("=" * 50)
@@ -98,6 +142,14 @@ def main():
 
     print(">>> Validation Demo <<<")
     demonstrate_validation()
+    print()
+
+    print(">>> Age Statistics <<<")
+    calculate_age_stats(age)
+    print()
+
+    print(">>> Life Milestones <<<")
+    calculate_milestones(age)
 
 
 if __name__ == "__main__":
