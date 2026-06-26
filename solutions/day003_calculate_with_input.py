@@ -59,6 +59,53 @@ def demonstrate_operators():
         print(f"   {expr:<25} {result:>10}")
 
 
+# ---------- Interactive Calculator ----------
+def interactive_calculator():
+    """A menu-driven calculator that runs until the user quits."""
+    operations = {
+        "1": ("Addition (+)", lambda a, b: a + b),
+        "2": ("Subtraction (-)", lambda a, b: a - b),
+        "3": ("Multiplication (×)", lambda a, b: a * b),
+        "4": ("Division (÷)", lambda a, b: a / b if b != 0 else "ERROR: Division by zero"),
+        "5": ("Power (^)", lambda a, b: a ** b),
+        "6": ("Modulus (%)", lambda a, b: a % b if b != 0 else "ERROR: Division by zero"),
+    }
+
+    print("🧮 Interactive Calculator")
+    print("   Select an operation:")
+    for key, (name, _) in operations.items():
+        print(f"   [{key}] {name}")
+    print("   [q] Quit")
+
+    choice = input("\n   Your choice: ").strip().lower()
+    if choice == "q":
+        print("   Calculator closed. 👋")
+        return
+
+    if choice not in operations:
+        print("   ❌ Invalid choice!")
+        return
+
+    try:
+        a = float(input("   Enter first number:  "))
+        b = float(input("   Enter second number: "))
+    except ValueError:
+        print("   ❌ Invalid number input!")
+        return
+
+    name, func = operations[choice]
+    result = func(a, b)
+
+    if isinstance(result, str):
+        print(f"\n   ❌ {result}")
+    else:
+        print(f"\n   ✅ {name}")
+        print(f"   {a} → {name.split('(')[1][0]} ← {b}")
+        print(f"   Result: {result}")
+        if isinstance(result, float) and result != int(result):
+            print(f"   Rounded: {round(result, 4)}")
+
+
 def main():
     """Entry point for the program."""
     print("=" * 50)
@@ -72,6 +119,10 @@ def main():
 
     print(">>> Operator Precedence <<<")
     demonstrate_operators()
+    print()
+
+    print(">>> Interactive Calculator <<<")
+    interactive_calculator()
 
 
 if __name__ == "__main__":
