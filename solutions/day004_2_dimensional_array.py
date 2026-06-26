@@ -207,6 +207,95 @@ def main():
 
     print(">>> Matrix Transformations <<<")
     matrix_transformations()
+    print()
+
+    print(">>> Advanced Operations <<<")
+    advanced_operations()
+    print()
+
+    print(">>> Tic-Tac-Toe Board <<<")
+    tic_tac_toe_display()
+
+
+# ---------- Advanced Operations ----------
+def spiral_order(matrix):
+    """Traverse a matrix in spiral order."""
+    if not matrix:
+        return []
+    result = []
+    top, bottom = 0, len(matrix) - 1
+    left, right = 0, len(matrix[0]) - 1
+
+    while top <= bottom and left <= right:
+        for j in range(left, right + 1):
+            result.append(matrix[top][j])
+        top += 1
+        for i in range(top, bottom + 1):
+            result.append(matrix[i][right])
+        right -= 1
+        if top <= bottom:
+            for j in range(right, left - 1, -1):
+                result.append(matrix[bottom][j])
+            bottom -= 1
+        if left <= right:
+            for i in range(bottom, top - 1, -1):
+                result.append(matrix[i][left])
+            left += 1
+    return result
+
+
+def matrix_add(a, b):
+    """Add two matrices element-wise."""
+    return [[a[i][j] + b[i][j] for j in range(len(a[0]))] for i in range(len(a))]
+
+
+def advanced_operations():
+    """Demo spiral traversal and matrix arithmetic."""
+    m = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+    print_matrix(m, "Matrix")
+    print(f"\n   🌀 Spiral Order: {spiral_order(m)}")
+
+    a = [[1, 2], [3, 4]]
+    b = [[5, 6], [7, 8]]
+    print_matrix(a, "Matrix A")
+    print_matrix(b, "Matrix B")
+    print_matrix(matrix_add(a, b), "A + B")
+
+
+# ---------- Creative: Tic-Tac-Toe Board ----------
+def tic_tac_toe_display():
+    """Display a Tic-Tac-Toe board using a 2D array."""
+    board = [
+        ["X", "O", "X"],
+        ["O", "X", " "],
+        [" ", "O", "X"],
+    ]
+
+    print("\n   🎮 Tic-Tac-Toe Board:")
+    print()
+    for i, row in enumerate(board):
+        line = " | ".join(f" {cell} " for cell in row)
+        print(f"      {line}")
+        if i < 2:
+            print(f"      {'-----+-------+-----'}")
+
+    # Check winner
+    for i in range(3):
+        if board[i][0] == board[i][1] == board[i][2] != " ":
+            print(f"\n   🏆 Row {i + 1} wins: {board[i][0]}!")
+            return
+    for j in range(3):
+        if board[0][j] == board[1][j] == board[2][j] != " ":
+            print(f"\n   🏆 Column {j + 1} wins: {board[0][j]}!")
+            return
+    if board[0][0] == board[1][1] == board[2][2] != " ":
+        print(f"\n   🏆 Diagonal wins: {board[1][1]}!")
+        return
+    if board[0][2] == board[1][1] == board[2][0] != " ":
+        print(f"\n   🏆 Anti-diagonal wins: {board[1][1]}!")
+        return
+    print("\n   🤝 No winner yet — game in progress!")
+
 
 if __name__ == "__main__":
     main()
