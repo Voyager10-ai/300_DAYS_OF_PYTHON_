@@ -251,5 +251,73 @@ def main():
 
     print(">>> Unit Converter <<<")
     unit_converter()
+    print()
+
+    print(">>> Number Analyzer <<<")
+    number_analyzer()
+
+
+# ---------- Creative Number Analysis ----------
+def number_analyzer():
+    """Analyze a number and display creative visual output."""
+    num = float(input("Enter a number to analyze: "))
+    n = int(num)
+
+    print(f"\n🔍 Number Analysis for {num}:")
+
+    # Number properties
+    properties = []
+    if n == num:  # is integer
+        properties.append("Integer")
+        if n % 2 == 0:
+            properties.append("Even")
+        else:
+            properties.append("Odd")
+        if n > 1:
+            is_prime = all(n % i != 0 for i in range(2, int(math.sqrt(n)) + 1))
+            if is_prime:
+                properties.append("Prime ✨")
+        if n > 0 and math.sqrt(n) == int(math.sqrt(n)):
+            properties.append("Perfect Square")
+    else:
+        properties.append("Decimal")
+
+    if num > 0:
+        properties.append("Positive")
+    elif num < 0:
+        properties.append("Negative")
+    else:
+        properties.append("Zero")
+
+    print(f"   Properties: {', '.join(properties)}")
+
+    # Visual bar chart of digits
+    if n > 0:
+        digits = [int(d) for d in str(abs(n))]
+        print(f"\n   📊 Digit Bar Chart:")
+        for i, d in enumerate(digits):
+            bar = "█" * d + "░" * (9 - d)
+            print(f"      Digit {i + 1} ({d}): [{bar}]")
+
+        print(f"\n   📈 Digit Statistics:")
+        print(f"      Sum of digits:     {sum(digits)}")
+        print(f"      Product of digits: {math.prod(digits)}")
+        print(f"      Largest digit:     {max(digits)}")
+        print(f"      Smallest digit:    {min(digits)}")
+
+    # Artistic summary box
+    width = 40
+    print()
+    print("╔" + "═" * (width - 2) + "╗")
+    print("║" + f"  🧮  CALCULATION COMPLETE  🧮  ".center(width - 2) + "║")
+    print("║" + " " * (width - 2) + "║")
+    print("║" + f"  Number: {num}".ljust(width - 2) + "║")
+    print("║" + f"  √n = {math.sqrt(abs(num)):.4f}".ljust(width - 2) + "║")
+    print("║" + f"  n² = {num ** 2:,.2f}".ljust(width - 2) + "║")
+    print("║" + f"  n³ = {num ** 3:,.2f}".ljust(width - 2) + "║")
+    print("║" + " " * (width - 2) + "║")
+    print("╚" + "═" * (width - 2) + "╝")
+
+
 if __name__ == "__main__":
     main()
