@@ -215,6 +215,10 @@ def main():
 
     print(">>> Tic-Tac-Toe Board <<<")
     tic_tac_toe_display()
+    print()
+
+    print(">>> Heatmap Visualization <<<")
+    heatmap_display()
 
 
 # ---------- Advanced Operations ----------
@@ -295,6 +299,49 @@ def tic_tac_toe_display():
         print(f"\n   🏆 Anti-diagonal wins: {board[1][1]}!")
         return
     print("\n   🤝 No winner yet — game in progress!")
+
+
+# ---------- Creative: Heatmap Visualization ----------
+def heatmap_display():
+    """Visualize a 2D array as an ASCII heatmap."""
+    import random
+    random.seed(42)
+
+    # Simulated weekly activity data (7 days × 4 weeks)
+    data = [[random.randint(0, 10) for _ in range(7)] for _ in range(4)]
+    days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    blocks = " ░▒▓█"  # 5 intensity levels
+
+    max_val = max(max(row) for row in data)
+
+    print("\n   🗓️  Activity Heatmap (4 weeks × 7 days):")
+    print()
+    print("         " + "  ".join(f"{d:>3}" for d in days))
+    print("        " + "─" * 35)
+    for i, row in enumerate(data):
+        cells = []
+        for val in row:
+            level = int(val / max_val * (len(blocks) - 1))
+            cells.append(f" {blocks[level]}{blocks[level]} ")
+        print(f"   Wk {i + 1} │{''.join(cells)}│")
+    print("        " + "─" * 35)
+
+    # Legend
+    print(f"\n   Legend: ", end="")
+    for i, b in enumerate(blocks):
+        label = ["None", "Low", "Med", "High", "Max"][i]
+        print(f" {b}{b}={label}", end=" ")
+    print()
+
+    # Summary box
+    total = sum(sum(row) for row in data)
+    width = 40
+    print()
+    print("   ╔" + "═" * (width - 2) + "╗")
+    print("   ║" + "  📊 2D ARRAY MASTERED! 📊  ".center(width - 2) + "║")
+    print("   ║" + f"  Total activity score: {total}".ljust(width - 2) + "║")
+    print("   ║" + f"  Grid size: {len(data)}×{len(data[0])}".ljust(width - 2) + "║")
+    print("   ╚" + "═" * (width - 2) + "╝")
 
 
 if __name__ == "__main__":
