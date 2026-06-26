@@ -161,6 +161,68 @@ def compound_interest():
 
 
 def main():
+
+# ---------- Unit Converter ----------
+def unit_converter():
+    """A multi-category unit converter."""
+    categories = {
+        "1": "Temperature",
+        "2": "Length",
+        "3": "Weight",
+    }
+
+    print("🔄 Unit Converter")
+    for key, name in categories.items():
+        print(f"   [{key}] {name}")
+
+    choice = input("   Select category: ").strip()
+
+    if choice == "1":
+        # Temperature
+        temp = float(input("   Enter temperature: "))
+        unit = input("   From (C/F/K): ").strip().upper()
+
+        if unit == "C":
+            f = temp * 9 / 5 + 32
+            k = temp + 273.15
+            print(f"\n   🌡️  {temp}°C = {f:.2f}°F = {k:.2f}K")
+        elif unit == "F":
+            c = (temp - 32) * 5 / 9
+            k = c + 273.15
+            print(f"\n   🌡️  {temp}°F = {c:.2f}°C = {k:.2f}K")
+        elif unit == "K":
+            c = temp - 273.15
+            f = c * 9 / 5 + 32
+            print(f"\n   🌡️  {temp}K = {c:.2f}°C = {f:.2f}°F")
+        else:
+            print("   ❌ Invalid unit!")
+
+    elif choice == "2":
+        # Length
+        value = float(input("   Enter length in meters: "))
+        print(f"\n   📏 {value} meters =")
+        print(f"      {value * 100:.2f} centimeters")
+        print(f"      {value * 1000:.2f} millimeters")
+        print(f"      {value / 1000:.6f} kilometers")
+        print(f"      {value * 3.28084:.4f} feet")
+        print(f"      {value * 39.3701:.4f} inches")
+        print(f"      {value * 1.09361:.4f} yards")
+        print(f"      {value * 0.000621371:.6f} miles")
+
+    elif choice == "3":
+        # Weight
+        value = float(input("   Enter weight in kilograms: "))
+        print(f"\n   ⚖️  {value} kg =")
+        print(f"      {value * 1000:.2f} grams")
+        print(f"      {value * 2.20462:.4f} pounds")
+        print(f"      {value * 35.274:.4f} ounces")
+        print(f"      {value * 0.157473:.6f} stones")
+
+    else:
+        print("   ❌ Invalid category!")
+
+
+def main():
     """Entry point for the program."""
     print("=" * 50)
     print("  DAY 3: CALCULATE WITH INPUT")
@@ -185,6 +247,9 @@ def main():
 
     print(">>> Compound Interest <<<")
     compound_interest()
+    print()
 
+    print(">>> Unit Converter <<<")
+    unit_converter()
 if __name__ == "__main__":
     main()
