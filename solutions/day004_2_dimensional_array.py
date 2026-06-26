@@ -76,6 +76,62 @@ def access_elements():
     print(f"      diagonal     = {diagonal}  (main diagonal)")
 
 
+# ---------- Row & Column Operations ----------
+def matrix_statistics():
+    """Calculate statistics for rows and columns."""
+    scores = [
+        [85, 92, 78, 90],  # Student 1
+        [70, 88, 95, 82],  # Student 2
+        [90, 76, 88, 94],  # Student 3
+        [65, 80, 72, 85],  # Student 4
+    ]
+    subjects = ["Math", "Sci", "Eng", "Hist"]
+    print_matrix(scores, "Student Scores (4 students × 4 subjects)")
+
+    # Row statistics (per student)
+    print(f"\n   📊 Per-Student Statistics:")
+    print(f"   {'Student':<12} {'Sum':>6} {'Avg':>8} {'Min':>6} {'Max':>6}")
+    print(f"   {'-' * 42}")
+    for i, row in enumerate(scores):
+        print(f"   Student {i + 1:<4} {sum(row):>6} {sum(row)/len(row):>8.1f} {min(row):>6} {max(row):>6}")
+
+    # Column statistics (per subject)
+    print(f"\n   📚 Per-Subject Statistics:")
+    print(f"   {'Subject':<12} {'Sum':>6} {'Avg':>8} {'Min':>6} {'Max':>6}")
+    print(f"   {'-' * 42}")
+    for j, subj in enumerate(subjects):
+        col = [scores[i][j] for i in range(len(scores))]
+        print(f"   {subj:<12} {sum(col):>6} {sum(col)/len(col):>8.1f} {min(col):>6} {max(col):>6}")
+
+    # Grand total
+    total = sum(sum(row) for row in scores)
+    count = sum(len(row) for row in scores)
+    print(f"\n   🏆 Overall: Total = {total}, Average = {total / count:.1f}")
+
+
+def search_in_matrix():
+    """Search for elements in a 2D array."""
+    matrix = [
+        [15, 22, 38, 41],
+        [50, 63, 77, 84],
+        [91, 10, 25, 33],
+    ]
+    print_matrix(matrix, "Search Matrix")
+
+    target = 77
+    print(f"\n   🔍 Searching for {target}:")
+    for i, row in enumerate(matrix):
+        for j, val in enumerate(row):
+            if val == target:
+                print(f"   ✅ Found {target} at position [{i}][{j}]")
+
+    # Find all values > 50
+    print(f"\n   🔍 Values greater than 50:")
+    found = [(i, j, matrix[i][j]) for i in range(len(matrix)) for j in range(len(matrix[i])) if matrix[i][j] > 50]
+    for r, c, v in found:
+        print(f"      [{r}][{c}] = {v}")
+
+
 def main():
     """Entry point for the program."""
     print("=" * 50)
@@ -89,6 +145,14 @@ def main():
 
     print(">>> Accessing Elements <<<")
     access_elements()
+    print()
+
+    print(">>> Matrix Statistics <<<")
+    matrix_statistics()
+    print()
+
+    print(">>> Search in Matrix <<<")
+    search_in_matrix()
 
 
 if __name__ == "__main__":
