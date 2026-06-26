@@ -1,11 +1,11 @@
 {
   "total_problems": 282,
-  "current_day": 3,
+  "current_day": 4,
   "problems": [
     {"day": 1, "title": "Print String", "status": "done"},
     {"day": 2, "title": "Input Age", "status": "done"},
     {"day": 3, "title": "Calculate with Input", "status": "done"},
-    {"day": 4, "title": "2 Dimensional Array", "status": "pending"},
+    {"day": 4, "title": "2 Dimensional Array", "status": "done"},
     {"day": 5, "title": "Check Triangle", "status": "pending"},
     {"day": 6, "title": "Construct Number Pattern", "status": "pending"},
     {"day": 7, "title": "Construct Pattern", "status": "pending"},
