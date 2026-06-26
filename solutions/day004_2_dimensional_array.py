@@ -132,6 +132,56 @@ def search_in_matrix():
         print(f"      [{r}][{c}] = {v}")
 
 
+
+# ---------- Matrix Transformations ----------
+def transpose_matrix(matrix):
+    """Transpose a matrix (swap rows and columns)."""
+    return [[matrix[i][j] for i in range(len(matrix))] for j in range(len(matrix[0]))]
+
+
+def rotate_90_clockwise(matrix):
+    """Rotate matrix 90 degrees clockwise."""
+    rows, cols = len(matrix), len(matrix[0])
+    return [[matrix[rows - 1 - j][i] for j in range(rows)] for i in range(cols)]
+
+
+def flip_horizontal(matrix):
+    """Flip matrix horizontally (reverse each row)."""
+    return [row[::-1] for row in matrix]
+
+
+def flip_vertical(matrix):
+    """Flip matrix vertically (reverse row order)."""
+    return matrix[::-1]
+
+
+def matrix_transformations():
+    """Demonstrate various matrix transformations."""
+    original = [
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
+    ]
+    print_matrix(original, "Original")
+
+    transposed = transpose_matrix(original)
+    print_matrix(transposed, "Transposed (rows ↔ cols)")
+
+    rotated = rotate_90_clockwise(original)
+    print_matrix(rotated, "Rotated 90° Clockwise")
+
+    h_flip = flip_horizontal(original)
+    print_matrix(h_flip, "Flipped Horizontal ↔")
+
+    v_flip = flip_vertical(original)
+    print_matrix(v_flip, "Flipped Vertical ↕")
+
+    # Non-square transpose
+    rect = [[1, 2, 3, 4], [5, 6, 7, 8]]
+    print_matrix(rect, "Rectangle (2×4)")
+    print_matrix(transpose_matrix(rect), "Transposed (4×2)")
+
+
 def main():
     """Entry point for the program."""
     print("=" * 50)
@@ -153,7 +203,10 @@ def main():
 
     print(">>> Search in Matrix <<<")
     search_in_matrix()
+    print()
 
+    print(">>> Matrix Transformations <<<")
+    matrix_transformations()
 
 if __name__ == "__main__":
     main()
