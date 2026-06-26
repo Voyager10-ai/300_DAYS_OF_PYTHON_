@@ -106,6 +106,60 @@ def interactive_calculator():
             print(f"   Rounded: {round(result, 4)}")
 
 
+
+# ---------- Advanced Math (math module) ----------
+def advanced_math_demo():
+    """Demonstrate Python's math module with practical examples."""
+    num = float(input("Enter a positive number for math operations: "))
+
+    print(f"\n🔬 Advanced Math for {num}:")
+    print(f"   Square root:     √{num} = {math.sqrt(abs(num)):.4f}")
+    print(f"   Ceiling:         ⌈{num}⌉ = {math.ceil(num)}")
+    print(f"   Floor:           ⌊{num}⌋ = {math.floor(num)}")
+    print(f"   Absolute:        |{num}| = {abs(num)}")
+    print(f"   Factorial of {min(int(abs(num)), 20)}:  {math.factorial(min(int(abs(num)), 20))}")
+
+    print(f"\n📐 Trigonometry (angle = {num}°):")
+    radians = math.radians(num)
+    print(f"   sin({num}°) = {math.sin(radians):.6f}")
+    print(f"   cos({num}°) = {math.cos(radians):.6f}")
+    print(f"   tan({num}°) = {math.tan(radians):.6f}" if num % 90 != 0 or num % 180 == 0 else f"   tan({num}°) = undefined")
+
+    if num > 0:
+        print(f"\n📈 Logarithms:")
+        print(f"   log₂({num})  = {math.log2(num):.4f}")
+        print(f"   log₁₀({num}) = {math.log10(num):.4f}")
+        print(f"   ln({num})    = {math.log(num):.4f}")
+
+    print(f"\n🔢 Math Constants:")
+    print(f"   π (pi)    = {math.pi}")
+    print(f"   e (euler) = {math.e}")
+    print(f"   τ (tau)   = {math.tau}")
+    print(f"   ∞ (inf)   = {math.inf}")
+
+
+def compound_interest():
+    """Calculate compound interest — a practical financial calculation."""
+    print("💰 Compound Interest Calculator:")
+    principal = float(input("   Principal amount (₹): "))
+    rate = float(input("   Annual interest rate (%): ")) / 100
+    years = int(input("   Number of years: "))
+    compounds = int(input("   Compounding frequency per year (e.g., 12 for monthly): "))
+
+    amount = principal * (1 + rate / compounds) ** (compounds * years)
+    interest_earned = amount - principal
+
+    print(f"\n   📊 Investment Summary:")
+    print(f"   {'Principal:':<25} ₹{principal:>12,.2f}")
+    print(f"   {'Rate:':<25} {rate * 100:>11.2f}%")
+    print(f"   {'Duration:':<25} {years:>10} years")
+    print(f"   {'Compounding:':<25} {compounds:>10}x/year")
+    print(f"   {'-' * 40}")
+    print(f"   {'Final Amount:':<25} ₹{amount:>12,.2f}")
+    print(f"   {'Interest Earned:':<25} ₹{interest_earned:>12,.2f}")
+    print(f"   {'Growth:':<25} {(amount / principal - 1) * 100:>11.2f}%")
+
+
 def main():
     """Entry point for the program."""
     print("=" * 50)
@@ -123,7 +177,14 @@ def main():
 
     print(">>> Interactive Calculator <<<")
     interactive_calculator()
+    print()
 
+    print(">>> Advanced Math <<<")
+    advanced_math_demo()
+    print()
+
+    print(">>> Compound Interest <<<")
+    compound_interest()
 
 if __name__ == "__main__":
     main()
