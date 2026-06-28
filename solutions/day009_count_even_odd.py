@@ -61,6 +61,30 @@ def parity_subsets_stats(numbers):
     return evens_list, odds_list
 
 
+# ---------- Visual Distribution Representation ----------
+def visualize_parity_distribution(numbers):
+    """Draw a horizontal ASCII bar chart comparing even and odd count proportions."""
+    evens = sum(1 for n in numbers if n % 2 == 0)
+    odds = len(numbers) - evens
+    total = len(numbers)
+
+    print(f"\n   📊 Parity Chart (total {total} items):")
+    if total == 0:
+        print("      Empty list.")
+        return
+
+    max_width = 30
+    e_width = int(evens / total * max_width) if total > 0 else 0
+    o_width = int(odds / total * max_width) if total > 0 else 0
+
+    # Ensure min width of 1 if count > 0
+    if evens > 0 and e_width == 0: e_width = 1
+    if odds > 0 and o_width == 0: o_width = 1
+
+    print(f"      🔵 Evens: [{ '█' * e_width }{ '░' * (max_width - e_width) }] {evens} ({evens/total*100:.1f}%)")
+    print(f"      🔴 Odds:  [{ '█' * o_width }{ '░' * (max_width - o_width) }] {odds} ({odds/total*100:.1f}%)")
+
+
 def main():
     """Entry point for the program."""
     print("=" * 50)
@@ -80,10 +104,15 @@ def main():
 
     print(">>> Subset Statistics Demo <<<")
     parity_subsets_stats([12, 15, 22, 91, 104, 3, 7, 8])
+    print()
+
+    print(">>> Visual Parity Distribution <<<")
+    visualize_parity_distribution([1, 1, 3, 5, 7, 9, 2, 4, 6])
 
 
 if __name__ == "__main__":
     main()
+
 
 
 
