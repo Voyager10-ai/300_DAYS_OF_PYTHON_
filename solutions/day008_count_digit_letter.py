@@ -77,6 +77,35 @@ def character_frequency(text):
     return freq
 
 
+# ---------- Visual Data Representation ----------
+def visualize_categories(text):
+    """Draw a horizontal ASCII bar chart of character categories."""
+    letters = sum(1 for char in text if char.isalpha())
+    digits = sum(1 for char in text if char.isdigit())
+    others = len(text) - letters - digits
+    total = len(text)
+
+    print(f"\n   📊 Category Chart for '{text}':")
+    if total == 0:
+        print("      Empty string.")
+        return
+
+    # Scale to max width of 30 characters
+    max_bar_width = 30
+    l_width = int(letters / total * max_bar_width) if total > 0 else 0
+    d_width = int(digits / total * max_bar_width) if total > 0 else 0
+    o_width = int(others / total * max_bar_width) if total > 0 else 0
+
+    # Ensure we show at least one block if count > 0
+    if letters > 0 and l_width == 0: l_width = 1
+    if digits > 0 and d_width == 0: d_width = 1
+    if others > 0 and o_width == 0: o_width = 1
+
+    print(f"      🔤 Letters: [{ '█' * l_width }{ '░' * (max_bar_width - l_width) }] {letters} ({letters/total*100:.1f}%)")
+    print(f"      🔢 Digits:  [{ '█' * d_width }{ '░' * (max_bar_width - d_width) }] {digits} ({digits/total*100:.1f}%)")
+    print(f"      ✨ Others:  [{ '█' * o_width }{ '░' * (max_bar_width - o_width) }] {others} ({others/total*100:.1f}%)")
+
+
 def main():
     """Entry point for the program."""
     print("=" * 50)
@@ -95,10 +124,15 @@ def main():
 
     print(">>> Alphanumeric Frequencies <<<")
     character_frequency("Abrakadabra! 99 Luftballons.")
+    print()
+
+    print(">>> Visual Data Representation <<<")
+    visualize_categories("Today is June 28, 2026. The time is 1:46 PM.")
 
 
 if __name__ == "__main__":
     main()
+
 
 
 
