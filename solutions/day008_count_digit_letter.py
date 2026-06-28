@@ -27,6 +27,31 @@ def count_builtins(text):
     return letters, digits, others
 
 
+# ---------- Custom ASCII Range Counting ----------
+def count_ascii_ranges(text):
+    """Count letters and digits using raw ASCII integer comparisons (ord())."""
+    letters = 0
+    digits = 0
+    others = 0
+
+    for char in text:
+        code = ord(char)
+        # Check uppercase (65-90) or lowercase (97-122)
+        if (65 <= code <= 90) or (97 <= code <= 122):
+            letters += 1
+        # Check digit (48-57)
+        elif 48 <= code <= 57:
+            digits += 1
+        else:
+            others += 1
+
+    print(f"\n   📝 ASCII analysis: '{text}'")
+    print(f"      🔤 Letters: {letters} (ASCII 65-90, 97-122)")
+    print(f"      🔢 Digits:  {digits} (ASCII 48-57)")
+    print(f"      ✨ Others:  {others}")
+    return letters, digits, others
+
+
 def main():
     """Entry point for the program."""
     print("=" * 50)
@@ -37,8 +62,13 @@ def main():
     print(">>> Basic Counting Demo <<<")
     count_builtins("hello world! 123")
     count_builtins("Python 3.10 is awesome!")
+    print()
+
+    print(">>> ASCII Range Counting Demo <<<")
+    count_ascii_ranges("User#123! Pass@456")
 
 
 if __name__ == "__main__":
     main()
+
 
