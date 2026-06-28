@@ -124,6 +124,56 @@ def checkerboard_pattern(size=8, sym1="█", sym2="░"):
         print("      " + " ".join(row))
 
 
+# ---------- Generative ASCII Patterns ----------
+def generative_circle_pattern(size=15):
+    """Generate a concentric circle pattern using Euclidean distance."""
+    import math
+    print(f"\n   🌀 Generative Circle Pattern ({size}x{size}):")
+    center = size // 2
+    chars = " .:-=+*#%@"
+    for y in range(size):
+        row = []
+        for x in range(size):
+            # Scale x to adjust for character aspect ratio (usually 2:1 height-to-width)
+            dx = (x - center) * 1.8
+            dy = y - center
+            distance = math.sqrt(dx**2 + dy**2)
+            # Map distance to char index
+            char_idx = int(distance) % len(chars)
+            row.append(chars[char_idx])
+        print("      " + " ".join(row))
+
+
+def sine_wave_pattern(width=45, height=10):
+    """Generate a mathematical sine wave using coordinate mapping."""
+    import math
+    print(f"\n   🌊 Generative Sine Wave Pattern (width={width}, height={height}):")
+    grid = [[" " for _ in range(width)] for _ in range(height)]
+    for x in range(width):
+        # Calculate y coordinate of sine wave
+        # Amplitude is height/2, Period is about width/2
+        y_float = (height / 2) + (height / 2 - 1) * math.sin(x * 0.4)
+        y = int(y_float)
+        if 0 <= y < height:
+            grid[y][x] = "•"
+
+    for row in grid:
+        print("      " + "".join(row))
+
+
+def pattern_mastery_summary():
+    """Print an artistic summary box for pattern generation."""
+    width = 44
+    print()
+    print("   ╔" + "═" * (width - 2) + "╗")
+    print("   ║" + "  ✨ PATTERN GENERATION COMPLETE! ✨  ".center(width - 2) + "║")
+    print("   ║" + " " * (width - 2) + "║")
+    print("   ║" + "  Mastered Shapes: Square, Pyramid,   ".center(width - 2) + "║")
+    print("   ║" + "  Diamond, Hollow, Checkerboard,      ".center(width - 2) + "║")
+    print("   ║" + "  Generative Math Circles/Sine Waves  ".center(width - 2) + "║")
+    print("   ╚" + "═" * (width - 2) + "╝")
+
+
 def main():
     """Entry point for the program."""
     print("=" * 50)
@@ -150,10 +200,17 @@ def main():
     print(">>> Complex Patterns <<<")
     butterfly_symbol(4, "*")
     checkerboard_pattern(8, "█", "░")
+    print()
+
+    print(">>> Generative Patterns <<<")
+    generative_circle_pattern(15)
+    sine_wave_pattern(45, 10)
+    pattern_mastery_summary()
 
 
 if __name__ == "__main__":
     main()
+
 
 
 
