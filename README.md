@@ -10,4 +10,6 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 5: Check Triangle
 - Day 6: Construct Number Pattern
 - Day 7: Construct Pattern
+- Day 8: Count Digit Letter
+
 
