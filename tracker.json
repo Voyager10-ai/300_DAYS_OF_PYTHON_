@@ -1,13 +1,13 @@
 {
   "total_problems": 282,
-  "current_day": 5,
+  "current_day": 6,
   "problems": [
     {"day": 1, "title": "Print String", "status": "done"},
     {"day": 2, "title": "Input Age", "status": "done"},
     {"day": 3, "title": "Calculate with Input", "status": "done"},
     {"day": 4, "title": "2 Dimensional Array", "status": "done"},
     {"day": 5, "title": "Check Triangle", "status": "done"},
-    {"day": 6, "title": "Construct Number Pattern", "status": "pending"},
+    {"day": 6, "title": "Construct Number Pattern", "status": "done"},
     {"day": 7, "title": "Construct Pattern", "status": "pending"},
     {"day": 8, "title": "Count Digit Letter", "status": "pending"},
     {"day": 9, "title": "Count Even Odd", "status": "pending"},
