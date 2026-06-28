@@ -52,6 +52,31 @@ def count_ascii_ranges(text):
     return letters, digits, others
 
 
+# ---------- Character Frequency Distribution ----------
+def character_frequency(text):
+    """Calculate and display counts for each unique letter and digit."""
+    freq = {}
+    for char in text:
+        if char.isalnum():
+            # count case-insensitively
+            c = char.lower()
+            freq[c] = freq.get(c, 0) + 1
+
+    print(f"\n   📊 Character Frequencies (alphanumeric only, case-insensitive) in '{text}':")
+    if not freq:
+        print("      No letters or digits found.")
+        return freq
+
+    # Sort by character
+    sorted_chars = sorted(freq.items())
+    # Sort by frequency descending
+    sorted_freqs = sorted(freq.items(), key=lambda x: x[1], reverse=True)
+
+    print("      Sorted by char:      " + ", ".join(f"'{c}': {count}" for c, count in sorted_chars))
+    print("      Sorted by frequency: " + ", ".join(f"'{c}': {count}" for c, count in sorted_freqs))
+    return freq
+
+
 def main():
     """Entry point for the program."""
     print("=" * 50)
@@ -66,9 +91,14 @@ def main():
 
     print(">>> ASCII Range Counting Demo <<<")
     count_ascii_ranges("User#123! Pass@456")
+    print()
+
+    print(">>> Alphanumeric Frequencies <<<")
+    character_frequency("Abrakadabra! 99 Luftballons.")
 
 
 if __name__ == "__main__":
     main()
+
 
 
