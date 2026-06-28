@@ -106,6 +106,32 @@ def visualize_categories(text):
     print(f"      ✨ Others:  [{ '█' * o_width }{ '░' * (max_bar_width - o_width) }] {others} ({others/total*100:.1f}%)")
 
 
+# ---------- Interactive & Summary ----------
+def interactive_analyzer():
+    """Prompt the user for a sentence and run all analytical tools on it."""
+    print("\n   ✍️  Enter a sentence to analyze:")
+    user_input = input("      > ")
+    if user_input:
+        count_builtins(user_input)
+        character_frequency(user_input)
+        visualize_categories(user_input)
+    else:
+        print("      No input provided.")
+
+
+def show_summary_box():
+    """Print an artistic summary box."""
+    width = 44
+    print()
+    print("   ╔" + "═" * (width - 2) + "╗")
+    print("   ║" + "  🔢 CHARACTER ANALYZER COMPLETE! 🔤  ".center(width - 2) + "║")
+    print("   ║" + " " * (width - 2) + "║")
+    print("   ║" + "  Features: Built-in Counting, ASCII, ".ljust(width - 2) + "║")
+    print("   ║" + "            Char Frequencies,         ".ljust(width - 2) + "║")
+    print("   ║" + "            ASCII Visual Bar Charts   ".ljust(width - 2) + "║")
+    print("   ╚" + "═" * (width - 2) + "╝")
+
+
 def main():
     """Entry point for the program."""
     print("=" * 50)
@@ -128,10 +154,16 @@ def main():
 
     print(">>> Visual Data Representation <<<")
     visualize_categories("Today is June 28, 2026. The time is 1:46 PM.")
+    print()
+
+    print(">>> Interactive Sentence Analyzer <<<")
+    interactive_analyzer()
+    show_summary_box()
 
 
 if __name__ == "__main__":
     main()
+
 
 
 
