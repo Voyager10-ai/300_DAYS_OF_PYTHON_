@@ -86,6 +86,51 @@ def demonstrate_validation():
         print(f"   ({a},{b},{c}){'':>7} {status:<8} {side_type:<15} {note}")
 
 
+# ---------- Classification by Angles ----------
+def calculate_angles(a, b, c):
+    """Calculate all three angles in degrees using the cosine rule."""
+    angle_A = math.degrees(math.acos((b**2 + c**2 - a**2) / (2 * b * c)))
+    angle_B = math.degrees(math.acos((a**2 + c**2 - b**2) / (2 * a * c)))
+    angle_C = 180 - angle_A - angle_B
+    return round(angle_A, 2), round(angle_B, 2), round(angle_C, 2)
+
+
+def classify_by_angles(a, b, c):
+    """Classify triangle as acute, right, or obtuse."""
+    sides = sorted([a, b, c])
+    a2, b2, c2 = sides[0]**2, sides[1]**2, sides[2]**2
+
+    if abs(a2 + b2 - c2) < 1e-9:
+        return "Right (90°)", "🔺"
+    elif a2 + b2 > c2:
+        return "Acute (all < 90°)", "🔻"
+    else:
+        return "Obtuse (one > 90°)", "🔶"
+
+
+def angle_analysis():
+    """Analyze angles for various triangles."""
+    triangles = [
+        (3, 4, 5, "3-4-5"),
+        (5, 5, 5, "Equilateral"),
+        (7, 10, 5, "Scalene"),
+        (3, 4, 6, "Obtuse"),
+        (6, 8, 10, "Scaled 3-4-5"),
+    ]
+
+    for a, b, c, name in triangles:
+        if not is_valid_triangle(a, b, c):
+            continue
+        angles = calculate_angles(a, b, c)
+        angle_type, emoji = classify_by_angles(a, b, c)
+        side_type, _ = classify_by_sides(a, b, c)
+        print(f"\n   {emoji} Triangle '{name}' ({a}, {b}, {c}):")
+        print(f"      Sides:  {side_type}")
+        print(f"      Angles: {angle_type}")
+        print(f"      A={angles[0]}°, B={angles[1]}°, C={angles[2]}°")
+        print(f"      Sum of angles: {sum(angles)}°")
+
+
 def main():
     """Entry point for the program."""
     print("=" * 50)
@@ -100,6 +145,10 @@ def main():
 
     print(">>> Classification Demo <<<")
     demonstrate_validation()
+    print()
+
+    print(">>> Angle Analysis <<<")
+    angle_analysis()
 
 
 if __name__ == "__main__":
