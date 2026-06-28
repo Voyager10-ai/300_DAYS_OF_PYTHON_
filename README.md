@@ -9,3 +9,5 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 4: 2 Dimensional Array
 - Day 5: Check Triangle
 - Day 6: Construct Number Pattern
+- Day 7: Construct Pattern
+
