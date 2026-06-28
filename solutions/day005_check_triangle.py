@@ -155,6 +155,14 @@ def main():
     triangle_properties(3, 4, 5)
     triangle_properties(5, 5, 5)
     triangle_properties(7, 10, 12)
+    print()
+
+    print(">>> Special Triangles <<<")
+    demonstrate_special()
+    print()
+
+    print(">>> Interactive Triangle <<<")
+    interactive_triangle()
 
 
 # ---------- Triangle Properties ----------
@@ -195,6 +203,70 @@ def triangle_properties(a, b, c):
     print(f"   {'Inradius:':<20} {inradius:.4f}")
     print(f"   {'Circumradius:':<20} {circumradius:.4f}")
     print(f"   {'Angles:':<20} {angles[0]}°, {angles[1]}°, {angles[2]}°")
+
+
+# ---------- Special Triangles ----------
+def check_special_triangles(a, b, c):
+    """Check if the triangle has special properties."""
+    if not is_valid_triangle(a, b, c):
+        return
+
+    sides = sorted([a, b, c])
+    specials = []
+
+    # Pythagorean triple
+    if abs(sides[0]**2 + sides[1]**2 - sides[2]**2) < 1e-9:
+        specials.append("🔺 Pythagorean Triple")
+
+    # Equilateral
+    if sides[0] == sides[1] == sides[2]:
+        specials.append("🔷 Perfect Equilateral")
+
+    # Golden ratio triangle (ratio of sides ≈ 1.618)
+    phi = (1 + math.sqrt(5)) / 2
+    ratios = [sides[2] / sides[1], sides[1] / sides[0]]
+    if any(abs(r - phi) < 0.01 for r in ratios):
+        specials.append("✨ Golden Ratio Triangle")
+
+    # 30-60-90 triangle
+    angles = calculate_angles(a, b, c)
+    angle_set = set(round(a) for a in angles)
+    if angle_set == {30, 60, 90}:
+        specials.append("📐 30-60-90 Special Triangle")
+    elif angle_set == {45, 45, 90}:
+        specials.append("📐 45-45-90 Special Triangle")
+
+    print(f"\n   🔍 Special Triangle Check ({a}, {b}, {c}):")
+    if specials:
+        for s in specials:
+            print(f"      {s}")
+    else:
+        print("      No special properties detected")
+
+
+def demonstrate_special():
+    """Show special triangle detection."""
+    test = [(3, 4, 5), (5, 5, 5), (1, 1, math.sqrt(2)), (5, 12, 13), (7, 10, 12)]
+    for a, b, c in test:
+        check_special_triangles(a, b, c)
+
+
+def interactive_triangle():
+    """Take user input and analyze the triangle."""
+    print("🔢 Enter three sides of a triangle:")
+    try:
+        a = float(input("   Side a: "))
+        b = float(input("   Side b: "))
+        c = float(input("   Side c: "))
+    except ValueError:
+        print("   ❌ Invalid input! Please enter numbers.")
+        return
+
+    if is_valid_triangle(a, b, c):
+        triangle_properties(a, b, c)
+        check_special_triangles(a, b, c)
+    else:
+        validate_and_report(a, b, c)
 
 
 if __name__ == "__main__":
