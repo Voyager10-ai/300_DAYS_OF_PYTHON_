@@ -149,6 +149,52 @@ def main():
 
     print(">>> Angle Analysis <<<")
     angle_analysis()
+    print()
+
+    print(">>> Triangle Properties <<<")
+    triangle_properties(3, 4, 5)
+    triangle_properties(5, 5, 5)
+    triangle_properties(7, 10, 12)
+
+
+# ---------- Triangle Properties ----------
+def triangle_properties(a, b, c):
+    """Calculate and display all properties of a triangle."""
+    if not is_valid_triangle(a, b, c):
+        print(f"\n   ❌ ({a}, {b}, {c}) is not a valid triangle!")
+        return
+
+    # Perimeter
+    perimeter = a + b + c
+    s = perimeter / 2  # semi-perimeter
+
+    # Area using Heron's formula
+    area = math.sqrt(s * (s - a) * (s - b) * (s - c))
+
+    # Heights (from each side)
+    h_a = 2 * area / a
+    h_b = 2 * area / b
+    h_c = 2 * area / c
+
+    # Inradius and circumradius
+    inradius = area / s
+    circumradius = (a * b * c) / (4 * area)
+
+    side_type, _ = classify_by_sides(a, b, c)
+    angle_type, emoji = classify_by_angles(a, b, c)
+    angles = calculate_angles(a, b, c)
+
+    print(f"\n   {emoji} Triangle ({a}, {b}, {c}) — {side_type} {angle_type}")
+    print(f"   {'─' * 45}")
+    print(f"   {'Perimeter:':<20} {perimeter:.2f}")
+    print(f"   {'Semi-perimeter:':<20} {s:.2f}")
+    print(f"   {'Area (Heron):':<20} {area:.4f}")
+    print(f"   {'Height from a:':<20} {h_a:.4f}")
+    print(f"   {'Height from b:':<20} {h_b:.4f}")
+    print(f"   {'Height from c:':<20} {h_c:.4f}")
+    print(f"   {'Inradius:':<20} {inradius:.4f}")
+    print(f"   {'Circumradius:':<20} {circumradius:.4f}")
+    print(f"   {'Angles:':<20} {angles[0]}°, {angles[1]}°, {angles[2]}°")
 
 
 if __name__ == "__main__":
