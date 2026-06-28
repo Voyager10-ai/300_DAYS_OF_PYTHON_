@@ -115,6 +115,11 @@ def main():
     print(">>> Special Patterns <<<")
     zigzag_pattern()
     butterfly_pattern()
+    print()
+
+    print(">>> Pattern Gallery <<<")
+    number_spiral_board()
+    pattern_summary()
 
 
 # ---------- Pyramid & Diamond Patterns ----------
@@ -192,6 +197,56 @@ def butterfly_pattern(n=4):
         spaces = " " * (2 * (n - i))
         right = "".join(str(j) for j in range(i, 0, -1))
         print(f"      {left}{spaces}{right}")
+
+
+# ---------- Creative: Spiral Board & Summary ----------
+def number_spiral_board(n=5):
+    """Generate a spiral-filled number board."""
+    print(f"\n   🌀 Number Spiral Board ({n}×{n}):")
+    board = [[0] * n for _ in range(n)]
+    directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]  # right, down, left, up
+    r, c, d = 0, 0, 0
+    for num in range(1, n * n + 1):
+        board[r][c] = num
+        nr, nc = r + directions[d][0], c + directions[d][1]
+        if 0 <= nr < n and 0 <= nc < n and board[nr][nc] == 0:
+            r, c = nr, nc
+        else:
+            d = (d + 1) % 4
+            r, c = r + directions[d][0], c + directions[d][1]
+
+    width = len(str(n * n)) + 1
+    for row in board:
+        print("      " + "".join(str(v).center(width) for v in row))
+
+
+def pattern_summary():
+    """Display a creative summary of all patterns covered."""
+    patterns = [
+        "📐 Increasing Triangle",
+        "📐 Repeated Number",
+        "📐 Right-Aligned",
+        "📐 Continuous Flow",
+        "📐 Floyd's Triangle",
+        "📐 Pascal's Triangle",
+        "📐 Number Pyramid",
+        "💎 Number Diamond",
+        "⏳ Sandglass",
+        "📐 Zigzag",
+        "🦋 Butterfly",
+        "🌀 Spiral Board",
+    ]
+
+    width = 44
+    print()
+    print("   ╔" + "═" * (width - 2) + "╗")
+    print("   ║" + "  🎨 PATTERN GALLERY COMPLETE! 🎨  ".center(width - 2) + "║")
+    print("   ║" + " " * (width - 2) + "║")
+    print("   ║" + f"  Patterns mastered: {len(patterns)}".ljust(width - 2) + "║")
+    for p in patterns:
+        print("   ║" + f"    {p}".ljust(width - 2) + "║")
+    print("   ║" + " " * (width - 2) + "║")
+    print("   ╚" + "═" * (width - 2) + "╝")
 
 
 if __name__ == "__main__":
