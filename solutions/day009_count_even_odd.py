@@ -85,6 +85,50 @@ def visualize_parity_distribution(numbers):
     print(f"      🔴 Odds:  [{ '█' * o_width }{ '░' * (max_width - o_width) }] {odds} ({odds/total*100:.1f}%)")
 
 
+# ---------- Interactive & Summary ----------
+def interactive_parity_explorer():
+    """Prompt the user to choose input type (numbers or a large number) and analyze."""
+    print("\n   🤔 Parity Explorer:")
+    print("      1. Analyze a list of numbers (separated by spaces)")
+    print("      2. Analyze digits of a large number")
+    choice = input("      Select option (1-2): ").strip()
+
+    if choice == "1":
+        val = input("      Enter numbers separated by spaces: ").strip()
+        try:
+            numbers = [int(x) for x in val.split()]
+            if numbers:
+                count_even_odd_sequence(numbers)
+                parity_subsets_stats(numbers)
+                visualize_parity_distribution(numbers)
+            else:
+                print("      Empty list.")
+        except ValueError:
+            print("      ❌ Invalid numbers entered.")
+    elif choice == "2":
+        val = input("      Enter a large integer: ").strip()
+        try:
+            num = int(val)
+            count_digits_parity(num)
+        except ValueError:
+            print("      ❌ Invalid integer.")
+    else:
+        print("      No option selected.")
+
+
+def show_parity_summary():
+    """Print a beautiful parity summary box."""
+    width = 44
+    print()
+    print("   ╔" + "═" * (width - 2) + "╗")
+    print("   ║" + "  🔵 EVEN ODD PARITY MASTERED! 🔴  ".center(width - 2) + "║")
+    print("   ║" + " " * (width - 2) + "║")
+    print("   ║" + "  Concepts: Parity detection, subset   ".ljust(width - 2) + "║")
+    print("   ║" + "            statistics, digit parity,  ".ljust(width - 2) + "║")
+    print("   ║" + "            proportional bar charts.   ".ljust(width - 2) + "║")
+    print("   ╚" + "═" * (width - 2) + "╝")
+
+
 def main():
     """Entry point for the program."""
     print("=" * 50)
@@ -108,10 +152,16 @@ def main():
 
     print(">>> Visual Parity Distribution <<<")
     visualize_parity_distribution([1, 1, 3, 5, 7, 9, 2, 4, 6])
+    print()
+
+    print(">>> Interactive Parity Explorer <<<")
+    interactive_parity_explorer()
+    show_parity_summary()
 
 
 if __name__ == "__main__":
     main()
+
 
 
 
