@@ -34,6 +34,31 @@ def inverted_right_triangle(size=5, symbol="*"):
         print("      " + " ".join(symbol for _ in range(i)))
 
 
+# ---------- Symmetric Shapes ----------
+def symbol_pyramid(height=5, symbol="*"):
+    """Print a centered pyramid pattern using the given symbol."""
+    print(f"\n   🔺 Symbol Pyramid (height={height}, symbol='{symbol}'):")
+    for i in range(1, height + 1):
+        spaces = " " * (height - i)
+        row = " ".join(symbol for _ in range(2 * i - 1))
+        print(f"      {spaces}{row}")
+
+
+def symbol_diamond(height=5, symbol="*"):
+    """Print a diamond pattern using the given symbol."""
+    print(f"\n   💎 Symbol Diamond (height={height}, symbol='{symbol}'):")
+    # Upper half
+    for i in range(1, height + 1):
+        spaces = " " * (height - i)
+        row = " ".join(symbol for _ in range(2 * i - 1))
+        print(f"      {spaces}{row}")
+    # Lower half
+    for i in range(height - 1, 0, -1):
+        spaces = " " * (height - i)
+        row = " ".join(symbol for _ in range(2 * i - 1))
+        print(f"      {spaces}{row}")
+
+
 def main():
     """Entry point for the program."""
     print("=" * 50)
@@ -45,8 +70,14 @@ def main():
     solid_square(5, "*")
     right_triangle(5, "#")
     inverted_right_triangle(5, "@")
+    print()
+
+    print(">>> Symmetric Shapes <<<")
+    symbol_pyramid(5, "*")
+    symbol_diamond(4, "+")
 
 
 if __name__ == "__main__":
     main()
+
 
