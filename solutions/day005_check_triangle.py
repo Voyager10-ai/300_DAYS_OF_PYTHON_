@@ -163,6 +163,10 @@ def main():
 
     print(">>> Interactive Triangle <<<")
     interactive_triangle()
+    print()
+
+    print(">>> Triangle Art <<<")
+    triangle_ascii_art()
 
 
 # ---------- Triangle Properties ----------
@@ -267,6 +271,49 @@ def interactive_triangle():
         check_special_triangles(a, b, c)
     else:
         validate_and_report(a, b, c)
+
+
+# ---------- Creative: ASCII Triangle Art ----------
+def triangle_ascii_art():
+    """Display various ASCII art triangles."""
+    # Right triangle
+    height = 6
+    print("\n   🎨 Right Triangle:")
+    for i in range(1, height + 1):
+        print("      " + "* " * i)
+
+    # Equilateral (centered)
+    print("\n   🎨 Equilateral Triangle:")
+    for i in range(1, height + 1):
+        spaces = " " * (height - i)
+        stars = "* " * (2 * i - 1)
+        print(f"      {spaces}{stars}")
+
+    # Inverted triangle
+    print("\n   🎨 Inverted Triangle:")
+    for i in range(height, 0, -1):
+        spaces = " " * (height - i)
+        stars = "▼ " * (2 * i - 1)
+        print(f"      {spaces}{stars}")
+
+    # Diamond (two triangles)
+    print("\n   🎨 Diamond (Two Triangles):")
+    n = 5
+    for i in range(1, n + 1):
+        print("      " + " " * (n - i) + "◆ " * (2 * i - 1))
+    for i in range(n - 1, 0, -1):
+        print("      " + " " * (n - i) + "◆ " * (2 * i - 1))
+
+    # Summary box
+    width = 42
+    print()
+    print("   ╔" + "═" * (width - 2) + "╗")
+    print("   ║" + "  📐 TRIANGLE MASTERED! 📐  ".center(width - 2) + "║")
+    print("   ║" + " " * (width - 2) + "║")
+    print("   ║" + "  Types: Equilateral, Isosceles,".ljust(width - 2) + "║")
+    print("   ║" + "         Scalene, Right, Acute,".ljust(width - 2) + "║")
+    print("   ║" + "         Obtuse, Pythagorean".ljust(width - 2) + "║")
+    print("   ╚" + "═" * (width - 2) + "╝")
 
 
 if __name__ == "__main__":
