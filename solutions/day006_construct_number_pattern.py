@@ -110,6 +110,11 @@ def main():
     number_pyramid()
     number_diamond()
     number_sandglass()
+    print()
+
+    print(">>> Special Patterns <<<")
+    zigzag_pattern()
+    butterfly_pattern()
 
 
 # ---------- Pyramid & Diamond Patterns ----------
@@ -156,6 +161,37 @@ def number_sandglass(n=5):
         spaces = "  " * (n - i)
         row = " ".join(str(j) for j in range(1, i + 1))
         print(f"      {spaces}{row}")
+
+
+
+# ---------- Special Patterns ----------
+def zigzag_pattern(n=5):
+    """Alternating direction number pattern."""
+    print(f"\n   📐 Zigzag Pattern (n={n}):")
+    for i in range(1, n + 1):
+        if i % 2 == 1:
+            row = " ".join(str(j) for j in range(1, i + 1))
+        else:
+            row = " ".join(str(j) for j in range(i, 0, -1))
+        direction = "→" if i % 2 == 1 else "←"
+        print(f"      {direction} {row}")
+
+
+def butterfly_pattern(n=4):
+    """Butterfly pattern using numbers."""
+    print(f"\n   🦋 Butterfly Pattern (n={n}):")
+    # Upper half
+    for i in range(1, n + 1):
+        left = "".join(str(j) for j in range(1, i + 1))
+        spaces = " " * (2 * (n - i))
+        right = "".join(str(j) for j in range(i, 0, -1))
+        print(f"      {left}{spaces}{right}")
+    # Lower half
+    for i in range(n, 0, -1):
+        left = "".join(str(j) for j in range(1, i + 1))
+        spaces = " " * (2 * (n - i))
+        right = "".join(str(j) for j in range(i, 0, -1))
+        print(f"      {left}{spaces}{right}")
 
 
 if __name__ == "__main__":
