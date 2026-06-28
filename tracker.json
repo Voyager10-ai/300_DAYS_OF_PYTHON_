@@ -1,6 +1,6 @@
 {
   "total_problems": 282,
-  "current_day": 8,
+  "current_day": 9,
   "problems": [
     {"day": 1, "title": "Print String", "status": "done"},
     {"day": 2, "title": "Input Age", "status": "done"},
@@ -10,7 +10,7 @@
     {"day": 6, "title": "Construct Number Pattern", "status": "done"},
     {"day": 7, "title": "Construct Pattern", "status": "done"},
     {"day": 8, "title": "Count Digit Letter", "status": "done"},
-    {"day": 9, "title": "Count Even Odd", "status": "pending"},
+    {"day": 9, "title": "Count Even Odd", "status": "done"},
     {"day": 10, "title": "Fibonacci Generator", "status": "pending"},
     {"day": 11, "title": "Find Number", "status": "pending"},
     {"day": 12, "title": "Guess Game", "status": "pending"},
