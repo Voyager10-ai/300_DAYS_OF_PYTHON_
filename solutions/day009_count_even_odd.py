@@ -46,6 +46,21 @@ def count_digits_parity(number):
     return evens, odds
 
 
+# ---------- Statistical Subset Analysis ----------
+def parity_subsets_stats(numbers):
+    """Analyze even and odd subsets of numbers (sums, averages, min, max)."""
+    evens_list = [n for n in numbers if n % 2 == 0]
+    odds_list = [n for n in numbers if n % 2 != 0]
+
+    e_count, e_sum = len(evens_list), sum(evens_list)
+    o_count, o_sum = len(odds_list), sum(odds_list)
+
+    print(f"\n   📈 Subset Statistics for: {numbers}")
+    print(f"      🔵 Evens Count: {e_count} | Sum: {e_sum} | Avg: {e_sum/e_count if e_count > 0 else 0:.2f} | Min/Max: {min(evens_list) if e_count > 0 else 0}/{max(evens_list) if e_count > 0 else 0}")
+    print(f"      🔴 Odds Count:  {o_count} | Sum: {o_sum} | Avg: {o_sum/o_count if o_count > 0 else 0:.2f} | Min/Max: {min(odds_list) if o_count > 0 else 0}/{max(odds_list) if o_count > 0 else 0}")
+    return evens_list, odds_list
+
+
 def main():
     """Entry point for the program."""
     print("=" * 50)
@@ -61,9 +76,14 @@ def main():
     print(">>> Digit Parity Demo <<<")
     count_digits_parity(45678)
     count_digits_parity(1357902468)
+    print()
+
+    print(">>> Subset Statistics Demo <<<")
+    parity_subsets_stats([12, 15, 22, 91, 104, 3, 7, 8])
 
 
 if __name__ == "__main__":
     main()
+
 
 
