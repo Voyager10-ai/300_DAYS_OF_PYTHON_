@@ -93,6 +93,37 @@ def hollow_triangle(height=5, symbol="*"):
             print(f"      {outer_spaces}{symbol}{inner_sp}{symbol}")
 
 
+# ---------- Complex Patterns ----------
+def butterfly_symbol(size=4, symbol="*"):
+    """Print a butterfly symbol pattern."""
+    print(f"\n   🦋 Butterfly Symbol Pattern (size={size}, symbol='{symbol}'):")
+    # Upper half
+    for i in range(1, size + 1):
+        left = " ".join(symbol for _ in range(i))
+        spaces = "   " * (size - i)  # wider spacing for butterfly effect
+        right = " ".join(symbol for _ in range(i))
+        print(f"      {left}{spaces} {right}")
+    # Lower half
+    for i in range(size, 0, -1):
+        left = " ".join(symbol for _ in range(i))
+        spaces = "   " * (size - i)
+        right = " ".join(symbol for _ in range(i))
+        print(f"      {left}{spaces} {right}")
+
+
+def checkerboard_pattern(size=8, sym1="█", sym2="░"):
+    """Print a checkerboard grid pattern."""
+    print(f"\n   🏁 Checkerboard Pattern ({size}x{size}):")
+    for i in range(size):
+        row = []
+        for j in range(size):
+            if (i + j) % 2 == 0:
+                row.append(sym1)
+            else:
+                row.append(sym2)
+        print("      " + " ".join(row))
+
+
 def main():
     """Entry point for the program."""
     print("=" * 50)
@@ -114,10 +145,16 @@ def main():
     print(">>> Hollow Patterns <<<")
     hollow_square(5, "*")
     hollow_triangle(5, "o")
+    print()
+
+    print(">>> Complex Patterns <<<")
+    butterfly_symbol(4, "*")
+    checkerboard_pattern(8, "█", "░")
 
 
 if __name__ == "__main__":
     main()
+
 
 
 
