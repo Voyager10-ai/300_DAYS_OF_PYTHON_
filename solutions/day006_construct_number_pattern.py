@@ -104,6 +104,58 @@ def main():
     print(">>> Famous Triangles <<<")
     floyds_triangle()
     pascals_triangle()
+    print()
+
+    print(">>> Pyramid & Diamond <<<")
+    number_pyramid()
+    number_diamond()
+    number_sandglass()
+
+
+# ---------- Pyramid & Diamond Patterns ----------
+def number_pyramid(n=5):
+    """Centered number pyramid: 1 / 1 2 1 / 1 2 3 2 1 / ..."""
+    print(f"\n   📐 Number Pyramid (n={n}):")
+    for i in range(1, n + 1):
+        spaces = "  " * (n - i)
+        left = [str(j) for j in range(1, i + 1)]
+        right = [str(j) for j in range(i - 1, 0, -1)]
+        row = " ".join(left + right)
+        print(f"      {spaces}{row}")
+
+
+def number_diamond(n=5):
+    """Number diamond: pyramid + inverted pyramid."""
+    print(f"\n   💎 Number Diamond (n={n}):")
+    # Upper half
+    for i in range(1, n + 1):
+        spaces = "  " * (n - i)
+        nums = " ".join(str(j) for j in range(1, i + 1))
+        mirror = " ".join(str(j) for j in range(i - 1, 0, -1))
+        row = nums + (" " + mirror if mirror else "")
+        print(f"      {spaces}{row}")
+    # Lower half
+    for i in range(n - 1, 0, -1):
+        spaces = "  " * (n - i)
+        nums = " ".join(str(j) for j in range(1, i + 1))
+        mirror = " ".join(str(j) for j in range(i - 1, 0, -1))
+        row = nums + (" " + mirror if mirror else "")
+        print(f"      {spaces}{row}")
+
+
+def number_sandglass(n=5):
+    """Inverted pyramid + pyramid (sandglass/hourglass)."""
+    print(f"\n   ⏳ Number Sandglass (n={n}):")
+    # Upper half (inverted)
+    for i in range(n, 0, -1):
+        spaces = "  " * (n - i)
+        row = " ".join(str(j) for j in range(1, i + 1))
+        print(f"      {spaces}{row}")
+    # Lower half
+    for i in range(2, n + 1):
+        spaces = "  " * (n - i)
+        row = " ".join(str(j) for j in range(1, i + 1))
+        print(f"      {spaces}{row}")
 
 
 if __name__ == "__main__":
