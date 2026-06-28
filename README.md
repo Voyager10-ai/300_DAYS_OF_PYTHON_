@@ -7,3 +7,4 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 2: Input Age
 - Day 3: Calculate with Input
 - Day 4: 2 Dimensional Array
+- Day 5: Check Triangle
