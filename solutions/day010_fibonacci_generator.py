@@ -48,6 +48,22 @@ def fibonacci_recursive(n):
     return fibonacci_recursive(n - 1) + fibonacci_recursive(n - 2)
 
 
+# ---------- Fibonacci Number Validation ----------
+def is_fibonacci_number(n):
+    """Check if a number is a valid Fibonacci number using the perfect square formula."""
+    import math
+    if n < 0:
+        return False
+    # A number is Fibonacci if and only if one of (5*n^2 + 4) or (5*n^2 - 4) is a perfect square
+    val1 = 5 * n * n + 4
+    val2 = 5 * n * n - 4
+    
+    root1 = math.isqrt(val1)
+    root2 = math.isqrt(val2)
+    
+    return (root1 * root1 == val1) or (root2 * root2 == val2)
+
+
 def main():
     """Entry point for the program."""
     print("=" * 50)
@@ -67,6 +83,12 @@ def main():
     rec_terms = [fibonacci_recursive(i) for i in range(n)]
     print(f"   First {n} terms recursively: {rec_terms}")
     print(f"   50th Fibonacci number: {fibonacci_recursive(50)}")
+
+    print("\n>>> Fibonacci Number Validation <<<")
+    test_nums = [0, 1, 4, 5, 9, 13, 20, 21, 34, 100]
+    for num in test_nums:
+        status = "✅ YES" if is_fibonacci_number(num) else "❌ NO"
+        print(f"   Is {num:<3} a Fibonacci number? {status}")
 
 
 if __name__ == "__main__":
