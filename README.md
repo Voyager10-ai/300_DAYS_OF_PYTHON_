@@ -12,6 +12,8 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 7: Construct Pattern
 - Day 8: Count Digit Letter
 - Day 9: Count Even Odd
+- Day 10: Fibonacci Generator
+
 
 
 
