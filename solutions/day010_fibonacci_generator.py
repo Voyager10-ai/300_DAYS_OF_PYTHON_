@@ -85,6 +85,55 @@ def golden_ratio_convergence(n=15):
         print(f"      {i:<8} {curr:<8} {ratio:<18.10f} {diff:<12.10f}")
 
 
+# ---------- Visualizer & Interactive Explorer ----------
+def draw_fibonacci_spiral_blocks(n=8):
+    """Visualize Fibonacci growth using horizontal block bars."""
+    seq = fibonacci_iterative(n)
+    print("\n   🎨 Fibonacci Visual Growth:")
+    for i, val in enumerate(seq):
+        bar = "█" * val
+        print(f"      F({i:<2}) = {val:<3} | {bar}")
+
+
+def interactive_explorer():
+    """Prompt the user for inputs to run the various generator features."""
+    print("\n   🌀 Interactive Fibonacci Explorer:")
+    print("      1. Generate first N terms")
+    print("      2. Check if a number is Fibonacci")
+    choice = input("      Select option (1-2): ").strip()
+    
+    if choice == "1":
+        val = input("      Enter N terms to generate: ").strip()
+        if val.isdigit():
+            num = int(val)
+            print(f"      Terms: {fibonacci_iterative(num)}")
+            if num <= 10:
+                draw_fibonacci_spiral_blocks(num)
+        else:
+            print("      ❌ Invalid input.")
+    elif choice == "2":
+        val = input("      Enter a non-negative integer to check: ").strip()
+        if val.isdigit():
+            num = int(val)
+            res = "is a Fibonacci number! 🎉" if is_fibonacci_number(num) else "is NOT a Fibonacci number."
+            print(f"      Number {num} {res}")
+        else:
+            print("      ❌ Invalid input.")
+
+
+def show_mastery_box():
+    """Print an artistic summary box."""
+    width = 44
+    print()
+    print("   ╔" + "═" * (width - 2) + "╗")
+    print("   ║" + "  🌀 FIBONACCI GENERATOR COMPLETE! 🌀  ".center(width - 2) + "║")
+    print("   ║" + " " * (width - 2) + "║")
+    print("   ║" + "  Features: Iterative, Caching Recurse,".ljust(width - 2) + "║")
+    print("   ║" + "            Generators, Golden Ratio,  ".ljust(width - 2) + "║")
+    print("   ║" + "            Perfect Square Check, Art  ".ljust(width - 2) + "║")
+    print("   ╚" + "═" * (width - 2) + "╝")
+
+
 def main():
     """Entry point for the program."""
     print("=" * 50)
@@ -113,6 +162,13 @@ def main():
 
     print("\n>>> Golden Ratio Convergence <<<")
     golden_ratio_convergence(12)
+
+    print("\n>>> Fibonacci Growth Visualization <<<")
+    draw_fibonacci_spiral_blocks(8)
+
+    print("\n>>> Interactive Explorer <<<")
+    interactive_explorer()
+    show_mastery_box()
 
 
 if __name__ == "__main__":
