@@ -11,6 +11,8 @@
 # This exercise covers generators, recursion, caching, mathematical ratios,
 # and sequence validation.
 
+from functools import lru_cache
+
 # ---------- Generation (Iterative & Generator) ----------
 def fibonacci_iterative(n):
     """Generate the first N Fibonacci numbers iteratively."""
@@ -33,6 +35,19 @@ def fibonacci_generator(n):
         a, b = b, a + b
 
 
+# ---------- Recursive with Memoization ----------
+@lru_cache(maxsize=None)
+def fibonacci_recursive(n):
+    """Calculate the N-th Fibonacci number recursively with caching."""
+    if n < 0:
+        raise ValueError("Fibonacci is not defined for negative integers.")
+    elif n == 0:
+        return 0
+    elif n == 1:
+        return 1
+    return fibonacci_recursive(n - 1) + fibonacci_recursive(n - 2)
+
+
 def main():
     """Entry point for the program."""
     print("=" * 50)
@@ -47,6 +62,11 @@ def main():
     print("\n>>> Generator-based (yield) <<<")
     gen = fibonacci_generator(n)
     print(f"   First {n} terms from generator: {list(gen)}")
+
+    print("\n>>> Recursive with Caching <<<")
+    rec_terms = [fibonacci_recursive(i) for i in range(n)]
+    print(f"   First {n} terms recursively: {rec_terms}")
+    print(f"   50th Fibonacci number: {fibonacci_recursive(50)}")
 
 
 if __name__ == "__main__":
