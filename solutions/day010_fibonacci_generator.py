@@ -64,6 +64,27 @@ def is_fibonacci_number(n):
     return (root1 * root1 == val1) or (root2 * root2 == val2)
 
 
+# ---------- Mathematical Properties (Golden Ratio) ----------
+def golden_ratio_convergence(n=15):
+    """Demonstrate how the ratio of consecutive Fibonacci numbers converges to the Golden Ratio."""
+    seq = fibonacci_iterative(n + 1)
+    import math
+    golden_ratio = (1 + math.sqrt(5)) / 2
+    
+    print(f"\n   ✨ Golden Ratio approximation (Actual: {golden_ratio:.10f}):")
+    print(f"      {'Term N':<8} {'Fib(N)':<8} {'Ratio (N/N-1)':<18} {'Difference':<12}")
+    print(f"      {'-' * 50}")
+    
+    for i in range(2, len(seq)):
+        prev = seq[i - 1]
+        curr = seq[i]
+        if prev == 0:
+            continue
+        ratio = curr / prev
+        diff = abs(ratio - golden_ratio)
+        print(f"      {i:<8} {curr:<8} {ratio:<18.10f} {diff:<12.10f}")
+
+
 def main():
     """Entry point for the program."""
     print("=" * 50)
@@ -89,6 +110,9 @@ def main():
     for num in test_nums:
         status = "✅ YES" if is_fibonacci_number(num) else "❌ NO"
         print(f"   Is {num:<3} a Fibonacci number? {status}")
+
+    print("\n>>> Golden Ratio Convergence <<<")
+    golden_ratio_convergence(12)
 
 
 if __name__ == "__main__":
