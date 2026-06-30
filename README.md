@@ -13,6 +13,8 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 8: Count Digit Letter
 - Day 9: Count Even Odd
 - Day 10: Fibonacci Generator
+- Day 11: Find Number
+
 
 
 
