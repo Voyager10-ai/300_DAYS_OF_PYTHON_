@@ -214,5 +214,96 @@ def main():
     interactive_search_explorer()
 
 
+# ---------- Visualizer & Summary ----------
+def binary_search_visualizer(arr, target):
+    """Perform binary search and print step-by-step progress with ASCII pointers."""
+    print(f"\n   🎨 Binary Search Visualizer for target {target}:")
+    left, right = 0, len(arr) - 1
+    step = 1
+    while left <= right:
+        mid = (left + right) // 2
+        row_str = []
+        for idx, val in enumerate(arr):
+            label = ""
+            if idx == left:
+                label += "L"
+            if idx == right:
+                label += "R"
+            if idx == mid:
+                label += "M"
+            
+            if label:
+                row_str.append(f"[{val}]({label})")
+            else:
+                row_str.append(f" {val} ")
+        print(f"      Step {step:<2} (L={left}, R={right}, M={mid}): {' '.join(row_str)}")
+        
+        if arr[mid] == target:
+            print(f"      🎉 Found {target} at index {mid}!")
+            return mid
+        elif arr[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+        step += 1
+    print(f"      ❌ Target {target} not found.")
+    return -1
+
+
+def show_mastery_box():
+    """Print an artistic summary box."""
+    width = 44
+    print()
+    print("   ╔" + "═" * (width - 2) + "╗")
+    print("   ║" + "  🔍 FIND NUMBER & SEARCH COMPLETE! 🔍  ".center(width - 2) + "║")
+    print("   ║" + " " * (width - 2) + "║")
+    print("   ║" + "  Algorithms: Linear, Binary Search,  ".ljust(width - 2) + "║")
+    print("   ║" + "              Step-by-Step Pointers,  ".ljust(width - 2) + "║")
+    print("   ║" + "  Math Ranges: Divisible 7 & Mult 5,  ".ljust(width - 2) + "║")
+    print("   ║" + "               Armstrong, Perfect     ".ljust(width - 2) + "║")
+    print("   ╚" + "═" * (width - 2) + "╝")
+
+
+def main():
+    """Entry point for the program."""
+    print("=" * 50)
+    print("  DAY 11: FIND NUMBER")
+    print("=" * 50)
+    print()
+
+    print(">>> Range-Based Finding Demo <<<")
+    find_divisible_multiples(1500, 2700, 7, 5)
+    print()
+
+    print(">>> Search Algorithms Demo <<<")
+    numbers = [24, 8, 42, 16, 90, 5, 73, 11]
+    sorted_numbers = sorted(numbers)
+    target = 16
+    
+    print(f"   Original List: {numbers}")
+    print(f"   Sorted List:   {sorted_numbers}")
+    print(f"   Target to find: {target}")
+    
+    l_idx = linear_search(numbers, target)
+    b_idx = binary_search(sorted_numbers, target)
+    
+    print(f"      Linear Search index in original: {l_idx}")
+    print(f"      Binary Search index in sorted:   {b_idx}")
+    print()
+
+    print(">>> Special Number Finding <<<")
+    find_special_numbers(1, 1000)
+    print()
+
+    print(">>> Search Progress Visualizer <<<")
+    binary_search_visualizer(sorted_numbers, 16)
+    binary_search_visualizer(sorted_numbers, 99)
+    print()
+
+    print(">>> Interactive Explorer <<<")
+    interactive_search_explorer()
+    show_mastery_box()
+
+
 if __name__ == "__main__":
     main()
