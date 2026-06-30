@@ -135,5 +135,84 @@ def main():
     find_special_numbers(1, 1000)
 
 
+# ---------- Interactive Search Explorer ----------
+def interactive_search_explorer():
+    """Allows interactive search and finding features."""
+    print("\n   🔍 Interactive Search Explorer:")
+    print("      1. Search target number in a list (Linear & Binary)")
+    print("      2. Find divisible & multiples in range")
+    print("      3. Find special numbers (Armstrong & Perfect)")
+    choice = input("      Select option (1-3): ").strip()
+    
+    if choice == "1":
+        list_str = input("      Enter numbers separated by spaces: ").strip()
+        target_str = input("      Enter target number to find: ").strip()
+        try:
+            arr = [int(x) for x in list_str.split()]
+            target = int(target_str)
+            sorted_arr = sorted(arr)
+            
+            l_idx = linear_search(arr, target)
+            b_idx = binary_search(sorted_arr, target)
+            
+            print(f"      Linear Search index: {l_idx}")
+            print(f"      Binary Search index (on sorted {sorted_arr}): {b_idx}")
+        except ValueError:
+            print("      ❌ Invalid inputs.")
+            
+    elif choice == "2":
+        try:
+            start = int(input("      Enter start of range: ").strip())
+            end = int(input("      Enter end of range: ").strip())
+            div = int(input("      Enter divisibility factor: ").strip())
+            mult = int(input("      Enter multiple factor: ").strip())
+            find_divisible_multiples(start, end, div, mult)
+        except ValueError:
+            print("      ❌ Invalid inputs.")
+            
+    elif choice == "3":
+        try:
+            start = int(input("      Enter start of range: ").strip())
+            end = int(input("      Enter end of range: ").strip())
+            find_special_numbers(start, end)
+        except ValueError:
+            print("      ❌ Invalid inputs.")
+
+
+def main():
+    """Entry point for the program."""
+    print("=" * 50)
+    print("  DAY 11: FIND NUMBER")
+    print("=" * 50)
+    print()
+
+    print(">>> Range-Based Finding Demo <<<")
+    find_divisible_multiples(1500, 2700, 7, 5)
+    print()
+
+    print(">>> Search Algorithms Demo <<<")
+    numbers = [24, 8, 42, 16, 90, 5, 73, 11]
+    sorted_numbers = sorted(numbers)
+    target = 16
+    
+    print(f"   Original List: {numbers}")
+    print(f"   Sorted List:   {sorted_numbers}")
+    print(f"   Target to find: {target}")
+    
+    l_idx = linear_search(numbers, target)
+    b_idx = binary_search(sorted_numbers, target)
+    
+    print(f"      Linear Search index in original: {l_idx}")
+    print(f"      Binary Search index in sorted:   {b_idx}")
+    print()
+
+    print(">>> Special Number Finding <<<")
+    find_special_numbers(1, 1000)
+    print()
+
+    print(">>> Interactive Explorer <<<")
+    interactive_search_explorer()
+
+
 if __name__ == "__main__":
     main()
