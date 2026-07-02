@@ -186,6 +186,27 @@ def play_multiplayer_game():
 
 
 
+# ---------- Creative Visualizer & Dashboard ----------
+def draw_attempts_bar(attempts, max_attempts):
+    """Draw a graphical ASCII indicator of remaining attempts."""
+    left = max_attempts - attempts
+    bar = "█" * left + "░" * attempts
+    return f"[{bar}] ({left}/{max_attempts} left)"
+
+
+def show_mastery_box():
+    """Print an artistic summary box."""
+    width = 44
+    print()
+    print("   ╔" + "═" * (width - 2) + "╗")
+    print("   ║" + "  🎮 NUMBER GUESS GAME COMPLETE! 🎮  ".center(width - 2) + "║")
+    print("   ║" + " " * (width - 2) + "║")
+    print("   ║" + "  Modes: Single Player (Easy/Med/Hard),".ljust(width - 2) + "║")
+    print("   ║" + "         Multiplayer mode,            ".ljust(width - 2) + "║")
+    print("   ║" + "         Proximity Temperature feedback".ljust(width - 2) + "║")
+    print("   ╚" + "═" * (width - 2) + "╝")
+
+
 def main():
     """Entry point for the program."""
     print("=" * 50)
@@ -193,9 +214,26 @@ def main():
     print("=" * 50)
     print()
 
-    print(">>> Basic Guess Game Demo <<<")
-    # For testing, we can run the difficulty mode.
-    play_difficulty_game()
+    print("   🎲 Welcome to the Number Guess Game! 🎲")
+    print("      1. Play Basic Mode (1-100, Unlimited)")
+    print("      2. Play Difficulty Mode (Easy/Medium/Hard)")
+    print("      3. Play Proximity Mode (Hot/Cold feedback)")
+    print("      4. Play Multiplayer Mode")
+    print("      5. Exit")
+    
+    choice = input("\n      Select game mode (1-5): ").strip()
+    if choice == "1":
+        play_basic_game()
+    elif choice == "2":
+        play_difficulty_game()
+    elif choice == "3":
+        play_advanced_game()
+    elif choice == "4":
+        play_multiplayer_game()
+    else:
+        print("      Goodbye!")
+        
+    show_mastery_box()
 
 
 if __name__ == "__main__":
