@@ -92,6 +92,58 @@ def play_difficulty_game():
     return False
 
 
+# ---------- Temperature Hints & Proximity ----------
+def get_temperature_hint(guess, target):
+    """Return a descriptive hot/cold indicator based on closeness to target."""
+    diff = abs(guess - target)
+    if diff == 0:
+        return "🎉 Correct!"
+    elif diff <= 3:
+        return "🥵 Burning Hot!"
+    elif diff <= 7:
+        return "☀️ Warm!"
+    elif diff <= 15:
+        return "❄️ Cool!"
+    else:
+        return "🧊 Ice Cold!"
+
+
+def play_advanced_game():
+    """Play a guessing game with higher/lower hints and Hot/Cold proximity feedback."""
+    target = random.randint(1, 100)
+    attempts = 0
+    max_attempts = 8
+    print(f"\n   🎮 Playing Proximity Guess Game (Range: 1-100, Max attempts: {max_attempts})")
+    
+    while attempts < max_attempts:
+        try:
+            remaining = max_attempts - attempts
+            guess_str = input(f"      [{remaining} left] Enter guess: ").strip()
+            if not guess_str:
+                continue
+            guess = int(guess_str)
+            
+            if not (1 <= guess <= 100):
+                print("      ⚠️  Please enter a number between 1 and 100.")
+                continue
+                
+            attempts += 1
+            hint = get_temperature_hint(guess, target)
+            
+            if guess == target:
+                print(f"      🎉 Correct! You won in {attempts} attempts. Closeness: {hint}")
+                return True
+                
+            direction = "Higher 🔺" if guess < target else "Lower 🔻"
+            print(f"      Feedback: {direction} | Closeness: {hint}")
+        except ValueError:
+            print("      ❌ Please enter a valid integer.")
+            
+    print(f"      💀 Game Over! The correct number was {target}.")
+    return False
+
+
+
 def main():
     """Entry point for the program."""
     print("=" * 50)
