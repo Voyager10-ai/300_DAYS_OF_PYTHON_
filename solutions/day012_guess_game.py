@@ -143,6 +143,48 @@ def play_advanced_game():
     return False
 
 
+# ---------- Local Multiplayer Mode ----------
+def play_multiplayer_game():
+    """Two-player mode: Player 1 inputs secret, Player 2 guesses."""
+    print("\n   👥 Local Multiplayer Mode")
+    
+    while True:
+        try:
+            secret_str = input("      Player 1: Enter secret number to guess (1-100): ").strip()
+            if not secret_str:
+                continue
+            secret = int(secret_str)
+            if 1 <= secret <= 100:
+                break
+            print("      ⚠️  Number must be between 1 and 100.")
+        except ValueError:
+            print("      ❌ Please enter a valid integer.")
+            
+    # Print 50 blank lines to hide Player 1's secret
+    print("\n" * 50)
+    print("      Player 2: Start guessing!")
+    
+    attempts = 0
+    while True:
+        try:
+            guess_str = input("      Enter your guess: ").strip()
+            if not guess_str:
+                continue
+            guess = int(guess_str)
+            attempts += 1
+            
+            if guess < secret:
+                print("      🔺 Too low!")
+            elif guess > secret:
+                print("      🔻 Too high!")
+            else:
+                print(f"      🎉 Player 2 won! The secret number was {secret}. Solved in {attempts} attempts.")
+                break
+        except ValueError:
+            print("      ❌ Please enter a valid integer.")
+
+
+
 
 def main():
     """Entry point for the program."""
