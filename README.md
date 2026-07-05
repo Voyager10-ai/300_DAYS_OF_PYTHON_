@@ -16,6 +16,7 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 11: Find Number
 - Day 12: Guess Game
 - Day 13: Password Validation
+- Day 14: Triangle Types
 
 
 
