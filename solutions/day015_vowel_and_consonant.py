@@ -106,3 +106,59 @@ def transform_text(text, op_type, replace_char="*"):
     elif op_type == "replace_consonants":
         return "".join(replace_char if c in CONSONANTS else c for c in text)
     return text
+
+
+# ---------- ASCII Visualizations ----------
+def draw_bar_chart(label, count, total, bar_length=20):
+    """Draw a text-based progress/bar chart."""
+    if total == 0:
+        pct = 0.0
+        filled = 0
+    else:
+        pct = (count / total) * 100
+        filled = int((count / total) * bar_length)
+    bar = "█" * filled + "░" * (bar_length - filled)
+    return f"{label:<12} {bar} {count:>4} ({pct:.1f}%)"
+
+
+def print_analysis_report(text, stats):
+    """Print a detailed, beautiful analysis report."""
+    print("\n   📊 Text Analysis Results:")
+    print("      " + "-" * 45)
+    
+    # Calculate denominator for vowel/consonant ratio (letters only)
+    letters_total = stats["vowel_count"] + stats["consonant_count"]
+    
+    print(f"      - Total Characters Analyzed: {stats['total_chars']}")
+    print(f"      - Total Letters Found:     {letters_total}")
+    print()
+    print("      --- Distribution Summary ---")
+    print("      " + draw_bar_chart("Vowels", stats["vowel_count"], stats["total_chars"]))
+    print("      " + draw_bar_chart("Consonants", stats["consonant_count"], stats["total_chars"]))
+    print("      " + draw_bar_chart("Digits", stats["digit_count"], stats["total_chars"]))
+    print("      " + draw_bar_chart("Whitespaces", stats["space_count"], stats["total_chars"]))
+    print("      " + draw_bar_chart("Special/Punct", stats["special_count"], stats["total_chars"]))
+    print()
+    
+    if letters_total > 0:
+        print("      --- Vowel vs. Consonant Ratio (of Letters) ---")
+        print("      " + draw_bar_chart("Vowels", stats["vowel_count"], letters_total))
+        print("      " + draw_bar_chart("Consonants", stats["consonant_count"], letters_total))
+        print()
+        
+    print("      --- Vowel Frequencies ---")
+    if stats["vowel_freq"]:
+        sorted_vowels = sorted(stats["vowel_freq"].items(), key=lambda x: x[1], reverse=True)
+        vowel_strs = [f"{v.upper()}:{count}" for v, count in sorted_vowels]
+        print(f"         {', '.join(vowel_strs)}")
+    else:
+        print("         No vowels found.")
+        
+    print("\n      --- Top Consonant Frequencies ---")
+    if stats["consonant_freq"]:
+        sorted_cons = sorted(stats["consonant_freq"].items(), key=lambda x: x[1], reverse=True)[:8]
+        cons_strs = [f"{c.upper()}:{count}" for c, count in sorted_cons]
+        print(f"         {', '.join(cons_strs)}")
+    else:
+        print("         No consonants found.")
+    print("      " + "-" * 45)
