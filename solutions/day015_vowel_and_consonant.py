@@ -53,3 +53,56 @@ def analyze_text(text):
             stats["special_count"] += 1
             
     return stats
+
+
+# ---------- Text Transformation ----------
+def highlight_characters(text, highlight_mode):
+    """
+    Highlight characters based on mode.
+    Modes:
+      - 'vowels': Wraps vowels in square brackets like [a]
+      - 'consonants': Wraps consonants in square brackets like [b]
+      - 'color': Wraps vowels in cyan color and consonants in yellow color (ANSI codes)
+    """
+    result = []
+    
+    # ANSI escape sequences for coloring
+    CYAN = "\033[96m"
+    YELLOW = "\033[93m"
+    RESET = "\033[0m"
+    
+    for char in text:
+        if highlight_mode == "vowels":
+            if char in VOWELS:
+                result.append(f"[{char}]")
+            else:
+                result.append(char)
+        elif highlight_mode == "consonants":
+            if char in CONSONANTS:
+                result.append(f"[{char}]")
+            else:
+                result.append(char)
+        elif highlight_mode == "color":
+            if char in VOWELS:
+                result.append(f"{CYAN}{char}{RESET}")
+            elif char in CONSONANTS:
+                result.append(f"{YELLOW}{char}{RESET}")
+            else:
+                result.append(char)
+        else:
+            result.append(char)
+            
+    return "".join(result)
+
+
+def transform_text(text, op_type, replace_char="*"):
+    """Transform text based on operation type."""
+    if op_type == "strip_vowels":
+        return "".join(c for c in text if c not in VOWELS)
+    elif op_type == "strip_consonants":
+        return "".join(c for c in text if c not in CONSONANTS)
+    elif op_type == "replace_vowels":
+        return "".join(replace_char if c in VOWELS else c for c in text)
+    elif op_type == "replace_consonants":
+        return "".join(replace_char if c in CONSONANTS else c for c in text)
+    return text
