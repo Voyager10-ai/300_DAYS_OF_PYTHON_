@@ -162,3 +162,77 @@ def print_analysis_report(text, stats):
     else:
         print("         No consonants found.")
     print("      " + "-" * 45)
+
+
+# ---------- Interactive Features ----------
+def analyze_interactive_text():
+    """Prompt user for text input and perform analysis and highlighting."""
+    print("\n   === Input Text to Analyze ===")
+    text = input("      Enter your text below:\n      > ").strip()
+    if not text:
+        print("      ⚠️  Text cannot be empty.")
+        return
+        
+    stats = analyze_text(text)
+    print_analysis_report(text, stats)
+    
+    # Prompt for highlighting options
+    print("\n   Highlighting Options:")
+    print("      1. Highlight Vowels in [ ] brackets")
+    print("      2. Highlight Consonants in [ ] brackets")
+    print("      3. Highlight using Colors (Cyan: Vowels, Yellow: Consonants)")
+    print("      4. Skip Highlighting")
+    choice = input("\n      Select option (1-4): ").strip()
+    
+    if choice == "1":
+        print(f"\n   📝 Highlighted Vowels:\n      {highlight_characters(text, 'vowels')}")
+    elif choice == "2":
+        print(f"\n   📝 Highlighted Consonants:\n      {highlight_characters(text, 'consonants')}")
+    elif choice == "3":
+        print(f"\n   📝 Colorized Output:\n      {highlight_characters(text, 'color')}")
+        
+    # Prompt for transformation options
+    print("\n   Transformation Options:")
+    print("      1. Strip all Vowels")
+    print("      2. Strip all Consonants")
+    print("      3. Redact Vowels (replace with *)")
+    print("      4. Redact Consonants (replace with *)")
+    print("      5. Skip Transformations")
+    trans_choice = input("\n      Select option (1-5): ").strip()
+    
+    if trans_choice == "1":
+        print(f"\n   🔄 Result: {transform_text(text, 'strip_vowels')}")
+    elif trans_choice == "2":
+        print(f"\n   🔄 Result: {transform_text(text, 'strip_consonants')}")
+    elif trans_choice == "3":
+        print(f"\n   🔄 Result: {transform_text(text, 'replace_vowels', '*')}")
+    elif trans_choice == "4":
+        print(f"\n   🔄 Result: {transform_text(text, 'replace_consonants', '*')}")
+
+
+def analyze_file_text():
+    """Read a local file and analyze its text content."""
+    print("\n   === File-Based Text Analyzer ===")
+    file_path = input("      Enter absolute or relative file path: ").strip()
+    if not file_path:
+        return
+        
+    if not os.path.exists(file_path):
+        print(f"      ❌ File not found at: {file_path}")
+        return
+        
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+            
+        print(f"\n      📖 Read {len(content)} characters from file.")
+        if len(content) > 2000:
+            print("      ⚠️  File is large, analysis report shown. Preview of first 200 chars:")
+            print(f"      \"{content[:200]}...\"")
+        else:
+            print(f"      Text Preview:\n      \"{content}\"")
+            
+        stats = analyze_text(content)
+        print_analysis_report(content, stats)
+    except Exception as e:
+        print(f"      ❌ Error reading file: {e}")
