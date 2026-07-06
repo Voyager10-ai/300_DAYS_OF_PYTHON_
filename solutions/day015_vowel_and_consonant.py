@@ -236,3 +236,56 @@ def analyze_file_text():
         print_analysis_report(content, stats)
     except Exception as e:
         print(f"      ❌ Error reading file: {e}")
+
+
+def show_mastery_box():
+    """Print an artistic summary box."""
+    width = 44
+    print()
+    print("   ╔" + "═" * (width - 2) + "╗")
+    print("   ║" + "  🔤 VOWELS & CONSONANTS ANALYSIS DONE! 🔤  ".center(width - 2) + "║")
+    print("   ║" + " " * (width - 2) + "║")
+    print("   ║" + "  Calculations: Letter Ratio Statistics,".ljust(width - 2) + "║")
+    print("   ║" + "                Vowel/Consonant Counts, ".ljust(width - 2) + "║")
+    print("   ║" + "                Frequency Distribution, ".ljust(width - 2) + "║")
+    print("   ║" + "  Features: Color Highlighting,         ".ljust(width - 2) + "║")
+    print("   ║" + "            Text Redaction & Stripping, ".ljust(width - 2) + "║")
+    print("   ║" + "            File Reader Integration     ".ljust(width - 2) + "║")
+    print("   ╚" + "═" * (width - 2) + "╝")
+
+
+def main():
+    """Entry point for the program."""
+    while True:
+        print("\n" + "=" * 50)
+        print("  DAY 15: VOWEL AND CONSONANT ANALYZER")
+        print("=" * 50)
+        print()
+        print("   📂 Choose an option:")
+        print("      1. Analyze text input interactively")
+        print("      2. Analyze a text file")
+        print("      3. Run built-in demo (Python quote)")
+        print("      4. Exit")
+        
+        choice = input("\n      Select mode (1-4): ").strip()
+        if choice == "1":
+            analyze_interactive_text()
+        elif choice == "2":
+            analyze_file_text()
+        elif choice == "3":
+            demo_text = "Beautiful is better than ugly. Explicit is better than implicit. Simple is better than complex."
+            print(f"\n   📝 Demo Text: \"{demo_text}\"")
+            stats = analyze_text(demo_text)
+            print_analysis_report(demo_text, stats)
+            print(f"   🎨 Color Highlight Preview:\n      {highlight_characters(demo_text, 'color')}")
+        elif choice == "4":
+            print("\n      Goodbye!")
+            break
+        else:
+            print("      ⚠️  Invalid selection. Please choose 1-4.")
+            
+    show_mastery_box()
+
+
+if __name__ == "__main__":
+    main()
