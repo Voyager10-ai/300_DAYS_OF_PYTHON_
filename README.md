@@ -18,6 +18,7 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 13: Password Validation
 - Day 14: Triangle Types
 - Day 15: Vowel and Consonant
+- Day 16: Characters to String
 
 
 

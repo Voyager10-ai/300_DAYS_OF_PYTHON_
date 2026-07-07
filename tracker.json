@@ -1,6 +1,6 @@
 {
   "total_problems": 282,
-  "current_day": 15,
+  "current_day": 16,
   "problems": [
     {"day": 1, "title": "Print String", "status": "done"},
     {"day": 2, "title": "Input Age", "status": "done"},
@@ -17,7 +17,7 @@
     {"day": 13, "title": "Password Validation", "status": "done"},
     {"day": 14, "title": "Triangle Types", "status": "done"},
     {"day": 15, "title": "Vowel and Consonant", "status": "done"},
-    {"day": 16, "title": "Characters to String", "status": "pending"},
+    {"day": 16, "title": "Characters to String", "status": "done"},
     {"day": 17, "title": "Check a List Contains Sublist", "status": "pending"},
     {"day": 18, "title": "Common Items", "status": "pending"},
     {"day": 19, "title": "Difference Between 2 Lists", "status": "pending"},
