@@ -176,3 +176,65 @@ def interactive_split_flow():
     print(f"      - List Count: {len(result)}")
     
     draw_freq_chart(text)
+
+
+# ---------- Mastery Summary & Entry Point ----------
+def show_mastery_box():
+    """Print an artistic summary box."""
+    width = 44
+    print()
+    print("   ╔" + "═" * (width - 2) + "╗")
+    print("   ║" + "  🔠 CHARS <-> STRING COMPLETE! 🔠  ".center(width - 2) + "║")
+    print("   ║" + " " * (width - 2) + "║")
+    print("   ║" + "  Methods: Separator Joining, Case Conversion,".ljust(width - 2) + "║")
+    print("   ║" + "           List Filtering, Unique Preserves,  ".ljust(width - 2) + "║")
+    print("   ║" + "           Sorting (Asc/Desc/Freq),           ".ljust(width - 2) + "║")
+    print("   ║" + "           Frequency Chart Rendering          ".ljust(width - 2) + "║")
+    print("   ╚" + "═" * (width - 2) + "╝")
+
+
+def main():
+    """Entry point for the program."""
+    while True:
+        print("\n" + "=" * 50)
+        print("  DAY 16: CHARS TO STRING & STRING TO CHARS")
+        print("=" * 50)
+        print()
+        print("   📂 Choose an option:")
+        print("      1. Join characters to a string")
+        print("      2. Split a string to characters")
+        print("      3. Run built-in demo cases")
+        print("      4. Exit")
+        
+        choice = input("\n      Select option (1-4): ").strip()
+        if choice == "1":
+            interactive_join_flow()
+        elif choice == "2":
+            interactive_split_flow()
+        elif choice == "3":
+            print("\n   >>> Running Built-in Demo Cases <<<")
+            chars = ['P', 'y', 't', 'h', 'o', 'n', '3']
+            print(f"      Original list: {chars}")
+            print(f"      Joined with '':      \"{join_characters(chars)}\"")
+            print(f"      Joined with '-':     \"{join_characters(chars, '-')}\"")
+            print(f"      Joined with ' ' (UPPER): \"{join_characters(chars, ' ', 'upper')}\"")
+            
+            sentence = "Mississippi"
+            print(f"\n      Original String: \"{sentence}\"")
+            print(f"      Split (Default):      {split_string_to_characters(sentence)}")
+            print(f"      Split (Unique):       {split_string_to_characters(sentence, unique=True)}")
+            print(f"      Split (Sorted Asc):   {split_string_to_characters(sentence, sort_list='asc')}")
+            print(f"      Split (Sorted Freq):  {split_string_to_characters(sentence, sort_list='frequency')}")
+            
+            draw_freq_chart(sentence)
+        elif choice == "4":
+            print("\n      Goodbye!")
+            break
+        else:
+            print("      ⚠️  Invalid selection. Please choose 1-4.")
+            
+    show_mastery_box()
+
+
+if __name__ == "__main__":
+    main()
