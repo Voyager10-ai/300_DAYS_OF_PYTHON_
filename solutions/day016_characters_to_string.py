@@ -43,3 +43,39 @@ def join_characters(char_list, separator="", casing="none"):
         return joined.swapcase()
     else:
         return joined
+
+
+# ---------- Core String-to-Characters Splitting ----------
+def split_string_to_characters(input_string, strip_spaces=False, unique=False, sort_list="none"):
+    """
+    Split a string back into a list of characters with optional filtering
+    for unique characters, whitespace trimming, and sorting.
+    """
+    if not input_string:
+        return []
+        
+    chars = list(input_string)
+    
+    if strip_spaces:
+        chars = [c for c in chars if not c.isspace()]
+        
+    if unique:
+        # Preserve insertion order for unique characters
+        seen = set()
+        unique_chars = []
+        for c in chars:
+            if c not in seen:
+                seen.add(c)
+                unique_chars.append(c)
+        chars = unique_chars
+        
+    if sort_list == "asc":
+        chars.sort()
+    elif sort_list == "desc":
+        chars.sort(reverse=True)
+    elif sort_list == "frequency":
+        counts = collections.Counter(chars)
+        # Sort by frequency descending, then alphabetically ascending
+        chars.sort(key=lambda x: (-counts[x], x))
+        
+    return chars
