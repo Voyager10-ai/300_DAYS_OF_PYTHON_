@@ -110,3 +110,69 @@ def draw_freq_chart(input_string, max_bars=10, bar_length=20):
         bar = "█" * filled + "░" * (bar_length - filled)
         print(f"      {display_char:<6} {bar} {count:>3} ({pct:.1f}%)")
     print("      " + "-" * 50)
+
+
+# ---------- Interactive Flow Functions ----------
+def interactive_join_flow():
+    """Run the interactive flow for joining characters into a string."""
+    print("\n   === Character Joining Explorer ===")
+    print("      Enter characters/strings one by one. Leave blank when finished.")
+    char_list = []
+    while True:
+        char = input(f"      Item {len(char_list) + 1}: ")
+        if char == "":
+            break
+        char_list.append(char)
+        
+    if not char_list:
+        print("      ⚠️  No items entered.")
+        return
+        
+    print(f"\n      Entered items: {char_list}")
+    sep = input("      Enter custom separator (default: empty): ")
+    
+    print("\n      Choose casing transformation:")
+    print("         1. None")
+    print("         2. Lowercase")
+    print("         3. Uppercase")
+    print("         4. Capitalize (first character only)")
+    print("         5. Titlecase (first letter of each word)")
+    print("         6. Swapcase (invert upper/lower)")
+    case_choice = input("      Select casing option (1-6, default 1): ").strip()
+    
+    case_map = {"1": "none", "2": "lower", "3": "upper", "4": "capitalize", "5": "title", "6": "swap"}
+    casing = case_map.get(case_choice, "none")
+    
+    result = join_characters(char_list, sep, casing)
+    print("\n   ✨ Resulting String:")
+    print(f"      👉 \"{result}\"")
+    print(f"      - String Length: {len(result)}")
+
+
+def interactive_split_flow():
+    """Run the interactive flow for splitting a string into characters."""
+    print("\n   === String Splitting Explorer ===")
+    text = input("      Enter the string to split: ")
+    if not text:
+        print("      ⚠️  Input string cannot be empty.")
+        return
+        
+    strip_sp = input("      Strip whitespace characters? (y/n, default n): ").strip().lower() == "y"
+    uniq = input("      Keep unique characters only? (y/n, default n): ").strip().lower() == "y"
+    
+    print("\n      Choose sorting option:")
+    print("         1. None (keep original order)")
+    print("         2. Ascending order")
+    print("         3. Descending order")
+    print("         4. Sort by occurrence frequency")
+    sort_choice = input("      Select option (1-4, default 1): ").strip()
+    
+    sort_map = {"1": "none", "2": "asc", "3": "desc", "4": "frequency"}
+    sorting = sort_map.get(sort_choice, "none")
+    
+    result = split_string_to_characters(text, strip_sp, uniq, sorting)
+    print("\n   ✨ Resulting Character List:")
+    print(f"      👉 {result}")
+    print(f"      - List Count: {len(result)}")
+    
+    draw_freq_chart(text)
