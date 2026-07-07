@@ -79,3 +79,34 @@ def split_string_to_characters(input_string, strip_spaces=False, unique=False, s
         chars.sort(key=lambda x: (-counts[x], x))
         
     return chars
+
+
+# ---------- Character Analysis & Visualization ----------
+def draw_freq_chart(input_string, max_bars=10, bar_length=20):
+    """
+    Generate and print an ASCII bar chart of character frequencies in the input string.
+    Removes whitespaces for cleaner display.
+    """
+    if not input_string:
+        print("      No text to analyze.")
+        return
+        
+    filtered = [c for c in input_string if not c.isspace()]
+    if not filtered:
+        print("      Text contains only whitespace.")
+        return
+        
+    counts = collections.Counter(filtered)
+    total_non_space = len(filtered)
+    most_common = counts.most_common(max_bars)
+    
+    print("\n   📊 Character Frequency Analysis (Excluding Spaces):")
+    print("      " + "-" * 50)
+    for char, count in most_common:
+        # Format display for readability (like quotes for symbols/punctuation)
+        display_char = f"'{char}'"
+        pct = (count / total_non_space) * 100
+        filled = int((count / total_non_space) * bar_length)
+        bar = "█" * filled + "░" * (bar_length - filled)
+        print(f"      {display_char:<6} {bar} {count:>3} ({pct:.1f}%)")
+    print("      " + "-" * 50)
