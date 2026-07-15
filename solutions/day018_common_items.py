@@ -36,3 +36,26 @@ def find_ordered_common(list_a, list_b):
     """
     set_b = set(list_b)
     return [item for item in list_a if item in set_b]
+
+
+def find_multiset_common(list_a, list_b):
+    """
+    Find common elements preserving duplicates.
+    E.g. If 'x' appears 3 times in list_a and 2 times in list_b,
+    it will appear 2 times (min of both counts) in the result.
+    """
+    count_a = collections.Counter(list_a)
+    count_b = collections.Counter(list_b)
+    
+    intersection_counter = count_a & count_b # Multiset intersection in Counter
+    return list(intersection_counter.elements())
+
+
+def find_relative_difference(list_a, list_b):
+    """Find unique elements in list_a that are not in list_b."""
+    return sorted(list(set(list_a) - set(list_b)), key=lambda x: str(x))
+
+
+def find_symmetric_difference(list_a, list_b):
+    """Find unique elements that are in either list_a or list_b but not both."""
+    return sorted(list(set(list_a) ^ set(list_b)), key=lambda x: str(x))
