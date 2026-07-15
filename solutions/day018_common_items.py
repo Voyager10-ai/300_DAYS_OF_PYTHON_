@@ -80,3 +80,71 @@ def draw_ascii_venn(list_a, list_b):
     print("       │           │   Common   │           │")
     print("       │           │            │           │")
     print("       └───────────┘            └───────────┘")
+
+
+# ---------- Interactive Features ----------
+def parse_list_input(prompt_text):
+    """Helper to parse comma-separated string/numeric inputs into a list."""
+    raw = input(prompt_text).strip()
+    if not raw:
+        return []
+    items = [item.strip() for item in raw.split(",") if item.strip()]
+    
+    # Try parsing integers or floats for cleaner representation
+    converted = []
+    for item in items:
+        try:
+            converted.append(int(item))
+        except ValueError:
+            try:
+                converted.append(float(item))
+            except ValueError:
+                converted.append(item)
+    return converted
+
+
+def interactive_explorer():
+    """Prompt user for two lists and run various operations."""
+    print("\n   === Common Items Finder Explorer ===")
+    list_a = parse_list_input("      Enter elements of List A (comma-separated): ")
+    list_b = parse_list_input("      Enter elements of List B (comma-separated): ")
+    
+    if not list_a or not list_b:
+        print("      ⚠️  Both lists must have elements.")
+        return
+        
+    print(f"\n      List A: {list_a} (Size: {len(list_a)})")
+    print(f"      List B: {list_b} (Size: {len(list_b)})")
+    
+    print("\n      Select Operation:")
+    print("         1. Unique Common Items (Set Intersection)")
+    print("         2. Common Items Preserving Order (of List A)")
+    print("         3. Common Items Preserving Duplicates (Multi-set)")
+    print("         4. Difference (A - B)")
+    print("         5. Symmetric Difference (A ^ B)")
+    print("         6. Run All Operations")
+    choice = input("\n      Select option (1-6, default 1): ").strip()
+    
+    if choice == "2":
+        res = find_ordered_common(list_a, list_b)
+        print(f"\n      👉 Ordered Intersection: {res}")
+    elif choice == "3":
+        res = find_multiset_common(list_a, list_b)
+        print(f"\n      👉 Multi-set Intersection: {res}")
+    elif choice == "4":
+        res = find_relative_difference(list_a, list_b)
+        print(f"\n      👉 Difference (A - B): {res}")
+    elif choice == "5":
+        res = find_symmetric_difference(list_a, list_b)
+        print(f"\n      👉 Symmetric Difference (A ^ B): {res}")
+    elif choice == "6":
+        print(f"\n      👉 Unique Common Items:    {find_unique_common(list_a, list_b)}")
+        print(f"      👉 Ordered Intersection:   {find_ordered_common(list_a, list_b)}")
+        print(f"      👉 Multi-set Intersection: {find_multiset_common(list_a, list_b)}")
+        print(f"      👉 Difference (A - B):     {find_relative_difference(list_a, list_b)}")
+        print(f"      👉 Symmetric Difference:   {find_symmetric_difference(list_a, list_b)}")
+    else:
+        res = find_unique_common(list_a, list_b)
+        print(f"\n      👉 Unique Common Items: {res}")
+        
+    draw_ascii_venn(list_a, list_b)
