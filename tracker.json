@@ -1,6 +1,6 @@
 {
   "total_problems": 282,
-  "current_day": 18,
+  "current_day": 19,
   "problems": [
     {"day": 1, "title": "Print String", "status": "done"},
     {"day": 2, "title": "Input Age", "status": "done"},
@@ -20,7 +20,7 @@
     {"day": 16, "title": "Characters to String", "status": "done"},
     {"day": 17, "title": "Check a List Contains Sublist", "status": "done"},
     {"day": 18, "title": "Common Items", "status": "done"},
-    {"day": 19, "title": "Difference Between 2 Lists", "status": "pending"},
+    {"day": 19, "title": "Difference Between 2 Lists", "status": "done"},
     {"day": 20, "title": "Find Max", "status": "pending"},
     {"day": 21, "title": "Frequency of Elements", "status": "pending"},
     {"day": 22, "title": "Permutations", "status": "pending"},
