@@ -147,3 +147,72 @@ def interactive_explorer():
         print(f"      👉 Multiset Difference (A - B):  {find_multiset_difference(list_a, list_b)}")
         draw_difference_visualization(list_a, list_b)
 
+
+# ---------- Mastery Summary & Entry Point ----------
+def show_mastery_box():
+    """Print an artistic summary box."""
+    width = 44
+    print()
+    print("   ╔" + "═" * (width - 2) + "╗")
+    print("   ║" + "🤝 LIST DIFFERENCE MASTERED! 🤝".center(width - 2) + "║")
+    print("   ║" + " " * (width - 2) + "║")
+    print("   ║  Methods: Set-based Unique Difference,  ".ljust(width - 2) + "║")
+    print("   ║           Symmetric Difference,          ".ljust(width - 2) + "║")
+    print("   ║           Order-Preserving Difference,   ".ljust(width - 2) + "║")
+    print("   ║           Multiset (Frequency) Difference,".ljust(width - 2) + "║")
+    print("   ║           ASCII Overlap Diagram Render   ".ljust(width - 2) + "║")
+    print("   ╚" + "═" * (width - 2) + "╝")
+
+
+def main():
+    """Entry point for the program."""
+    while True:
+        print("\n" + "=" * 50)
+        print("  DAY 19: FIND DIFFERENCES BETWEEN TWO LISTS")
+        print("=" * 50)
+        print()
+        print("   📂 Choose an option:")
+        print("      1. Run interactive list comparator")
+        print("      2. Run built-in demo cases (numbers & duplicates)")
+        print("      3. Exit")
+        
+        choice = input("\n      Select option (1-3): ").strip()
+        if choice == "1":
+            interactive_explorer()
+        elif choice == "2":
+            print("\n   >>> Running Built-in Demo Cases <<<")
+            
+            # Demo 1: Numbers with duplicates
+            a = [1, 2, 2, 3, 4, 4, 5]
+            b = [2, 4, 4, 5, 6, 7]
+            print(f"\n      Demo 1: Integers & Duplicates")
+            print(f"      List A: {a}")
+            print(f"      List B: {b}")
+            print(f"      👉 Unique Difference (A - B):    {find_unique_difference(a, b)}")
+            print(f"      👉 Symmetric Difference (A ^ B): {find_symmetric_difference(a, b)}")
+            print(f"      👉 Ordered Difference (A - B):   {find_ordered_difference(a, b)}")
+            print(f"      👉 Multiset Difference (A - B):  {find_multiset_difference(a, b)}")
+            draw_difference_visualization(a, b)
+            
+            # Demo 2: Strings
+            x = ["apple", "banana", "orange", "grape"]
+            y = ["pear", "grape", "banana", "kiwi"]
+            print(f"\n      Demo 2: Strings")
+            print(f"      List A: {x}")
+            print(f"      List B: {y}")
+            print(f"      👉 Unique Difference (A - B):    {find_unique_difference(x, y)}")
+            print(f"      👉 Symmetric Difference (x ^ y): {find_symmetric_difference(x, y)}")
+            draw_difference_visualization(x, y)
+        elif choice == "3":
+            print("\n      Goodbye!")
+            break
+        else:
+            print("      ⚠️  Invalid selection. Please choose 1-3.")
+            
+    show_mastery_box()
+
+
+if __name__ == "__main__":
+    main()
+
+
