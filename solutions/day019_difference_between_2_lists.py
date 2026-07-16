@@ -44,3 +44,15 @@ def find_ordered_difference(list_a, list_b):
     set_b = set(list_b)
     return [item for item in list_a if item not in set_b]
 
+
+def find_multiset_difference(list_a, list_b):
+    """
+    Find elements of list_a after subtracting frequency of occurrences in list_b.
+    E.g. If 'x' appears 3 times in list_a and 1 time in list_b, it will appear
+    2 times in the output.
+    """
+    count_a = collections.Counter(list_a)
+    count_b = collections.Counter(list_b)
+    diff = count_a - count_b
+    return list(diff.elements())
+
