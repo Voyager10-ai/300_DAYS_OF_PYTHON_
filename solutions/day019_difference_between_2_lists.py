@@ -85,3 +85,65 @@ def draw_difference_visualization(list_a, list_b):
     print(f"      👉 Relative Difference (B - A):  {sorted(list(only_b), key=lambda x: str(x))}")
     print(f"      👉 Symmetric Difference (A ^ B): {sorted(list(only_a ^ only_b), key=lambda x: str(x))}")
 
+
+# ---------- Interactive Features ----------
+def parse_list_input(prompt_text):
+    """Helper to parse comma-separated string/numeric inputs into a list."""
+    raw = input(prompt_text).strip()
+    if not raw:
+        return []
+    items = [item.strip() for item in raw.split(",") if item.strip()]
+    
+    # Try parsing integers or floats for cleaner representation
+    converted = []
+    for item in items:
+        try:
+            converted.append(int(item))
+        except ValueError:
+            try:
+                converted.append(float(item))
+            except ValueError:
+                converted.append(item)
+    return converted
+
+
+def interactive_explorer():
+    """Prompt user for two lists and run various operations."""
+    print("\n   === List Difference Explorer ===")
+    list_a = parse_list_input("      Enter elements of List A (comma-separated): ")
+    list_b = parse_list_input("      Enter elements of List B (comma-separated): ")
+    
+    if not list_a and not list_b:
+        print("      ⚠️  At least one list must have elements.")
+        return
+        
+    print(f"\n      List A: {list_a} (Size: {len(list_a)})")
+    print(f"      List B: {list_b} (Size: {len(list_b)})")
+    
+    print("\n      Select Operation:")
+    print("         1. Unique Difference (A - B)")
+    print("         2. Symmetric Difference (A ^ B)")
+    print("         3. Ordered Difference (A - B preserving order of A)")
+    print("         4. Multiset Difference (A - B accounting for frequency)")
+    print("         5. Run All Operations & Visualization")
+    choice = input("\n      Select option (1-5, default 5): ").strip()
+    
+    if choice == "1":
+        res = find_unique_difference(list_a, list_b)
+        print(f"\n      👉 Unique Difference (A - B): {res}")
+    elif choice == "2":
+        res = find_symmetric_difference(list_a, list_b)
+        print(f"\n      👉 Symmetric Difference (A ^ B): {res}")
+    elif choice == "3":
+        res = find_ordered_difference(list_a, list_b)
+        print(f"\n      👉 Ordered Difference (A - B): {res}")
+    elif choice == "4":
+        res = find_multiset_difference(list_a, list_b)
+        print(f"\n      👉 Multiset Difference (A - B): {res}")
+    else:
+        print(f"\n      👉 Unique Difference (A - B):    {find_unique_difference(list_a, list_b)}")
+        print(f"      👉 Symmetric Difference (A ^ B): {find_symmetric_difference(list_a, list_b)}")
+        print(f"      👉 Ordered Difference (A - B):   {find_ordered_difference(list_a, list_b)}")
+        print(f"      👉 Multiset Difference (A - B):  {find_multiset_difference(list_a, list_b)}")
+        draw_difference_visualization(list_a, list_b)
+
