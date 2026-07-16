@@ -15,12 +15,23 @@
 import collections
 
 
-# Stubs to be implemented in subsequent commits
+# ---------- Core List Difference Algorithms ----------
 def find_unique_difference(list_a, list_b):
-    """Find unique elements in list_a that are not in list_b."""
-    pass
+    """
+    Find unique elements in list_a that are not in list_b (Set Difference A - B).
+    Returns a sorted list of unique elements.
+    """
+    set_a = set(list_a)
+    set_b = set(list_b)
+    return sorted(list(set_a - set_b), key=lambda x: str(x))
 
 
 def find_symmetric_difference(list_a, list_b):
-    """Find unique elements that are in either list_a or list_b but not both."""
-    pass
+    """
+    Find unique elements that are in either list_a or list_b but not both (A ^ B).
+    Returns a sorted list of unique elements.
+    """
+    set_a = set(list_a)
+    set_b = set(list_b)
+    return sorted(list(set_a ^ set_b), key=lambda x: str(x))
+
