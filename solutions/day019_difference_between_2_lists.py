@@ -35,3 +35,12 @@ def find_symmetric_difference(list_a, list_b):
     set_b = set(list_b)
     return sorted(list(set_a ^ set_b), key=lambda x: str(x))
 
+
+def find_ordered_difference(list_a, list_b):
+    """
+    Find elements in list_a that are not in list_b, preserving the original order
+    and keeping any duplicates present in list_a (as long as they are not in list_b).
+    """
+    set_b = set(list_b)
+    return [item for item in list_a if item not in set_b]
+
