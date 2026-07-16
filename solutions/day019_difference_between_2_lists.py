@@ -56,3 +56,32 @@ def find_multiset_difference(list_a, list_b):
     diff = count_a - count_b
     return list(diff.elements())
 
+
+# ---------- ASCII Visualization ----------
+def draw_difference_visualization(list_a, list_b):
+    """Draw an ASCII representation showing relative difference and symmetric difference."""
+    set_a = set(list_a)
+    set_b = set(list_b)
+    
+    only_a = set_a - set_b
+    only_b = set_b - set_a
+    common = set_a.intersection(set_b)
+    
+    print("\n   📊 Set Difference & Overlap Diagram:")
+    print(f"      List A (Unique: {len(set_a)})         List B (Unique: {len(set_b)})")
+    print("       ┌───────────┐            ┌───────────┐")
+    print("       │           │            │           │")
+    print(f"       │  Only A   │            │  Only B   │")
+    print(f"       │    ({len(only_a):<2})    │            │    ({len(only_b):<2})    │")
+    print("       │           │            │           │")
+    print("       └─────┬─────┘            └─────┬─────┘")
+    print("             │                        │")
+    print("             │      ┌───────────┐     │")
+    print("             │      │  Common   │     │")
+    print(f"             └─────►│    ({len(common):<2})    │◄────┘")
+    print("                    │           │")
+    print("                    └───────────┘")
+    print(f"\n      👉 Relative Difference (A - B):  {sorted(list(only_a), key=lambda x: str(x))}")
+    print(f"      👉 Relative Difference (B - A):  {sorted(list(only_b), key=lambda x: str(x))}")
+    print(f"      👉 Symmetric Difference (A ^ B): {sorted(list(only_a ^ only_b), key=lambda x: str(x))}")
+
