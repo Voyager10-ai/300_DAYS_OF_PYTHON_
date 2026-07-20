@@ -109,4 +109,43 @@ def draw_max_visualization(lst, max_val):
     Draw an ASCII bar chart or histogram representing the elements in lst,
     clearly highlighting the maximum value.
     """
-    pass
+    # Flatten/filter list to get numbers
+    flat_nums = []
+    def traverse(item):
+        if isinstance(item, (list, tuple, set)):
+            for sub in item:
+                traverse(sub)
+        elif isinstance(item, (int, float)):
+            flat_nums.append(item)
+            
+    traverse(lst)
+    
+    if not flat_nums:
+        print("      ⚠️  No numeric values to visualize.")
+        return
+        
+    print("\n   📊 Dataset ASCII Visualization:")
+    print("   " + "─" * 45)
+    
+    max_abs = max(abs(x) for x in flat_nums) if flat_nums else 1
+    if max_abs == 0:
+        max_abs = 1
+    scale_width = 30
+    
+    for i, val in enumerate(flat_nums):
+        is_max = (val == max_val)
+        bar_len = int((abs(val) / max_abs) * scale_width)
+        
+        # Build bar representation
+        bar_char = "█" if val >= 0 else "░"
+        bar_str = bar_char * bar_len
+        
+        prefix = f"      [{val: >6}] "
+        marker = " 👑 [MAX]" if is_max else ""
+        
+        if val >= 0:
+            print(f"{prefix}{bar_str}{marker}")
+        else:
+            print(f"{prefix}-{bar_str}{marker}")
+            
+    print("   " + "─" * 45)
