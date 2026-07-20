@@ -22,7 +22,13 @@ def find_max_iterative(lst):
     Find the maximum element in a flat list iteratively (manual linear scan).
     Raises ValueError if the list is empty.
     """
-    pass
+    if not lst:
+        raise ValueError("Cannot find maximum of an empty list.")
+    max_val = lst[0]
+    for item in lst[1:]:
+        if item > max_val:
+            max_val = item
+    return max_val
 
 
 def find_max_recursive(lst):
@@ -30,7 +36,18 @@ def find_max_recursive(lst):
     Find the maximum element in a flat list recursively.
     Raises ValueError if the list is empty.
     """
-    pass
+    if not lst:
+        raise ValueError("Cannot find maximum of an empty list.")
+    
+    def _helper(sub_lst):
+        if len(sub_lst) == 1:
+            return sub_lst[0]
+        mid = len(sub_lst) // 2
+        left_max = _helper(sub_lst[:mid])
+        right_max = _helper(sub_lst[mid:])
+        return left_max if left_max > right_max else right_max
+
+    return _helper(lst)
 
 
 def find_max_nested(lst):
@@ -38,7 +55,24 @@ def find_max_nested(lst):
     Find the maximum element in an arbitrarily nested list/structure.
     Raises ValueError if no numbers/elements are found in the entire nested structure.
     """
-    pass
+    found = False
+    max_val = None
+    
+    def traverse(item):
+        nonlocal found, max_val
+        if isinstance(item, (list, tuple, set)):
+            for sub_item in item:
+                traverse(sub_item)
+        else:
+            if isinstance(item, (int, float)):
+                if not found or item > max_val:
+                    max_val = item
+                    found = True
+                    
+    traverse(lst)
+    if not found:
+        raise ValueError("No numbers found in the nested structure.")
+    return max_val
 
 
 # ---------- Custom Key & Top-K Finding ----------
