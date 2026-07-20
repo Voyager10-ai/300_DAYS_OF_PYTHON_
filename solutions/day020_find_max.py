@@ -81,7 +81,16 @@ def find_max_custom(lst, key_func):
     Find the maximum element using a custom key function.
     Raises ValueError if the list is empty.
     """
-    pass
+    if not lst:
+        raise ValueError("Cannot find maximum of an empty list.")
+    max_item = lst[0]
+    max_key = key_func(max_item)
+    for item in lst[1:]:
+        val = key_func(item)
+        if val > max_key:
+            max_key = val
+            max_item = item
+    return max_item
 
 
 def find_top_k(lst, k):
@@ -89,7 +98,9 @@ def find_top_k(lst, k):
     Find the top K largest elements in a list.
     Returns a sorted list of top K elements (descending order).
     """
-    pass
+    if k <= 0:
+        return []
+    return heapq.nlargest(k, lst)
 
 
 # ---------- ASCII Visualization ----------
