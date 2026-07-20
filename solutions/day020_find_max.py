@@ -149,3 +149,143 @@ def draw_max_visualization(lst, max_val):
             print(f"{prefix}-{bar_str}{marker}")
             
     print("   " + "─" * 45)
+
+
+# ---------- Interactive Features ----------
+import ast
+
+def parse_list_input(prompt_text):
+    """
+    Parse user input. Supports:
+    1. Python list literal syntax (e.g., [1, [2, 3], 4]) for nested lists.
+    2. Plain comma-separated list of items.
+    """
+    raw = input(prompt_text).strip()
+    if not raw:
+        return []
+    
+    # Try ast.literal_eval for nested lists or list literals
+    try:
+        parsed = ast.literal_eval(raw)
+        if isinstance(parsed, list):
+            return parsed
+        return [parsed]
+    except (ValueError, SyntaxError):
+        # Fallback to comma-separated values
+        items = [item.strip() for item in raw.split(",") if item.strip()]
+        converted = []
+        for item in items:
+            try:
+                converted.append(int(item))
+            except ValueError:
+                try:
+                    converted.append(float(item))
+                except ValueError:
+                    converted.append(item)
+        return converted
+
+
+def interactive_explorer():
+    """Prompt user for data and run various max-finding operations."""
+    print("\n   === Find Max Explorer ===")
+    print("      Supports flat lists (e.g., 5, -2, 10, 3) or nested lists (e.g., [5, [12, -3], 8])")
+    lst = parse_list_input("      Enter list or nested list: ")
+    
+    if not lst:
+        print("      ⚠️  List cannot be empty.")
+        return
+        
+    print(f"\n      Input Structure: {lst}")
+    
+    print("\n      Select Operation:")
+    print("         1. Find Max Iteratively")
+    print("         2. Find Max Recursively")
+    print("         3. Find Max in Nested Lists")
+    print("         4. Find Max by custom criteria (absolute value)")
+    print("         5. Find Top K elements")
+    print("         6. Run All Operations & Visualization")
+    
+    choice = input("\n      Select option (1-6, default 6): ").strip()
+    
+    is_nested = any(isinstance(x, (list, tuple, set)) for x in lst)
+    
+    def flatten(item):
+        res = []
+        if isinstance(item, (list, tuple, set)):
+            for sub in item:
+                res.extend(flatten(sub))
+        else:
+            res.append(item)
+        return res
+    
+    flat_lst = flatten(lst)
+    flat_nums = [x for x in flat_lst if isinstance(x, (int, float))]
+    
+    if choice == "1":
+        if is_nested:
+            print("      ⚠️  Iterative search requires flat list. Using flattened version.")
+        try:
+            res = find_max_iterative(flat_nums)
+            print(f"\n      👉 Iterative Max: {res}")
+        except Exception as e:
+            print(f"      ❌ Error: {e}")
+    elif choice == "2":
+        if is_nested:
+            print("      ⚠️  Recursive search requires flat list. Using flattened version.")
+        try:
+            res = find_max_recursive(flat_nums)
+            print(f"\n      👉 Recursive Max: {res}")
+        except Exception as e:
+            print(f"      ❌ Error: {e}")
+    elif choice == "3":
+        try:
+            res = find_max_nested(lst)
+            print(f"\n      👉 Nested Max: {res}")
+        except Exception as e:
+            print(f"      ❌ Error: {e}")
+    elif choice == "4":
+        if is_nested:
+            print("      ⚠️  Custom search uses flattened version.")
+        try:
+            res = find_max_custom(flat_nums, abs)
+            print(f"\n      👉 Custom Max (by absolute value): {res}")
+        except Exception as e:
+            print(f"      ❌ Error: {e}")
+    elif choice == "5":
+        if is_nested:
+            print("      ⚠️  Top K uses flattened version.")
+        try:
+            k_input = input("         Enter K: ").strip()
+            k = int(k_input) if k_input.isdigit() else 3
+            res = find_top_k(flat_nums, k)
+            print(f"\n      👉 Top {k} elements: {res}")
+        except Exception as e:
+            print(f"      ❌ Error: {e}")
+    else:
+        print("\n      --- Results ---")
+        try:
+            print(f"      👉 Iterative Max (flat): {find_max_iterative(flat_nums) if flat_nums else 'N/A'}")
+        except Exception as e:
+            print(f"      Iterative Max failed: {e}")
+        try:
+            print(f"      👉 Recursive Max (flat): {find_max_recursive(flat_nums) if flat_nums else 'N/A'}")
+        except Exception as e:
+            print(f"      Recursive Max failed: {e}")
+        try:
+            print(f"      👉 Nested Max:          {find_max_nested(lst)}")
+        except Exception as e:
+            print(f"      Nested Max failed: {e}")
+        try:
+            print(f"      👉 Custom Max (abs):    {find_max_custom(flat_nums, abs) if flat_nums else 'N/A'}")
+        except Exception as e:
+            print(f"      Custom Max failed: {e}")
+        try:
+            print(f"      👉 Top 3 Elements:      {find_top_k(flat_nums, 3)}")
+        except Exception as e:
+            print(f"      Top K failed: {e}")
+            
+        if flat_nums:
+            try:
+                draw_max_visualization(lst, find_max_nested(lst))
+            except Exception as e:
+                print(f"      Visualization failed: {e}")
