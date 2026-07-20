@@ -289,3 +289,70 @@ def interactive_explorer():
                 draw_max_visualization(lst, find_max_nested(lst))
             except Exception as e:
                 print(f"      Visualization failed: {e}")
+
+
+# ---------- Mastery Summary & Entry Point ----------
+def show_mastery_box():
+    """Print an artistic summary box."""
+    width = 44
+    print()
+    print("   ╔" + "═" * (width - 2) + "╗")
+    print("   ║" + "👑 MAXIMUM FINDER MASTERED! 👑".center(width - 2) + "║")
+    print("   ║" + " " * (width - 2) + "║")
+    print("   ║  Methods: Iterative Scan, Recursive search, ".ljust(width - 2) + "║")
+    print("   ║           Nested List traversal,           ".ljust(width - 2) + "║")
+    print("   ║           Custom key (absolute value),    ".ljust(width - 2) + "║")
+    print("   ║           Top K finding (via Heap),        ".ljust(width - 2) + "║")
+    print("   ║           ASCII Bar Chart visualization    ".ljust(width - 2) + "║")
+    print("   ╚" + "═" * (width - 2) + "╝")
+
+
+def main():
+    """Entry point for the program."""
+    while True:
+        print("\n" + "=" * 50)
+        print("  DAY 20: FIND THE MAXIMUM VALUE")
+        print("=" * 50)
+        print()
+        print("   📂 Choose an option:")
+        print("      1. Run interactive max finder")
+        print("      2. Run built-in demo cases")
+        print("      3. Exit")
+        
+        choice = input("\n      Select option (1-3): ").strip()
+        if choice == "1":
+            interactive_explorer()
+        elif choice == "2":
+            print("\n   >>> Running Built-in Demo Cases <<<")
+            
+            # Demo 1: Simple list with positive/negative numbers
+            d1 = [10, -5, 25, 42, 0, 18]
+            print(f"\n      Demo 1: Flat List {d1}")
+            print(f"      👉 Iterative Max: {find_max_iterative(d1)}")
+            print(f"      👉 Recursive Max: {find_max_recursive(d1)}")
+            print(f"      👉 Top 3 elements: {find_top_k(d1, 3)}")
+            draw_max_visualization(d1, 42)
+            
+            # Demo 2: Nested list
+            d2 = [3, [12, 5], [[99, 45], -10], 8]
+            print(f"\n      Demo 2: Nested List {d2}")
+            m2 = find_max_nested(d2)
+            print(f"      👉 Nested Max: {m2}")
+            draw_max_visualization(d2, m2)
+            
+            # Demo 3: Custom keys (by string length)
+            d3 = ["apple", "banana", "kiwi", "watermelon", "cherry"]
+            print(f"\n      Demo 3: Strings (custom key = len) {d3}")
+            print(f"      👉 Longest word: '{find_max_custom(d3, len)}'")
+            
+        elif choice == "3":
+            print("\n      Goodbye!")
+            break
+        else:
+            print("      ⚠️  Invalid selection. Please choose 1-3.")
+            
+    show_mastery_box()
+
+
+if __name__ == "__main__":
+    main()

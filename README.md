@@ -21,6 +21,8 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 16: Characters to String
 - Day 17: Check a List Contains Sublist
 - Day 18: Common Items
+- Day 19: Difference Between 2 Lists
+- Day 20: Find Max
 
 
 
