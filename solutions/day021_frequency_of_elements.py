@@ -147,3 +147,93 @@ def draw_frequency_histogram(lst_or_freq):
         print(f"      {item_repr: >12} | {bar_str:<{max_bar_width}} {count: >3}x ({pct:5.1f}%){marker}")
 
     print("   " + "─" * 58)
+
+
+# ---------- Interactive CLI Features ----------
+def parse_element_input(prompt_text):
+    """
+    Parse user input string.
+    Supports Python list literal syntax (e.g., [1, 'a', [2, 1]]) or comma-separated values.
+    """
+    raw = input(prompt_text).strip()
+    if not raw:
+        return []
+    try:
+        parsed = ast.literal_eval(raw)
+        if isinstance(parsed, list):
+            return parsed
+        return [parsed]
+    except (ValueError, SyntaxError):
+        items = [item.strip() for item in raw.split(",") if item.strip()]
+        converted = []
+        for item in items:
+            try:
+                converted.append(int(item))
+            except ValueError:
+                try:
+                    converted.append(float(item))
+                except ValueError:
+                    converted.append(item)
+        return converted
+
+
+def interactive_explorer():
+    """Prompt user for input and display frequency analysis results."""
+    print("\n   === Element Frequency Explorer ===")
+    print("      Enter a list (e.g. 1, 2, 2, 3, a, b, a) or nested list (e.g. [1, [2, 'a'], 'a', 2])")
+    lst = parse_element_input("      Enter elements: ")
+
+    if not lst:
+        print("      ⚠️  List cannot be empty.")
+        return
+
+    print(f"\n      Input List: {lst}")
+    is_nested = any(isinstance(x, (list, tuple, set)) for x in lst)
+
+    print("\n      Select Operation:")
+    print("         1. Standard Dictionary Frequency")
+    print("         2. Collections.Counter Frequency")
+    print("         3. Nested List Frequency Analysis")
+    print("         4. Top K Most & Least Frequent Elements")
+    print("         5. Group Elements by Frequency")
+    print("         6. Run All Analyses & ASCII Histogram")
+
+    choice = input("\n      Select option (1-6, default 6): ").strip()
+
+    if choice == "1":
+        if is_nested:
+            print("      ⚠️  Standard dict requires flat elements. Using nested frequency algorithm.")
+            freq = count_frequencies_nested(lst)
+        else:
+            freq = count_frequencies_dict(lst)
+        print(f"\n      👉 Frequency Dict: {freq}")
+    elif choice == "2":
+        if is_nested:
+            print("      ⚠️  Counter requires flat hashable elements. Using nested frequency algorithm.")
+            freq = count_frequencies_nested(lst)
+        else:
+            freq = count_frequencies_counter(lst)
+        print(f"\n      👉 Counter Result: {freq}")
+    elif choice == "3":
+        freq = count_frequencies_nested(lst)
+        print(f"\n      👉 Nested Frequency Dict: {freq}")
+    elif choice == "4":
+        freq = count_frequencies_nested(lst)
+        k_str = input("         Enter K value (default 2): ").strip()
+        k = int(k_str) if k_str.isdigit() else 2
+        most = get_most_frequent(freq, k)
+        least = get_least_frequent(freq, k)
+        print(f"\n      👉 Top {k} Most Frequent:  {most}")
+        print(f"      👉 Top {k} Least Frequent: {least}")
+    elif choice == "5":
+        freq = count_frequencies_nested(lst)
+        grouped = group_by_frequency(freq)
+        print(f"\n      👉 Grouped by Frequency: {grouped}")
+    else:
+        freq = count_frequencies_nested(lst)
+        print("\n      --- Frequency Analysis Results ---")
+        print(f"      👉 Frequency Dictionary: {freq}")
+        print(f"      👉 Most Frequent (Mode): {get_most_frequent(freq, 1)}")
+        print(f"      👉 Least Frequent:       {get_least_frequent(freq, 1)}")
+        print(f"      👉 Grouped by Frequency: {group_by_frequency(freq)}")
+        draw_frequency_histogram(freq)
