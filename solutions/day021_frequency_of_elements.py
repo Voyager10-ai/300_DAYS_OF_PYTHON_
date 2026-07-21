@@ -237,3 +237,74 @@ def interactive_explorer():
         print(f"      👉 Least Frequent:       {get_least_frequent(freq, 1)}")
         print(f"      👉 Grouped by Frequency: {group_by_frequency(freq)}")
         draw_frequency_histogram(freq)
+
+
+# ---------- Mastery Summary & Entry Point ----------
+def show_mastery_box():
+    """Print an artistic summary box."""
+    width = 46
+    print()
+    print("   ╔" + "═" * (width - 2) + "╗")
+    print("   ║" + "👑 FREQUENCY OF ELEMENTS MASTERED! 👑".center(width - 2) + "║")
+    print("   ║" + " " * (width - 2) + "║")
+    print("   ║  Methods: Manual dict iteration, Counter, ".ljust(width - 2) + "║")
+    print("   ║           Nested list recursive counting, ".ljust(width - 2) + "║")
+    print("   ║           Top K Most/Least frequent,     ".ljust(width - 2) + "║")
+    print("   ║           Frequency-based grouping,       ".ljust(width - 2) + "║")
+    print("   ║           ASCII Histogram Visualization   ".ljust(width - 2) + "║")
+    print("   ╚" + "═" * (width - 2) + "╝")
+
+
+def main():
+    """Entry point for the program."""
+    while True:
+        print("\n" + "=" * 50)
+        print("  DAY 21: FREQUENCY OF ELEMENTS")
+        print("=" * 50)
+        print()
+        print("   📂 Choose an option:")
+        print("      1. Run interactive frequency explorer")
+        print("      2. Run built-in demo cases")
+        print("      3. Exit")
+
+        choice = input("\n      Select option (1-3): ").strip()
+        if choice == "1":
+            interactive_explorer()
+        elif choice == "2":
+            print("\n   >>> Running Built-in Demo Cases <<<")
+
+            # Demo 1: Flat integer list
+            d1 = [4, 2, 4, 1, 3, 2, 4, 1, 5, 4, 2]
+            print(f"\n      Demo 1: Flat Integer List {d1}")
+            f1 = count_frequencies_dict(d1)
+            print(f"      👉 Frequency Dict: {f1}")
+            print(f"      👉 Top 2 Most Frequent: {get_most_frequent(f1, 2)}")
+            draw_frequency_histogram(f1)
+
+            # Demo 2: String characters / words list
+            d2 = ["apple", "banana", "apple", "cherry", "banana", "apple", "date"]
+            print(f"\n      Demo 2: String List {d2}")
+            f2 = count_frequencies_counter(d2)
+            print(f"      👉 Counter Frequency: {f2}")
+            print(f"      👉 Grouped by Frequency: {group_by_frequency(f2)}")
+            draw_frequency_histogram(f2)
+
+            # Demo 3: Nested list structure
+            d3 = [1, [2, "x"], ["x", [3, 2, "x"]], 1, 2]
+            print(f"\n      Demo 3: Nested Structure {d3}")
+            f3 = count_frequencies_nested(d3)
+            print(f"      👉 Nested Frequency: {f3}")
+            print(f"      👉 Least Frequent 2 elements: {get_least_frequent(f3, 2)}")
+            draw_frequency_histogram(f3)
+
+        elif choice == "3":
+            print("\n      Goodbye!")
+            break
+        else:
+            print("      ⚠️  Invalid selection. Please choose 1-3.")
+
+    show_mastery_box()
+
+
+if __name__ == "__main__":
+    main()
