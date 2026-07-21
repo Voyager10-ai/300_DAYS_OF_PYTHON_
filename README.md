@@ -23,6 +23,7 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 18: Common Items
 - Day 19: Difference Between 2 Lists
 - Day 20: Find Max
+- Day 21: Frequency of Elements
 
 
 
