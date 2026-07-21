@@ -62,7 +62,16 @@ def get_most_frequent(lst_or_freq, k=1):
     Accepts either a list/nested structure or a frequency dictionary.
     Returns a list of tuples (element, count) sorted by count descending.
     """
-    pass
+    if isinstance(lst_or_freq, dict):
+        freq_dict = lst_or_freq
+    else:
+        freq_dict = count_frequencies_nested(lst_or_freq)
+
+    if not freq_dict or k <= 0:
+        return []
+
+    sorted_items = sorted(freq_dict.items(), key=lambda x: x[1], reverse=True)
+    return sorted_items[:k]
 
 
 def get_least_frequent(lst_or_freq, k=1):
@@ -71,7 +80,16 @@ def get_least_frequent(lst_or_freq, k=1):
     Accepts either a list/nested structure or a frequency dictionary.
     Returns a list of tuples (element, count) sorted by count ascending.
     """
-    pass
+    if isinstance(lst_or_freq, dict):
+        freq_dict = lst_or_freq
+    else:
+        freq_dict = count_frequencies_nested(lst_or_freq)
+
+    if not freq_dict or k <= 0:
+        return []
+
+    sorted_items = sorted(freq_dict.items(), key=lambda x: x[1])
+    return sorted_items[:k]
 
 
 def group_by_frequency(lst_or_freq):
@@ -79,7 +97,17 @@ def group_by_frequency(lst_or_freq):
     Group elements by their frequency of occurrence.
     Returns a dictionary mapping frequency count -> list of elements with that count.
     """
-    pass
+    if isinstance(lst_or_freq, dict):
+        freq_dict = lst_or_freq
+    else:
+        freq_dict = count_frequencies_nested(lst_or_freq)
+
+    grouped = {}
+    for elem, count in freq_dict.items():
+        if count not in grouped:
+            grouped[count] = []
+        grouped[count].append(elem)
+    return grouped
 
 
 # ---------- ASCII Visualization ----------
