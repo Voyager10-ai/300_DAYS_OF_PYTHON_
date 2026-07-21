@@ -23,7 +23,10 @@ def count_frequencies_dict(lst):
     Count element frequencies using a standard Python dictionary loop.
     Returns a dictionary mapping elements to their count.
     """
-    pass
+    freq = {}
+    for item in lst:
+        freq[item] = freq.get(item, 0) + 1
+    return freq
 
 
 def count_frequencies_counter(lst):
@@ -31,7 +34,7 @@ def count_frequencies_counter(lst):
     Count element frequencies using collections.Counter.
     Returns a dictionary mapping elements to their count.
     """
-    pass
+    return dict(Counter(lst))
 
 
 def count_frequencies_nested(lst):
@@ -39,7 +42,17 @@ def count_frequencies_nested(lst):
     Count element frequencies in an arbitrarily nested list/iterable structure.
     Traverses lists, tuples, sets recursively.
     """
-    pass
+    freq = {}
+
+    def traverse(item):
+        if isinstance(item, (list, tuple, set)):
+            for sub in item:
+                traverse(sub)
+        else:
+            freq[item] = freq.get(item, 0) + 1
+
+    traverse(lst)
+    return freq
 
 
 # ---------- Frequency Analysis & Grouping ----------
