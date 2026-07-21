@@ -116,4 +116,34 @@ def draw_frequency_histogram(lst_or_freq):
     Draw an ASCII histogram representing frequency of elements.
     Highlights most frequent element(s) with 👑 [MODE].
     """
-    pass
+    if isinstance(lst_or_freq, dict):
+        freq = lst_or_freq
+    else:
+        freq = count_frequencies_nested(lst_or_freq)
+
+    if not freq:
+        print("      ⚠️  No elements to visualize.")
+        return
+
+    total_count = sum(freq.values())
+    max_count = max(freq.values())
+    max_bar_width = 30
+
+    print("\n   📊 Element Frequency Histogram:")
+    print("   " + "─" * 58)
+
+    # Sort by frequency descending, then element key ascending for display
+    sorted_items = sorted(freq.items(), key=lambda x: (-x[1], str(x[0])))
+
+    for item, count in sorted_items:
+        bar_len = int((count / max_count) * max_bar_width) if max_count > 0 else 0
+        bar_str = "█" * max(bar_len, 1)
+        pct = (count / total_count) * 100
+
+        is_mode = (count == max_count and max_count > 1)
+        marker = " 👑 [MODE]" if is_mode else ""
+
+        item_repr = f"'{item}'" if isinstance(item, str) else str(item)
+        print(f"      {item_repr: >12} | {bar_str:<{max_bar_width}} {count: >3}x ({pct:5.1f}%){marker}")
+
+    print("   " + "─" * 58)
