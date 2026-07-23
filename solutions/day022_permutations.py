@@ -245,12 +245,66 @@ def interactive_explorer():
 
 def show_mastery_box():
     """Print an artistic summary box."""
-    pass
+    width = 46
+    print()
+    print("   ╔" + "═" * (width - 2) + "╗")
+    print("   ║" + "👑 PERMUTATIONS MASTERED! 👑".center(width - 2) + "║")
+    print("   ║" + " " * (width - 2) + "║")
+    print("   ║  Methods: Backtracking recursion,             ".ljust(width - 2) + "║")
+    print("   ║           Itertools permutations,             ".ljust(width - 2) + "║")
+    print("   ║           Heap's algorithm swapping,          ".ljust(width - 2) + "║")
+    print("   ║           Unique duplicate-safe generation,   ".ljust(width - 2) + "║")
+    print("   ║           Partial P(n, k) permutations,       ".ljust(width - 2) + "║")
+    print("   ║           ASCII Tree Search Visualization     ".ljust(width - 2) + "║")
+    print("   ╚" + "═" * (width - 2) + "╝")
 
 
 def main():
     """Entry point for the program."""
-    pass
+    while True:
+        print("\n" + "=" * 50)
+        print("  DAY 22: PERMUTATIONS")
+        print("=" * 50)
+        print()
+        print("   📂 Choose an option:")
+        print("      1. Run interactive permutations explorer")
+        print("      2. Run built-in demo cases")
+        print("      3. Exit")
+
+        choice = input("\n      Select option (1-3): ").strip()
+        if choice == "1":
+            interactive_explorer()
+        elif choice == "2":
+            print("\n   >>> Running Built-in Demo Cases <<<")
+
+            # Demo 1: Distinct integer elements
+            d1 = [1, 2, 3]
+            print(f"\n      Demo 1: Distinct Elements {d1}")
+            p1 = permutations_backtracking(d1)
+            print(f"      👉 All Permutations ({len(p1)} total): {p1}")
+            draw_permutation_tree(d1)
+
+            # Demo 2: Elements with duplicates
+            d2 = [1, 1, 2]
+            print(f"\n      Demo 2: Duplicate Elements {d2}")
+            p2_all = permutations_itertools(d2)
+            p2_unique = permutations_unique(d2)
+            print(f"      👉 All (incl. duplicates) ({len(p2_all)} total): {p2_all}")
+            print(f"      👉 Unique Permutations ({len(p2_unique)} total): {p2_unique}")
+
+            # Demo 3: String elements with partial permutations P(4, 2)
+            d3 = ["A", "B", "C", "D"]
+            print(f"\n      Demo 3: String Elements {d3} with K=2")
+            p3 = permutations_k_length(d3, 2)
+            print(f"      👉 P(4, 2) Permutations ({len(p3)} total): {p3}")
+
+        elif choice == "3":
+            print("\n      Goodbye!")
+            break
+        else:
+            print("      ⚠️  Invalid selection. Please choose 1-3.")
+
+    show_mastery_box()
 
 
 if __name__ == "__main__":
