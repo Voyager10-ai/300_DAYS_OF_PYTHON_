@@ -160,9 +160,87 @@ def draw_permutation_tree(lst, max_depth=3):
     print("   " + "─" * 58)
 
 
+def parse_input_list(prompt_text):
+    """
+    Parse input into a list of elements.
+    Supports list literal format (e.g. [1, 2, 3]) or comma-separated elements.
+    """
+    raw = input(prompt_text).strip()
+    if not raw:
+        return []
+    try:
+        parsed = ast.literal_eval(raw)
+        if isinstance(parsed, list):
+            return parsed
+        return [parsed]
+    except (ValueError, SyntaxError):
+        items = [item.strip() for item in raw.split(",") if item.strip()]
+        converted = []
+        for item in items:
+            try:
+                converted.append(int(item))
+            except ValueError:
+                try:
+                    converted.append(float(item))
+                except ValueError:
+                    converted.append(item)
+        return converted
+
+
 def interactive_explorer():
-    """Prompt user for input and display permutation analysis results."""
-    pass
+    """Prompt user for input and run selected permutation algorithms."""
+    print("\n   === Permutations Explorer ===")
+    print("      Enter elements (e.g. 1, 2, 3 or A, B, C or [1, 'a', 2])")
+    lst = parse_input_list("      Enter elements: ")
+
+    if not lst:
+        print("      ⚠️  List cannot be empty.")
+        return
+
+    print(f"\n      Input Elements: {lst} (n = {len(lst)})")
+
+    print("\n      Select Operation:")
+    print("         1. Backtracking Permutations")
+    print("         2. Itertools Permutations")
+    print("         3. Heap's Algorithm Permutations")
+    print("         4. Unique Permutations (handles duplicates)")
+    print("         5. K-length Permutations P(n, k)")
+    print("         6. Run All Algorithms & Draw Decision Tree")
+
+    choice = input("\n      Select option (1-6, default 6): ").strip()
+
+    if choice == "1":
+        perms = permutations_backtracking(lst)
+        print(f"\n      👉 Backtracking Result ({len(perms)} total): {perms}")
+    elif choice == "2":
+        perms = permutations_itertools(lst)
+        print(f"\n      👉 Itertools Result ({len(perms)} total): {perms}")
+    elif choice == "3":
+        perms = permutations_heaps(lst)
+        print(f"\n      👉 Heap's Algorithm Result ({len(perms)} total): {perms}")
+    elif choice == "4":
+        perms = permutations_unique(lst)
+        print(f"\n      👉 Unique Permutations ({len(perms)} total): {perms}")
+    elif choice == "5":
+        k_str = input("         Enter K value (length of permutations): ").strip()
+        k = int(k_str) if k_str.isdigit() else min(2, len(lst))
+        perms = permutations_k_length(lst, k)
+        print(f"\n      👉 P({len(lst)}, {k}) Permutations ({len(perms)} total): {perms}")
+    else:
+        p_backtrack = permutations_backtracking(lst)
+        p_itertools = permutations_itertools(lst)
+        p_heaps = permutations_heaps(lst)
+        p_unique = permutations_unique(lst)
+
+        print("\n      --- Permutations Analysis Results ---")
+        print(f"      👉 Total Expected Permutations n!: {len(p_backtrack)}")
+        print(f"      👉 Backtracking Output Count:       {len(p_backtrack)}")
+        print(f"      👉 Itertools Output Count:          {len(p_itertools)}")
+        print(f"      👉 Heap's Algorithm Count:          {len(p_heaps)}")
+        print(f"      👉 Unique Permutations Count:       {len(p_unique)}")
+        print(f"      👉 Sample Unique Permutations:      {p_unique[:6]}")
+
+        draw_permutation_tree(lst)
 
 
 def show_mastery_box():
