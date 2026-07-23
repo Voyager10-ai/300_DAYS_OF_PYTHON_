@@ -78,13 +78,46 @@ def permutations_heaps(lst):
 
 
 def permutations_unique(lst):
-    """Generate unique permutations for a list containing duplicate elements."""
-    pass
+    """
+    Generate unique permutations for a list that may contain duplicate elements.
+    Uses sorting and backtracking with boolean used array to avoid duplicates.
+    """
+    arr = list(lst)
+    try:
+        arr.sort()
+    except TypeError:
+        arr = sorted(arr, key=str)
+
+    res = []
+    used = [False] * len(arr)
+
+    def backtrack(path):
+        if len(path) == len(arr):
+            res.append(path[:])
+            return
+        for i in range(len(arr)):
+            if used[i]:
+                continue
+            if i > 0 and arr[i] == arr[i - 1] and not used[i - 1]:
+                continue
+            used[i] = True
+            path.append(arr[i])
+            backtrack(path)
+            path.pop()
+            used[i] = False
+
+    backtrack([])
+    return res
 
 
 def permutations_k_length(lst, k):
-    """Generate partial permutations P(n, k) of length k."""
-    pass
+    """
+    Generate partial permutations P(n, k) of length k from list lst.
+    Returns a list of lists.
+    """
+    if k < 0 or k > len(lst):
+        return []
+    return [list(p) for p in itertools.permutations(lst, k)]
 
 
 def draw_permutation_tree(lst, max_depth=3):
