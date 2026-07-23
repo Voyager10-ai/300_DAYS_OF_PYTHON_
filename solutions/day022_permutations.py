@@ -121,8 +121,43 @@ def permutations_k_length(lst, k):
 
 
 def draw_permutation_tree(lst, max_depth=3):
-    """Draw an ASCII decision search tree visualizing permutation branching."""
-    pass
+    """
+    Draw an ASCII decision search tree visualizing permutation branching.
+    Shows chosen prefix paths and remaining choices.
+    """
+    print("\n   🌳 Permutation Decision Tree Diagram:")
+    print("   " + "─" * 58)
+
+    arr = list(lst)
+    if not arr:
+        print("      (Empty list)")
+        print("   " + "─" * 58)
+        return
+
+    print(f"   ROOT: {arr}")
+
+    def build_tree(path, remaining, depth, prefix_str):
+        if not remaining or depth > max_depth:
+            if not remaining:
+                print(f"{prefix_str}└── 🎯 Permutation: {path}")
+            else:
+                print(f"{prefix_str}└── ... (depth limit reached)")
+            return
+
+        count = len(remaining)
+        for idx, item in enumerate(remaining):
+            is_last = (idx == count - 1)
+            connector = "└── " if is_last else "├── "
+            child_prefix = prefix_str + ("    " if is_last else "│   ")
+
+            next_path = path + [item]
+            next_remaining = remaining[:idx] + remaining[idx + 1:]
+
+            print(f"{prefix_str}{connector}Pick [{item}] -> Path: {next_path} (Remaining: {next_remaining})")
+            build_tree(next_path, next_remaining, depth + 1, child_prefix)
+
+    build_tree([], arr, 1, "   ")
+    print("   " + "─" * 58)
 
 
 def interactive_explorer():
