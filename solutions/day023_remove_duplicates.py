@@ -165,8 +165,53 @@ def remove_duplicates_nested(lst):
 
 
 def visualize_duplicate_removal(lst):
-    """Render ASCII visualization showing original vs deduplicated array and stats."""
-    pass
+    """
+    Render ASCII visualization showing original vs deduplicated list, element status,
+    and reduction statistics.
+    """
+    print("\n   📊 Duplicate Removal Analysis & Visualization:")
+    print("   " + "─" * 58)
+
+    if not lst:
+        print("      (Empty list provided)")
+        print("   " + "─" * 58)
+        return
+
+    dedup = remove_duplicates_preserve_order(lst)
+    orig_len = len(lst)
+    dedup_len = len(dedup)
+    removed_count = orig_len - dedup_len
+    reduction_pct = (removed_count / orig_len * 100) if orig_len > 0 else 0.0
+
+    print(f"   Original List  ({orig_len:2d} items): {lst}")
+    print(f"   Unique List    ({dedup_len:2d} items): {dedup}")
+    print("   " + "─" * 58)
+
+    # Element tracking
+    seen = set()
+    tracking_str = []
+    for item in lst:
+        try:
+            if item in seen:
+                tracking_str.append(f"❌[{item}]")
+            else:
+                seen.add(item)
+                tracking_str.append(f"✅[{item}]")
+        except TypeError:
+            tracking_str.append(f"?[{item}]")
+
+    print("   Element Stream (✅ = Keep / ❌ = Duplicate Removed):")
+    print("      " + " → ".join(tracking_str))
+
+    # Metrics summary
+    print("\n   📈 Metrics:")
+    orig_bar = "█" * min(30, orig_len)
+    dedup_bar = "█" * min(30, dedup_len)
+
+    print(f"      Original Count : {orig_bar:<30} {orig_len}")
+    print(f"      Unique Count   : {dedup_bar:<30} {dedup_len}")
+    print(f"      Duplicates Off : {removed_count} item(s) removed ({reduction_pct:.1f}% reduction)")
+    print("   " + "─" * 58)
 
 
 def parse_input_list(prompt_text):
