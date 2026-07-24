@@ -19,8 +19,27 @@ from collections import Counter
 
 
 def remove_duplicates_preserve_order(lst):
-    """Remove duplicates while preserving original insertion order."""
-    pass
+    """
+    Remove duplicate elements while preserving original insertion order.
+    Handles hashable and unhashable elements gracefully.
+    Returns a new list with unique elements in first-seen order.
+    """
+    seen = set()
+    seen_unhashable = []
+    result = []
+
+    for item in lst:
+        try:
+            if item not in seen:
+                seen.add(item)
+                result.append(item)
+        except TypeError:
+            # Fallback for unhashable types (lists, dicts, etc.)
+            if item not in seen_unhashable:
+                seen_unhashable.append(item)
+                result.append(item)
+
+    return result
 
 
 def remove_duplicates_in_place_sorted(lst):
