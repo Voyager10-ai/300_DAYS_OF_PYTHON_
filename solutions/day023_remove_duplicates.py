@@ -215,13 +215,87 @@ def visualize_duplicate_removal(lst):
 
 
 def parse_input_list(prompt_text):
-    """Parse user input string into a list."""
-    pass
+    """
+    Parse user input string into a list.
+    Supports Python list literal notation (e.g. [1, 2, 2, 'a', 'a']) or comma-separated string.
+    """
+    raw = input(prompt_text).strip()
+    if not raw:
+        return []
+    try:
+        parsed = ast.literal_eval(raw)
+        if isinstance(parsed, list):
+            return parsed
+        return [parsed]
+    except (ValueError, SyntaxError):
+        items = [item.strip() for item in raw.split(",") if item.strip()]
+        converted = []
+        for item in items:
+            try:
+                converted.append(int(item))
+            except ValueError:
+                try:
+                    converted.append(float(item))
+                except ValueError:
+                    converted.append(item)
+        return converted
 
 
 def interactive_explorer():
-    """Prompt user for input and display deduplication analysis results."""
-    pass
+    """Prompt user for input list and display deduplication operations."""
+    print("\n   === Duplicate Removal Explorer ===")
+    print("      Enter elements (e.g. 1, 2, 2, 3, 1, 4 or [1, 'a', 'A', 'a', 2])")
+    lst = parse_input_list("      Enter list: ")
+
+    if not lst:
+        print("      ⚠️  List cannot be empty.")
+        return
+
+    print(f"\n      Input List ({len(lst)} items): {lst}")
+
+    print("\n      Select Operation:")
+    print("         1. Preserve-Order Deduplication")
+    print("         2. In-Place Sorted Deduplication (Two-pointer)")
+    print("         3. In-Place Unsorted Deduplication")
+    print("         4. Case-Insensitive Key Deduplication (for strings)")
+    print("         5. Frequency Threshold Deduplication (Max K occurrences)")
+    print("         6. Nested List Deep Deduplication")
+    print("         7. Run All & Visualize Duplicate Stream")
+
+    choice = input("\n      Select option (1-7, default 7): ").strip()
+
+    if choice == "1":
+        res = remove_duplicates_preserve_order(lst)
+        print(f"\n      👉 Order-Preserved Deduplicated List: {res}")
+    elif choice == "2":
+        lst_copy = sorted(lst, key=lambda x: str(x))
+        res = remove_duplicates_in_place_sorted(lst_copy)
+        print(f"\n      👉 In-Place Sorted Result: {res}")
+    elif choice == "3":
+        lst_copy = list(lst)
+        res = remove_duplicates_in_place_unsorted(lst_copy)
+        print(f"\n      👉 In-Place Unsorted Result: {res}")
+    elif choice == "4":
+        res = remove_duplicates_by_key(lst, key=lambda x: str(x).lower())
+        print(f"\n      👉 Case-Insensitive Key Deduplicated Result: {res}")
+    elif choice == "5":
+        k_str = input("         Enter max occurrences allowed K (default 2): ").strip()
+        k = int(k_str) if k_str.isdigit() else 2
+        res = remove_duplicates_max_occurrences(lst, max_k=k)
+        print(f"\n      👉 Max {k} Occurrences Result: {res}")
+    elif choice == "6":
+        res = remove_duplicates_nested(lst)
+        print(f"\n      👉 Nested Deep Deduplication Result: {res}")
+    else:
+        res = remove_duplicates_preserve_order(lst)
+        res_k2 = remove_duplicates_max_occurrences(lst, max_k=2)
+        print("\n      --- Deduplication Analysis Results ---")
+        print(f"      👉 Original Count:               {len(lst)}")
+        print(f"      👉 Unique Count (Preserved Order): {len(res)}")
+        print(f"      👉 Deduplicated Result List:      {res}")
+        print(f"      👉 Bounded (Max 2 Occurrences):   {res_k2}")
+
+        visualize_duplicate_removal(lst)
 
 
 def show_mastery_box():
