@@ -300,12 +300,76 @@ def interactive_explorer():
 
 def show_mastery_box():
     """Print an artistic summary box."""
-    pass
+    width = 46
+    print()
+    print("   ╔" + "═" * (width - 2) + "╗")
+    print("   ║" + "👑 REMOVE DUPLICATES MASTERED! 👑".center(width - 2) + "║")
+    print("   ║" + " " * (width - 2) + "║")
+    print("   ║  Methods: Set/Dict preserve-order lookup,    ".ljust(width - 2) + "║")
+    print("   ║           In-place two-pointer algorithm,    ".ljust(width - 2) + "║")
+    print("   ║           Key-based custom deduplication,    ".ljust(width - 2) + "║")
+    print("   ║           Max K occurrences thresholding,    ".ljust(width - 2) + "║")
+    print("   ║           Nested list deep deduplication,    ".ljust(width - 2) + "║")
+    print("   ║           ASCII stream visualizer & metrics  ".ljust(width - 2) + "║")
+    print("   ╚" + "═" * (width - 2) + "╝")
 
 
 def main():
     """Entry point for the program."""
-    pass
+    while True:
+        print("\n" + "=" * 50)
+        print("  DAY 23: REMOVE DUPLICATES")
+        print("=" * 50)
+        print()
+        print("   📂 Choose an option:")
+        print("      1. Run interactive deduplication explorer")
+        print("      2. Run built-in demo cases")
+        print("      3. Exit")
+
+        choice = input("\n      Select option (1-3): ").strip()
+        if choice == "1":
+            interactive_explorer()
+        elif choice == "2":
+            print("\n   >>> Running Built-in Demo Cases <<<")
+
+            # Demo 1: Unsorted integer list with duplicates
+            d1 = [4, 2, 4, 1, 3, 2, 4, 1, 5, 2]
+            print(f"\n      Demo 1: Unsorted Integer List {d1}")
+            res1 = remove_duplicates_preserve_order(d1)
+            print(f"      👉 Order-Preserved Unique List: {res1}")
+            visualize_duplicate_removal(d1)
+
+            # Demo 2: Sorted array in-place two-pointer deduplication
+            d2 = [1, 1, 2, 2, 3, 4, 4, 4, 5]
+            print(f"\n      Demo 2: Sorted Array Two-Pointer In-Place {d2}")
+            d2_copy = list(d2)
+            res2 = remove_duplicates_in_place_sorted(d2_copy)
+            print(f"      👉 In-Place Deduplicated Result: {res2}")
+
+            # Demo 3: Key-based & Bounded deduplication
+            d3 = ["apple", "Apple", "BANANA", "banana", "Cherry"]
+            print(f"\n      Demo 3: String List Case-Insensitive Key {d3}")
+            res3 = remove_duplicates_by_key(d3, key=str.lower)
+            print(f"      👉 Case-Insensitive Unique List: {res3}")
+
+            d3_k2 = [1, 2, 2, 2, 3, 3, 3, 3, 4]
+            print(f"\n      Demo 3b: Max 2 Occurrences Thresholding {d3_k2}")
+            res3_k2 = remove_duplicates_max_occurrences(d3_k2, max_k=2)
+            print(f"      👉 Max 2 Occurrences Result: {res3_k2}")
+
+            # Demo 4: Nested list deep deduplication
+            d4 = [1, [2, 2, 3], [2, 2, 3], 1, 4]
+            print(f"\n      Demo 4: Nested List Structure {d4}")
+            res4 = remove_duplicates_nested(d4)
+            print(f"      👉 Deep Deduplicated Result: {res4}")
+
+        elif choice == "3":
+            print("\n      Goodbye!")
+            break
+        else:
+            print("      ⚠️  Invalid selection. Please choose 1-3.")
+
+    show_mastery_box()
 
 
 if __name__ == "__main__":

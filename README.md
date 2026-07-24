@@ -25,6 +25,7 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 20: Find Max
 - Day 21: Frequency of Elements
 - Day 22: Permutations
+- Day 23: Remove Duplicates
 
 
 
