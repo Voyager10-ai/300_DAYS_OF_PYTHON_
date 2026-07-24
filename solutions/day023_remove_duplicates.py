@@ -43,13 +43,47 @@ def remove_duplicates_preserve_order(lst):
 
 
 def remove_duplicates_in_place_sorted(lst):
-    """Remove duplicates in-place from a sorted list using two-pointer approach."""
-    pass
+    """
+    Remove duplicates in-place from a sorted list using the two-pointer technique.
+    Modifies the list in-place and truncates it to unique elements.
+    Returns the modified list.
+    """
+    if not lst:
+        return lst
+
+    write_idx = 1
+    for read_idx in range(1, len(lst)):
+        if lst[read_idx] != lst[read_idx - 1]:
+            lst[write_idx] = lst[read_idx]
+            write_idx += 1
+
+    del lst[write_idx:]
+    return lst
 
 
 def remove_duplicates_in_place_unsorted(lst):
-    """Remove duplicates in-place from an unsorted list."""
-    pass
+    """
+    Remove duplicates in-place from an unsorted list while preserving order.
+    Modifies the list in-place and returns it.
+    """
+    seen = set()
+    write_idx = 0
+
+    for read_idx in range(len(lst)):
+        item = lst[read_idx]
+        try:
+            if item not in seen:
+                seen.add(item)
+                lst[write_idx] = item
+                write_idx += 1
+        except TypeError:
+            # Fallback for unhashable items
+            if item not in lst[:write_idx]:
+                lst[write_idx] = item
+                write_idx += 1
+
+    del lst[write_idx:]
+    return lst
 
 
 def remove_duplicates_by_key(lst, key=None):
