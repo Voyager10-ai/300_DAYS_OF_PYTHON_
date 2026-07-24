@@ -140,8 +140,28 @@ def remove_duplicates_max_occurrences(lst, max_k=1):
 
 
 def remove_duplicates_nested(lst):
-    """Recursively remove duplicates from nested list structures."""
-    pass
+    """
+    Recursively process nested lists, tuples, and sets to remove duplicate items at every level
+    while preserving structure and first-seen element ordering.
+    """
+    if not isinstance(lst, (list, tuple, set)):
+        return lst
+
+    processed_elements = []
+    for item in lst:
+        if isinstance(item, (list, tuple, set)):
+            processed_elements.append(remove_duplicates_nested(item))
+        else:
+            processed_elements.append(item)
+
+    # Now deduplicate the current level
+    result = remove_duplicates_preserve_order(processed_elements)
+
+    if isinstance(lst, tuple):
+        return tuple(result)
+    elif isinstance(lst, set):
+        return set(result)
+    return result
 
 
 def visualize_duplicate_removal(lst):
