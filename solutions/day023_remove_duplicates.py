@@ -87,13 +87,56 @@ def remove_duplicates_in_place_unsorted(lst):
 
 
 def remove_duplicates_by_key(lst, key=None):
-    """Remove duplicates based on a custom key function or attribute."""
-    pass
+    """
+    Remove duplicates based on a custom key function (e.g. key=str.lower, key=lambda x: x['id']).
+    If key is None, behaves like standard preserve-order deduplication.
+    Returns a new list with unique items according to the key.
+    """
+    if key is None:
+        key = lambda x: x
+
+    seen_keys = set()
+    seen_unhashable_keys = []
+    result = []
+
+    for item in lst:
+        k = key(item)
+        try:
+            if k not in seen_keys:
+                seen_keys.add(k)
+                result.append(item)
+        except TypeError:
+            if k not in seen_unhashable_keys:
+                seen_unhashable_keys.append(k)
+                result.append(item)
+
+    return result
 
 
 def remove_duplicates_max_occurrences(lst, max_k=1):
-    """Remove duplicates allowing up to max_k occurrences of each element."""
-    pass
+    """
+    Filter list to allow at most `max_k` occurrences of each element while preserving order.
+    Returns a new list containing up to max_k copies of each distinct element.
+    """
+    if max_k <= 0:
+        return []
+
+    counts = {}
+    result = []
+
+    for item in lst:
+        try:
+            current = counts.get(item, 0)
+            if current < max_k:
+                counts[item] = current + 1
+                result.append(item)
+        except TypeError:
+            # Fallback for unhashable elements
+            unhashable_count = sum(1 for x in result if x == item)
+            if unhashable_count < max_k:
+                result.append(item)
+
+    return result
 
 
 def remove_duplicates_nested(lst):
