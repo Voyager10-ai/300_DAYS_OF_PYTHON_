@@ -299,12 +299,74 @@ def interactive_explorer():
 
 def show_mastery_box():
     """Print an artistic summary box."""
-    pass
+    width = 46
+    print()
+    print("   ╔" + "═" * (width - 2) + "╗")
+    print("   ║" + "👑 SECOND SMALLEST MASTERED! 👑".center(width - 2) + "║")
+    print("   ║" + " " * (width - 2) + "║")
+    print("   ║  Methods: Single-pass linear scan O(n),       ".ljust(width - 2) + "║")
+    print("   ║           Sorting-based selection O(n log n), ".ljust(width - 2) + "║")
+    print("   ║           Min-heap priority queue heapq,      ".ljust(width - 2) + "║")
+    print("   ║           Key-based custom finder,            ".ljust(width - 2) + "║")
+    print("   ║           General K-th smallest retrieval,    ".ljust(width - 2) + "║")
+    print("   ║           ASCII rank breakdown visualization  ".ljust(width - 2) + "║")
+    print("   ╚" + "═" * (width - 2) + "╝")
 
 
 def main():
     """Entry point for the program."""
-    pass
+    while True:
+        print("\n" + "=" * 50)
+        print("  DAY 24: SECOND SMALLEST")
+        print("=" * 50)
+        print()
+        print("   📂 Choose an option:")
+        print("      1. Run interactive second smallest explorer")
+        print("      2. Run built-in demo cases")
+        print("      3. Exit")
+
+        choice = input("\n      Select option (1-3): ").strip()
+        if choice == "1":
+            interactive_explorer()
+        elif choice == "2":
+            print("\n   >>> Running Built-in Demo Cases <<<")
+
+            # Demo 1: Unsorted numbers with duplicate min
+            d1 = [12, 3, 1, 1, 5, 8, 3, 19]
+            print(f"\n      Demo 1: Unsorted List with Duplicates {d1}")
+            s_min1 = find_second_smallest_linear(d1)
+            print(f"      👉 Second Smallest: {s_min1}")
+            draw_rank_visualization(d1)
+
+            # Demo 2: Floats / Negative numbers
+            d2 = [-10.5, 0.0, -2.3, -10.5, 15.2, -5.0]
+            print(f"\n      Demo 2: Negative & Float Numbers {d2}")
+            s_min2 = find_second_smallest_heap(d2)
+            s_max2 = find_second_largest_linear(d2)
+            print(f"      👉 Second Smallest: {s_min2}")
+            print(f"      👉 Second Largest : {s_max2}")
+            draw_rank_visualization(d2)
+
+            # Demo 3: Key-based search on strings
+            d3 = ["cat", "apple", "banana", "kiwi", "fig"]
+            print(f"\n      Demo 3: Strings by Length Key {d3}")
+            s_min3 = find_second_smallest_by_key(d3, key=len)
+            print(f"      👉 Second Shortest String: '{s_min3}' (len={len(s_min3)})")
+
+            # Demo 4: K-th smallest elements
+            d4 = [100, 40, 20, 50, 80, 10]
+            print(f"\n      Demo 4: K-th Smallest Selection {d4}")
+            print(f"      👉 1st Smallest: {find_kth_smallest(d4, 1)}")
+            print(f"      👉 2nd Smallest: {find_kth_smallest(d4, 2)}")
+            print(f"      👉 3rd Smallest: {find_kth_smallest(d4, 3)}")
+
+        elif choice == "3":
+            print("\n      Goodbye!")
+            break
+        else:
+            print("      ⚠️  Invalid selection. Please choose 1-3.")
+
+    show_mastery_box()
 
 
 if __name__ == "__main__":
