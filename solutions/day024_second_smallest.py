@@ -62,13 +62,47 @@ def find_second_largest_linear(lst):
 
 
 def find_second_smallest_sorting(lst):
-    """Find the second smallest distinct element by sorting."""
-    pass
+    """
+    Find the second smallest distinct element by sorting unique elements.
+    Time Complexity: O(n log n), Space Complexity: O(n).
+    Returns None if fewer than 2 distinct elements exist.
+    """
+    if not lst:
+        return None
+
+    try:
+        unique_elems = sorted(set(lst))
+    except TypeError:
+        # Fallback for unhashable elements
+        unique_elems = []
+        for item in lst:
+            if item not in unique_elems:
+                unique_elems.append(item)
+        unique_elems.sort(key=lambda x: str(x))
+
+    return unique_elems[1] if len(unique_elems) >= 2 else None
 
 
 def find_second_smallest_heap(lst):
-    """Find the second smallest element using a min-heap."""
-    pass
+    """
+    Find the second smallest element using a min-heap (heapq.nsmallest).
+    Time Complexity: O(n + k log n), Space Complexity: O(n).
+    Returns None if fewer than 2 distinct elements exist.
+    """
+    if not lst:
+        return None
+
+    try:
+        unique_set = set(lst)
+        two_smallest = heapq.nsmallest(2, unique_set)
+    except TypeError:
+        unique_elems = []
+        for item in lst:
+            if item not in unique_elems:
+                unique_elems.append(item)
+        two_smallest = heapq.nsmallest(2, unique_elems, key=lambda x: str(x))
+
+    return two_smallest[1] if len(two_smallest) >= 2 else None
 
 
 def find_second_smallest_by_key(lst, key=None):
