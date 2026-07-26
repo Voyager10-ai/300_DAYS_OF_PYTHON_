@@ -215,13 +215,86 @@ def draw_rank_visualization(lst):
 
 
 def parse_input_list(prompt_text):
-    """Parse user input string into a list."""
-    pass
+    """
+    Parse user input string into a list.
+    Supports Python list syntax (e.g., [5, 2, 8, 1, 9]) or comma-separated numbers/strings.
+    """
+    raw = input(prompt_text).strip()
+    if not raw:
+        return []
+    try:
+        parsed = ast.literal_eval(raw)
+        if isinstance(parsed, list):
+            return parsed
+        return [parsed]
+    except (ValueError, SyntaxError):
+        items = [item.strip() for item in raw.split(",") if item.strip()]
+        converted = []
+        for item in items:
+            try:
+                converted.append(int(item))
+            except ValueError:
+                try:
+                    converted.append(float(item))
+                except ValueError:
+                    converted.append(item)
+        return converted
 
 
 def interactive_explorer():
-    """Prompt user for input and display second smallest analysis results."""
-    pass
+    """Prompt user for input list and execute second smallest operations."""
+    print("\n   === Second Smallest Explorer ===")
+    print("      Enter numbers or strings (e.g. 5, 2, 8, 1, 9, 2 or [10, 20, 5, 15])")
+    lst = parse_input_list("      Enter list: ")
+
+    if not lst:
+        print("      ⚠️  List cannot be empty.")
+        return
+
+    print(f"\n      Input List ({len(lst)} items): {lst}")
+
+    print("\n      Select Operation:")
+    print("         1. Single-Pass Linear Search O(n)")
+    print("         2. Sorting Approach O(n log n)")
+    print("         3. Min-Heap Priority Queue Approach")
+    print("         4. Key-Based Search (e.g. string length)")
+    print("         5. General K-th Smallest Element")
+    print("         6. Run All Algorithms & Render Rank Visualization")
+
+    choice = input("\n      Select option (1-6, default 6): ").strip()
+
+    if choice == "1":
+        s_min = find_second_smallest_linear(lst)
+        s_max = find_second_largest_linear(lst)
+        print(f"\n      👉 Second Smallest (Linear): {s_min}")
+        print(f"      👉 Second Largest  (Linear): {s_max}")
+    elif choice == "2":
+        s_min = find_second_smallest_sorting(lst)
+        print(f"\n      👉 Second Smallest (Sorting): {s_min}")
+    elif choice == "3":
+        s_min = find_second_smallest_heap(lst)
+        print(f"\n      👉 Second Smallest (Heap): {s_min}")
+    elif choice == "4":
+        s_min = find_second_smallest_by_key(lst, key=lambda x: len(str(x)))
+        print(f"\n      👉 Second Smallest by Length Key: {s_min}")
+    elif choice == "5":
+        k_str = input("         Enter K value (default 2): ").strip()
+        k = int(k_str) if k_str.isdigit() else 2
+        kth = find_kth_smallest(lst, k)
+        print(f"\n      👉 {k}-th Smallest Distinct Element: {kth}")
+    else:
+        s_min_lin = find_second_smallest_linear(lst)
+        s_max_lin = find_second_largest_linear(lst)
+        s_min_sort = find_second_smallest_sorting(lst)
+        s_min_heap = find_second_smallest_heap(lst)
+
+        print("\n      --- Second Smallest Analysis Results ---")
+        print(f"      👉 Second Smallest (Linear O(n)): {s_min_lin}")
+        print(f"      👉 Second Smallest (Sorting):    {s_min_sort}")
+        print(f"      👉 Second Smallest (Heap):       {s_min_heap}")
+        print(f"      👉 Second Largest  (Linear O(n)): {s_max_lin}")
+
+        draw_rank_visualization(lst)
 
 
 def show_mastery_box():
