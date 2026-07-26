@@ -106,13 +106,45 @@ def find_second_smallest_heap(lst):
 
 
 def find_second_smallest_by_key(lst, key=None):
-    """Find the second smallest element based on a custom key function."""
-    pass
+    """
+    Find the element corresponding to the second smallest value computed by key function.
+    Returns the actual element or None if fewer than 2 distinct key values exist.
+    """
+    if not lst:
+        return None
+
+    if key is None:
+        key = lambda x: x
+
+    # Group elements by key or sort distinct key values
+    key_map = {}
+    for item in lst:
+        k_val = key(item)
+        if k_val not in key_map:
+            key_map[k_val] = item
+
+    sorted_keys = sorted(key_map.keys())
+    return key_map[sorted_keys[1]] if len(sorted_keys) >= 2 else None
 
 
 def find_kth_smallest(lst, k=2):
-    """Find the K-th smallest distinct element in a list."""
-    pass
+    """
+    Find the K-th smallest distinct element in a list (1-indexed, default k=2).
+    Returns the K-th smallest distinct element or None if insufficient elements exist.
+    """
+    if not lst or k <= 0:
+        return None
+
+    try:
+        unique_sorted = sorted(set(lst))
+    except TypeError:
+        unique_elems = []
+        for item in lst:
+            if item not in unique_elems:
+                unique_elems.append(item)
+        unique_sorted = sorted(unique_elems, key=lambda x: str(x))
+
+    return unique_sorted[k - 1] if len(unique_sorted) >= k else None
 
 
 def draw_rank_visualization(lst):
