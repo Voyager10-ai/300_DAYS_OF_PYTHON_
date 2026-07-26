@@ -18,13 +18,47 @@ import heapq
 
 
 def find_second_smallest_linear(lst):
-    """Find the second smallest distinct element using a single-pass O(n) scan."""
-    pass
+    """
+    Find the second smallest distinct element using a single-pass O(n) scan.
+    Time Complexity: O(n), Space Complexity: O(1).
+    Returns None if fewer than 2 distinct elements exist.
+    """
+    if not lst or len(lst) < 2:
+        return None
+
+    first = float('inf')
+    second = float('inf')
+
+    for num in lst:
+        if num < first:
+            second = first
+            first = num
+        elif first < num < second:
+            second = num
+
+    return second if second != float('inf') else None
 
 
 def find_second_largest_linear(lst):
-    """Find the second largest distinct element using a single-pass O(n) scan."""
-    pass
+    """
+    Find the second largest distinct element using a single-pass O(n) scan.
+    Time Complexity: O(n), Space Complexity: O(1).
+    Returns None if fewer than 2 distinct elements exist.
+    """
+    if not lst or len(lst) < 2:
+        return None
+
+    first = float('-inf')
+    second = float('-inf')
+
+    for num in lst:
+        if num > first:
+            second = first
+            first = num
+        elif first > num > second:
+            second = num
+
+    return second if second != float('-inf') else None
 
 
 def find_second_smallest_sorting(lst):
