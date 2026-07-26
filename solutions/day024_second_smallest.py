@@ -148,8 +148,70 @@ def find_kth_smallest(lst, k=2):
 
 
 def draw_rank_visualization(lst):
-    """Render an ASCII rank visualization showing sorted order and key ranks."""
-    pass
+    """
+    Render an ASCII rank visualization showing sorted unique order,
+    rank badges (1st Min, 2nd Min, 2nd Max, Max), and relative position bars.
+    """
+    print("\n   📊 Element Rank & Order Visualization:")
+    print("   " + "─" * 58)
+
+    if not lst:
+        print("      (Empty list provided)")
+        print("   " + "─" * 58)
+        return
+
+    try:
+        unique_sorted = sorted(set(lst))
+    except TypeError:
+        unique_elems = []
+        for item in lst:
+            if item not in unique_elems:
+                unique_elems.append(item)
+        unique_sorted = sorted(unique_elems, key=lambda x: str(x))
+
+    n_unique = len(unique_sorted)
+    print(f"   Raw List      : {lst}")
+    print(f"   Unique Count  : {n_unique} distinct element(s)")
+    print("   " + "─" * 58)
+
+    if n_unique < 2:
+        print(f"   ⚠️  Need at least 2 distinct elements (found {n_unique}).")
+        print("   " + "─" * 58)
+        return
+
+    first_min = unique_sorted[0]
+    second_min = unique_sorted[1]
+    second_max = unique_sorted[-2]
+    first_max = unique_sorted[-1]
+
+    # Render rank breakdown table
+    print("   Rank breakdown:")
+    for idx, val in enumerate(unique_sorted, 1):
+        badges = []
+        if val == first_min:
+            badges.append("👑 [1st MIN]")
+        if val == second_min:
+            badges.append("🥈 [2nd MIN]")
+        if val == second_max and n_unique > 2:
+            badges.append("🥈 [2nd MAX]")
+        if val == first_max:
+            badges.append("👑 [1st MAX]")
+
+        badge_str = " ".join(badges)
+
+        # Bar width calculation for numbers
+        if isinstance(val, (int, float)):
+            max_v = max(abs(x) for x in unique_sorted if isinstance(x, (int, float))) or 1
+            bar_len = int((abs(val) / max_v) * 20)
+            bar_str = "█" * max(1, bar_len)
+            val_str = f"{val: >8}"
+        else:
+            bar_str = "■" * min(20, len(str(val)))
+            val_str = f"'{val}': >8"
+
+        print(f"      Rank #{idx: >2}: {val_str} | {bar_str:<20} {badge_str}")
+
+    print("   " + "─" * 58)
 
 
 def parse_input_list(prompt_text):
