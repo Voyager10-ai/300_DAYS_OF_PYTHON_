@@ -1,0 +1,96 @@
+# Day 25: Sum List
+#
+# Problem:
+#   Write a Python program to compute sums of list elements using multiple algorithms and techniques.
+#   - Compute sum using an iterative loop accumulator.
+#   - Compute sum using Python's built-in sum() function.
+#   - Compute sum using functools.reduce() with operator.add.
+#   - Compute sum recursively (head recursion and tail recursion approaches).
+#   - Compute conditional / filtered sums (even-only, odd-only, positive-only, custom predicate).
+#   - Compute cumulative (prefix) sums / running totals.
+#   - Compute sum of nested / deeply-nested lists via recursive flattening.
+#   - Compute pairwise sums of two lists (element-wise zip addition).
+#   - Render an ASCII contribution breakdown visualizing each element's percentage share.
+#   - Provide an interactive CLI explorer with built-in test suites.
+#
+# This exercise covers iteration, built-ins, functional programming (reduce),
+# recursion, conditional filtering, prefix sums, nested structures,
+# pairwise operations, ASCII visualization, and CLI interactions.
+
+import ast
+import functools
+import operator
+
+
+def sum_iterative(lst):
+    """Compute sum using an iterative loop accumulator."""
+    pass
+
+
+def sum_builtin(lst):
+    """Compute sum using Python's built-in sum() function."""
+    pass
+
+
+def sum_reduce(lst):
+    """Compute sum using functools.reduce with operator.add."""
+    pass
+
+
+def sum_recursive(lst):
+    """Compute sum recursively using head recursion."""
+    pass
+
+
+def sum_tail_recursive(lst, acc=0):
+    """Compute sum recursively using tail-recursive style."""
+    pass
+
+
+def sum_filtered(lst, predicate=None):
+    """Compute sum of elements matching a custom predicate function."""
+    pass
+
+
+def sum_cumulative(lst):
+    """Compute cumulative (prefix) sums / running totals."""
+    pass
+
+
+def sum_nested(lst):
+    """Compute sum of elements in arbitrarily nested lists."""
+    pass
+
+
+def sum_pairwise(lst_a, lst_b):
+    """Compute element-wise pairwise sums of two lists."""
+    pass
+
+
+def draw_contribution_chart(lst):
+    """Render ASCII contribution breakdown showing each element's percentage share."""
+    pass
+
+
+def parse_input_list(prompt_text):
+    """Parse user input string into a list."""
+    pass
+
+
+def interactive_explorer():
+    """Prompt user for input and display sum analysis results."""
+    pass
+
+
+def show_mastery_box():
+    """Print an artistic summary box."""
+    pass
+
+
+def main():
+    """Entry point for the program."""
+    pass
+
+
+if __name__ == "__main__":
+    main()

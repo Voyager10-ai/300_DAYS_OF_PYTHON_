@@ -1,6 +1,6 @@
 {
   "total_problems": 282,
-  "current_day": 24,
+  "current_day": 25,
   "problems": [
     {"day": 1, "title": "Print String", "status": "done"},
     {"day": 2, "title": "Input Age", "status": "done"},
