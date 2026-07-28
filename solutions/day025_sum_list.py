@@ -23,28 +23,52 @@ import operator
 
 
 def sum_iterative(lst):
-    """Compute sum using an iterative loop accumulator."""
-    pass
+    """
+    Compute sum using an iterative loop accumulator.
+    Time Complexity: O(n), Space Complexity: O(1).
+    """
+    total = 0
+    for item in lst:
+        total += item
+    return total
 
 
 def sum_builtin(lst):
-    """Compute sum using Python's built-in sum() function."""
-    pass
+    """
+    Compute sum using Python's built-in sum() function.
+    Time Complexity: O(n), Space Complexity: O(1).
+    """
+    return sum(lst)
 
 
 def sum_reduce(lst):
-    """Compute sum using functools.reduce with operator.add."""
-    pass
+    """
+    Compute sum using functools.reduce with operator.add.
+    Time Complexity: O(n), Space Complexity: O(1).
+    """
+    if not lst:
+        return 0
+    return functools.reduce(operator.add, lst)
 
 
 def sum_recursive(lst):
-    """Compute sum recursively using head recursion."""
-    pass
+    """
+    Compute sum recursively using head recursion.
+    Time Complexity: O(n), Space Complexity: O(n) call stack depth.
+    """
+    if not lst:
+        return 0
+    return lst[0] + sum_recursive(lst[1:])
 
 
 def sum_tail_recursive(lst, acc=0):
-    """Compute sum recursively using tail-recursive style."""
-    pass
+    """
+    Compute sum recursively using tail-recursive style with accumulator.
+    Time Complexity: O(n), Space Complexity: O(n) call stack depth.
+    """
+    if not lst:
+        return acc
+    return sum_tail_recursive(lst[1:], acc + lst[0])
 
 
 def sum_filtered(lst, predicate=None):
