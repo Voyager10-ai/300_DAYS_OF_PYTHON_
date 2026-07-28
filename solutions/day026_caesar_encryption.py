@@ -90,28 +90,140 @@ def crack_caesar(ciphertext):
 
 
 def draw_shift_visualization(shift, sample_text="HELLOPYTHON"):
-    """Render ASCII diagram illustrating Caesar shift mapping."""
-    pass
+    """
+    Render ASCII diagram illustrating Caesar shift mapping and sample transformation.
+    """
+    alpha = string.ascii_uppercase
+    shifted_alpha = alpha[shift % 26:] + alpha[:shift % 26]
+
+    print("\n   ┌" + "─" * 62 + "┐")
+    print("   │" + f"🔒 CAESAR CIPHER SHIFT MAPPING (Shift = {shift})".center(62) + "│")
+    print("   ├" + "─" * 62 + "┤")
+    print("   │ Plain : " + " ".join(list(alpha[:13])) + " │")
+    print("   │ Cipher: " + " ".join(list(shifted_alpha[:13])) + " │")
+    print("   │ " + "─" * 60 + " │")
+    print("   │ Plain : " + " ".join(list(alpha[13:])) + " │")
+    print("   │ Cipher: " + " ".join(list(shifted_alpha[13:])) + " │")
+    print("   ├" + "─" * 62 + "┤")
+
+    encrypted_sample = caesar_encrypt(sample_text, shift)
+    print("   │ Sample Transformation:".ljust(63) + "│")
+    print(f"   │   Input : {sample_text:<48} │")
+    print(f"   │   Output: {encrypted_sample:<48} │")
+    print("   └" + "─" * 62 + "┘")
 
 
 def parse_input_text(prompt_text):
     """Parse user input text for cipher operations."""
-    pass
+    return input(prompt_text).strip()
 
 
 def interactive_explorer():
     """Prompt user for text and shift key to perform interactive cipher analysis."""
-    pass
+    print("\n" + "=" * 50)
+    print("   🔐 INTERACTIVE CAESAR CIPHER EXPLORER")
+    print("=" * 50)
+
+    text = parse_input_text("\n   Enter text to analyze: ")
+    if not text:
+        print("   ⚠️  No text entered.")
+        return
+
+    try:
+        shift_str = input("   Enter shift key integer (e.g., 3): ").strip()
+        shift = int(shift_str) if shift_str else 3
+    except ValueError:
+        print("   ⚠️  Invalid shift key. Defaulting to 3.")
+        shift = 3
+
+    encrypted = caesar_encrypt(text, shift)
+    decrypted = caesar_decrypt(encrypted, shift)
+    rot13_text = rot13(text)
+
+    print("\n   📋 Cipher Results:")
+    print("   " + "─" * 45)
+    print(f"   🔹 Original Text : {text}")
+    print(f"   🔹 Shift Key     : {shift}")
+    print(f"   🔹 Encrypted Text: {encrypted}")
+    print(f"   🔹 Decrypted Text: {decrypted}")
+    print(f"   🔹 ROT13 Variant : {rot13_text}")
+
+    print("\n   🕵️  Automated Frequency Analysis Crack Top 3:")
+    top_candidates = crack_caesar(encrypted)[:3]
+    for rank, (score, cand_shift, cand_text) in enumerate(top_candidates, 1):
+        print(f"      Rank {rank}: Shift={cand_shift:2d} | Score={score:.3f} | Text: '{cand_text}'")
+
+    draw_shift_visualization(shift, sample_text=text[:15].upper() if text else "HELLOPYTHON")
 
 
 def show_mastery_box():
     """Print an artistic summary box."""
-    pass
+    width = 46
+    print()
+    print("   ╔" + "═" * (width - 2) + "╗")
+    print("   ║" + "👑 CAESAR CIPHER MASTERED! 👑".center(width - 2) + "║")
+    print("   ║" + " " * (width - 2) + "║")
+    print("   ║  Features: Shift Encryption & Decryption,     ".ljust(width - 2) + "║")
+    print("   ║            Case & Non-alpha preservation,     ".ljust(width - 2) + "║")
+    print("   ║            ROT13 Transformation,              ".ljust(width - 2) + "║")
+    print("   ║            Brute-force Frequency Cracker,     ".ljust(width - 2) + "║")
+    print("   ║            ASCII Shift Diagram Visualization  ".ljust(width - 2) + "║")
+    print("   ╚" + "═" * (width - 2) + "╝")
 
 
 def main():
     """Entry point for the program."""
-    pass
+    while True:
+        print("\n" + "=" * 50)
+        print("  DAY 26: CAESAR ENCRYPTION")
+        print("=" * 50)
+        print()
+        print("   📂 Choose an option:")
+        print("      1. Run interactive Caesar cipher explorer")
+        print("      2. Run built-in demo cases")
+        print("      3. Exit")
+
+        choice = input("\n      Select option (1-3): ").strip()
+        if choice == "1":
+            interactive_explorer()
+        elif choice == "2":
+            print("\n   >>> Running Built-in Demo Cases <<<")
+
+            # Demo 1: Standard Encryption & Decryption
+            t1 = "Hello World! Python Cryptography 101."
+            s1 = 5
+            print(f"\n      Demo 1: Standard Shift {s1}")
+            print(f"      👉 Input    : '{t1}'")
+            enc1 = caesar_encrypt(t1, s1)
+            print(f"      👉 Encrypted: '{enc1}'")
+            print(f"      👉 Decrypted: '{caesar_decrypt(enc1, s1)}'")
+            draw_shift_visualization(s1, "HELLOPYTHON")
+
+            # Demo 2: ROT13 Transformation
+            t2 = "The Quick Brown Fox Jumps Over The Lazy Dog"
+            print(f"\n      Demo 2: ROT13 Transformation")
+            print(f"      👉 Input  : '{t2}'")
+            r2 = rot13(t2)
+            print(f"      👉 ROT13  : '{r2}'")
+            print(f"      👉 Un-ROT : '{rot13(r2)}'")
+
+            # Demo 3: Keyless Brute-force Frequency Cracking
+            secret_msg = "Attack the eastern castle at dawn when the fog clears"
+            secret_shift = 17
+            encrypted_secret = caesar_encrypt(secret_msg, secret_shift)
+            print(f"\n      Demo 3: Automated Keyless Cipher Cracker")
+            print(f"      👉 Intercepted Ciphertext: '{encrypted_secret}'")
+            print("      👉 Running English Letter Frequency Analysis...")
+            top_crack = crack_caesar(encrypted_secret)[0]
+            print(f"      🎉 Cracked Key: Shift {top_crack[1]} | Decrypted: '{top_crack[2]}'")
+
+        elif choice == "3":
+            print("\n      Goodbye!")
+            break
+        else:
+            print("      ⚠️  Invalid selection. Please choose 1-3.")
+
+    show_mastery_box()
 
 
 if __name__ == "__main__":

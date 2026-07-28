@@ -28,6 +28,7 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 23: Remove Duplicates
 - Day 24: Second Smallest
 - Day 25: Sum List
+- Day 26: Caesar Encryption
 
 
 
