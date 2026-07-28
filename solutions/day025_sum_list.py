@@ -153,13 +153,72 @@ def draw_contribution_chart(lst, max_bar_width=30):
 
 
 def parse_input_list(prompt_text):
-    """Parse user input string into a list."""
-    pass
+    """
+    Parse user input string into a list of numbers or elements.
+    Supports Python list literal format [1, 2, 3] and space/comma separated inputs.
+    """
+    raw_input = input(prompt_text).strip()
+    if not raw_input:
+        return []
+
+    try:
+        parsed = ast.literal_eval(raw_input)
+        if isinstance(parsed, (list, tuple)):
+            return list(parsed)
+        elif isinstance(parsed, (int, float)):
+            return [parsed]
+    except (ValueError, SyntaxError):
+        pass
+
+    # Fallback: parse comma or space separated numbers
+    clean_str = raw_input.replace(",", " ")
+    parts = clean_str.split()
+    elements = []
+    for p in parts:
+        try:
+            if "." in p:
+                elements.append(float(p))
+            else:
+                elements.append(int(p))
+        except ValueError:
+            elements.append(p)
+    return elements
 
 
 def interactive_explorer():
-    """Prompt user for input and display sum analysis results."""
-    pass
+    """Prompt user for input list and display comprehensive sum analysis results."""
+    print("\n" + "=" * 50)
+    print("   🧮 INTERACTIVE SUM LIST EXPLORER")
+    print("=" * 50)
+
+    user_list = parse_input_list("\n   Enter a list of numbers (e.g., [10, 20, 30, 40] or 5, 10, 15): ")
+    if not user_list:
+        print("   ⚠️  No elements provided.")
+        return
+
+    # Check if elements are purely numeric
+    numeric_list = [x for x in user_list if isinstance(x, (int, float))]
+    if len(numeric_list) != len(user_list):
+        print(f"   ⚠️  List contains non-numeric elements: {user_list}")
+        print(f"   Filtered numeric elements: {numeric_list}")
+        user_list = numeric_list
+
+    if not user_list:
+        return
+
+    print(f"\n   📋 Input List: {user_list}")
+    print("   " + "─" * 45)
+    print(f"   🔹 Iterative Accumulator Sum : {sum_iterative(user_list)}")
+    print(f"   🔹 Built-in sum()            : {sum_builtin(user_list)}")
+    print(f"   🔹 functools.reduce() Sum    : {sum_reduce(user_list)}")
+    print(f"   🔹 Recursive Head Sum        : {sum_recursive(user_list)}")
+    print(f"   🔹 Recursive Tail Sum        : {sum_tail_recursive(user_list)}")
+    print(f"   🔹 Filtered Even-only Sum    : {sum_filtered(user_list, lambda x: x % 2 == 0)}")
+    print(f"   🔹 Filtered Odd-only Sum     : {sum_filtered(user_list, lambda x: x % 2 != 0)}")
+    print(f"   🔹 Filtered Positive Sum     : {sum_filtered(user_list, lambda x: x > 0)}")
+    print(f"   🔹 Cumulative (Prefix) Sums  : {sum_cumulative(user_list)}")
+
+    draw_contribution_chart(user_list)
 
 
 def show_mastery_box():
