@@ -223,12 +223,76 @@ def interactive_explorer():
 
 def show_mastery_box():
     """Print an artistic summary box."""
-    pass
+    width = 46
+    print()
+    print("   ╔" + "═" * (width - 2) + "╗")
+    print("   ║" + "👑 SUM LIST MASTERED! 👑".center(width - 2) + "║")
+    print("   ║" + " " * (width - 2) + "║")
+    print("   ║  Techniques: Iterative & built-in sum(),      ".ljust(width - 2) + "║")
+    print("   ║              functools.reduce() functional,   ".ljust(width - 2) + "║")
+    print("   ║              Head & Tail Recursion,           ".ljust(width - 2) + "║")
+    print("   ║              Filtered & Cumulative sums,      ".ljust(width - 2) + "║")
+    print("   ║              Arbitrarily nested flattening,   ".ljust(width - 2) + "║")
+    print("   ║              Pairwise element-wise addition,  ".ljust(width - 2) + "║")
+    print("   ║              ASCII contribution chart viz     ".ljust(width - 2) + "║")
+    print("   ╚" + "═" * (width - 2) + "╝")
 
 
 def main():
     """Entry point for the program."""
-    pass
+    while True:
+        print("\n" + "=" * 50)
+        print("  DAY 25: SUM LIST")
+        print("=" * 50)
+        print()
+        print("   📂 Choose an option:")
+        print("      1. Run interactive list sum explorer")
+        print("      2. Run built-in demo cases")
+        print("      3. Exit")
+
+        choice = input("\n      Select option (1-3): ").strip()
+        if choice == "1":
+            interactive_explorer()
+        elif choice == "2":
+            print("\n   >>> Running Built-in Demo Cases <<<")
+
+            # Demo 1: Basic list summation techniques
+            d1 = [10, 20, 30, 40, 50]
+            print(f"\n      Demo 1: Basic List Summation {d1}")
+            print(f"      👉 Iterative: {sum_iterative(d1)}")
+            print(f"      👉 Built-in : {sum_builtin(d1)}")
+            print(f"      👉 Reduce   : {sum_reduce(d1)}")
+            print(f"      👉 Recursive: {sum_recursive(d1)}")
+            print(f"      👉 Tail Rec : {sum_tail_recursive(d1)}")
+            draw_contribution_chart(d1)
+
+            # Demo 2: Filtered & Cumulative Sums
+            d2 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            print(f"\n      Demo 2: Filtered & Prefix Sums {d2}")
+            print(f"      👉 Even Numbers Sum: {sum_filtered(d2, lambda x: x % 2 == 0)}")
+            print(f"      👉 Odd Numbers Sum : {sum_filtered(d2, lambda x: x % 2 != 0)}")
+            print(f"      👉 Cumulative Sums : {sum_cumulative(d2)}")
+
+            # Demo 3: Arbitrarily Nested Lists
+            d3 = [1, [2, [3, 4], 5], [6, 7], 8]
+            print(f"\n      Demo 3: Deeply Nested List {d3}")
+            print(f"      👉 Total Flattened Sum: {sum_nested(d3)}")
+
+            # Demo 4: Pairwise Addition
+            list_a = [10, 20, 30, 40]
+            list_b = [1, 2, 3]
+            print(f"\n      Demo 4: Pairwise List Summation")
+            print(f"      👉 List A: {list_a}")
+            print(f"      👉 List B: {list_b}")
+            print(f"      👉 Pairwise Result: {sum_pairwise(list_a, list_b)}")
+
+        elif choice == "3":
+            print("\n      Goodbye!")
+            break
+        else:
+            print("      ⚠️  Invalid selection. Please choose 1-3.")
+
+    show_mastery_box()
 
 
 if __name__ == "__main__":
