@@ -122,9 +122,34 @@ def sum_pairwise(lst_a, lst_b):
     return [a + b for a, b in itertools.zip_longest(lst_a, lst_b, fillvalue=0)]
 
 
-def draw_contribution_chart(lst):
-    """Render ASCII contribution breakdown showing each element's percentage share."""
-    pass
+def draw_contribution_chart(lst, max_bar_width=30):
+    """
+    Render ASCII contribution breakdown showing each element's percentage share of the sum.
+    """
+    if not lst:
+        print("      [Empty List - No chart available]")
+        return
+
+    total = sum(lst)
+    print("\n   ┌" + "─" * 60 + "┐")
+    print("   │" + "📊 ELEMENT CONTRIBUTION BREAKDOWN CHART".center(60) + "│")
+    print("   ├" + "─" * 60 + "┤")
+    print(f"   │ Total Sum: {total:<47} │")
+    print("   ├" + "─" * 60 + "┤")
+
+    if total == 0:
+        for idx, val in enumerate(lst):
+            print(f"   │ Index [{idx:2d}]: Val={val:<6} | Share:  0.0% [N/A]                 │")
+    else:
+        abs_sum = sum(abs(x) for x in lst)
+        for idx, val in enumerate(lst):
+            share = (val / total) * 100
+            bar_len = int((abs(val) / (abs_sum if abs_sum != 0 else 1)) * max_bar_width)
+            bar_char = "█" if val >= 0 else "░"
+            bar = bar_char * bar_len
+            print(f"   │ Index [{idx:2d}]: Val={val:<6} | {share:6.1f}% {bar:<{max_bar_width}} │")
+
+    print("   └" + "─" * 60 + "┘")
 
 
 def parse_input_list(prompt_text):
