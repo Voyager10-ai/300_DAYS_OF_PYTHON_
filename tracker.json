@@ -1,6 +1,6 @@
 {
   "total_problems": 282,
-  "current_day": 25,
+  "current_day": 26,
   "problems": [
     {"day": 1, "title": "Print String", "status": "done"},
     {"day": 2, "title": "Input Age", "status": "done"},
@@ -26,7 +26,7 @@
     {"day": 22, "title": "Permutations", "status": "done"},
     {"day": 23, "title": "Remove Duplicates", "status": "done"},
     {"day": 24, "title": "Second Smallest", "status": "done"},
-    {"day": 25, "title": "Sum List", "status": "pending"},
+    {"day": 25, "title": "Sum List", "status": "done"},
     {"day": 26, "title": "Caesar Encryption", "status": "pending"},
     {"day": 27, "title": "Character Exchange", "status": "pending"},
     {"day": 28, "title": "Count Character", "status": "pending"},
