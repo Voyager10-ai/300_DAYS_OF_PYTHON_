@@ -72,13 +72,28 @@ def sum_tail_recursive(lst, acc=0):
 
 
 def sum_filtered(lst, predicate=None):
-    """Compute sum of elements matching a custom predicate function."""
-    pass
+    """
+    Compute sum of elements matching a predicate function.
+    If predicate is None, sums all elements.
+    Time Complexity: O(n), Space Complexity: O(1).
+    """
+    if predicate is None:
+        predicate = lambda x: True
+    return sum(x for x in lst if predicate(x))
 
 
 def sum_cumulative(lst):
-    """Compute cumulative (prefix) sums / running totals."""
-    pass
+    """
+    Compute cumulative (prefix) sums / running totals for a list.
+    Time Complexity: O(n), Space Complexity: O(n).
+    Example: [1, 2, 3, 4] -> [1, 3, 6, 10]
+    """
+    running_total = 0
+    prefix_sums = []
+    for item in lst:
+        running_total += item
+        prefix_sums.append(running_total)
+    return prefix_sums
 
 
 def sum_nested(lst):
