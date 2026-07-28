@@ -97,13 +97,29 @@ def sum_cumulative(lst):
 
 
 def sum_nested(lst):
-    """Compute sum of elements in arbitrarily nested lists."""
-    pass
+    """
+    Compute total sum of elements in arbitrarily nested lists/tuples.
+    Time Complexity: O(total elements), Space Complexity: O(recursion depth).
+    Example: [1, [2, [3, 4], 5], 6] -> 21
+    """
+    total = 0
+    if isinstance(lst, (list, tuple, set)):
+        for item in lst:
+            total += sum_nested(item)
+    elif isinstance(lst, (int, float)):
+        total += lst
+    return total
 
 
 def sum_pairwise(lst_a, lst_b):
-    """Compute element-wise pairwise sums of two lists."""
-    pass
+    """
+    Compute element-wise pairwise sums of two lists.
+    Pads shorter list with 0 using itertools.zip_longest.
+    Time Complexity: O(max(len(a), len(b))), Space Complexity: O(max(len(a), len(b))).
+    Example: [1, 2, 3], [10, 20] -> [11, 22, 3]
+    """
+    import itertools
+    return [a + b for a, b in itertools.zip_longest(lst_a, lst_b, fillvalue=0)]
 
 
 def draw_contribution_chart(lst):
