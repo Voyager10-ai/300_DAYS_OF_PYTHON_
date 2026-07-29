@@ -203,4 +203,41 @@ def swap_custom_mapping(s: str, mapping: Dict[str, str]) -> str:
     return "".join(mapping.get(ch, ch) for ch in s)
 
 
+def draw_exchange_visualization(original: str, modified: str, title: str = "CHARACTER EXCHANGE VISUALIZATION") -> None:
+    """
+    Renders an ASCII visualization chart showing original string, index layout,
+    swap indicators, and the resulting modified string.
+    """
+    print("\n   ┌" + "─" * 62 + "┐")
+    print("   │" + f"🔀 {title}".center(62) + "│")
+    print("   ├" + "─" * 62 + "┤")
+    
+    n = max(len(original), len(modified))
+    if n == 0:
+        print("   │" + " (empty string) ".center(62) + "│")
+        print("   └" + "─" * 62 + "┘\n")
+        return
+
+    # Index header
+    indices_str = " ".join(f"{i:2d}" for i in range(len(original)))
+    orig_chars_str = " ".join(f" '{ch}'" if len(ch) == 1 else f"'{ch}'" for ch in original)
+    mod_chars_str = " ".join(f" '{ch}'" if len(ch) == 1 else f"'{ch}'" for ch in modified)
+    
+    print("   │ Index:    " + indices_str.ljust(50) + "│")
+    print("   │ Original: " + orig_chars_str.ljust(50) + "│")
+    
+    # Highlight changed positions
+    diff_markers = []
+    for i in range(max(len(original), len(modified))):
+        c1 = original[i] if i < len(original) else ""
+        c2 = modified[i] if i < len(modified) else ""
+        diff_markers.append(" ↕ " if c1 != c2 else " │ ")
+    
+    markers_str = "".join(diff_markers)
+    print("   │ Change:   " + markers_str.ljust(50) + "│")
+    print("   │ Result:   " + mod_chars_str.ljust(50) + "│")
+    print("   └" + "─" * 62 + "┘\n")
+
+
+
 
