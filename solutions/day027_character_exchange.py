@@ -239,5 +239,72 @@ def draw_exchange_visualization(original: str, modified: str, title: str = "CHAR
     print("   └" + "─" * 62 + "┘\n")
 
 
+def run_demo_suite() -> None:
+    """
+    Executes comprehensive test suites demonstrating all character exchange algorithms.
+    """
+    print("\n" + "=" * 66)
+    print(" 🚀 DAY 27: CHARACTER EXCHANGE DEMONSTRATION SUITE")
+    print("=" * 66)
+
+    test_cases = [
+        ("python", "First & Last Exchange"),
+        ("a", "Single Char String"),
+        ("hello world python", "Per-Word First & Last Exchange"),
+        ("leetcode", "Vowel Position Reversal"),
+        ("code", "Index Swap (0, 2)"),
+        ("123456", "Pairwise Adjacent Swap"),
+        ("python", "Cyclic Rotation Right (k=2)"),
+    ]
+
+    for item, label in test_cases:
+        print(f"\n📌 Case: {label}")
+        if label == "First & Last Exchange":
+            res = swap_first_last(item)
+        elif label == "Single Char String":
+            res = swap_first_last(item)
+        elif label == "Per-Word First & Last Exchange":
+            res = swap_first_last_words(item)
+        elif label == "Vowel Position Reversal":
+            res = swap_vowels(item)
+        elif label == "Index Swap (0, 2)":
+            res = swap_indices(item, 0, 2)
+        elif label == "Pairwise Adjacent Swap":
+            res = swap_pairwise(item)
+        elif label == "Cyclic Rotation Right (k=2)":
+            res = rotate_characters(item, 2)
+        else:
+            res = item
+
+        draw_exchange_visualization(item, res, title=f"{label.upper()}")
+        print(f"   Input : '{item}'")
+        print(f"   Output: '{res}'")
+
+    # Automated assertions validation
+    assert swap_first_last("python") == "nythop"
+    assert swap_first_last("a") == "a"
+    assert swap_first_last_words("hello world") == "oellh dorlw"
+    assert swap_indices("code", 0, 2) == "doce"
+    assert swap_vowels("hello") == "holle"
+    assert swap_pairwise("abcd") == "badc"
+    assert rotate_characters("python", 2) == "onpyth"
+    
+    print("\n" + "─" * 66)
+    print(" ✅ All test assertions passed successfully!")
+    print("─" * 66 + "\n")
+
+
+def main() -> None:
+    """
+    Main entry point for Day 27 executable script.
+    """
+    run_demo_suite()
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
