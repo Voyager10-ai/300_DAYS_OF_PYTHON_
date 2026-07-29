@@ -155,3 +155,52 @@ def swap_consonants(s: str) -> str:
     return "".join(chars)
 
 
+def swap_pairwise(s: str) -> str:
+    """
+    Exchanges adjacent character pairs (index 0 with 1, 2 with 3, etc.).
+    If string length is odd, the trailing character remains unchanged.
+    Time Complexity: O(n), Space Complexity: O(n).
+    
+    Example:
+      'python' -> 'ypto nh' -> 'yptonh'
+      'abc'    -> 'bac'
+    """
+    chars = list(s)
+    for idx in range(0, len(chars) - 1, 2):
+        chars[idx], chars[idx + 1] = chars[idx + 1], chars[idx]
+    return "".join(chars)
+
+
+def rotate_characters(s: str, k: int) -> str:
+    """
+    Cyclically rotates string characters by k positions.
+    Positive k rotates right (e.g. k=2 shifts last 2 chars to front).
+    Negative k rotates left.
+    Time Complexity: O(n), Space Complexity: O(n).
+    
+    Example:
+      rotate_characters("python", 2)  -> "onpyth"
+      rotate_characters("python", -1) -> "ythonp"
+    """
+    if not s:
+        return s
+    n = len(s)
+    effective_k = k % n
+    if effective_k == 0:
+        return s
+    return s[-effective_k:] + s[:-effective_k]
+
+
+def swap_custom_mapping(s: str, mapping: Dict[str, str]) -> str:
+    """
+    Exchanges characters in the string according to a custom lookup dictionary.
+    Simultaneously substitutes mapped characters to avoid chain replacements.
+    Time Complexity: O(n), Space Complexity: O(n).
+    
+    Example:
+      swap_custom_mapping("cat", {'c': 'b', 't': 's'}) -> "bas"
+    """
+    return "".join(mapping.get(ch, ch) for ch in s)
+
+
+
