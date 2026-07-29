@@ -63,7 +63,7 @@ def swap_indices(s: str, i: int, j: int) -> str:
     Time Complexity: O(n), Space Complexity: O(n).
     
     Example:
-      swap_indices("code", 0, 2) -> "dレスレット" wait: c and d swapped -> "doc-..." -> 'd' at 0, 'o' at 1, 'c' at 2, 'e' at 3 -> "doce"
+      swap_indices("code", 0, 2) -> "doce"
     """
     n = len(s)
     if n <= 1:
@@ -82,4 +82,76 @@ def swap_indices(s: str, i: int, j: int) -> str:
     chars = list(s)
     chars[actual_i], chars[actual_j] = chars[actual_j], chars[actual_i]
     return "".join(chars)
+
+
+def swap_vowels(s: str) -> str:
+    """
+    Reverses the positions of all vowels (a, e, i, o, u, A, E, I, O, U) in a string
+    while keeping non-vowel characters in place. Two-pointer technique.
+    Time Complexity: O(n), Space Complexity: O(n).
+    
+    Example:
+      'hello' -> 'holle'
+      'leetcode' -> 'leotcede'
+    """
+    vowels = set("aeiouAEIOU")
+    chars = list(s)
+    left, right = 0, len(chars) - 1
+    
+    while left < right:
+        while left < right and chars[left] not in vowels:
+            left += 1
+        while left < right and chars[right] not in vowels:
+            right -= 1
+            
+        if left < right:
+            chars[left], chars[right] = chars[right], chars[left]
+            left += 1
+            right -= 1
+            
+    return "".join(chars)
+
+
+def swap_first_last_vowel(s: str) -> str:
+    """
+    Swaps only the very first vowel and the very last vowel in a string.
+    Time Complexity: O(n), Space Complexity: O(n).
+    
+    Example:
+      'python coding' -> 'pythan codong'
+    """
+    vowels = set("aeiouAEIOU")
+    vowel_indices = [idx for idx, ch in enumerate(s) if ch in vowels]
+    
+    if len(vowel_indices) < 2:
+        return s
+    
+    return swap_indices(s, vowel_indices[0], vowel_indices[-1])
+
+
+def swap_consonants(s: str) -> str:
+    """
+    Reverses the positions of all consonants in a string while keeping vowels and numbers in place.
+    Time Complexity: O(n), Space Complexity: O(n).
+    """
+    vowels = set("aeiouAEIOU")
+    chars = list(s)
+    left, right = 0, len(chars) - 1
+    
+    def is_consonant(ch: str) -> bool:
+        return ch.isalpha() and ch not in vowels
+    
+    while left < right:
+        while left < right and not is_consonant(chars[left]):
+            left += 1
+        while left < right and not is_consonant(chars[right]):
+            right -= 1
+            
+        if left < right:
+            chars[left], chars[right] = chars[right], chars[left]
+            left += 1
+            right -= 1
+            
+    return "".join(chars)
+
 
