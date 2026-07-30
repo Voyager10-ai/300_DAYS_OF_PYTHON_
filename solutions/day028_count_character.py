@@ -254,15 +254,70 @@ def draw_category_summary_table(s: str) -> None:
     print("   │ " + f"Shannon Entropy (bits) : {entropy}".ljust(60) + "│")
     print("   ├" + "─" * 62 + "┤")
     print("   │ " + f"Alphabetic (Letters)   : {stats['alphabetic']}".ljust(60) + "│")
-    print("   │   - Uppercase Letters : {stats['uppercase']}".ljust(60) + "│")
-    print("   │   - Lowercase Letters : {stats['lowercase']}".ljust(60) + "│")
-    print("   │   - Vowels            : {stats['vowels']}".ljust(60) + "│")
-    print("   │   - Consonants        : {stats['consonants']}".ljust(60) + "│")
+    print("   │   - Uppercase Letters : " + f"{stats['uppercase']}".ljust(37) + "│")
+    print("   │   - Lowercase Letters : " + f"{stats['lowercase']}".ljust(37) + "│")
+    print("   │   - Vowels            : " + f"{stats['vowels']}".ljust(37) + "│")
+    print("   │   - Consonants        : " + f"{stats['consonants']}".ljust(37) + "│")
+
     print("   │ " + f"Digits (0-9)           : {stats['digits']}".ljust(60) + "│")
     print("   │ " + f"Whitespace             : {stats['whitespace']}".ljust(60) + "│")
     print("   │ " + f"Punctuation Marks      : {stats['punctuation']}".ljust(60) + "│")
     print("   │ " + f"Special / Non-Alphanum  : {stats['special']}".ljust(60) + "│")
     print("   └" + "─" * 62 + "┘\n")
+
+
+def run_demo_suite() -> None:
+    """
+    Runs demonstration suite over sample inputs and validates assertions.
+    """
+    print("\n" + "=" * 66)
+    print(" 🚀 DAY 28: COUNT CHARACTER DEMONSTRATION SUITE")
+    print("=" * 66)
+
+    sample_strings = [
+        "google.com",
+        "Hello World! 123",
+        "leetcode",
+        "abracadabra",
+    ]
+
+    for sample in sample_strings:
+        print(f"\n📌 Analyzing String: '{sample}'")
+        draw_frequency_histogram(sample)
+        draw_category_summary_table(sample)
+
+    # Unit assertions validation
+    assert count_character_frequency("google.com") == {'g': 2, 'o': 3, 'l': 1, 'e': 1, '.': 1, 'c': 1, 'm': 1}
+    assert count_specific_char("banana", "a") == 3
+    assert count_specific_char("Banana", "b", case_sensitive=False) == 1
+    assert get_top_k_frequent("abracadabra", k=1) == [('a', 5)]
+    assert find_first_non_repeating_char("leetcode") == "l"
+    assert find_first_non_repeating_char("loveleetcode") == "v"
+    assert count_unique_characters("abc") == 3
+    assert calculate_character_entropy("") == 0.0
+
+    cats = count_character_categories("Hello 123!")
+    assert cats["total_chars"] == 10
+    assert cats["alphabetic"] == 5
+    assert cats["digits"] == 3
+    assert cats["whitespace"] == 1
+    assert cats["punctuation"] == 1
+
+    print("─" * 66)
+    print(" ✅ All test assertions passed successfully!")
+    print("─" * 66 + "\n")
+
+
+def main() -> None:
+    """
+    Main execution entry point.
+    """
+    run_demo_suite()
+
+
+if __name__ == "__main__":
+    main()
+
 
 
 
