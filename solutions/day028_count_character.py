@@ -125,3 +125,52 @@ def count_character_categories(s: str) -> Dict[str, int]:
     return stats
 
 
+def get_top_k_frequent(s: str, k: int = 3, ignore_spaces: bool = False) -> List[Tuple[str, int]]:
+    """
+    Returns the top K most frequently occurring characters sorted by count descending.
+    Time Complexity: O(n + u log u), Space Complexity: O(u).
+    
+    Example:
+      get_top_k_frequent("abracadabra", k=3) -> [('a', 5), ('b', 2), ('r', 2)]
+    """
+    freq = count_character_frequency(s, ignore_spaces=ignore_spaces)
+    sorted_pairs = sorted(freq.items(), key=lambda item: (-item[1], item[0]))
+    return sorted_pairs[:k]
+
+
+def get_least_frequent(s: str, k: int = 3, ignore_spaces: bool = False) -> List[Tuple[str, int]]:
+    """
+    Returns the top K least frequently occurring characters sorted by count ascending.
+    Time Complexity: O(n + u log u), Space Complexity: O(u).
+    """
+    freq = count_character_frequency(s, ignore_spaces=ignore_spaces)
+    sorted_pairs = sorted(freq.items(), key=lambda item: (item[1], item[0]))
+    return sorted_pairs[:k]
+
+
+def find_first_non_repeating_char(s: str) -> Optional[str]:
+    """
+    Finds the first non-repeating (unique occurrence) character in a string.
+    Returns None if all characters repeat or string is empty.
+    Time Complexity: O(n), Space Complexity: O(u).
+    
+    Example:
+      find_first_non_repeating_char("leetcode") -> "l"
+      find_first_non_repeating_char("loveleetcode") -> "v"
+    """
+    counts = Counter(s)
+    for char in s:
+        if counts[char] == 1:
+            return char
+    return None
+
+
+def count_unique_characters(s: str) -> int:
+    """
+    Returns total number of distinct/unique characters in the string.
+    Time Complexity: O(n), Space Complexity: O(u).
+    """
+    return len(set(s))
+
+
+
