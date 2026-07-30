@@ -30,6 +30,7 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 25: Sum List
 - Day 26: Caesar Encryption
 - Day 27: Character Exchange
+- Day 28: Count Character
 
 
 

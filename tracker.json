@@ -1,6 +1,6 @@
 {
   "total_problems": 282,
-  "current_day": 28,
+  "current_day": 29,
   "problems": [
     {"day": 1, "title": "Print String", "status": "done"},
     {"day": 2, "title": "Input Age", "status": "done"},
@@ -29,9 +29,10 @@
     {"day": 25, "title": "Sum List", "status": "done"},
     {"day": 26, "title": "Caesar Encryption", "status": "done"},
     {"day": 27, "title": "Character Exchange", "status": "done"},
-    {"day": 28, "title": "Count Character", "status": "pending"},
+    {"day": 28, "title": "Count Character", "status": "done"},
     {"day": 29, "title": "HTML Tag", "status": "pending"},
     {"day": 30, "title": "Longest Word", "status": "pending"},
+
     {"day": 31, "title": "Remove Nth Character", "status": "pending"},
     {"day": 32, "title": "Reverse Word in String", "status": "pending"},
     {"day": 33, "title": "String Length", "status": "pending"},
