@@ -173,4 +173,39 @@ def count_unique_characters(s: str) -> int:
     return len(set(s))
 
 
+def calculate_character_entropy(s: str) -> float:
+    """
+    Calculates the Shannon entropy (H in bits) of character distribution in a string.
+    H = - sum(p(x) * log2(p(x)))
+    Higher entropy indicates greater character diversity/randomness.
+    Time Complexity: O(n), Space Complexity: O(u).
+    """
+    if not s:
+        return 0.0
+    
+    n = len(s)
+    freq = Counter(s)
+    entropy = 0.0
+    
+    for count in freq.values():
+        p = count / n
+        entropy -= p * math.log2(p)
+        
+    return round(entropy, 4)
+
+
+def calculate_char_distribution_percentage(s: str) -> Dict[str, float]:
+    """
+    Calculates the percentage contribution of each character in the string.
+    Returns dictionary mapping char to float percentage rounded to 2 decimal places.
+    Time Complexity: O(n), Space Complexity: O(u).
+    """
+    if not s:
+        return {}
+    n = len(s)
+    freq = Counter(s)
+    return {char: round((count / n) * 100, 2) for char, count in freq.items()}
+
+
+
 
