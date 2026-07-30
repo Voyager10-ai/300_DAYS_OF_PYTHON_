@@ -207,5 +207,64 @@ def calculate_char_distribution_percentage(s: str) -> Dict[str, float]:
     return {char: round((count / n) * 100, 2) for char, count in freq.items()}
 
 
+def draw_frequency_histogram(s: str, max_bar_width: int = 30) -> None:
+    """
+    Renders an ASCII horizontal bar chart visualizing character frequencies.
+    """
+    freq = count_character_frequency(s, ignore_spaces=False)
+    if not freq:
+        print("\n   [Empty string - no character frequency to display]\n")
+        return
+
+    total = len(s)
+    max_count = max(freq.values())
+
+    print("\n   ┌" + "─" * 62 + "┐")
+    print("   │" + "📊 CHARACTER FREQUENCY HISTOGRAM".center(62) + "│")
+    print("   ├" + "─" * 62 + "┤")
+
+    sorted_items = sorted(freq.items(), key=lambda item: (-item[1], item[0]))
+
+    for char, count in sorted_items:
+        display_char = f"'{char}'" if char != " " else "'SPACE'"
+        bar_len = int((count / max_count) * max_bar_width) if max_count > 0 else 0
+        bar = "█" * bar_len
+        pct = (count / total) * 100
+        line = f"{display_char:>8} │ {bar:<30} {count:2d} ({pct:5.1f}%)"
+        print("   │ " + line.ljust(60) + "│")
+
+    print("   └" + "─" * 62 + "┘\n")
+
+
+def draw_category_summary_table(s: str) -> None:
+    """
+    Renders an ASCII summary table detailing character classification stats.
+    """
+    stats = count_character_categories(s)
+    entropy = calculate_character_entropy(s)
+    unique_count = count_unique_characters(s)
+    first_non_rep = find_first_non_repeating_char(s) or "None"
+
+    print("   ┌" + "─" * 62 + "┐")
+    print("   │" + "📋 CHARACTER COMPOSITION SUMMARY".center(62) + "│")
+    print("   ├" + "─" * 62 + "┤")
+    print("   │ " + f"Total String Length    : {stats['total_chars']}".ljust(60) + "│")
+    print("   │ " + f"Unique Characters      : {unique_count}".ljust(60) + "│")
+    print("   │ " + f"First Non-Repeating    : '{first_non_rep}'".ljust(60) + "│")
+    print("   │ " + f"Shannon Entropy (bits) : {entropy}".ljust(60) + "│")
+    print("   ├" + "─" * 62 + "┤")
+    print("   │ " + f"Alphabetic (Letters)   : {stats['alphabetic']}".ljust(60) + "│")
+    print("   │   - Uppercase Letters : {stats['uppercase']}".ljust(60) + "│")
+    print("   │   - Lowercase Letters : {stats['lowercase']}".ljust(60) + "│")
+    print("   │   - Vowels            : {stats['vowels']}".ljust(60) + "│")
+    print("   │   - Consonants        : {stats['consonants']}".ljust(60) + "│")
+    print("   │ " + f"Digits (0-9)           : {stats['digits']}".ljust(60) + "│")
+    print("   │ " + f"Whitespace             : {stats['whitespace']}".ljust(60) + "│")
+    print("   │ " + f"Punctuation Marks      : {stats['punctuation']}".ljust(60) + "│")
+    print("   │ " + f"Special / Non-Alphanum  : {stats['special']}".ljust(60) + "│")
+    print("   └" + "─" * 62 + "┘\n")
+
+
+
 
 
