@@ -423,3 +423,97 @@ def parse_html_to_dom(html_str: str) -> HTMLNode:
                     
     return root
 
+
+def escape_html_entities(text: str) -> str:
+    """
+    Escapes special HTML characters (&, <, >, ", ') into corresponding HTML entities.
+    
+    Args:
+        text: Plain text string.
+        
+    Returns:
+        HTML entity escaped string.
+        
+    Example:
+        escape_html_entities('1 < 2 & "quote"') -> '1 &lt; 2 &amp; &quot;quote&quot;'
+    """
+    return html.escape(text, quote=True)
+
+
+def unescape_html_entities(text: str) -> str:
+    """
+    Converts HTML entity references back to standard plain text characters.
+    
+    Args:
+        text: HTML entity string.
+        
+    Returns:
+        Decoded plain text string.
+        
+    Example:
+        unescape_html_entities('1 &lt; 2') -> '1 < 2'
+    """
+    return html.unescape(text)
+
+
+def sanitize_html(
+    html_str: str,
+    allowed_tags: Optional[Set[str]] = None,
+    allowed_attributes: Optional[Set[str]] = None
+) -> str:
+    """
+    Sanitizes HTML string by removing disallowed/dangerous tags (e.g., <script>, <iframe>)
+    and dangerous event handler attributes (e.g., onclick=, onload=) to prevent XSS attacks.
+    
+    Args:
+        html_str: Raw un-sanitized HTML string.
+        allowed_tags: Optional set of allowed tag names. Defaults to safe semantic HTML tags.
+        allowed_attributes: Optional set of allowed attribute names. Defaults to standard safe attributes.
+        
+    Returns:
+        Sanitized safe HTML string.
+    """
+    if allowed_tags is None:
+        allowed_tags = {
+            "p", "b", "i", "em", "strong", "a", "span", "div", "h1", "h2", "h3",
+            "h4", "h5", "h6", "ul", "ol", "li", "br", "hr", "img", "code", "pre"
+        }
+        
+    if allowed_attributes is None:
+        allowed_attributes = {"href", "src", "alt", "title", "class", "id", "width", "height"}
+
+    # Remove script and style blocks entirely
+    cleaned = re.sub(r'<(script|style)[^>]*>.*?</\1>', '', html_str, flags=re.IGNORECASE | re.DOTALL)
+    
+    def replace_tag(match: re.Match) -> str:
+        is_closing = bool(match.group(1))
+        tag_name = match.group(2).lower()
+        raw_attrs = match.group(3)
+        
+        if tag_name not in allowed_tags:
+            return ""
+            
+        if is_closing:
+            return f"</{tag_name}>"
+            
+        # Parse attributes and filter
+        parsed_attrs = parse_tag_attributes(match.group(0))
+        safe_attrs = {}
+        for attr, val in parsed_attrs.items():
+            if attr.lower() in allowed_attributes and not attr.lower().startswith('on'):
+                # Block javascript: URLs
+                if attr.lower() in ('href', 'src') and val.strip().lower().startswith('javascript:'):
+                    continue
+                safe_attrs[attr] = val
+                
+        is_self_closing = raw_attrs.strip().endswith('/') or tag_name in HTML_VOID_TAGS
+        if is_self_closing:
+            return create_self_closing_tag(tag_name, safe_attrs)
+        else:
+            attrs_str = format_attributes(safe_attrs)
+            return f"<{tag_name}{attrs_str}>"
+            
+    tag_regex = r'<(/?)s*([a-zA-Z0-9-]+)([^>]*)>'
+    return re.sub(tag_regex, replace_tag, cleaned)
+
+
