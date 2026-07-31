@@ -197,5 +197,120 @@ def find_tags_by_name(html_str: str, tag_name: str) -> List[Dict[str, Any]]:
         
     return matches
 
+HTML_VOID_TAGS: Set[str] = {
+    "area", "base", "br", "col", "embed", "hr", "img", "input",
+    "link", "meta", "param", "source", "track", "wbr"
+}
+
+HTML_INLINE_TAGS: Set[str] = {
+    "a", "b", "i", "em", "strong", "span", "code", "small", "sub",
+    "sup", "mark", "ins", "del", "abbr", "label", "button", "input"
+}
+
+HTML_BLOCK_TAGS: Set[str] = {
+    "div", "p", "h1", "h2", "h3", "h4", "h5", "h6", "ul", "ol", "li",
+    "table", "tr", "td", "th", "form", "header", "footer", "section",
+    "article", "nav", "aside", "main", "blockquote", "pre", "body", "html"
+}
 
 
+def is_valid_tag_name(tag_name: str) -> bool:
+    """
+    Checks if a tag name string is a syntactically valid HTML tag identifier.
+    
+    Args:
+        tag_name: Tag name string.
+        
+    Returns:
+        Boolean indicating validity.
+    """
+    if not tag_name or not isinstance(tag_name, str):
+        return False
+    clean = tag_name.strip().lower()
+    return bool(re.match(r'^[a-z][a-z0-9-]*$', clean))
+
+
+def get_tag_category(tag_name: str) -> str:
+    """
+    Determines the category type of an HTML tag.
+    
+    Returns one of: 'void', 'inline', 'block', or 'other'.
+    """
+    tag = tag_name.lower().strip()
+    if tag in HTML_VOID_TAGS:
+        return "void"
+    if tag in HTML_INLINE_TAGS:
+        return "inline"
+    if tag in HTML_BLOCK_TAGS:
+        return "block"
+    return "other"
+
+
+def validate_html_structure(html_str: str) -> Dict[str, Any]:
+    """
+    Validates whether an HTML string has balanced and properly matched opening/closing tags.
+    
+    Args:
+        html_str: HTML content string to validate.
+        
+    Returns:
+        Dictionary containing:
+        - 'is_valid': bool indicating if HTML is properly balanced
+        - 'errors': list of error message strings if invalid
+        - 'max_depth': integer representing maximum tag nesting depth reached
+        
+    Example:
+        validate_html_structure('<div><p>Ok</p></div>') -> {'is_valid': True, 'errors': [], 'max_depth': 2}
+        validate_html_structure('<div><p>Error</div>') -> {'is_valid': False, 'errors': [...], 'max_depth': 2}
+    """
+    tag_regex = r'<(/?)s*([a-zA-Z0-9-]+)([^>]*)>'
+    stack: List[Tuple[str, int]] = []
+    errors: List[str] = []
+    max_depth = 0
+    
+    # Clean out comments and doctype
+    cleaned_html = re.sub(r'<!--.*?-->', '', html_str, flags=re.DOTALL)
+    cleaned_html = re.sub(r'<!DOCTYPE[^>]*>', '', cleaned_html, flags=re.IGNORECASE)
+    
+    for match in re.finditer(tag_regex, cleaned_html):
+        is_closing = bool(match.group(1))
+        tag_name = match.group(2).lower()
+        attributes_raw = match.group(3)
+        
+        # Check if self-closing tag indicated by trailing slash (e.g. <br/> or <div />)
+        is_self_closing = attributes_raw.strip().endswith('/') or tag_name in HTML_VOID_TAGS
+        
+        if is_self_closing:
+            continue
+            
+        if not is_closing:
+            stack.append((tag_name, match.start()))
+            if len(stack) > max_depth:
+                max_depth = len(stack)
+        else:
+            if not stack:
+                errors.append(f"Unexpected closing tag </{tag_name}> at index {match.start()} with no matching opening tag.")
+            elif stack[-1][0] != tag_name:
+                expected_tag, expected_idx = stack[-1]
+                errors.append(
+                    f"Mismatched closing tag </{tag_name}> at index {match.start()}. "
+                    f"Expected closing tag </{expected_tag}> for opening tag at index {expected_idx}."
+                )
+                # Pop matching tag if found higher up in stack
+                stack_tags = [t[0] for t in stack]
+                if tag_name in stack_tags:
+                    while stack and stack[-1][0] != tag_name:
+                        stack.pop()
+                    if stack:
+                        stack.pop()
+            else:
+                stack.pop()
+                
+    for tag_name, idx in stack:
+        errors.append(f"Unclosed opening tag <{tag_name}> at index {idx}.")
+        
+    return {
+        "is_valid": len(errors) == 0,
+        "errors": errors,
+        "max_depth": max_depth
+    }
