@@ -517,3 +517,42 @@ def sanitize_html(
     return re.sub(tag_regex, replace_tag, cleaned)
 
 
+def get_html_stats(html_str: str) -> Dict[str, Any]:
+    """
+    Analyzes an HTML string and compiles a comprehensive statistical report.
+    
+    Args:
+        html_str: HTML document string.
+        
+    Returns:
+        Dictionary containing counts, ratios, unique tags, frequencies, and structure metrics.
+    """
+    total_len = len(html_str)
+    plain_text = strip_html_tags(html_str)
+    text_len = len(plain_text)
+    
+    all_tags = extract_html_tags(html_str)
+    tag_freq = dict(Counter(all_tags))
+    unique_tags = len(tag_freq)
+    total_tags = len(all_tags)
+    
+    void_count = sum(count for tag, count in tag_freq.items() if tag in HTML_VOID_TAGS)
+    validation = validate_html_structure(html_str)
+    
+    text_ratio = round((text_len / total_len * 100), 2) if total_len > 0 else 0.0
+    
+    return {
+        "total_length": total_len,
+        "text_length": text_len,
+        "text_ratio_percent": text_ratio,
+        "total_tags_count": total_tags,
+        "unique_tags_count": unique_tags,
+        "void_tags_count": void_count,
+        "tag_frequency": tag_freq,
+        "is_valid_structure": validation["is_valid"],
+        "max_nesting_depth": validation["max_depth"],
+        "validation_errors": validation["errors"]
+    }
+
+
+
