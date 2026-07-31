@@ -627,5 +627,119 @@ def format_html_code(html_str: str, indent_size: int = 2) -> str:
     return "\n".join(_format_node(dom, 0))
 
 
+def run_tests() -> None:
+    """
+    Executes unit test assertions verifying all HTML tag manipulation and analysis functions.
+    """
+    print("[+] Running Day 29 HTML Tag unit test suite...")
+    
+    # 1. Tag Wrapping
+    assert add_html_tag('i', 'Python') == '<i>Python</i>'
+    assert add_html_tag('a', 'Link', {'href': 'https://py.org'}) == '<a href="https://py.org">Link</a>'
+    assert wrap_html_tags(['b', 'i'], 'Hi') == '<b><i>Hi</i></b>'
+    assert create_self_closing_tag('img', {'src': 'a.jpg'}) == '<img src="a.jpg" />'
+    
+    # 2. Tag Extraction & Stripping
+    sample_html = '<div><h1>Title</h1><p>Hello <b>World</b>!</p><br /></div>'
+    tags = extract_html_tags(sample_html)
+    assert tags == ['div', 'h1', 'h1', 'p', 'b', 'b', 'p', 'br', 'div']
+    assert strip_html_tags('<p>Hello <b>World</b>!</p>') == 'Hello World!'
+    
+    # 3. Attribute Parsing
+    attrs = parse_tag_attributes('<a href="https://example.com" class="btn active" id="main">')
+    assert attrs == {'href': 'https://example.com', 'class': 'btn active', 'id': 'main'}
+    
+    # 4. Find tags by name
+    matches = find_tags_by_name(sample_html, 'h1')
+    assert len(matches) == 1
+    assert matches[0]['inner_content'] == 'Title'
+    
+    # 5. Structure Validation
+    val_ok = validate_html_structure('<div><p><span>Test</span></p></div>')
+    assert val_ok['is_valid'] is True
+    assert val_ok['max_depth'] == 3
+    
+    val_err = validate_html_structure('<div><p>Mismatch</div></p>')
+    assert val_err['is_valid'] is False
+    assert len(val_err['errors']) > 0
+    
+    # 6. HTMLNode & DOM Tree
+    dom = parse_html_to_dom('<div><p class="intro">Welcome</p><img src="logo.png" /></div>')
+    p_node = dom.find('p')
+    assert p_node is not None
+    assert p_node.attributes.get('class') == 'intro'
+    assert p_node.text == 'Welcome'
+    
+    # 7. Sanitizer & Security
+    dirty_html = '<p>Safe</p><script>alert("XSS")</script><a href="javascript:alert(1)" onclick="bad()">Click</a>'
+    sanitized = sanitize_html(dirty_html)
+    assert '<script>' not in sanitized
+    assert 'onclick' not in sanitized
+    assert 'javascript:' not in sanitized
+    assert '<p>Safe</p>' in sanitized
+    
+    # 8. Document Stats
+    stats = get_html_stats('<div><h1>Title</h1><p>Body</p><img src="x.png" /></div>')
+    assert stats['total_tags_count'] == 7
+    assert stats['unique_tags_count'] == 4
+    assert stats['void_tags_count'] == 1
+    assert stats['is_valid_structure'] is True
+    
+    print("[✓] All 25 test assertions passed successfully!")
+
+
+def main() -> None:
+    """
+    Main demonstration execution entry point.
+    """
+    run_tests()
+    print("\n" + "=" * 60)
+    print(" 🐍 Day 29: HTML Tag Parsing, Validation & DOM Explorer")
+    print("=" * 60)
+    
+    doc = """<!DOCTYPE html>
+<html>
+  <head><title>Python HTML Explorer</title></head>
+  <body>
+    <div id="container" class="main-box">
+      <h1>HTML Tag Masterclass</h1>
+      <p class="lead">Welcome to <b>Day 29</b> of 300 Days of Python!</p>
+      <img src="banner.png" alt="Banner" />
+      <ul>
+        <li>Parsing & Extraction</li>
+        <li>DOM Tree Building</li>
+        <li>Security Sanitization</li>
+      </ul>
+    </div>
+  </body>
+</html>"""
+
+    print("\n1. Tag Statistics & Metrics:")
+    stats = get_html_stats(doc)
+    print(f"   • Total Length:       {stats['total_length']} bytes")
+    print(f"   • Plain Text Length:  {stats['text_length']} chars ({stats['text_ratio_percent']}% ratio)")
+    print(f"   • Total Tags Count:   {stats['total_tags_count']}")
+    print(f"   • Unique Tag Types:   {stats['unique_tags_count']}")
+    print(f"   • Void/Self-closing:  {stats['void_tags_count']}")
+    print(f"   • Structure Valid:    {stats['is_valid_structure']} (Max Depth: {stats['max_nesting_depth']})")
+    print("   • Tag Frequencies:   ", stats['tag_frequency'])
+
+    print("\n2. DOM Tree Visualization:")
+    dom = parse_html_to_dom(doc)
+    print(render_html_tree(dom))
+
+    print("\n3. Sanitization Demonstration:")
+    unsafe_input = '<div><h3>User Post</h3><script>stealCookies()</script><a href="javascript:doHarm()" onclick="evil()">Link</a></div>'
+    print(f"   Unsafe: {unsafe_input}")
+    print(f"   Clean:  {sanitize_html(unsafe_input)}")
+
+    print("\n" + "=" * 60)
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
