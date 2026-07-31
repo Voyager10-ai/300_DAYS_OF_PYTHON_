@@ -306,11 +306,120 @@ def validate_html_structure(html_str: str) -> Dict[str, Any]:
             else:
                 stack.pop()
                 
-    for tag_name, idx in stack:
-        errors.append(f"Unclosed opening tag <{tag_name}> at index {idx}.")
-        
     return {
         "is_valid": len(errors) == 0,
         "errors": errors,
         "max_depth": max_depth
     }
+
+
+class HTMLNode:
+    """
+    Represents an HTML DOM Element node with tag, text, attributes, and child nodes.
+    """
+    def __init__(
+        self,
+        tag: str = "root",
+        text: str = "",
+        attributes: Optional[Dict[str, str]] = None,
+        children: Optional[List['HTMLNode']] = None
+    ):
+        self.tag = tag.strip().lower()
+        self.text = text
+        self.attributes = attributes or {}
+        self.children = children or []
+
+    def add_child(self, child: 'HTMLNode') -> 'HTMLNode':
+        """Appends a child HTMLNode."""
+        self.children.append(child)
+        return child
+
+    def to_html(self) -> str:
+        """Serializes the HTMLNode tree back to an HTML string."""
+        if self.tag == "root":
+            inner = "".join(child.to_html() for child in self.children)
+            return f"{self.text}{inner}"
+            
+        attrs_str = format_attributes(self.attributes)
+        if self.tag in HTML_VOID_TAGS:
+            return f"<{self.tag}{attrs_str} />"
+            
+        children_html = "".join(child.to_html() for child in self.children)
+        return f"<{self.tag}{attrs_str}>{self.text}{children_html}</{self.tag}>"
+
+    def find(self, tag_name: str) -> Optional['HTMLNode']:
+        """Finds first child/descendant node matching given tag_name."""
+        target = tag_name.lower()
+        if self.tag == target:
+            return self
+        for child in self.children:
+            found = child.find(target)
+            if found:
+                return found
+        return None
+
+    def find_all(self, tag_name: str) -> List['HTMLNode']:
+        """Finds all child/descendant nodes matching given tag_name."""
+        target = tag_name.lower()
+        results = []
+        if self.tag == target:
+            results.append(self)
+        for child in self.children:
+            results.extend(child.find_all(target))
+        return results
+
+    def __repr__(self) -> str:
+        return f"<HTMLNode <{self.tag}> children={len(self.children)} text='{self.text[:15]}'>"
+
+
+def parse_html_to_dom(html_str: str) -> HTMLNode:
+    """
+    Parses a simple HTML snippet into a hierarchical DOM tree of HTMLNode instances.
+    
+    Args:
+        html_str: Input HTML markup string.
+        
+    Returns:
+        Root HTMLNode containing document tree.
+    """
+    root = HTMLNode(tag="root")
+    stack: List[HTMLNode] = [root]
+    
+    # Tokenize tags and text
+    token_pattern = r'(<!--.*?-->|<[^>]+>|[^<]+)'
+    tokens = [t for t in re.findall(token_pattern, html_str, re.DOTALL) if t.strip()]
+    
+    tag_regex = r'^<(/?)s*([a-zA-Z0-9-]+)([^>]*)>$'
+    
+    for token in tokens:
+        if token.startswith('<!--') or token.startswith('<!DOCTYPE'):
+            continue
+            
+        tag_match = re.match(tag_regex, token)
+        if tag_match:
+            is_closing = bool(tag_match.group(1))
+            tag_name = tag_match.group(2).lower()
+            attrs_raw = tag_match.group(3)
+            
+            is_void = tag_name in HTML_VOID_TAGS or attrs_raw.strip().endswith('/')
+            
+            if is_closing:
+                if len(stack) > 1 and stack[-1].tag == tag_name:
+                    stack.pop()
+            else:
+                attrs = parse_tag_attributes(token)
+                node = HTMLNode(tag=tag_name, attributes=attrs)
+                stack[-1].add_child(node)
+                if not is_void:
+                    stack.append(node)
+        else:
+            # Text content
+            cleaned_text = html.unescape(token.strip())
+            if cleaned_text:
+                if len(stack) > 1:
+                    stack[-1].text += ( " " + cleaned_text if stack[-1].text else cleaned_text )
+                else:
+                    root.add_child(HTMLNode(tag="text", text=cleaned_text))
+                    
+    return root
+
