@@ -555,4 +555,77 @@ def get_html_stats(html_str: str) -> Dict[str, Any]:
     }
 
 
+def render_html_tree(node: HTMLNode, prefix: str = "", is_last: bool = True) -> str:
+    """
+    Renders an ASCII tree representation of an HTMLNode hierarchy.
+    
+    Args:
+        node: Root or child HTMLNode to render.
+        prefix: Indentation prefix for tree branches.
+        is_last: Whether current node is the last sibling.
+        
+    Returns:
+        Formatted ASCII tree string.
+    """
+    connector = "└── " if is_last else "├── "
+    
+    if node.tag == "root":
+        tree_str = "ROOT\n"
+    else:
+        attrs = f" {node.attributes}" if node.attributes else ""
+        text_preview = f" -> '{node.text[:20]}'" if node.text.strip() else ""
+        tree_str = f"{prefix}{connector}<{node.tag}>{attrs}{text_preview}\n"
+        
+    new_prefix = prefix + ("    " if is_last else "│   ")
+    for i, child in enumerate(node.children):
+        is_child_last = (i == len(node.children) - 1)
+        tree_str += render_html_tree(child, new_prefix if node.tag != "root" else "", is_child_last)
+        
+    return tree_str
+
+
+def format_html_code(html_str: str, indent_size: int = 2) -> str:
+    """
+    Prettifies and indents unformatted HTML code.
+    
+    Args:
+        html_str: Raw HTML string.
+        indent_size: Number of spaces for each indentation level.
+        
+    Returns:
+        Indented HTML code string.
+    """
+    dom = parse_html_to_dom(html_str)
+    
+    def _format_node(n: HTMLNode, level: int) -> List[str]:
+        indent = " " * (level * indent_size)
+        lines = []
+        
+        if n.tag == "root":
+            for child in n.children:
+                lines.extend(_format_node(child, level))
+            return lines
+            
+        attrs_str = format_attributes(n.attributes)
+        
+        if n.tag in HTML_VOID_TAGS:
+            lines.append(f"{indent}<{n.tag}{attrs_str} />")
+        elif not n.children and not n.text:
+            lines.append(f"{indent}<{n.tag}{attrs_str}></{n.tag}>")
+        elif not n.children:
+            lines.append(f"{indent}<{n.tag}{attrs_str}>{n.text}</{n.tag}>")
+        else:
+            lines.append(f"{indent}<{n.tag}{attrs_str}>")
+            if n.text.strip():
+                lines.append(f"{indent}{' ' * indent_size}{n.text}")
+            for child in n.children:
+                lines.extend(_format_node(child, level + 1))
+            lines.append(f"{indent}</{n.tag}>")
+            
+        return lines
+
+    return "\n".join(_format_node(dom, 0))
+
+
+
 
