@@ -125,3 +125,43 @@ def longest_word_by_criteria(text: str, filter_func: Callable[[str], bool]) -> O
     return max(matching_words, key=len)
 
 
+def word_length_analysis(text: str) -> Dict[str, Any]:
+    """
+    Generates detailed statistical analysis and frequency breakdown of word lengths in text.
+
+    Args:
+        text: Input string.
+
+    Returns:
+        Dictionary containing total_words, longest_words, max_length, average_length, length_distribution.
+    """
+    words = [clean_word(w) for w in text.split()]
+    words = [w for w in words if w]
+
+    if not words:
+        return {
+            "total_words": 0,
+            "longest_words": [],
+            "max_length": 0,
+            "average_length": 0.0,
+            "length_distribution": {},
+        }
+
+    lengths = [len(w) for w in words]
+    max_len = max(lengths)
+    distribution: Dict[int, int] = {}
+    for l in lengths:
+        distribution[l] = distribution.get(l, 0) + 1
+
+    longest_words = find_all_longest_words(text)
+
+    return {
+        "total_words": len(words),
+        "longest_words": longest_words,
+        "max_length": max_len,
+        "average_length": round(sum(lengths) / len(words), 2),
+        "length_distribution": dict(sorted(distribution.items())),
+    }
+
+
+
