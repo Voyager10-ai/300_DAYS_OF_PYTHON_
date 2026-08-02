@@ -312,6 +312,36 @@ class TestLongestWord(unittest.TestCase):
         self.assertIn("Length  5", rendered)
 
 
+def run_demo():
+    print("=== Day 30: Longest Word Explorer ===")
+    sample_text = (
+        "Python is an extraordinarily versatile and high-level programming language. "
+        "Developers build artificial intelligence, data science models, web applications, "
+        "and automation scripts seamlessly using clean Python code."
+    )
+    print("\n[Sample Text]:")
+    print(f'"{sample_text}"')
+
+    longest = find_longest_word(sample_text)
+    print(f"\n1. Single Longest Word: '{longest}' (length: {len(longest)})")
+
+    all_longest = find_all_longest_words(sample_text)
+    print(f"2. All Longest Words: {all_longest}")
+
+    top_3 = find_top_n_longest_words(sample_text, 3)
+    print(f"3. Top 3 Longest Words: {top_3}")
+
+    histogram = render_word_length_histogram(sample_text)
+    print(f"\n4. Histogram:\n{histogram}")
+
+
+if __name__ == "__main__":
+    run_demo()
+    print("\n--- Running Unit Tests ---")
+    unittest.main(verbosity=2)
+
+
+
 
 
 
