@@ -164,4 +164,47 @@ def word_length_analysis(text: str) -> Dict[str, Any]:
     }
 
 
+def find_longest_word_in_file(file_path: str, encoding: str = "utf-8") -> Dict[str, Any]:
+    """
+    Reads a file line-by-line and extracts the longest words without loading the entire file into memory.
+
+    Args:
+        file_path: Absolute or relative file path.
+        encoding: File character encoding format (default: 'utf-8').
+
+    Returns:
+        Dictionary containing total_lines, total_words, longest_words, max_length.
+    """
+    max_len = 0
+    longest_words = []
+    seen = set()
+    total_lines = 0
+    total_words = 0
+
+    with open(file_path, "r", encoding=encoding) as f:
+        for line in f:
+            total_lines += 1
+            words = [clean_word(w) for w in line.split()]
+            words = [w for w in words if w]
+            total_words += len(words)
+
+            for w in words:
+                w_len = len(w)
+                if w_len > max_len:
+                    max_len = w_len
+                    longest_words = [w]
+                    seen = {w}
+                elif w_len == max_len and w not in seen:
+                    longest_words.append(w)
+                    seen.add(w)
+
+    return {
+        "total_lines": total_lines,
+        "total_words": total_words,
+        "longest_words": longest_words,
+        "max_length": max_len,
+    }
+
+
+
 
