@@ -261,6 +261,58 @@ def render_word_length_histogram(text: str, max_bar_width: int = 30) -> str:
     return "\n".join(lines)
 
 
+import unittest
+import tempfile
+import os
+
+
+class TestLongestWord(unittest.TestCase):
+    def test_find_longest_word_basic(self):
+        text = "Python software development methodology"
+        self.assertEqual(find_longest_word(text), "identification" if "identification" in text else "development")
+
+    def test_find_longest_word_punctuation(self):
+        text = "Hello, world! Developers love programming."
+        self.assertEqual(find_longest_word(text), "programming")
+
+    def test_find_all_longest_words(self):
+        text = "cat dog elephant dinosaur"
+        self.assertEqual(find_all_longest_words(text), ["elephant", "dinosaur"])
+
+    def test_empty_string(self):
+        self.assertEqual(find_longest_word(""), "")
+        self.assertEqual(find_all_longest_words(""), [])
+        self.assertIsNone(longest_word_by_criteria("", lambda w: True))
+
+    def test_criteria_filtering(self):
+        text = "apple banana blueberry strawberry"
+        res = longest_word_by_criteria(text, lambda w: w.startswith('b'))
+        self.assertEqual(res, "blueberry")
+
+    def test_top_n_longest(self):
+        text = "apple banana strawberry blueberry kiwi"
+        top3 = find_top_n_longest_words(text, 3)
+        self.assertEqual(top3, [("strawberry", 10), ("blueberry", 9), ("banana", 6)])
+
+    def test_file_stream_reading(self):
+        with tempfile.NamedTemporaryFile(mode="w+", delete=False, encoding="utf-8") as tmp:
+            tmp.write("First line with short words.\nSecond line with supercalifragilisticexpialidocious word!")
+            tmp_path = tmp.name
+
+        try:
+            res = find_longest_word_in_file(tmp_path)
+            self.assertEqual(res["max_length"], 34)
+            self.assertIn("supercalifragilisticexpialidocious", res["longest_words"])
+        finally:
+            os.remove(tmp_path)
+
+    def test_histogram_renderer(self):
+        rendered = render_word_length_histogram("one two three")
+        self.assertIn("Word Length Distribution Histogram:", rendered)
+        self.assertIn("Length  5", rendered)
+
+
+
 
 
 
