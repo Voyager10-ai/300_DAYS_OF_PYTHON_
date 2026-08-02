@@ -98,3 +98,30 @@ def find_all_longest_words(text: str, strip_punctuation: bool = True) -> List[st
 
     return longest_words
 
+
+def longest_word_by_criteria(text: str, filter_func: Callable[[str], bool]) -> Optional[str]:
+    """
+    Finds the longest word in text that satisfies a custom filter predicate.
+
+    Args:
+        text: Input text string.
+        filter_func: Callable returning True if a word token meets criteria.
+
+    Returns:
+        Longest word matching criteria or None if no match is found.
+
+    Example:
+        longest_word_by_criteria("apple banana blueberry", lambda w: w.startswith('b')) -> "blueberry"
+    """
+    if not text or not text.strip():
+        return None
+
+    words = [clean_word(w) for w in text.split()]
+    matching_words = [w for w in words if w and filter_func(w)]
+
+    if not matching_words:
+        return None
+
+    return max(matching_words, key=len)
+
+
