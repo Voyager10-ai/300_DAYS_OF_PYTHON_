@@ -58,3 +58,43 @@ def find_longest_word(text: str, strip_punctuation: bool = True) -> str:
         return ""
 
     return max(words, key=len)
+
+
+def find_all_longest_words(text: str, strip_punctuation: bool = True) -> List[str]:
+    """
+    Finds all words in text that share the maximum word length.
+
+    Args:
+        text: Input text string.
+        strip_punctuation: Whether to strip surrounding punctuation.
+
+    Returns:
+        List of distinct longest words in order of appearance.
+
+    Example:
+        find_all_longest_words("cat dog elephant dinosaur") -> ["elephant", "dinosaur"]
+    """
+    if not text or not text.strip():
+        return []
+
+    tokens = text.split()
+    if strip_punctuation:
+        cleaned_words = [clean_word(t) for t in tokens]
+        words = [w for w in cleaned_words if w]
+    else:
+        words = tokens
+
+    if not words:
+        return []
+
+    max_len = max(len(w) for w in words)
+    longest_words = []
+    seen = set()
+
+    for w in words:
+        if len(w) == max_len and w not in seen:
+            longest_words.append(w)
+            seen.add(w)
+
+    return longest_words
+
