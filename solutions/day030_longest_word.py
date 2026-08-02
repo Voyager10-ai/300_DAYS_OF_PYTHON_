@@ -232,6 +232,36 @@ def find_top_n_longest_words(text: str, n: int = 5) -> List[Tuple[str, int]]:
     return [(w, len(w)) for w in sorted_words[:n]]
 
 
+def render_word_length_histogram(text: str, max_bar_width: int = 30) -> str:
+    """
+    Renders an ASCII text histogram visualizing word length distribution.
+
+    Args:
+        text: Input string to analyze.
+        max_bar_width: Maximum character width for the histogram bars.
+
+    Returns:
+        Formatted multi-line ASCII histogram string.
+    """
+    stats = word_length_analysis(text)
+    dist = stats.get("length_distribution", {})
+    if not dist:
+        return "No words to display in histogram."
+
+    max_count = max(dist.values())
+    lines = ["Word Length Distribution Histogram:", "=" * 40]
+
+    for length, count in dist.items():
+        bar_len = int((count / max_count) * max_bar_width) if max_count > 0 else 0
+        bar = "█" * max(bar_len, 1) if count > 0 else ""
+        lines.append(f"Length {length:2d} | {bar:<{max_bar_width}} ({count})")
+
+    lines.append("=" * 40)
+    lines.append(f"Total Words: {stats['total_words']} | Max Length: {stats['max_length']}")
+    return "\n".join(lines)
+
+
+
 
 
 
