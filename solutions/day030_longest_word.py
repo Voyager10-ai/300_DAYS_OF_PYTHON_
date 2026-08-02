@@ -206,5 +206,32 @@ def find_longest_word_in_file(file_path: str, encoding: str = "utf-8") -> Dict[s
     }
 
 
+def find_top_n_longest_words(text: str, n: int = 5) -> List[Tuple[str, int]]:
+    """
+    Extracts the top N longest unique words from input text sorted descending by word length.
+
+    Args:
+        text: Input text string.
+        n: Number of top longest words to return.
+
+    Returns:
+        List of tuples (word, length) sorted by length descending.
+
+    Example:
+        find_top_n_longest_words("apple banana strawberry blueberry kiwi", 3) ->
+        [('strawberry', 10), ('blueberry', 9), ('banana', 6)]
+    """
+    if not text or not text.strip() or n <= 0:
+        return []
+
+    words = [clean_word(w) for w in text.split()]
+    unique_words = list(set(w for w in words if w))
+
+    # Sort descending by length then alphabetically
+    sorted_words = sorted(unique_words, key=lambda w: (-len(w), w.lower()))
+    return [(w, len(w)) for w in sorted_words[:n]]
+
+
+
 
 
