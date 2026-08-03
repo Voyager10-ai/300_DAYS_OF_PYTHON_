@@ -1,6 +1,6 @@
 {
   "total_problems": 282,
-  "current_day": 30,
+  "current_day": 31,
   "problems": [
     {"day": 1, "title": "Print String", "status": "done"},
     {"day": 2, "title": "Input Age", "status": "done"},
@@ -32,8 +32,8 @@
     {"day": 28, "title": "Count Character", "status": "done"},
     {"day": 29, "title": "HTML Tag", "status": "done"},
     {"day": 30, "title": "Longest Word", "status": "done"},
+    {"day": 31, "title": "Remove Nth Character", "status": "done"},
 
-    {"day": 31, "title": "Remove Nth Character", "status": "pending"},
     {"day": 32, "title": "Reverse Word in String", "status": "pending"},
     {"day": 33, "title": "String Length", "status": "pending"},
     {"day": 34, "title": "Unique Word", "status": "pending"},
