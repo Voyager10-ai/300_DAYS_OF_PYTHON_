@@ -142,3 +142,11 @@ public class learn {
 //         for(int i=0; i<10; i++) { if(i%2==0) continue; System.out.println(i); }
 //     }
 // }
+
+// Array Example
+// class LearnArray {
+//     public static void main(String[] args) {
+//         int[] arr = {1, 2, 3, 4, 5};
+//         for(int a : arr) System.out.println(a);
+//     }
+// }
