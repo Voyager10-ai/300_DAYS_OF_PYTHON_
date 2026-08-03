@@ -105,3 +105,10 @@ public class learn {
 //         switch(day) { case 1: System.out.println("Mon"); break; default: System.out.println("Other"); }
 //     }
 // }
+
+// For Loop
+// class LearnFor {
+//     public static void main(String[] args) {
+//         for(int i=0; i<5; i++) System.out.println(i);
+//     }
+// }
