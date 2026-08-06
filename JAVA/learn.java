@@ -168,3 +168,18 @@ public class learn {
 //     }
 // }
 
+// Methods and Overloading Example
+// class LearnMethods {
+//     public static int calculateSum(int a, int b) {
+//         return a + b;
+//     }
+//     public static double calculateSum(double a, double b) {
+//         return a + b;
+//     }
+//     public static void main(String[] args) {
+//         System.out.println("Int sum: " + calculateSum(10, 20));
+//         System.out.println("Double sum: " + calculateSum(5.5, 4.5));
+//     }
+// }
+
+
