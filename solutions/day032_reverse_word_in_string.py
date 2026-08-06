@@ -57,3 +57,78 @@ def reverse_each_word(text: str) -> str:
     words = text.split()
     reversed_words = [w[::-1] for w in words]
     return " ".join(reversed_words)
+
+
+def reverse_words_custom_delimiter(text: str, delimiter: str = ",") -> str:
+    """
+    Reverses sequence of tokens delimited by a custom separator string.
+
+    Args:
+        text: Input string with custom delimiters.
+        delimiter: Separator string between tokens.
+
+    Returns:
+        Delimited string with token order reversed.
+    """
+    if not text:
+        return ""
+    tokens = [t.strip() for t in text.split(delimiter)]
+    return delimiter.join(reversed(tokens))
+
+
+def reverse_words_preserve_whitespace(text: str) -> str:
+    """
+    Reverses word sequence while keeping original spacing/whitespace layout intact.
+
+    Args:
+        text: Input text containing spaces, tabs, or newlines.
+
+    Returns:
+        Reversed word order string matching identical whitespace slot locations.
+    """
+    if not text:
+        return ""
+    # Extract words and whitespace gaps using regex split
+    tokens = re.split(r'(\s+)', text)
+    words = [t for t in tokens if not t.isspace() and t != '']
+    reversed_words = list(reversed(words))
+
+    result = []
+    word_idx = 0
+    for t in tokens:
+        if t == '':
+            continue
+        if t.isspace():
+            result.append(t)
+        else:
+            result.append(reversed_words[word_idx])
+            word_idx += 1
+    return "".join(result)
+
+
+def reverse_each_word_preserve_case(text: str) -> str:
+    """
+    Reverses characters of each word while maintaining capital letter positions.
+
+    Args:
+        text: Input string.
+
+    Returns:
+        Character-reversed string with original casing template preserved.
+
+    Example:
+        reverse_each_word_preserve_case("Hello World") -> "Olleh Dlrow"
+    """
+    def transform_word(w: str) -> str:
+        casing_mask = [c.isupper() for c in w]
+        raw_reversed = list(w[::-1].lower())
+        for i, is_upper in enumerate(casing_mask):
+            if is_upper:
+                raw_reversed[i] = raw_reversed[i].upper()
+        return "".join(raw_reversed)
+
+    if not text:
+        return ""
+    words = text.split()
+    return " ".join(transform_word(w) for w in words)
+
