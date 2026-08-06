@@ -305,6 +305,42 @@ class TestReverseWordInString(unittest.TestCase):
         self.assertEqual(out, "beta alpha\ndelta gamma")
 
 
+def main():
+    print("=" * 60)
+    print(" 🔄 Day 32: Reverse Word in String - Interactive CLI Demo")
+    print("=" * 60)
+
+    sample_sentence = "The quick brown fox jumps over the lazy dog."
+    print(f"\nOriginal Sentence:\n  '{sample_sentence}'")
+
+    print("\n1. Reversing Word Order:")
+    print(f"  -> '{reverse_words(sample_sentence)}'")
+
+    print("\n2. Reversing Characters in Each Word:")
+    print(f"  -> '{reverse_each_word(sample_sentence)}'")
+
+    print("\n3. Reversing Both Word Order and Characters:")
+    print(f"  -> '{format_reversed_sentence(sample_sentence, mode='both')}'")
+
+    print("\n4. Preserving Punctuation Slots:")
+    print(f"  -> '{reverse_words_preserve_punctuation(sample_sentence)}'")
+
+    print("\n5. Sentence Transformation Analysis:")
+    metrics = analyze_sentence_transformation(sample_sentence)
+    for key, value in metrics.items():
+        print(f"  - {key}: {value}")
+
+    print("\n" + "=" * 60)
+    print(" Running Unit Tests...")
+    print("=" * 60)
+    unittest.main(argv=['first-arg-is-ignored'], exit=False)
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 
