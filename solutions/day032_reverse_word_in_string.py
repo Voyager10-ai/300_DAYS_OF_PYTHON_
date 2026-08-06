@@ -220,4 +220,40 @@ def analyze_sentence_transformation(original_text: str) -> Dict[str, Any]:
     }
 
 
+def reverse_words_stream(stream_input: io.StringIO, mode: str = "word_order") -> str:
+    """
+    Processes line-by-line text stream and yields formatted reversed sentences.
+
+    Args:
+        stream_input: StringIO or file-like object.
+        mode: Reversing mode to apply to each line.
+
+    Returns:
+        Multi-line string with transformed content.
+    """
+    output_lines = []
+    for line in stream_input:
+        cleaned_line = line.rstrip("\r\n")
+        if cleaned_line:
+            output_lines.append(format_reversed_sentence(cleaned_line, mode=mode))
+        else:
+            output_lines.append("")
+    return "\n".join(output_lines)
+
+
+def batch_reverse_lines(lines: List[str], mode: str = "word_order") -> List[str]:
+    """
+    Applies word reversing transformation to a list of sentence strings in bulk.
+
+    Args:
+        lines: List of sentences.
+        mode: Reversing mode to apply.
+
+    Returns:
+        List of transformed sentence strings.
+    """
+    return [format_reversed_sentence(line, mode=mode) for line in lines]
+
+
+
 
