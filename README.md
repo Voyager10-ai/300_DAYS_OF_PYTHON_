@@ -34,6 +34,8 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 29: HTML Tag
 - Day 30: Longest Word
 - Day 31: Remove Nth Character
+- Day 32: Reverse Word in String
+
 
 
 
