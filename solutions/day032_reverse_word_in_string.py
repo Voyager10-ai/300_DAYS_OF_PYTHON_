@@ -132,3 +132,61 @@ def reverse_each_word_preserve_case(text: str) -> str:
     words = text.split()
     return " ".join(transform_word(w) for w in words)
 
+
+def reverse_words_preserve_punctuation(text: str) -> str:
+    """
+    Reverses word order while maintaining trailing/leading punctuation positions intact.
+
+    Args:
+        text: Sentence with punctuation marks.
+
+    Returns:
+        Sentence with words reversed but punctuation bound to structural slots.
+
+    Example:
+        reverse_words_preserve_punctuation("Hello, world!") -> "world, Hello!"
+    """
+    if not text:
+        return ""
+
+    # Tokenize words and non-word characters (punctuation/whitespace)
+    tokens = re.findall(r'\w+|[^\w\s]+|\s+', text)
+
+    words = [t for t in tokens if t.isalnum()]
+    reversed_words = list(reversed(words))
+
+    result = []
+    word_idx = 0
+    for t in tokens:
+        if t.isalnum():
+            result.append(reversed_words[word_idx])
+            word_idx += 1
+        else:
+            result.append(t)
+
+    return "".join(result)
+
+
+def format_reversed_sentence(text: str, mode: str = "word_order") -> str:
+    """
+    High-level dispatcher for formatting reversed string outputs.
+
+    Args:
+        text: Input string.
+        mode: Reversing mode ('word_order', 'char_in_word', 'both', 'preserve_punct').
+
+    Returns:
+        Formatted reversed string output based on selected mode.
+    """
+    if mode == "word_order":
+        return reverse_words(text)
+    elif mode == "char_in_word":
+        return reverse_each_word(text)
+    elif mode == "both":
+        return reverse_words(reverse_each_word(text))
+    elif mode == "preserve_punct":
+        return reverse_words_preserve_punctuation(text)
+    else:
+        raise ValueError(f"Unknown reversing mode: {mode}")
+
+
