@@ -190,3 +190,34 @@ def format_reversed_sentence(text: str, mode: str = "word_order") -> str:
         raise ValueError(f"Unknown reversing mode: {mode}")
 
 
+def analyze_sentence_transformation(original_text: str) -> Dict[str, Any]:
+    """
+    Analyzes sentence properties before and after applying word reversing transformations.
+
+    Args:
+        original_text: Raw input string.
+
+    Returns:
+        Dictionary containing metric summaries and transformation outputs.
+    """
+    words = original_text.strip().split()
+    word_count = len(words)
+    char_count = len(original_text)
+    palindromes = [w for w in words if w.lower() == w[::-1].lower()]
+
+    rev_words = reverse_words(original_text)
+    rev_each = reverse_each_word(original_text)
+
+    return {
+        "original_text": original_text,
+        "word_count": word_count,
+        "character_count": char_count,
+        "palindrome_count": len(palindromes),
+        "palindromes": palindromes,
+        "reversed_words_order": rev_words,
+        "reversed_each_word": rev_each,
+        "is_sentence_palindrome": original_text.lower().replace(" ", "") == rev_words.lower().replace(" ", ""),
+    }
+
+
+
