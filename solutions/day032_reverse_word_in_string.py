@@ -255,5 +255,56 @@ def batch_reverse_lines(lines: List[str], mode: str = "word_order") -> List[str]
     return [format_reversed_sentence(line, mode=mode) for line in lines]
 
 
+import unittest
+
+
+class TestReverseWordInString(unittest.TestCase):
+    def test_reverse_words_basic(self):
+        self.assertEqual(reverse_words("the sky is blue"), "blue is sky the")
+        self.assertEqual(reverse_words("  hello world  "), "world hello")
+        self.assertEqual(reverse_words("a"), "a")
+        self.assertEqual(reverse_words(""), "")
+
+
+    def test_reverse_each_word(self):
+        self.assertEqual(reverse_each_word("hello world"), "olleh dlrow")
+        self.assertEqual(reverse_each_word("Python"), "nohtyP")
+        self.assertEqual(reverse_each_word(""), "")
+
+    def test_custom_delimiter(self):
+        self.assertEqual(reverse_words_custom_delimiter("apple,banana,cherry", ","), "cherry,banana,apple")
+        self.assertEqual(reverse_words_custom_delimiter("a|b|c", "|"), "c|b|a")
+
+    def test_preserve_whitespace(self):
+        self.assertEqual(reverse_words_preserve_whitespace("one   two  three"), "three   two  one")
+
+    def test_preserve_case(self):
+        self.assertEqual(reverse_each_word_preserve_case("Hello World"), "Olleh Dlrow")
+
+    def test_preserve_punctuation(self):
+        self.assertEqual(reverse_words_preserve_punctuation("Hello, world!"), "world, Hello!")
+
+    def test_format_reversed_sentence(self):
+        self.assertEqual(format_reversed_sentence("hello world", mode="word_order"), "world hello")
+        self.assertEqual(format_reversed_sentence("hello world", mode="char_in_word"), "olleh dlrow")
+        self.assertEqual(format_reversed_sentence("hello world", mode="both"), "dlrow olleh")
+
+    def test_analyze_sentence_transformation(self):
+        res = analyze_sentence_transformation("radar cat level")
+        self.assertEqual(res["word_count"], 3)
+        self.assertEqual(res["palindrome_count"], 2)
+        self.assertIn("radar", res["palindromes"])
+
+    def test_batch_and_stream(self):
+        lines = ["hello world", "python code"]
+        res = batch_reverse_lines(lines)
+        self.assertEqual(res, ["world hello", "code python"])
+
+        stream_in = io.StringIO("alpha beta\ngamma delta")
+        out = reverse_words_stream(stream_in)
+        self.assertEqual(out, "beta alpha\ndelta gamma")
+
+
+
 
 
