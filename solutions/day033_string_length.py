@@ -72,3 +72,82 @@ def calculate_length_builtin(s: Optional[str]) -> int:
     if s is None:
         return 0
     return len(s)
+
+
+def calculate_byte_length(s: str, encoding: str = "utf-8") -> int:
+    """
+    Calculates the byte size of a string under a given text encoding format.
+
+    Args:
+        s: Input string.
+        encoding: Character encoding format (e.g. 'utf-8', 'utf-16', 'ascii').
+
+    Returns:
+        Total number of encoded bytes.
+
+    Example:
+        calculate_byte_length("hello", "utf-8") -> 5
+        calculate_byte_length("🚀", "utf-8") -> 4
+    """
+    if not s:
+        return 0
+    return len(s.encode(encoding, errors="replace"))
+
+
+def calculate_unicode_code_points(s: str) -> int:
+    """
+    Calculates the total count of distinct Unicode code points in a string.
+
+    Args:
+        s: Input text string.
+
+    Returns:
+        Count of code points.
+    """
+    if not s:
+        return 0
+    return len([ord(c) for c in s])
+
+
+def analyze_multi_byte_characters(s: str, encoding: str = "utf-8") -> Dict[str, Any]:
+    """
+    Analyzes character composition and identifies single-byte vs multi-byte characters.
+
+    Args:
+        s: Input string.
+        encoding: Character encoding format.
+
+    Returns:
+        Dictionary containing character count, byte count, and multi-byte breakdown.
+    """
+    if not s:
+        return {
+            "char_count": 0,
+            "byte_count": 0,
+            "single_byte_chars": 0,
+            "multi_byte_chars": 0,
+            "expansion_ratio": 1.0,
+        }
+
+    char_count = len(s)
+    byte_count = calculate_byte_length(s, encoding=encoding)
+
+    single_byte = 0
+    multi_byte = 0
+    for char in s:
+        b_len = len(char.encode(encoding, errors="replace"))
+        if b_len == 1:
+            single_byte += 1
+        else:
+            multi_byte += 1
+
+    ratio = round(byte_count / char_count, 2) if char_count > 0 else 1.0
+
+    return {
+        "char_count": char_count,
+        "byte_count": byte_count,
+        "single_byte_chars": single_byte,
+        "multi_byte_chars": multi_byte,
+        "expansion_ratio": ratio,
+    }
+
