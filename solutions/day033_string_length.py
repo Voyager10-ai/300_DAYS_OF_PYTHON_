@@ -220,3 +220,83 @@ def get_word_lengths(text: str) -> List[Tuple[str, int]]:
     return [(w, len(w)) for w in words]
 
 
+def analyze_length_statistics(text: str) -> Dict[str, Any]:
+    """
+    Computes statistical metrics regarding word lengths in a given text body.
+
+    Args:
+        text: Input sentence or document text.
+
+    Returns:
+        Dictionary containing length metrics (min, max, average, median, distribution).
+    """
+    word_pairs = get_word_lengths(text)
+    if not word_pairs:
+        return {
+            "total_words": 0,
+            "min_length": 0,
+            "max_length": 0,
+            "average_length": 0.0,
+            "median_length": 0.0,
+            "length_distribution": {},
+        }
+
+    lengths = [length for _, length in word_pairs]
+    total_words = len(lengths)
+    min_len = min(lengths)
+    max_len = max(lengths)
+    avg_len = round(sum(lengths) / total_words, 2)
+
+    sorted_lengths = sorted(lengths)
+    mid = total_words // 2
+    if total_words % 2 == 0:
+        median_len = round((sorted_lengths[mid - 1] + sorted_lengths[mid]) / 2.0, 2)
+    else:
+        median_len = float(sorted_lengths[mid])
+
+    freq: Dict[int, int] = {}
+    for l in lengths:
+        freq[l] = freq.get(l, 0) + 1
+
+    return {
+        "total_words": total_words,
+        "min_length": min_len,
+        "max_length": max_len,
+        "average_length": avg_len,
+        "median_length": median_len,
+        "length_distribution": dict(sorted(freq.items())),
+    }
+
+
+def render_length_histogram(text: str, max_bar_width: int = 20) -> str:
+    """
+    Renders a formatted ASCII visual histogram of word length frequencies in text.
+
+    Args:
+        text: Input text string.
+        max_bar_width: Maximum character width of visual frequency bar.
+
+    Returns:
+        Formatted multi-line ASCII chart string.
+    """
+    stats = analyze_length_statistics(text)
+    dist = stats["length_distribution"]
+    if not dist:
+        return "No words found to render histogram."
+
+    max_freq = max(dist.values())
+    lines = ["Word Length Frequency Histogram:"]
+    lines.append("-" * 40)
+    lines.append(f"{'Length':<8} | {'Count':<6} | {'Distribution':<20}")
+    lines.append("-" * 40)
+
+    for word_len, count in dist.items():
+        bar_len = int((count / max_freq) * max_bar_width) if max_freq > 0 else 0
+        bar = "█" * max(bar_len, 1)
+        lines.append(f"{word_len:<8} | {count:<6} | {bar}")
+
+    lines.append("-" * 40)
+    return "\n".join(lines)
+
+
+
