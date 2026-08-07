@@ -151,3 +151,72 @@ def analyze_multi_byte_characters(s: str, encoding: str = "utf-8") -> Dict[str, 
         "expansion_ratio": ratio,
     }
 
+
+def calculate_trimmed_length(s: str) -> int:
+    """
+    Calculates string length after stripping boundary whitespace.
+
+    Args:
+        s: Input string.
+
+    Returns:
+        Length of trimmed string.
+    """
+    if not s:
+        return 0
+    return len(s.strip())
+
+
+def calculate_non_whitespace_length(s: str) -> int:
+    """
+    Calculates string length ignoring all whitespace characters (spaces, tabs, newlines).
+
+    Args:
+        s: Input text string.
+
+    Returns:
+        Count of non-whitespace characters.
+    """
+    if not s:
+        return 0
+    return len([c for c in s if not c.isspace()])
+
+
+def calculate_filtered_length(s: str, predicate: Callable[[str], bool]) -> int:
+    """
+    Calculates length of string matching a custom condition predicate.
+
+    Args:
+        s: Input text string.
+        predicate: Function taking a char string and returning boolean.
+
+    Returns:
+        Count of matching characters.
+
+    Example:
+        calculate_filtered_length("Py3.9!", str.isalpha) -> 2 ("Py")
+    """
+    if not s:
+        return 0
+    return len([c for c in s if predicate(c)])
+
+
+def get_word_lengths(text: str) -> List[Tuple[str, int]]:
+    """
+    Splits text into words and calculates the length of each individual word.
+
+    Args:
+        text: Input sentence or paragraph.
+
+    Returns:
+        List of tuples containing (word, length).
+
+    Example:
+        get_word_lengths("hello world") -> [("hello", 5), ("world", 5)]
+    """
+    if not text:
+        return []
+    words = text.strip().split()
+    return [(w, len(w)) for w in words]
+
+
