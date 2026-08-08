@@ -299,4 +299,35 @@ def render_length_histogram(text: str, max_bar_width: int = 20) -> str:
     return "\n".join(lines)
 
 
+def calculate_stream_line_lengths(stream_input: io.StringIO) -> List[Tuple[int, int]]:
+    """
+    Reads line-by-line text stream and computes character length per line.
+
+    Args:
+        stream_input: StringIO or file-like object.
+
+    Returns:
+        List of tuples (line_number, character_length).
+    """
+    results = []
+    for line_no, line in enumerate(stream_input, start=1):
+        cleaned = line.rstrip("\r\n")
+        results.append((line_no, len(cleaned)))
+    return results
+
+
+def batch_calculate_lengths(strings: List[str]) -> Dict[str, int]:
+    """
+    Evaluates a collection of strings and maps each string to its character length.
+
+    Args:
+        strings: List of input string items.
+
+    Returns:
+        Dictionary mapping string text to character length.
+    """
+    return {s: len(s) for s in strings}
+
+
+
 
