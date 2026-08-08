@@ -200,5 +200,28 @@ public class learn {
 //     }
 // }
 
+// Constructor and 'this' Keyword Example
+// class Car {
+//     String brand;
+//     int year;
+//
+//     // Parameterized Constructor
+//     Car(String brand, int year) {
+//         this.brand = brand;
+//         this.year = year;
+//     }
+//
+//     public void displayDetails() {
+//         System.out.println("Brand: " + this.brand + ", Year: " + this.year);
+//     }
+// }
+// class LearnConstructors {
+//     public static void main(String[] args) {
+//         Car car1 = new Car("Tesla", 2024);
+//         car1.displayDetails();
+//     }
+// }
+
+
 
 
