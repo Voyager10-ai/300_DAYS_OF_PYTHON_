@@ -329,5 +329,62 @@ def batch_calculate_lengths(strings: List[str]) -> Dict[str, int]:
     return {s: len(s) for s in strings}
 
 
+import unittest
+
+
+class TestStringLength(unittest.TestCase):
+    def test_iterative_and_recursive_length(self):
+        self.assertEqual(calculate_length_iterative("Python"), 6)
+        self.assertEqual(calculate_length_iterative(""), 0)
+        self.assertEqual(calculate_length_recursive("Programming"), 11)
+        self.assertEqual(calculate_length_recursive(""), 0)
+
+    def test_builtin_and_null(self):
+        self.assertEqual(calculate_length_builtin("test"), 4)
+        self.assertEqual(calculate_length_builtin(None), 0)
+
+    def test_byte_length_and_unicode(self):
+        self.assertEqual(calculate_byte_length("hello", "utf-8"), 5)
+        self.assertEqual(calculate_byte_length("🚀", "utf-8"), 4)
+        self.assertEqual(calculate_unicode_code_points("abc"), 3)
+
+        analysis = analyze_multi_byte_characters("a🚀b")
+        self.assertEqual(analysis["char_count"], 3)
+        self.assertEqual(analysis["single_byte_chars"], 2)
+        self.assertEqual(analysis["multi_byte_chars"], 1)
+
+    def test_trimmed_and_non_whitespace(self):
+        self.assertEqual(calculate_trimmed_length("   hello   "), 5)
+        self.assertEqual(calculate_non_whitespace_length("a b c d"), 4)
+
+    def test_filtered_length(self):
+        self.assertEqual(calculate_filtered_length("Py3.9!", str.isalpha), 2)
+        self.assertEqual(calculate_filtered_length("Py3.9!", str.isdigit), 2)
+
+    def test_word_lengths(self):
+        pairs = get_word_lengths("cat elephant dog")
+        self.assertEqual(pairs, [("cat", 3), ("elephant", 8), ("dog", 3)])
+
+    def test_length_statistics(self):
+        stats = analyze_length_statistics("one two three")
+        self.assertEqual(stats["total_words"], 3)
+        self.assertEqual(stats["min_length"], 3)
+        self.assertEqual(stats["max_length"], 5)
+
+    def test_histogram_rendering(self):
+        chart = render_length_histogram("a bb ccc")
+        self.assertIn("Word Length Frequency Histogram:", chart)
+        self.assertIn("3", chart)
+
+    def test_stream_and_batch(self):
+        stream_in = io.StringIO("first line\nsecond line here")
+        res = calculate_stream_line_lengths(stream_in)
+        self.assertEqual(res, [(1, 10), (2, 16)])
+
+        batch_res = batch_calculate_lengths(["cat", "elephant"])
+        self.assertEqual(batch_res, {"cat": 3, "elephant": 8})
+
+
+
 
 
