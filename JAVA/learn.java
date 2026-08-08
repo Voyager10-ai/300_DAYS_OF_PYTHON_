@@ -182,4 +182,23 @@ public class learn {
 //     }
 // }
 
+// Classes and Objects Example
+// class Student {
+//     String name;
+//     int age;
+
+//     public void printInfo() {
+//         System.out.println("Name: " + this.name + ", Age: " + this.age);
+//     }
+// }
+// class LearnClasses {
+//     public static void main(String[] args) {
+//         Student s1 = new Student();
+//         s1.name = "Alice";
+//         s1.age = 20;
+//         s1.printInfo();
+//     }
+// }
+
+
 
