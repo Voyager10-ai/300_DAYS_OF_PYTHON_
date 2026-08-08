@@ -385,6 +385,47 @@ class TestStringLength(unittest.TestCase):
         self.assertEqual(batch_res, {"cat": 3, "elephant": 8})
 
 
+def main():
+    print("=" * 60)
+    print(" 📏 Day 33: String Length Calculation - Interactive CLI Demo")
+    print("=" * 60)
+
+    sample_text = "The quick brown fox 🚀 jumps over 123 lazy dogs!"
+    print(f"\nSample Input Text:\n  '{sample_text}'")
+
+    print("\n1. Basic Length Algorithms:")
+    print(f"  - Iterative Length:  {calculate_length_iterative(sample_text)}")
+    print(f"  - Recursive Length:  {calculate_length_recursive(sample_text)}")
+    print(f"  - Built-in len():    {calculate_length_builtin(sample_text)}")
+
+    print("\n2. Encoding & Multi-Byte Metrics:")
+    print(f"  - UTF-8 Byte Size:   {calculate_byte_length(sample_text, 'utf-8')} bytes")
+    print(f"  - Code Points Count: {calculate_unicode_code_points(sample_text)}")
+    mb_analysis = analyze_multi_byte_characters(sample_text)
+    print(f"  - Single-byte chars: {mb_analysis['single_byte_chars']}")
+    print(f"  - Multi-byte chars:  {mb_analysis['multi_byte_chars']}")
+    print(f"  - Expansion Ratio:   {mb_analysis['expansion_ratio']}")
+
+    print("\n3. Filtered Lengths:")
+    print(f"  - Trimmed Length:    {calculate_trimmed_length(sample_text)}")
+    print(f"  - Non-whitespace:    {calculate_non_whitespace_length(sample_text)}")
+    print(f"  - Alphabetic Chars:  {calculate_filtered_length(sample_text, str.isalpha)}")
+    print(f"  - Numeric Digits:    {calculate_filtered_length(sample_text, str.isdigit)}")
+
+    print("\n4. Length Frequency Histogram:")
+    print(render_length_histogram(sample_text))
+
+    print("\n" + "=" * 60)
+    print(" Running Unit Tests...")
+    print("=" * 60)
+    unittest.main(argv=['first-arg-is-ignored'], exit=False)
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 
