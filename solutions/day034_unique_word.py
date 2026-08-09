@@ -9,7 +9,7 @@
 import sys
 import re
 import unittest
-from typing import List, Set, Dict, Tuple, Optional, Iterable, Iterator
+from typing import List, Set, Dict, Tuple, Optional, Iterable, Iterator, Any
 
 
 def get_unique_words_set(text: str) -> Set[str]:
@@ -276,5 +276,54 @@ class TestUniqueWord(unittest.TestCase):
         stream_data = ["First line with words\n", "Second line with unique words\n"]
         unique_stream = list(get_unique_words_from_stream(stream_data))
         self.assertEqual(unique_stream, ["first", "line", "with", "words", "second", "unique"])
+
+
+def main():
+    print("=" * 60)
+    print("🐍 300 Days of Python - Day 34: Unique Word Extraction")
+    print("=" * 60)
+
+    sample_text = (
+        "Python is amazing, python is versatile! "
+        "Learning Python daily builds consistency. "
+        "Consistency leads to mastery in Python and programming."
+    )
+
+    print("\n📝 Sample Input Text:")
+    print(f"   \"{sample_text}\"")
+
+    print("\n1️⃣ Unordered Unique Words (set):")
+    print("  ", get_unique_words_set(sample_text))
+
+    print("\n2️⃣ Order-Preserving Unique Words (list):")
+    print("  ", get_unique_words_ordered(sample_text))
+
+    print("\n3️⃣ Case-Insensitive Unique Words:")
+    print("  ", get_unique_words_case_insensitive(sample_text))
+
+    print("\n4️⃣ Cleaned & Filtered Unique Words (min length = 4):")
+    print("  ", get_unique_words_cleaned(sample_text, min_length=4))
+
+    print("\n5️⃣ Strictly Unique Words (Frequency == 1):")
+    print("  ", get_strictly_unique_words(sample_text))
+
+    print("\n📊 Vocabulary Richness Metrics (TTR):")
+    metrics = calculate_vocabulary_richness(sample_text)
+    for k, v in metrics.items():
+        print(f"   - {k}: {v}")
+
+    print("\n🧪 Running Unit Tests...")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestUniqueWord)
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    if result.wasSuccessful():
+        print("✅ All Day 34 unit tests passed successfully!")
+    else:
+        print("❌ Some unit tests failed.")
+
+
+if __name__ == "__main__":
+    main()
+
 
 
