@@ -36,6 +36,7 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 31: Remove Nth Character
 - Day 32: Reverse Word in String
 - Day 33: String Length
+- Day 34: Unique Word
 
 
 

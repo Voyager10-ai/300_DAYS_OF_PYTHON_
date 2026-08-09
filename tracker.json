@@ -1,6 +1,6 @@
 {
   "total_problems": 282,
-  "current_day": 33,
+  "current_day": 34,
   "problems": [
     {"day": 1, "title": "Print String", "status": "done"},
     {"day": 2, "title": "Input Age", "status": "done"},
@@ -37,7 +37,7 @@
 
     {"day": 33, "title": "String Length", "status": "done"},
 
-    {"day": 34, "title": "Unique Word", "status": "pending"},
+    {"day": 34, "title": "Unique Word", "status": "done"},
 
     {"day": 35, "title": "Word Count", "status": "pending"},
     {"day": 36, "title": "Check Key Exist", "status": "pending"},
