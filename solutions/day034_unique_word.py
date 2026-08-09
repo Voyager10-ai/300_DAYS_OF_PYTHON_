@@ -206,3 +206,75 @@ def calculate_vocabulary_richness(text: str, case_fold: bool = True) -> Dict[str
         "hapax_legomena_ratio": round(hapax_count / unique_types, 4) if unique_types > 0 else 0.0
     }
 
+
+def get_unique_words_from_stream(lines: Iterable[str], case_fold: bool = True) -> Iterator[str]:
+    """
+    Memory-efficient generator that yields unique words as they appear in a text stream or file line iterable.
+
+    Args:
+        lines: Iterable of text lines (e.g., file handle or list of strings).
+        case_fold: If True, yields lowercase unique words.
+
+    Yields:
+        Unique words in order of appearance across the stream.
+    """
+    seen: Set[str] = set()
+    for line in lines:
+        tokens = re.findall(r'\b\w+\b', line)
+        for token in tokens:
+            processed = token.lower() if case_fold else token
+            if processed not in seen:
+                seen.add(processed)
+                yield processed
+
+
+class TestUniqueWord(unittest.TestCase):
+    """Unit test suite for Day 34: Unique Word solutions."""
+
+    def test_get_unique_words_set(self):
+        self.assertEqual(get_unique_words_set("apple banana apple cherry"), {"apple", "banana", "cherry"})
+        self.assertEqual(get_unique_words_set(""), set())
+
+    def test_get_unique_words_ordered(self):
+        self.assertEqual(
+            get_unique_words_ordered("apple banana apple cherry banana"),
+            ["apple", "banana", "cherry"]
+        )
+        self.assertEqual(get_unique_words_ordered(""), [])
+
+    def test_get_unique_words_case_insensitive(self):
+        self.assertEqual(
+            get_unique_words_case_insensitive("Python python PYTHON"),
+            ["python"]
+        )
+        self.assertEqual(
+            get_unique_words_case_insensitive("Python python PYTHON", preserve_first_case=True),
+            ["Python"]
+        )
+
+    def test_get_strictly_unique_words(self):
+        self.assertEqual(
+            get_strictly_unique_words("apple banana apple cherry banana date"),
+            ["cherry", "date"]
+        )
+        self.assertEqual(get_strictly_unique_words(""), [])
+
+    def test_get_unique_words_cleaned(self):
+        result = get_unique_words_cleaned("Hello, world! Hello... Python 3.10", min_length=2)
+        self.assertIn("hello", result)
+        self.assertIn("world", result)
+        self.assertIn("python", result)
+        self.assertNotIn("3", result)
+
+    def test_calculate_vocabulary_richness(self):
+        metrics = calculate_vocabulary_richness("the quick brown fox jumps over the lazy dog")
+        self.assertEqual(metrics["total_tokens"], 9)
+        self.assertEqual(metrics["unique_types"], 8)
+        self.assertAlmostEqual(metrics["ttr_ratio"], 0.8889, places=4)
+
+    def test_get_unique_words_from_stream(self):
+        stream_data = ["First line with words\n", "Second line with unique words\n"]
+        unique_stream = list(get_unique_words_from_stream(stream_data))
+        self.assertEqual(unique_stream, ["first", "line", "with", "words", "second", "unique"])
+
+
