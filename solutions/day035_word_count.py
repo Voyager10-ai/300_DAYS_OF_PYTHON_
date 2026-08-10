@@ -54,3 +54,49 @@ def get_word_frequencies(text: str, case_sensitive: bool = False) -> Dict[str, i
     words = text.split()
     processed_words = words if case_sensitive else [w.lower() for w in words]
     return dict(Counter(processed_words))
+
+
+def count_words_regex(text: str, strip_punctuation: bool = True) -> int:
+    """
+    Counts words using regex pattern matching, ignoring punctuation marks and special symbols.
+
+    Args:
+        text: Input string.
+        strip_punctuation: If True, uses word boundaries \\b\\w+\\b to isolate alphanumeric tokens.
+
+    Returns:
+        Number of valid word tokens.
+
+    Example:
+        count_words_regex("Hello, world! 123... test-case") -> 4
+    """
+    if not text or not text.strip():
+        return 0
+
+    if strip_punctuation:
+        tokens = re.findall(r'\b\w+\b', text)
+    else:
+        tokens = text.split()
+
+    return len(tokens)
+
+
+def count_words_case_insensitive(text: str) -> Dict[str, int]:
+    """
+    Counts word occurrences case-insensitively after stripping punctuation.
+
+    Args:
+        text: Input string.
+
+    Returns:
+        Dictionary of lowercased word frequencies.
+
+    Example:
+        count_words_case_insensitive("Python python PYTHON!") -> {"python": 3}
+    """
+    if not text or not text.strip():
+        return {}
+
+    tokens = [w.lower() for w in re.findall(r'\b\w+\b', text)]
+    return dict(Counter(tokens))
+
