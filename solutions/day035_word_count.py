@@ -275,7 +275,7 @@ class TestWordCount(unittest.TestCase):
         )
 
     def test_count_words_regex(self):
-        self.assertEqual(count_words_regex("Hello, world! 123... test-case"), 4)
+        self.assertEqual(count_words_regex("Hello, world! 123... test-case"), 5)
         self.assertEqual(count_words_regex(""), 0)
 
     def test_count_words_case_insensitive(self):
@@ -312,6 +312,53 @@ class TestWordCount(unittest.TestCase):
         text = "word " * 50
         counter = count_words_chunked(text, chunk_size=20)
         self.assertEqual(counter["word"], 50)
+
+
+def main():
+    print("=" * 60)
+    print("🐍 300 Days of Python - Day 35: Word Count & Text Analytics")
+    print("=" * 60)
+
+    sample_text = (
+        "Data science and machine learning with Python. "
+        "Python makes data analysis fast, efficient, and readable! "
+        "Machine learning models require clean data and robust Python code."
+    )
+
+    print("\n📝 Sample Input Text:")
+    print(f"   \"{sample_text}\"")
+
+    print("\n1️⃣ Basic Word Count (split):", count_words_basic(sample_text))
+    print("2️⃣ Regex Alphanumeric Token Count:", count_words_regex(sample_text))
+
+    print("\n3️⃣ Top 5 Most Frequent Words (excluding stop-words):")
+    top_words = get_top_n_words(sample_text, top_n=5, exclude_stopwords=True)
+    for word, count in top_words:
+        print(f"   - {word:<15}: {count}")
+
+    print("\n4️⃣ Bigram (2-gram) Frequencies:")
+    bigrams = get_ngram_frequencies(sample_text, n=2)
+    for ngram, count in list(bigrams.items())[:5]:
+        print(f"   - {' '.join(ngram):<25}: {count}")
+
+    print("\n5️⃣ Word Length Distribution:")
+    length_dist = get_word_length_distribution(sample_text)
+    for length in sorted(length_dist.keys()):
+        print(f"   - {length}-letter words: {length_dist[length]}")
+
+    print("\n🧪 Running Unit Tests...")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestWordCount)
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    if result.wasSuccessful():
+        print("✅ All Day 35 unit tests passed successfully!")
+    else:
+        print("❌ Some unit tests failed.")
+
+
+if __name__ == "__main__":
+    main()
+
 
 
 
