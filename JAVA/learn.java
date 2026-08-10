@@ -222,6 +222,20 @@ public class learn {
 //     }
 // }
 
+// Word Frequency Counter using HashMap
+// class LearnWordCountHashMap {
+//     public static void main(String[] args) {
+//         String text = "java python java c++ python java";
+//         String[] words = text.split(" ");
+//         Map<String, Integer> freqMap = new HashMap<>();
+//         for (String word : words) {
+//             freqMap.put(word, freqMap.getOrDefault(word, 0) + 1);
+//         }
+//         System.out.println(freqMap);
+//     }
+// }
+
+
 
 
 
