@@ -216,4 +216,48 @@ def get_top_n_words(
     return counter.most_common(top_n)
 
 
+def count_words_stream(lines: Iterable[str], case_fold: bool = True) -> Counter:
+    """
+    Memory-efficient stream word counter that processes lines iteratively.
+
+    Args:
+        lines: Iterable yielding strings (e.g. open file handle).
+        case_fold: Whether to standardize casing.
+
+    Returns:
+        collections.Counter containing accumulated word frequencies.
+    """
+    counter = Counter()
+    for line in lines:
+        tokens = re.findall(r'\b\w+\b', line)
+        if case_fold:
+            tokens = [t.lower() for t in tokens]
+        counter.update(tokens)
+    return counter
+
+
+def count_words_chunked(text: str, chunk_size: int = 1000) -> Counter:
+    """
+    Splits text into chunks of specified character size and aggregates word counts.
+
+    Args:
+        text: Input string.
+        chunk_size: Character limit per chunk.
+
+    Returns:
+        Combined Counter of all chunks.
+    """
+    if not text:
+        return Counter()
+
+    total_counter = Counter()
+    for i in range(0, len(text), chunk_size):
+        chunk = text[i : i + chunk_size]
+        tokens = re.findall(r'\b\w+\b', chunk.lower())
+        total_counter.update(tokens)
+
+    return total_counter
+
+
+
 
