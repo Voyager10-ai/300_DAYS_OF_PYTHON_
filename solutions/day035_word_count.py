@@ -161,3 +161,59 @@ def get_word_length_distribution(text: str) -> Dict[int, int]:
     return dict(Counter(lengths))
 
 
+def get_ngram_frequencies(text: str, n: int = 2) -> Dict[Tuple[str, ...], int]:
+    """
+    Extracts N-gram word sequences (bigrams, trigrams, etc.) and computes their occurrence frequencies.
+
+    Args:
+        text: Input text string.
+        n: Sequence length (2 for bigrams, 3 for trigrams, etc.).
+
+    Returns:
+        Dictionary mapping n-gram tuple of words -> count.
+
+    Example:
+        get_ngram_frequencies("deep learning artificial intelligence deep learning", n=2)
+        -> {("deep", "learning"): 2, ("learning", "artificial"): 1, ("artificial", "intelligence"): 1, ("intelligence", "deep"): 1}
+    """
+    if not text or not text.strip() or n < 1:
+        return {}
+
+    tokens = [w.lower() for w in re.findall(r'\b\w+\b', text)]
+    if len(tokens) < n:
+        return {}
+
+    ngrams = [tuple(tokens[i : i + n]) for i in range(len(tokens) - n + 1)]
+    return dict(Counter(ngrams))
+
+
+def get_top_n_words(
+    text: str,
+    top_n: int = 5,
+    exclude_stopwords: bool = True
+) -> List[Tuple[str, int]]:
+    """
+    Retrieves the top N most frequent words from text.
+
+    Args:
+        text: Input text string.
+        top_n: Number of top elements to return.
+        exclude_stopwords: Whether to ignore stop-words.
+
+    Returns:
+        List of tuples (word, count) sorted by frequency in descending order.
+
+    Example:
+        get_top_n_words("python code python python data code", top_n=2)
+        -> [("python", 3), ("code", 2)]
+    """
+    if exclude_stopwords:
+        freq_map = count_words_filter_stopwords(text)
+    else:
+        freq_map = count_words_case_insensitive(text)
+
+    counter = Counter(freq_map)
+    return counter.most_common(top_n)
+
+
+
