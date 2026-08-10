@@ -233,7 +233,16 @@ public class learn {
 //         }
 //         System.out.println(freqMap);
 //     }
+// Word Frequency Counter using Java 8 Stream API & Collectors.groupingBy
+// class LearnWordCountStreams {
+//     public static void main(String[] args) {
+//         String sentence = "apple banana apple orange banana apple";
+//         Map<String, Long> counts = Arrays.stream(sentence.split(" "))
+//             .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+//         System.out.println(counts);
+//     }
 // }
+
 
 
 
