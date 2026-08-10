@@ -259,5 +259,61 @@ def count_words_chunked(text: str, chunk_size: int = 1000) -> Counter:
     return total_counter
 
 
+class TestWordCount(unittest.TestCase):
+    """Unit test suite for Day 35: Word Count algorithms."""
+
+    def test_count_words_basic(self):
+        self.assertEqual(count_words_basic("Hello world! Python is great."), 5)
+        self.assertEqual(count_words_basic(""), 0)
+        self.assertEqual(count_words_basic("   "), 0)
+
+    def test_get_word_frequencies(self):
+        self.assertEqual(get_word_frequencies("apple Banana apple"), {"apple": 2, "banana": 1})
+        self.assertEqual(
+            get_word_frequencies("apple Banana apple", case_sensitive=True),
+            {"apple": 2, "Banana": 1}
+        )
+
+    def test_count_words_regex(self):
+        self.assertEqual(count_words_regex("Hello, world! 123... test-case"), 4)
+        self.assertEqual(count_words_regex(""), 0)
+
+    def test_count_words_case_insensitive(self):
+        self.assertEqual(count_words_case_insensitive("Python python PYTHON!"), {"python": 3})
+
+    def test_count_words_filter_stopwords(self):
+        freq = count_words_filter_stopwords("The quick brown fox is fast")
+        self.assertIn("quick", freq)
+        self.assertIn("brown", freq)
+        self.assertNotIn("the", freq)
+        self.assertNotIn("is", freq)
+
+    def test_get_word_length_distribution(self):
+        dist = get_word_length_distribution("cat dog elephant")
+        self.assertEqual(dist[3], 2)
+        self.assertEqual(dist[8], 1)
+
+    def test_get_ngram_frequencies(self):
+        ngrams = get_ngram_frequencies("deep learning deep learning artificial", n=2)
+        self.assertEqual(ngrams[("deep", "learning")], 2)
+
+    def test_get_top_n_words(self):
+        top = get_top_n_words("python data python python data code", top_n=2, exclude_stopwords=False)
+        self.assertEqual(top[0], ("python", 3))
+        self.assertEqual(top[1], ("data", 2))
+
+    def test_count_words_stream(self):
+        lines = ["First line of text\n", "Second line of text\n"]
+        counter = count_words_stream(lines)
+        self.assertEqual(counter["text"], 2)
+        self.assertEqual(counter["line"], 2)
+
+    def test_count_words_chunked(self):
+        text = "word " * 50
+        counter = count_words_chunked(text, chunk_size=20)
+        self.assertEqual(counter["word"], 50)
+
+
+
 
 
