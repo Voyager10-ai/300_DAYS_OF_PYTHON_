@@ -241,7 +241,22 @@ public class learn {
 //             .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 //         System.out.println(counts);
 //     }
+// Check if Key Exists using Map.containsKey and Map.getOrDefault
+// class LearnCheckKeyExistMap {
+//     public static void main(String[] args) {
+//         Map<String, Integer> scores = new HashMap<>();
+//         scores.put("Alice", 95);
+//         scores.put("Bob", 88);
+//
+//         boolean hasAlice = scores.containsKey("Alice");
+//         boolean hasCharlie = scores.containsKey("Charlie");
+//
+//         System.out.println("Alice exists: " + hasAlice);
+//         System.out.println("Charlie exists: " + hasCharlie);
+//         System.out.println("Charlie score: " + scores.getOrDefault("Charlie", 0));
+//     }
 // }
+
 
 
 
