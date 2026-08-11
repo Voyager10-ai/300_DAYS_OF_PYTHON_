@@ -286,5 +286,77 @@ def validate_dict_schema(d: dict, schema: Dict[str, type]) -> Dict[str, Any]:
     }
 
 
+class TestCheckKeyExist(unittest.TestCase):
+    """Unit test suite for Day 36: Check Key Exist algorithms."""
+
+    def test_check_key_in(self):
+        sample = {"a": 1, "b": 2, 3: "three", None: "none"}
+        self.assertTrue(check_key_in(sample, "a"))
+        self.assertTrue(check_key_in(sample, 3))
+        self.assertTrue(check_key_in(sample, None))
+        self.assertFalse(check_key_in(sample, "c"))
+        self.assertFalse(check_key_in(None, "a"))
+
+    def test_check_key_get(self):
+        sample = {"a": 10, "b": None}
+        self.assertEqual(check_key_get(sample, "a"), (True, 10))
+        self.assertEqual(check_key_get(sample, "b"), (True, None))
+        self.assertEqual(check_key_get(sample, "c"), (False, None))
+
+    def test_check_key_has_keys(self):
+        sample = {"x": 1, "y": 2}
+        self.assertTrue(check_key_has_keys(sample, "x"))
+        self.assertFalse(check_key_has_keys(sample, "z"))
+
+    def test_check_nested_key(self):
+        nested = {"user": {"profile": {"id": 101, "name": "Alice"}}}
+        self.assertEqual(check_nested_key(nested, ["user", "profile", "id"]), (True, 101))
+        self.assertEqual(check_nested_key(nested, ["user", "profile", "email"]), (False, None))
+        self.assertEqual(check_nested_key(nested, ["user", "settings"]), (False, None))
+
+    def test_check_key_recursive(self):
+        tree = {"id": 1, "child": {"id": 2, "items": [{"id": 3}, {"other": 4}]}}
+        ids = check_key_recursive(tree, "id")
+        self.assertEqual(ids, [1, 2, 3])
+
+    def test_check_all_keys_exist(self):
+        data = {"name": "Alice", "age": 30, "city": "NY"}
+        self.assertTrue(check_all_keys_exist(data, ["name", "age"]))
+        self.assertFalse(check_all_keys_exist(data, ["name", "zip"]))
+
+    def test_check_any_key_exists(self):
+        data = {"name": "Alice", "age": 30}
+        self.assertTrue(check_any_key_exists(data, ["zip", "name"]))
+        self.assertFalse(check_any_key_exists(data, ["zip", "country"]))
+
+    def test_get_missing_keys(self):
+        data = {"a": 1, "b": 2}
+        missing = get_missing_keys(data, ["a", "b", "c", "d"])
+        self.assertEqual(missing, {"c", "d"})
+
+    def test_check_key_case_insensitive(self):
+        data = {"User_Name": "Alice", "API_KEY": "secret"}
+        self.assertEqual(check_key_case_insensitive(data, "username"), (True, "User_Name", "Alice"))
+        self.assertEqual(check_key_case_insensitive(data, "api_key"), (True, "API_KEY", "secret"))
+        self.assertEqual(check_key_case_insensitive(data, "missing"), (False, None, None))
+
+    def test_search_keys_by_regex(self):
+        data = {"user_id": 1, "user_name": "Bob", "app_version": "1.0", "user_email": "b@x.com"}
+        matched = search_keys_by_regex(data, r"^user_")
+        self.assertEqual(set(matched.keys()), {"user_id", "user_name", "user_email"})
+
+    def test_validate_dict_schema(self):
+        schema = {"name": str, "age": int, "email": str}
+        valid_data = {"name": "Alice", "age": 30, "email": "a@x.com"}
+        invalid_data = {"name": "Alice", "age": "thirty"}
+
+        self.assertTrue(validate_dict_schema(valid_data, schema)["valid"])
+        res = validate_dict_schema(invalid_data, schema)
+        self.assertFalse(res["valid"])
+        self.assertIn("email", res["missing_keys"])
+        self.assertEqual(len(res["type_mismatches"]), 1)
+
+
+
 
 
