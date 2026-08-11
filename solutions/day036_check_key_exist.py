@@ -191,3 +191,59 @@ def get_missing_keys(d: dict, required_keys: Iterable[Any]) -> Set[Any]:
     return set(required_keys) - set(d.keys())
 
 
+def check_key_case_insensitive(d: dict, search_key: str) -> Tuple[bool, Optional[str], Any]:
+    """
+    Checks for a string key in dictionary ignoring case sensitivity.
+
+    Args:
+        d: Input dictionary with string keys.
+        search_key: Target key string to match case-insensitively.
+
+    Returns:
+        Tuple (exists: bool, matching_actual_key: Optional[str], value: Any).
+
+    Example:
+        check_key_case_insensitive({"User_Name": "Alice"}, "username") -> (True, "User_Name", "Alice")
+        check_key_case_insensitive({"User_Name": "Alice"}, "user_name") -> (True, "User_Name", "Alice")
+        check_key_case_insensitive({"User_Name": "Alice"}, "email") -> (False, None, None)
+    """
+    if not isinstance(d, dict) or not isinstance(search_key, str):
+        return False, None, None
+
+    normalized_target = search_key.lower()
+    for k, v in d.items():
+        if isinstance(k, str) and k.lower() == normalized_target:
+            return True, k, v
+
+    return False, None, None
+
+
+def search_keys_by_regex(d: dict, pattern: str) -> Dict[str, Any]:
+    """
+    Finds all dictionary key-value pairs where string keys match a regular expression pattern.
+
+    Args:
+        d: Input dictionary.
+        pattern: Regex pattern string.
+
+    Returns:
+        Sub-dictionary containing matching key-value pairs.
+
+    Example:
+        search_keys_by_regex({"user_id": 1, "user_name": "Bob", "age": 25}, r"^user_")
+        -> {"user_id": 1, "user_name": "Bob"}
+    """
+    if not isinstance(d, dict) or not pattern:
+        return {}
+
+    compiled_regex = re.compile(pattern)
+    matched: Dict[str, Any] = {}
+
+    for k, v in d.items():
+        if isinstance(k, str) and compiled_regex.search(k):
+            matched[k] = v
+
+    return matched
+
+
+
