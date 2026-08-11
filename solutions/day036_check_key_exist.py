@@ -241,6 +241,8 @@ def search_keys_by_regex(d: dict, pattern: str) -> Dict[str, Any]:
 
     for k, v in d.items():
         if isinstance(k, str) and compiled_regex.search(k):
+            matched[k] = v
+
     return matched
 
 
@@ -336,7 +338,7 @@ class TestCheckKeyExist(unittest.TestCase):
 
     def test_check_key_case_insensitive(self):
         data = {"User_Name": "Alice", "API_KEY": "secret"}
-        self.assertEqual(check_key_case_insensitive(data, "username"), (True, "User_Name", "Alice"))
+        self.assertEqual(check_key_case_insensitive(data, "user_name"), (True, "User_Name", "Alice"))
         self.assertEqual(check_key_case_insensitive(data, "api_key"), (True, "API_KEY", "secret"))
         self.assertEqual(check_key_case_insensitive(data, "missing"), (False, None, None))
 
@@ -355,6 +357,58 @@ class TestCheckKeyExist(unittest.TestCase):
         self.assertFalse(res["valid"])
         self.assertIn("email", res["missing_keys"])
         self.assertEqual(len(res["type_mismatches"]), 1)
+
+
+def main():
+    print("=" * 60)
+    print("🐍 300 Days of Python - Day 36: Check Key Exist")
+    print("=" * 60)
+
+    sample_dict = {
+        "User_ID": 1001,
+        "User_Name": "Alice",
+        "email_address": "alice@example.com",
+        "is_active": True,
+        "nested_config": {
+            "theme": "dark",
+            "notifications": {"email": True, "sms": False}
+        }
+    }
+
+    print("\n1️⃣ Direct Membership Key Checks:")
+    print("   - 'User_Name' in dict:", check_key_in(sample_dict, "User_Name"))
+    print("   - 'phone' in dict:", check_key_in(sample_dict, "phone"))
+
+    print("\n2️⃣ Sentinel-Based Safe Value Retrieval (.get()):")
+    print("   - 'is_active':", check_key_get(sample_dict, "is_active"))
+    print("   - 'missing_key':", check_key_get(sample_dict, "missing_key"))
+
+    print("\n3️⃣ Nested Path Traversal:")
+    path = ["nested_config", "notifications", "email"]
+    print(f"   - Path {path}:", check_nested_key(sample_dict, path))
+
+    print("\n4️⃣ Recursive Search for 'email':")
+    print("   - All values under key 'email':", check_key_recursive(sample_dict, "email"))
+
+    print("\n5️⃣ Case-Insensitive Key Search:")
+    print("   - Search 'user_name':", check_key_case_insensitive(sample_dict, "user_name"))
+
+    print("\n6️⃣ Regex Pattern Matching (keys ending in '_address' or starting with 'User_'):")
+    print("   - Matches:", search_keys_by_regex(sample_dict, r"^User_|_address$"))
+
+    print("\n🧪 Running Unit Tests...")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestCheckKeyExist)
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    if result.wasSuccessful():
+        print("✅ All Day 36 unit tests passed successfully!")
+    else:
+        print("❌ Some unit tests failed.")
+
+
+if __name__ == "__main__":
+    main()
+
 
 
 
