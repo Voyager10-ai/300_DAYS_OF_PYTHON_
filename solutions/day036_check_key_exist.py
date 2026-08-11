@@ -131,3 +131,63 @@ def check_key_recursive(d: Any, target_key: Any) -> List[Any]:
 
     return results
 
+
+def check_all_keys_exist(d: dict, keys: Iterable[Any]) -> bool:
+    """
+    Checks whether ALL specified keys exist in the dictionary.
+
+    Args:
+        d: Input dictionary.
+        keys: Iterable of keys to check.
+
+    Returns:
+        True if every key in keys exists in d, False otherwise.
+
+    Example:
+        check_all_keys_exist({"name": "Alice", "age": 30}, ["name", "age"]) -> True
+        check_all_keys_exist({"name": "Alice"}, ["name", "age"]) -> False
+    """
+    if not isinstance(d, dict):
+        return False
+    return all(key in d for key in keys)
+
+
+def check_any_key_exists(d: dict, keys: Iterable[Any]) -> bool:
+    """
+    Checks whether AT LEAST ONE of the specified keys exists in the dictionary.
+
+    Args:
+        d: Input dictionary.
+        keys: Iterable of keys to check.
+
+    Returns:
+        True if at least one key exists in d, False otherwise.
+
+    Example:
+        check_any_key_exists({"name": "Alice"}, ["age", "name"]) -> True
+        check_any_key_exists({"name": "Alice"}, ["age", "city"]) -> False
+    """
+    if not isinstance(d, dict):
+        return False
+    return any(key in d for key in keys)
+
+
+def get_missing_keys(d: dict, required_keys: Iterable[Any]) -> Set[Any]:
+    """
+    Identifies which required keys are missing from the dictionary using set operations.
+
+    Args:
+        d: Input dictionary.
+        required_keys: Iterable of expected keys.
+
+    Returns:
+        Set of keys present in required_keys but absent in d.
+
+    Example:
+        get_missing_keys({"a": 1}, ["a", "b", "c"]) -> {"b", "c"}
+    """
+    if not isinstance(d, dict):
+        return set(required_keys)
+    return set(required_keys) - set(d.keys())
+
+
