@@ -241,9 +241,50 @@ def search_keys_by_regex(d: dict, pattern: str) -> Dict[str, Any]:
 
     for k, v in d.items():
         if isinstance(k, str) and compiled_regex.search(k):
-            matched[k] = v
-
     return matched
+
+
+def validate_dict_schema(d: dict, schema: Dict[str, type]) -> Dict[str, Any]:
+    """
+    Validates dictionary against a schema defining required keys and expected data types.
+
+    Args:
+        d: Input dictionary.
+        schema: Mapping of required key names -> expected Python data types.
+
+    Returns:
+        Dict containing 'valid' (bool), 'missing_keys' (list), and 'type_mismatches' (list).
+
+    Example:
+        validate_dict_schema({"name": "Alice", "age": "thirty"}, {"name": str, "age": int, "email": str})
+        -> {'valid': False, 'missing_keys': ['email'], 'type_mismatches': [('age', int, str)]}
+    """
+    missing_keys: List[str] = []
+    type_mismatches: List[Tuple[str, type, type]] = []
+
+    if not isinstance(d, dict):
+        return {
+            "valid": False,
+            "missing_keys": list(schema.keys()),
+            "type_mismatches": []
+        }
+
+    for req_key, expected_type in schema.items():
+        if req_key not in d:
+            missing_keys.append(req_key)
+        else:
+            val = d[req_key]
+            if not isinstance(val, expected_type):
+                type_mismatches.append((req_key, expected_type, type(val)))
+
+    is_valid = len(missing_keys) == 0 and len(type_mismatches) == 0
+
+    return {
+        "valid": is_valid,
+        "missing_keys": missing_keys,
+        "type_mismatches": type_mismatches
+    }
+
 
 
 
