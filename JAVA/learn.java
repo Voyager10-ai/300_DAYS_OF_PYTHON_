@@ -255,7 +255,20 @@ public class learn {
 //         System.out.println("Charlie exists: " + hasCharlie);
 //         System.out.println("Charlie score: " + scores.getOrDefault("Charlie", 0));
 //     }
+// Key Existence and Value Handling using Optional.ofNullable
+// class LearnCheckKeyExistOptional {
+//     public static void main(String[] args) {
+//         Map<String, String> config = new HashMap<>();
+//         config.put("db_host", "localhost");
+//
+//         Optional<String> host = Optional.ofNullable(config.get("db_host"));
+//         Optional<String> port = Optional.ofNullable(config.get("db_port"));
+//
+//         System.out.println("Host: " + host.orElse("127.0.0.1"));
+//         System.out.println("Port: " + port.orElse("5432"));
+//     }
 // }
+
 
 
 
