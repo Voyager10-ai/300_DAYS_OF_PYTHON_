@@ -75,3 +75,59 @@ def check_key_has_keys(d: dict, key: Any) -> bool:
     if not isinstance(d, dict):
         return False
     return key in d.keys()
+
+
+def check_nested_key(d: dict, key_path: List[Any]) -> Tuple[bool, Any]:
+    """
+    Traverses a sequence of keys through nested dictionaries to check for path existence.
+
+    Args:
+        d: Input dictionary.
+        key_path: List of keys representing path (e.g., ['user', 'profile', 'id']).
+
+    Returns:
+        Tuple (exists: bool, value: Any).
+
+    Example:
+        check_nested_key({"a": {"b": {"c": 42}}}, ["a", "b", "c"]) -> (True, 42)
+        check_nested_key({"a": {"b": 10}}, ["a", "b", "c"]) -> (False, None)
+    """
+    if not isinstance(d, dict) or not key_path:
+        return False, None
+
+    current = d
+    for key in key_path:
+        if not isinstance(current, dict) or key not in current:
+            return False, None
+        current = current[key]
+
+    return True, current
+
+
+def check_key_recursive(d: Any, target_key: Any) -> List[Any]:
+    """
+    Recursively searches for all occurrences of a target key in nested dicts/lists.
+
+    Args:
+        d: Input data structure (dict, list, or primitive).
+        target_key: Key to find.
+
+    Returns:
+        List of values associated with target_key at any depth.
+
+    Example:
+        check_key_recursive({"a": 1, "sub": {"a": 2, "c": [{"a": 3}]}}, "a") -> [1, 2, 3]
+    """
+    results: List[Any] = []
+
+    if isinstance(d, dict):
+        for k, v in d.items():
+            if k == target_key:
+                results.append(v)
+            results.extend(check_key_recursive(v, target_key))
+    elif isinstance(d, list):
+        for item in d:
+            results.extend(check_key_recursive(item, target_key))
+
+    return results
+
