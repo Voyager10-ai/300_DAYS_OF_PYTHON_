@@ -138,3 +138,66 @@ def deep_merge_many(*dicts: dict) -> dict:
         return {}
     return reduce(deep_merge, dicts)
 
+
+# ─── Merge with Conflict Resolution ──────────────────────────────────────────
+
+
+def concat_with_resolver(d1: dict, d2: dict, resolver: Callable[[Any, Any, Any], Any]) -> dict:
+    """
+    Merges two dictionaries with a custom conflict resolution function.
+
+    Args:
+        d1: First dictionary.
+        d2: Second dictionary.
+        resolver: Callable(key, val_from_d1, val_from_d2) -> resolved_value.
+
+    Returns:
+        Merged dictionary with conflicts resolved by the resolver function.
+
+    Example:
+        concat_with_resolver({"a": 1}, {"a": 5}, lambda k, v1, v2: v1 + v2)
+        -> {"a": 6}
+    """
+    result = dict(d1)
+    for key, val in d2.items():
+        if key in result:
+            result[key] = resolver(key, result[key], val)
+        else:
+            result[key] = val
+    return result
+
+
+def concat_keep_first(d1: dict, d2: dict) -> dict:
+    """
+    Merges two dictionaries, keeping d1's value on conflict (first-wins).
+
+    Example:
+        concat_keep_first({"a": 1}, {"a": 99, "b": 2}) -> {"a": 1, "b": 2}
+    """
+    result = dict(d2)
+    result.update(d1)
+    return result
+
+
+def concat_collect_values(d1: dict, d2: dict) -> dict:
+    """
+    Merges dictionaries by collecting conflicting values into lists.
+
+    Example:
+        concat_collect_values({"a": 1, "b": 2}, {"a": 10, "c": 3})
+        -> {"a": [1, 10], "b": [2], "c": [3]}
+    """
+    result: Dict[Any, list] = {}
+    all_keys = set(d1.keys()) | set(d2.keys())
+
+    for key in all_keys:
+        values = []
+        if key in d1:
+            values.append(d1[key])
+        if key in d2:
+            values.append(d2[key])
+        result[key] = values
+
+    return result
+
+
