@@ -86,3 +86,55 @@ def concat_chainmap(d1: dict, d2: dict) -> dict:
         ChainMap gives priority to the FIRST dict, unlike update/unpack.
     """
     return dict(ChainMap(d1, d2))
+
+
+# ─── Deep Merge for Nested Dictionaries ──────────────────────────────────────
+
+
+def deep_merge(d1: dict, d2: dict) -> dict:
+    """
+    Recursively merges two nested dictionaries. When both values for a key
+    are dicts, they are merged recursively. Otherwise d2's value wins.
+
+    Args:
+        d1: Base dictionary.
+        d2: Dictionary to merge in.
+
+    Returns:
+        New deeply merged dictionary.
+
+    Example:
+        deep_merge(
+            {"a": 1, "cfg": {"x": 10, "y": 20}},
+            {"b": 2, "cfg": {"y": 99, "z": 30}}
+        ) -> {"a": 1, "b": 2, "cfg": {"x": 10, "y": 99, "z": 30}}
+    """
+    result = copy.deepcopy(d1)
+
+    for key, val in d2.items():
+        if key in result and isinstance(result[key], dict) and isinstance(val, dict):
+            result[key] = deep_merge(result[key], val)
+        else:
+            result[key] = copy.deepcopy(val)
+
+    return result
+
+
+def deep_merge_many(*dicts: dict) -> dict:
+    """
+    Deep-merges an arbitrary number of nested dictionaries left-to-right.
+
+    Args:
+        *dicts: Variable number of dictionaries.
+
+    Returns:
+        Single deeply merged dictionary.
+
+    Example:
+        deep_merge_many({"a": 1}, {"b": 2}, {"a": 99, "c": 3})
+        -> {"a": 99, "b": 2, "c": 3}
+    """
+    if not dicts:
+        return {}
+    return reduce(deep_merge, dicts)
+
