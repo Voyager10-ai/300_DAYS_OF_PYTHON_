@@ -354,3 +354,48 @@ def concat_with_value_transform(d1: dict, d2: dict, val_fn: Callable[[Any], Any]
         result[key] = val_fn(val)
     return result
 
+
+# ─── Dictionary Set Operations ───────────────────────────────────────────────
+
+
+def concat_intersection(d1: dict, d2: dict) -> dict:
+    """
+    Returns a dictionary containing only keys present in BOTH d1 and d2.
+    Values come from d2.
+
+    Example:
+        concat_intersection({"a": 1, "b": 2}, {"b": 99, "c": 3}) -> {"b": 99}
+    """
+    common_keys = set(d1.keys()) & set(d2.keys())
+    return {k: d2[k] for k in common_keys}
+
+
+def concat_difference(d1: dict, d2: dict) -> dict:
+    """
+    Returns entries from d1 whose keys are NOT in d2.
+
+    Example:
+        concat_difference({"a": 1, "b": 2, "c": 3}, {"b": 99}) -> {"a": 1, "c": 3}
+    """
+    diff_keys = set(d1.keys()) - set(d2.keys())
+    return {k: d1[k] for k in diff_keys}
+
+
+def concat_symmetric_difference(d1: dict, d2: dict) -> dict:
+    """
+    Returns entries with keys that are in d1 OR d2 but NOT in both.
+
+    Example:
+        concat_symmetric_difference({"a": 1, "b": 2}, {"b": 99, "c": 3})
+        -> {"a": 1, "c": 3}
+    """
+    sym_keys = set(d1.keys()) ^ set(d2.keys())
+    result = {}
+    for k in sym_keys:
+        if k in d1:
+            result[k] = d1[k]
+        else:
+            result[k] = d2[k]
+    return result
+
+
