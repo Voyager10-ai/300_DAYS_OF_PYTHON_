@@ -189,8 +189,22 @@
 //     }
 // }
 
-
-
+// Concatenate Maps with conflict resolution using Map.merge
+// class LearnMapMerge {
+//     public static void main(String[] args) {
+//         Map<String, Integer> scores1 = new HashMap<>();
+//         scores1.put("math", 80);
+//         scores1.put("science", 90);
+//
+//         Map<String, Integer> scores2 = new HashMap<>();
+//         scores2.put("science", 95);
+//         scores2.put("english", 88);
+//
+//         Map<String, Integer> merged = new HashMap<>(scores1);
+//         scores2.forEach((key, val) -> merged.merge(key, val, Integer::sum));
+//         System.out.println("Merged with sum: " + merged);
+//     }
+// }
 
 
 // Switch statement
