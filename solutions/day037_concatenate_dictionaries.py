@@ -568,5 +568,69 @@ class TestConcatenateDictionaries(unittest.TestCase):
         self.assertEqual(len(report["conflicts"]), 1)
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+#  MAIN RUNNER
+# ═══════════════════════════════════════════════════════════════════════════════
+
+
+def main():
+    print("=" * 60)
+    print("🐍 300 Days of Python - Day 37: Concatenate Dictionaries")
+    print("=" * 60)
+
+    inventory_a = {"apples": 30, "bananas": 15, "oranges": 20}
+    inventory_b = {"bananas": 10, "grapes": 25, "mangoes": 12}
+
+    print("\n📦 Inventory A:", inventory_a)
+    print("📦 Inventory B:", inventory_b)
+
+    print("\n1️⃣  update() merge (B overwrites A):")
+    print("   ", concat_update(inventory_a, inventory_b))
+
+    print("\n2️⃣  ** unpack merge:")
+    print("   ", concat_unpack(inventory_a, inventory_b))
+
+    print("\n3️⃣  ChainMap merge (A takes priority):")
+    print("   ", concat_chainmap(inventory_a, inventory_b))
+
+    print("\n4️⃣  Counter-sum merge (add quantities):")
+    print("   ", concat_with_counter(inventory_a, inventory_b))
+
+    print("\n5️⃣  Keep-first merge (A wins on conflict):")
+    print("   ", concat_keep_first(inventory_a, inventory_b))
+
+    print("\n6️⃣  Collect-values merge (group conflicting values):")
+    print("   ", concat_collect_values(inventory_a, inventory_b))
+
+    print("\n7️⃣  Deep merge (nested):")
+    cfg_a = {"db": {"host": "localhost", "port": 5432}, "debug": True}
+    cfg_b = {"db": {"port": 3306, "user": "admin"}, "log": "verbose"}
+    print("    cfg_a:", cfg_a)
+    print("    cfg_b:", cfg_b)
+    print("    merged:", deep_merge(cfg_a, cfg_b))
+
+    print("\n8️⃣  Intersection (common keys):")
+    print("   ", concat_intersection(inventory_a, inventory_b))
+
+    print("\n9️⃣  Merge with report:")
+    merged, report = concat_with_report(inventory_a, inventory_b)
+    print("    merged:", merged)
+    print("    conflicts:", report["conflicts"])
+
+    print("\n🧪 Running Unit Tests...")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestConcatenateDictionaries)
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    if result.wasSuccessful():
+        print("✅ All Day 37 unit tests passed successfully!")
+    else:
+        print("❌ Some unit tests failed.")
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
