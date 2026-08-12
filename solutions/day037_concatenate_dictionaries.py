@@ -452,4 +452,121 @@ def concat_with_report(d1: dict, d2: dict) -> Tuple[dict, Dict[str, Any]]:
     return merged, report
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+#  TESTS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+
+class TestConcatenateDictionaries(unittest.TestCase):
+    """Comprehensive test suite for Day 37: Concatenate Dictionaries."""
+
+    def setUp(self):
+        self.d1 = {"a": 1, "b": 2}
+        self.d2 = {"b": 99, "c": 3}
+
+    # ── Core Methods ──
+    def test_concat_update(self):
+        result = concat_update(self.d1, self.d2)
+        self.assertEqual(result, {"a": 1, "b": 99, "c": 3})
+        self.assertEqual(self.d1, {"a": 1, "b": 2})  # original unchanged
+
+    def test_concat_unpack(self):
+        self.assertEqual(concat_unpack(self.d1, self.d2), {"a": 1, "b": 99, "c": 3})
+
+    def test_concat_union(self):
+        self.assertEqual(concat_union(self.d1, self.d2), {"a": 1, "b": 99, "c": 3})
+
+    def test_concat_chainmap(self):
+        result = concat_chainmap(self.d1, self.d2)
+        self.assertEqual(result["b"], 2)  # ChainMap gives priority to first dict
+
+    # ── Deep Merge ──
+    def test_deep_merge(self):
+        a = {"x": 1, "cfg": {"a": 10, "b": 20}}
+        b = {"y": 2, "cfg": {"b": 99, "c": 30}}
+        result = deep_merge(a, b)
+        self.assertEqual(result, {"x": 1, "y": 2, "cfg": {"a": 10, "b": 99, "c": 30}})
+
+    def test_deep_merge_many(self):
+        result = deep_merge_many({"a": 1}, {"b": 2}, {"c": 3})
+        self.assertEqual(result, {"a": 1, "b": 2, "c": 3})
+
+    # ── Conflict Resolution ──
+    def test_concat_with_resolver_sum(self):
+        result = concat_with_resolver(self.d1, self.d2, lambda k, v1, v2: v1 + v2)
+        self.assertEqual(result["b"], 101)
+
+    def test_concat_keep_first(self):
+        result = concat_keep_first(self.d1, self.d2)
+        self.assertEqual(result["b"], 2)  # d1's value kept
+
+    def test_concat_collect_values(self):
+        result = concat_collect_values(self.d1, self.d2)
+        self.assertEqual(sorted(result["b"]), [2, 99])
+        self.assertEqual(result["a"], [1])
+
+    # ── Multi-Dict Merge ──
+    def test_concat_multiple(self):
+        result = concat_multiple({"a": 1}, {"b": 2}, {"c": 3, "a": 99})
+        self.assertEqual(result, {"a": 99, "b": 2, "c": 3})
+
+    def test_concat_from_list(self):
+        result = concat_from_list([{"a": 1}, {"b": 2}])
+        self.assertEqual(result, {"a": 1, "b": 2})
+
+    def test_concat_with_counter(self):
+        result = concat_with_counter({"a": 5, "b": 10}, {"a": 3, "c": 7})
+        self.assertEqual(result, {"a": 8, "b": 10, "c": 7})
+
+    # ── Conditional Merge ──
+    def test_concat_filtered(self):
+        result = concat_filtered({"a": 1}, {"b": 2, "c": -1}, lambda k, v: v > 0)
+        self.assertEqual(result, {"a": 1, "b": 2})
+
+    def test_concat_only_keys(self):
+        result = concat_only_keys({"a": 1}, {"b": 2, "c": 3, "d": 4}, ["b", "d"])
+        self.assertEqual(result, {"a": 1, "b": 2, "d": 4})
+
+    def test_concat_exclude_keys(self):
+        result = concat_exclude_keys({"a": 1}, {"b": 2, "c": 3}, ["c"])
+        self.assertEqual(result, {"a": 1, "b": 2})
+
+    # ── Transformation ──
+    def test_concat_with_key_transform(self):
+        result = concat_with_key_transform({"a": 1}, {"B": 2, "C": 3}, str.lower)
+        self.assertEqual(result, {"a": 1, "b": 2, "c": 3})
+
+    def test_concat_with_value_transform(self):
+        result = concat_with_value_transform({}, {"a": 5, "b": 10}, lambda v: v * 2)
+        self.assertEqual(result, {"a": 10, "b": 20})
+
+    # ── Set Operations ──
+    def test_concat_intersection(self):
+        self.assertEqual(concat_intersection(self.d1, self.d2), {"b": 99})
+
+    def test_concat_difference(self):
+        self.assertEqual(concat_difference(self.d1, self.d2), {"a": 1})
+
+    def test_concat_symmetric_difference(self):
+        result = concat_symmetric_difference(self.d1, self.d2)
+        self.assertEqual(result, {"a": 1, "c": 3})
+
+    # ── Validation ──
+    def test_concat_safe_no_conflict(self):
+        result = concat_safe({"a": 1}, {"b": 2})
+        self.assertEqual(result, {"a": 1, "b": 2})
+
+    def test_concat_safe_with_conflict(self):
+        with self.assertRaises(ValueError):
+            concat_safe(self.d1, self.d2)
+
+    def test_concat_with_report(self):
+        merged, report = concat_with_report(self.d1, self.d2)
+        self.assertEqual(merged, {"a": 1, "b": 99, "c": 3})
+        self.assertEqual(report["total_keys"], 3)
+        self.assertIn("b", report["overwritten"])
+        self.assertEqual(len(report["conflicts"]), 1)
+
+
+
 
