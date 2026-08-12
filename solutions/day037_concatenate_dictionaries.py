@@ -399,3 +399,57 @@ def concat_symmetric_difference(d1: dict, d2: dict) -> dict:
     return result
 
 
+# ─── Merge with Validation ───────────────────────────────────────────────────
+
+
+def concat_safe(d1: dict, d2: dict) -> dict:
+    """
+    Merges two dictionaries but raises ValueError if any key conflict exists.
+    Ensures no data is silently overwritten.
+
+    Args:
+        d1: First dictionary.
+        d2: Second dictionary.
+
+    Returns:
+        Merged dictionary (only if no key conflicts).
+
+    Raises:
+        ValueError: If any key exists in both dictionaries.
+    """
+    conflicts = set(d1.keys()) & set(d2.keys())
+    if conflicts:
+        raise ValueError(f"Key conflict detected: {conflicts}")
+    return {**d1, **d2}
+
+
+def concat_with_report(d1: dict, d2: dict) -> Tuple[dict, Dict[str, Any]]:
+    """
+    Merges two dicts and returns a detailed report of the merge operation.
+
+    Returns:
+        Tuple of (merged_dict, report_dict) where report contains:
+        - 'total_keys': total unique keys in merged result
+        - 'from_d1_only': keys unique to d1
+        - 'from_d2_only': keys unique to d2
+        - 'overwritten': keys in d1 overwritten by d2
+        - 'conflicts': list of (key, old_val, new_val) tuples
+    """
+    d1_only = set(d1.keys()) - set(d2.keys())
+    d2_only = set(d2.keys()) - set(d1.keys())
+    shared = set(d1.keys()) & set(d2.keys())
+
+    conflicts = [(k, d1[k], d2[k]) for k in shared if d1[k] != d2[k]]
+    merged = {**d1, **d2}
+
+    report = {
+        "total_keys": len(merged),
+        "from_d1_only": d1_only,
+        "from_d2_only": d2_only,
+        "overwritten": shared,
+        "conflicts": conflicts,
+    }
+    return merged, report
+
+
+
