@@ -201,3 +201,61 @@ def concat_collect_values(d1: dict, d2: dict) -> dict:
     return result
 
 
+# ─── Multi-Dictionary Merge ──────────────────────────────────────────────────
+
+
+def concat_multiple(*dicts: dict) -> dict:
+    """
+    Merges an arbitrary number of dictionaries left-to-right using reduce.
+    Later dictionaries overwrite earlier ones on key conflict.
+
+    Args:
+        *dicts: Variable number of dictionaries.
+
+    Returns:
+        Single merged dictionary.
+
+    Example:
+        concat_multiple({"a": 1}, {"b": 2}, {"c": 3, "a": 99})
+        -> {"a": 99, "b": 2, "c": 3}
+    """
+    if not dicts:
+        return {}
+    return reduce(lambda acc, d: {**acc, **d}, dicts)
+
+
+def concat_from_list(dict_list: List[dict]) -> dict:
+    """
+    Merges a list of dictionaries into one using dict comprehension.
+
+    Args:
+        dict_list: List of dictionaries.
+
+    Returns:
+        Single merged dictionary.
+    """
+    result = {}
+    for d in dict_list:
+        result.update(d)
+    return result
+
+
+def concat_with_counter(d1: dict, d2: dict) -> dict:
+    """
+    Merges two dictionaries by summing numeric values for shared keys.
+    Non-numeric shared keys use d2's value.
+
+    Example:
+        concat_with_counter({"a": 5, "b": 10}, {"a": 3, "c": 7})
+        -> {"a": 8, "b": 10, "c": 7}
+    """
+    result = dict(d1)
+    for key, val in d2.items():
+        if key in result and isinstance(result[key], (int, float)) and isinstance(val, (int, float)):
+            result[key] = result[key] + val
+        else:
+            result[key] = val
+    return result
+
+
+
