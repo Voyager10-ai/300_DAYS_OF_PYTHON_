@@ -80,21 +80,116 @@
 //     }
 // }
 
-import java.util.*;
+// import java.util.*;
 
-public class learn {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
+// public class learn {
+//     public static void main(String[] args) {
+//         Scanner sc = new Scanner(System.in);
 
-        int x = sc.nextInt();
+//         int x = sc.nextInt();
 
-        if (x % 2 == 0) {
-            System.out.println("even");
-        } else {
-            System.out.println("odd");
-        }
-    }
-}
+//         if (x % 2 == 0) {
+//             System.out.println("even");
+//         } else {
+//             System.out.println("odd");
+//         }
+//     }
+// }
+
+// import java.util.*;
+
+// public class learn {
+//     public static void main(String[] args) {
+
+//         Scanner sc = new Scanner(System.in);
+
+//         int x = sc.nextInt();
+//             if (x % 400==0) {
+//                 System.out.println("leap");
+//             } else {
+//                 System.out.println("not leap yr");
+//             }
+//      }
+// }
+
+// import java.util.*;
+// public class learn {
+//     public static void main(String[] args ){
+//         Scanner sc = new Scanner(System.in);
+//         int x = sc.nextInt();
+//         int i = 1;
+//         for(i=1;i<=100;i++){
+//             System.out.println(i);
+//         }
+
+//     }
+// }
+
+// import java util.*;
+// public class learn {
+//     public static void main(String[] args){
+//         Scanner sc = new Scanner(System.in);
+//         int sum =0;
+//         int n = sc.nextInt();
+//         for (int i=1;i<=n;i++ ){
+//             sum = sum + i;
+//         }
+//         System.out.println("sum="+sum);
+//     }
+// }
+
+// Multiplication Table using for loop
+// import java.util.*;
+// public class learn {
+//     public static void main (String[]args){
+//         Scanner sc = new Scanner(System.in);
+//         int n = sc.nextInt();
+//         for (int i = 1 ; i<=10; i++){
+//             int multiply = n * i;
+//             System.out.println(n + " x " + i + " = " + multiply);
+//         }
+//     }
+// }
+
+// Palindrome Number Check using while loop
+// import java.util.*;
+// public class learn {
+//     public static void main (String[]args){
+//         Scanner sc = new Scanner(System.in);
+//         int n = sc.nextInt();
+//         int og = n;
+//         int rev = 0;
+//         while(n > 0){
+//             int digit = n % 10;
+//             rev = rev * 10 + digit;
+//             n = n / 10;
+//         }
+//         if (og == rev){
+//             System.out.println("palindrome");
+//         } else {
+//             System.out.println("not palindrome");
+//         }
+//     }
+// }
+
+// Concatenate two HashMaps using putAll()
+// class LearnConcatHashMaps {
+//     public static void main(String[] args) {
+//         Map<String, Integer> map1 = new HashMap<>();
+//         map1.put("java", 95);
+//         map1.put("python", 90);
+//
+//         Map<String, Integer> map2 = new HashMap<>();
+//         map2.put("javascript", 85);
+//         map2.put("python", 92);
+//
+//         Map<String, Integer> merged = new HashMap<>(map1);
+//         merged.putAll(map2);
+//         System.out.println("Merged: " + merged);
+//     }
+// }
+
+
 
 
 
