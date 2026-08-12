@@ -258,4 +258,63 @@ def concat_with_counter(d1: dict, d2: dict) -> dict:
     return result
 
 
+# ─── Conditional & Filtered Merge ────────────────────────────────────────────
+
+
+def concat_filtered(d1: dict, d2: dict, predicate: Callable[[Any, Any], bool]) -> dict:
+    """
+    Merges d2 into d1, only including d2 entries that satisfy a predicate.
+
+    Args:
+        d1: Base dictionary.
+        d2: Source dictionary to filter and merge from.
+        predicate: Callable(key, value) -> bool. Only True entries are merged.
+
+    Returns:
+        Merged dictionary with filtered entries from d2.
+
+    Example:
+        concat_filtered({"a": 1}, {"b": 2, "c": -1}, lambda k, v: v > 0)
+        -> {"a": 1, "b": 2}
+    """
+    result = dict(d1)
+    for key, val in d2.items():
+        if predicate(key, val):
+            result[key] = val
+    return result
+
+
+def concat_only_keys(d1: dict, d2: dict, allowed_keys: Iterable[Any]) -> dict:
+    """
+    Merges d2 into d1, only including entries whose keys are in allowed_keys.
+
+    Example:
+        concat_only_keys({"a": 1}, {"b": 2, "c": 3, "d": 4}, ["b", "d"])
+        -> {"a": 1, "b": 2, "d": 4}
+    """
+    allowed = set(allowed_keys)
+    result = dict(d1)
+    for key, val in d2.items():
+        if key in allowed:
+            result[key] = val
+    return result
+
+
+def concat_exclude_keys(d1: dict, d2: dict, excluded_keys: Iterable[Any]) -> dict:
+    """
+    Merges d2 into d1, excluding entries whose keys are in excluded_keys.
+
+    Example:
+        concat_exclude_keys({"a": 1}, {"b": 2, "c": 3}, ["c"])
+        -> {"a": 1, "b": 2}
+    """
+    excluded = set(excluded_keys)
+    result = dict(d1)
+    for key, val in d2.items():
+        if key not in excluded:
+            result[key] = val
+    return result
+
+
+
 
