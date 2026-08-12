@@ -317,4 +317,40 @@ def concat_exclude_keys(d1: dict, d2: dict, excluded_keys: Iterable[Any]) -> dic
 
 
 
+# ─── Merge with Transformation ───────────────────────────────────────────────
+
+
+def concat_with_key_transform(d1: dict, d2: dict, key_fn: Callable[[Any], Any]) -> dict:
+    """
+    Merges d2 into d1, applying a transformation function to d2's keys.
+
+    Args:
+        d1: Base dictionary.
+        d2: Source dictionary.
+        key_fn: Function to transform each key from d2.
+
+    Returns:
+        Merged dictionary with transformed keys from d2.
+
+    Example:
+        concat_with_key_transform({"a": 1}, {"B": 2}, str.lower) -> {"a": 1, "b": 2}
+    """
+    result = dict(d1)
+    for key, val in d2.items():
+        result[key_fn(key)] = val
+    return result
+
+
+def concat_with_value_transform(d1: dict, d2: dict, val_fn: Callable[[Any], Any]) -> dict:
+    """
+    Merges d2 into d1, applying a transformation function to d2's values.
+
+    Example:
+        concat_with_value_transform({"a": 1}, {"b": "hello"}, lambda v: v.upper() if isinstance(v, str) else v)
+        -> {"a": 1, "b": "HELLO"}
+    """
+    result = dict(d1)
+    for key, val in d2.items():
+        result[key] = val_fn(val)
+    return result
 
