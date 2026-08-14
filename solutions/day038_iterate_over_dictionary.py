@@ -554,8 +554,67 @@ class TestIterateOverDictionary(unittest.TestCase):
         self.assertEqual(diffs, expected)
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+#  MAIN RUNNER
+# ═══════════════════════════════════════════════════════════════════════════════
 
 
+def main():
+    print("=" * 60)
+    print("🐍 300 Days of Python - Day 38: Iterate Over Dictionary")
+    print("=" * 60)
+
+    scores = {"Alice": 85, "Bob": 92, "Charlie": 78, "Diana": 95, "Eve": 88}
+
+    print("\n📊 Sample Dictionary:", scores)
+
+    print("\n1️⃣  Iterate Keys:")
+    print("   ", iterate_keys(scores))
+
+    print("\n2️⃣  Iterate Values:")
+    print("   ", iterate_values(scores))
+
+    print("\n3️⃣  Iterate Items (Sorted by Value Descending):")
+    print("   ", iterate_sorted_by_values(scores, reverse=True))
+
+    print("\n4️⃣  Filtered by High Scores (>= 90):")
+    print("   ", iterate_filtered_by_value(scores, lambda v: v >= 90))
+
+    print("\n5️⃣  Enumerated / Indexed Iteration (Rankings):")
+    for rank, name, score in iterate_with_index(dict(iterate_sorted_by_values(scores, reverse=True)), start=1):
+        print(f"    Rank {rank}: {name} -> {score}")
+
+    print("\n6️⃣  Nested Traversal & Flattening:")
+    org_chart = {
+        "engineering": {"frontend": {"lead": "Alice"}, "backend": {"lead": "Bob"}},
+        "hr": {"lead": "Carol"}
+    }
+    print("    Nested structure:", org_chart)
+    print("    Flattened:", flatten_dict(org_chart))
+
+    print("\n7️⃣  Chunked Iteration (Batching size 2):")
+    for i, batch in enumerate(iterate_in_chunks(scores, 2), 1):
+        print(f"    Batch {i}: {batch}")
+
+    print("\n8️⃣  Invert Dictionary (Multi-value mapping):")
+    grades = {"Alice": "A", "Bob": "A+", "Charlie": "B", "Diana": "A+", "Eve": "A"}
+    print("    Original:", grades)
+    print("    Inverted:", invert_dict_multi(grades))
+
+    print("\n9️⃣  Dictionary Difference Iterator:")
+    prev_prices = {"apple": 1.2, "banana": 0.5, "cherry": 3.0}
+    curr_prices = {"banana": 0.6, "cherry": 3.0, "dragonfruit": 4.5}
+    print("    Diffs:", dict_difference_iterator(prev_prices, curr_prices))
+
+    print("\n🧪 Running Unit Tests...")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestIterateOverDictionary)
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    if result.wasSuccessful():
+        print("\n✅ All Day 38 unit tests passed successfully!")
+    else:
+        print("\n❌ Some unit tests failed.")
 
 
-
+if __name__ == "__main__":
+    main()
