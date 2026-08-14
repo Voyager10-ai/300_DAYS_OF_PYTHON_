@@ -236,4 +236,51 @@ def flatten_dict(d: dict, sep: str = ".") -> Dict[str, Any]:
     return {sep.join(path): val for path, val in iterate_nested_dict(d)}
 
 
+# ─── Index-based & Enumerated Iteration ───────────────────────────────────────
+
+
+def iterate_with_index(d: dict, start: int = 0) -> List[Tuple[int, Any, Any]]:
+    """
+    Iterates over dictionary items yielding 0-based or start-based index alongside key and value.
+
+    Args:
+        d: Input dictionary.
+        start: Starting index number (default: 0).
+
+    Returns:
+        List of (index, key, value) tuples.
+
+    Example:
+        iterate_with_index({"a": 10, "b": 20}, start=1) -> [(1, "a", 10), (2, "b", 20)]
+    """
+    return [(idx, k, v) for idx, (k, v) in enumerate(d.items(), start=start)]
+
+
+def iterate_in_chunks(d: dict, chunk_size: int) -> Generator[Dict[Any, Any], None, None]:
+    """
+    Yields slices (chunks) of a dictionary as sub-dictionaries of fixed size.
+
+    Args:
+        d: Input dictionary.
+        chunk_size: Maximum number of items per chunk.
+
+    Yields:
+        Sub-dictionaries of size <= chunk_size.
+
+    Raises:
+        ValueError: If chunk_size <= 0.
+
+    Example:
+        list(iterate_in_chunks({"a": 1, "b": 2, "c": 3, "d": 4}, 2))
+        -> [{"a": 1, "b": 2}, {"c": 3, "d": 4}]
+    """
+    if chunk_size <= 0:
+        raise ValueError("chunk_size must be a positive integer.")
+
+    items = list(d.items())
+    for i in range(0, len(items), chunk_size):
+        yield dict(items[i : i + chunk_size])
+
+
+
 
