@@ -323,6 +323,106 @@ def invert_dict_multi(d: dict) -> Dict[Any, List[Any]]:
     return inverted
 
 
+# ─── Safe Mutation Iteration ──────────────────────────────────────────────────
+
+
+def remove_matching_keys(d: dict, predicate: Callable[[Any, Any], bool]) -> dict:
+    """
+    Safely removes key-value pairs matching predicate during iteration without RuntimeError.
+
+    Args:
+        d: Dictionary to mutate.
+        predicate: Function taking (key, value) returning True if item should be removed.
+
+    Returns:
+        Mutated dictionary d.
+
+    Example:
+        remove_matching_keys({"a": 1, "b": 2, "c": 3}, lambda k, v: v % 2 == 0) -> {"a": 1, "c": 3}
+    """
+    for k, v in list(d.items()):
+        if predicate(k, v):
+            del d[k]
+    return d
+
+
+def update_dict_in_place(d: dict, update_fn: Callable[[Any, Any], Any]) -> dict:
+    """
+    Modifies values in place by iterating over keys.
+
+    Args:
+        d: Dictionary to modify in place.
+        update_fn: Function taking (key, value) returning new value.
+
+    Returns:
+        Mutated dictionary d.
+    """
+    for k in list(d.keys()):
+        d[k] = update_fn(k, d[k])
+    return d
+
+
+# ─── Multi-Dictionary & Zip Iteration ─────────────────────────────────────────
+
+
+def zip_iterate_dicts(
+    d1: dict,
+    d2: dict,
+    combine_fn: Optional[Callable[[Any, Any], Any]] = None
+) -> List[Tuple[Any, Any, Any]]:
+    """
+    Iterates over shared keys present in both dictionaries.
+
+    Args:
+        d1: First dictionary.
+        d2: Second dictionary.
+        combine_fn: Optional function to combine (val1, val2).
+
+    Returns:
+        List of (key, val1, val2) or (key, combined_val) tuples.
+
+    Example:
+        zip_iterate_dicts({"a": 1, "b": 2}, {"b": 20, "c": 30})
+        -> [("b", 2, 20)]
+    """
+    shared_keys = [k for k in d1 if k in d2]
+    result = []
+    for k in shared_keys:
+        v1, v2 = d1[k], d2[k]
+        if combine_fn:
+            result.append((k, combine_fn(v1, v2)))
+        else:
+            result.append((k, v1, v2))
+    return result
+
+
+def dict_difference_iterator(d1: dict, d2: dict) -> List[Tuple[str, Any, Any, Any]]:
+    """
+    Iterates over two dictionaries reporting structural and value differences.
+
+    Args:
+        d1: Original dictionary.
+        d2: New dictionary.
+
+    Returns:
+        List of tuples: (change_type, key, val_in_d1, val_in_d2)
+        where change_type is 'added', 'removed', 'modified', or 'unchanged'.
+    """
+    all_keys = sorted(set(d1.keys()) | set(d2.keys()), key=lambda x: str(x))
+    diffs = []
+    for k in all_keys:
+        if k in d1 and k not in d2:
+            diffs.append(("removed", k, d1[k], None))
+        elif k not in d1 and k in d2:
+            diffs.append(("added", k, None, d2[k]))
+        elif d1[k] != d2[k]:
+            diffs.append(("modified", k, d1[k], d2[k]))
+        else:
+            diffs.append(("unchanged", k, d1[k], d2[k]))
+    return diffs
+
+
+
 
 
 
