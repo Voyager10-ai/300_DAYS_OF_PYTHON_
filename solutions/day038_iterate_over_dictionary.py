@@ -422,6 +422,139 @@ def dict_difference_iterator(d1: dict, d2: dict) -> List[Tuple[str, Any, Any, An
     return diffs
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+#  UNIT TESTS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+
+class TestIterateOverDictionary(unittest.TestCase):
+
+    def setUp(self):
+        self.sample_dict = {"apple": 10, "banana": 25, "cherry": 15, "date": 40}
+        self.nested_dict = {
+            "a": 1,
+            "b": {"c": 2, "d": {"e": 3}},
+            "f": 4
+        }
+
+    # ── Core Iteration Tests ──
+    def test_iterate_keys(self):
+        self.assertEqual(iterate_keys(self.sample_dict), ["apple", "banana", "cherry", "date"])
+
+    def test_iterate_values(self):
+        self.assertEqual(iterate_values(self.sample_dict), [10, 25, 15, 40])
+
+    def test_iterate_items(self):
+        self.assertEqual(
+            iterate_items(self.sample_dict),
+            [("apple", 10), ("banana", 25), ("cherry", 15), ("date", 40)]
+        )
+
+    # ── Sorted & Custom Order Tests ──
+    def test_iterate_sorted_by_keys(self):
+        result = iterate_sorted_by_keys(self.sample_dict)
+        self.assertEqual([k for k, v in result], ["apple", "banana", "cherry", "date"])
+
+        result_rev = iterate_sorted_by_keys(self.sample_dict, reverse=True)
+        self.assertEqual([k for k, v in result_rev], ["date", "cherry", "banana", "apple"])
+
+    def test_iterate_sorted_by_values(self):
+        result = iterate_sorted_by_values(self.sample_dict)
+        self.assertEqual([v for k, v in result], [10, 15, 25, 40])
+
+        result_rev = iterate_sorted_by_values(self.sample_dict, reverse=True)
+        self.assertEqual([v for k, v in result_rev], [40, 25, 15, 10])
+
+    def test_iterate_custom_order(self):
+        order = ["cherry", "apple", "fig"]
+        result = iterate_custom_order(self.sample_dict, order)
+        self.assertEqual(result, [("cherry", 15), ("apple", 10)])
+
+        result_with_missing = iterate_custom_order(self.sample_dict, order, include_missing=True, default_val=0)
+        self.assertEqual(result_with_missing, [("cherry", 15), ("apple", 10), ("fig", 0)])
+
+    # ── Filtered Iteration Tests ──
+    def test_iterate_filtered_by_key(self):
+        result = iterate_filtered_by_key(self.sample_dict, lambda k: k.startswith("b") or k.startswith("c"))
+        self.assertEqual(result, [("banana", 25), ("cherry", 15)])
+
+    def test_iterate_filtered_by_value(self):
+        result = iterate_filtered_by_value(self.sample_dict, lambda v: v >= 20)
+        self.assertEqual(result, [("banana", 25), ("date", 40)])
+
+    def test_iterate_with_min_max_threshold(self):
+        result = iterate_with_min_max_threshold(self.sample_dict, min_val=12, max_val=30)
+        self.assertEqual(result, [("banana", 25), ("cherry", 15)])
+
+    # ── Nested & Flattening Tests ──
+    def test_iterate_nested_dict(self):
+        leaves = list(iterate_nested_dict(self.nested_dict))
+        expected = [(("a",), 1), (("b", "c"), 2), (("b", "d", "e"), 3), (("f",), 4)]
+        self.assertEqual(leaves, expected)
+
+    def test_flatten_dict(self):
+        flat = flatten_dict(self.nested_dict, sep="/")
+        self.assertEqual(flat, {"a": 1, "b/c": 2, "b/d/e": 3, "f": 4})
+
+    # ── Index & Chunk Tests ──
+    def test_iterate_with_index(self):
+        indexed = iterate_with_index({"x": 100, "y": 200}, start=1)
+        self.assertEqual(indexed, [(1, "x", 100), (2, "y", 200)])
+
+    def test_iterate_in_chunks(self):
+        chunks = list(iterate_in_chunks(self.sample_dict, chunk_size=2))
+        self.assertEqual(len(chunks), 2)
+        self.assertEqual(chunks[0], {"apple": 10, "banana": 25})
+        self.assertEqual(chunks[1], {"cherry": 15, "date": 40})
+
+    def test_iterate_in_chunks_invalid(self):
+        with self.assertRaises(ValueError):
+            list(iterate_in_chunks(self.sample_dict, chunk_size=0))
+
+    # ── Transformation & Inversion Tests ──
+    def test_transform_dict_values(self):
+        transformed = transform_dict_values({"a": 2, "b": 5}, lambda v: v ** 2)
+        self.assertEqual(transformed, {"a": 4, "b": 25})
+
+    def test_invert_dict_multi(self):
+        inverted = invert_dict_multi({"a": 1, "b": 2, "c": 1, "d": 2, "e": 3})
+        self.assertEqual(inverted, {1: ["a", "c"], 2: ["b", "d"], 3: ["e"]})
+
+    # ── Safe Mutation Tests ──
+    def test_remove_matching_keys(self):
+        d = {"a": 1, "b": 2, "c": 3, "d": 4}
+        remove_matching_keys(d, lambda k, v: v % 2 == 0)
+        self.assertEqual(d, {"a": 1, "c": 3})
+
+    def test_update_dict_in_place(self):
+        d = {"a": 10, "b": 20}
+        update_dict_in_place(d, lambda k, v: v + 5)
+        self.assertEqual(d, {"a": 15, "b": 25})
+
+    # ── Multi-Dict Zip & Diff Tests ──
+    def test_zip_iterate_dicts(self):
+        d1 = {"a": 1, "b": 2, "c": 3}
+        d2 = {"b": 20, "c": 30, "d": 40}
+        zipped = zip_iterate_dicts(d1, d2)
+        self.assertEqual(zipped, [("b", 2, 20), ("c", 3, 30)])
+
+        combined = zip_iterate_dicts(d1, d2, combine_fn=lambda x, y: x + y)
+        self.assertEqual(combined, [("b", 22), ("c", 33)])
+
+    def test_dict_difference_iterator(self):
+        d1 = {"a": 1, "b": 2, "c": 3}
+        d2 = {"b": 20, "c": 3, "d": 4}
+        diffs = dict_difference_iterator(d1, d2)
+        expected = [
+            ("removed", "a", 1, None),
+            ("modified", "b", 2, 20),
+            ("unchanged", "c", 3, 3),
+            ("added", "d", None, 4)
+        ]
+        self.assertEqual(diffs, expected)
+
+
+
 
 
 
