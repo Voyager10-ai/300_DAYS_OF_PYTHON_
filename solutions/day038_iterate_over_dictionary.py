@@ -189,3 +189,51 @@ def iterate_with_min_max_threshold(
     return result
 
 
+# ─── Nested & Recursive Iteration ──────────────────────────────────────────────
+
+
+def iterate_nested_dict(
+    d: dict,
+    parent_path: Tuple[str, ...] = ()
+) -> Generator[Tuple[Tuple[str, ...], Any], None, None]:
+    """
+    Recursively iterates over a nested dictionary yielding key paths and leaf values.
+
+    Args:
+        d: Input dictionary (may contain nested dicts).
+        parent_path: Tuple tracking parent key hierarchy (used internally).
+
+    Yields:
+        Tuples of (key_path_tuple, leaf_value).
+
+    Example:
+        d = {"a": {"b": 1, "c": 2}, "d": 3}
+        list(iterate_nested_dict(d)) -> [(("a", "b"), 1), (("a", "c"), 2), (("d",), 3)]
+    """
+    for k, v in d.items():
+        current_path = parent_path + (str(k),)
+        if isinstance(v, dict):
+            yield from iterate_nested_dict(v, current_path)
+        else:
+            yield current_path, v
+
+
+def flatten_dict(d: dict, sep: str = ".") -> Dict[str, Any]:
+    """
+    Flattens a nested dictionary into a single-level dictionary with delimited keys.
+
+    Args:
+        d: Input nested dictionary.
+        sep: Separator for joining key paths (default: ".").
+
+    Returns:
+        Flattened dictionary mapping key path strings to leaf values.
+
+    Example:
+        flatten_dict({"user": {"name": "Alice", "meta": {"age": 30}}})
+        -> {"user.name": "Alice", "user.meta.age": 30}
+    """
+    return {sep.join(path): val for path, val in iterate_nested_dict(d)}
+
+
+
