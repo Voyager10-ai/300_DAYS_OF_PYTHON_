@@ -282,5 +282,47 @@ def iterate_in_chunks(d: dict, chunk_size: int) -> Generator[Dict[Any, Any], Non
         yield dict(items[i : i + chunk_size])
 
 
+# ─── Transformed Iteration & Dictionary Comprehensions ─────────────────────────
+
+
+def transform_dict_values(d: dict, transform_fn: Callable[[Any], Any]) -> Dict[Any, Any]:
+    """
+    Iterates through dictionary and constructs a new dictionary with transformed values.
+
+    Args:
+        d: Input dictionary.
+        transform_fn: Function to apply to each value.
+
+    Returns:
+        New dictionary with updated values.
+
+    Example:
+        transform_dict_values({"a": 1, "b": 2}, lambda v: v * 10) -> {"a": 10, "b": 20}
+    """
+    return {k: transform_fn(v) for k, v in d.items()}
+
+
+def invert_dict_multi(d: dict) -> Dict[Any, List[Any]]:
+    """
+    Iterates through dictionary to invert keys and values, grouping duplicate values into lists.
+
+    Args:
+        d: Input dictionary.
+
+    Returns:
+        Inverted dictionary mapping each unique value to list of keys that had that value.
+
+    Example:
+        invert_dict_multi({"a": 1, "b": 2, "c": 1}) -> {1: ["a", "c"], 2: ["b"]}
+    """
+    inverted: Dict[Any, List[Any]] = {}
+    for k, v in d.items():
+        if v not in inverted:
+            inverted[v] = []
+        inverted[v].append(k)
+    return inverted
+
+
+
 
 
