@@ -123,3 +123,69 @@ def iterate_custom_order(d: dict, key_order: List[Any], include_missing: bool = 
             result.append((k, default_val))
     return result
 
+
+# ─── Filtered & Conditional Iteration ─────────────────────────────────────────
+
+
+def iterate_filtered_by_key(d: dict, predicate: Callable[[Any], bool]) -> List[Tuple[Any, Any]]:
+    """
+    Iterates over dictionary items where the key satisfies a predicate function.
+
+    Args:
+        d: Input dictionary.
+        predicate: Function taking key and returning True/False.
+
+    Returns:
+        List of (key, value) tuples matching the predicate.
+
+    Example:
+        iterate_filtered_by_key({"apple": 1, "banana": 2, "avocado": 3}, lambda k: k.startswith("a"))
+        -> [("apple", 1), ("avocado", 3)]
+    """
+    return [(k, v) for k, v in d.items() if predicate(k)]
+
+
+def iterate_filtered_by_value(d: dict, predicate: Callable[[Any], bool]) -> List[Tuple[Any, Any]]:
+    """
+    Iterates over dictionary items where the value satisfies a predicate function.
+
+    Args:
+        d: Input dictionary.
+        predicate: Function taking value and returning True/False.
+
+    Returns:
+        List of (key, value) tuples matching the predicate.
+
+    Example:
+        iterate_filtered_by_value({"a": 10, "b": 25, "c": 5}, lambda v: v > 9)
+        -> [("a", 10), ("b", 25)]
+    """
+    return [(k, v) for k, v in d.items() if predicate(v)]
+
+
+def iterate_with_min_max_threshold(
+    d: dict,
+    min_val: Optional[Any] = None,
+    max_val: Optional[Any] = None
+) -> List[Tuple[Any, Any]]:
+    """
+    Iterates over items whose numeric or comparable values fall within [min_val, max_val].
+
+    Args:
+        d: Input dictionary.
+        min_val: Minimum threshold inclusive (or None for no lower bound).
+        max_val: Maximum threshold inclusive (or None for no upper bound).
+
+    Returns:
+        List of (key, value) tuples within specified bounds.
+    """
+    result = []
+    for k, v in d.items():
+        if min_val is not None and v < min_val:
+            continue
+        if max_val is not None and v > max_val:
+            continue
+        result.append((k, v))
+    return result
+
+
