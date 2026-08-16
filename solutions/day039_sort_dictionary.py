@@ -248,5 +248,77 @@ def sort_nested_dictionary(d: dict, by: str = "key", reverse: bool = False) -> d
         raise ValueError(f"Invalid sorting criterion: {by}. Choose 'key' or 'value'.")
 
 
+# ─── 6. Top-K, Bottom-K & Chunked Sorting ─────────────────────────────────────
+
+
+def get_top_k_by_value(d: dict, k: int, reverse: bool = True) -> dict:
+    """
+    Extracts top K items from dictionary sorted by value.
+
+    Args:
+        d: Input dictionary.
+        k: Number of elements to retrieve.
+        reverse: If True, highest values first.
+
+    Returns:
+        Dictionary containing top K items.
+
+    Example:
+        get_top_k_by_value({"a": 10, "b": 50, "c": 30}, k=2) -> {"b": 50, "c": 30}
+    """
+    sorted_items = sorted(d.items(), key=lambda x: x[1], reverse=reverse)
+    return dict(sorted_items[:k])
+
+
+def get_bottom_k_by_value(d: dict, k: int) -> dict:
+    """
+    Extracts bottom K items (lowest values) from dictionary.
+
+    Args:
+        d: Input dictionary.
+        k: Number of elements to retrieve.
+
+    Returns:
+        Dictionary containing bottom K items in ascending value order.
+
+    Example:
+        get_bottom_k_by_value({"a": 10, "b": 50, "c": 30}, k=2) -> {"a": 10, "c": 30}
+    """
+    sorted_items = sorted(d.items(), key=lambda x: x[1], reverse=False)
+    return dict(sorted_items[:k])
+
+
+def sort_dictionary_in_chunks(
+    d: dict, chunk_size: int, by: str = "key", reverse: bool = False
+) -> List[dict]:
+    """
+    Sorts a dictionary and splits it into chunks of fixed size.
+
+    Args:
+        d: Input dictionary.
+        chunk_size: Max elements per dictionary chunk.
+        by: 'key' or 'value'.
+        reverse: Sort order.
+
+    Returns:
+        List of sorted dictionary chunks.
+
+    Example:
+        sort_dictionary_in_chunks({"c": 3, "a": 1, "b": 2}, chunk_size=2, by="key")
+        -> [{"a": 1, "b": 2}, {"c": 3}]
+    """
+    if chunk_size <= 0:
+        raise ValueError("chunk_size must be a positive integer.")
+
+    key_func = (lambda x: x[0]) if by == "key" else (lambda x: x[1])
+    sorted_items = sorted(d.items(), key=key_func, reverse=reverse)
+
+    chunks = []
+    for i in range(0, len(sorted_items), chunk_size):
+        chunks.append(dict(sorted_items[i : i + chunk_size]))
+    return chunks
+
+
+
 
 
