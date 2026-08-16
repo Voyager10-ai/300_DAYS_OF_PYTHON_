@@ -319,6 +319,62 @@ def sort_dictionary_in_chunks(
     return chunks
 
 
+# ─── 7. OrderedDict & Order Verification ─────────────────────────────────────
+
+
+def sort_to_ordered_dict(
+    d: dict, by: str = "key", reverse: bool = False
+) -> OrderedDict:
+    """
+    Sorts a dictionary and returns an explicit collections.OrderedDict instance.
+
+    Args:
+        d: Input dictionary.
+        by: 'key' or 'value'.
+        reverse: Sort order.
+
+    Returns:
+        OrderedDict instance maintaining sorted order.
+
+    Example:
+        sort_to_ordered_dict({"b": 2, "a": 1}, by="key") -> OrderedDict([('a', 1), ('b', 2)])
+    """
+    key_func = (lambda x: x[0]) if by == "key" else (lambda x: x[1])
+    return OrderedDict(sorted(d.items(), key=key_func, reverse=reverse))
+
+
+def is_dictionary_sorted(d: dict, by: str = "key", reverse: bool = False) -> bool:
+    """
+    Verifies if keys or values of a dictionary are strictly in sorted order.
+
+    Args:
+        d: Input dictionary.
+        by: 'key' or 'value'.
+        reverse: Sort order to check against.
+
+    Returns:
+        True if the dictionary is sorted according to criteria, False otherwise.
+
+    Example:
+        is_dictionary_sorted({"a": 1, "b": 2}, by="key") -> True
+        is_dictionary_sorted({"b": 2, "a": 1}, by="key") -> False
+    """
+    if len(d) <= 1:
+        return True
+
+    elements = list(d.keys()) if by == "key" else list(d.values())
+    
+    for i in range(len(elements) - 1):
+        if reverse:
+            if elements[i] < elements[i + 1]:
+                return False
+        else:
+            if elements[i] > elements[i + 1]:
+                return False
+    return True
+
+
+
 
 
 
