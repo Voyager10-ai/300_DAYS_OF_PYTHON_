@@ -1,6 +1,6 @@
 {
   "total_problems": 282,
-  "current_day": 38,
+  "current_day": 39,
   "problems": [
     {"day": 1, "title": "Print String", "status": "done"},
     {"day": 2, "title": "Input Age", "status": "done"},
@@ -44,7 +44,8 @@
     {"day": 36, "title": "Check Key Exist", "status": "done"},
     {"day": 37, "title": "Concatenate Dictionaries", "status": "done"},
     {"day": 38, "title": "Iterate Over Dictionary", "status": "done"},
-    {"day": 39, "title": "Sort Dictionary", "status": "pending"},
+    {"day": 39, "title": "Sort Dictionary", "status": "done"},
+
 
     {"day": 40, "title": "Square Dictionary", "status": "pending"},
     {"day": 41, "title": "Sum of All Items", "status": "pending"},
