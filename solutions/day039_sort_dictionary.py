@@ -99,3 +99,57 @@ def sort_by_value_attribute(d: dict, attr: str, reverse: bool = False) -> dict:
 
     return dict(sorted(d.items(), key=lambda item: get_attr(item[1]), reverse=reverse))
 
+
+# ─── 3. Multi-Criteria & Tie-Breaker Sorting ─────────────────────────────────
+
+
+def sort_by_value_then_key(
+    d: dict, reverse_value: bool = False, reverse_key: bool = False
+) -> dict:
+    """
+    Sorts a dictionary primarily by value, using key as a tie-breaker.
+
+    Args:
+        d: Input dictionary.
+        reverse_value: If True, sort values in descending order.
+        reverse_key: If True, sort key tie-breakers in descending order.
+
+    Returns:
+        Sorted dictionary.
+
+    Example:
+        sort_by_value_then_key({"a": 10, "b": 5, "c": 10}) -> {"b": 5, "a": 10, "c": 10}
+    """
+    # For numeric values & string keys, we can build tuple sort keys
+    items = list(d.items())
+
+    # We sort twice or use custom comparison key for general types
+    if not reverse_value and not reverse_key:
+        return dict(sorted(items, key=lambda x: (x[1], x[0])))
+    
+    # Python's Timsort is stable: sort secondary key first, then primary key
+    items = sorted(items, key=lambda x: x[0], reverse=reverse_key)
+    items = sorted(items, key=lambda x: x[1], reverse=reverse_value)
+    return dict(items)
+
+
+def sort_by_key_length_then_alpha(d: dict, reverse_length: bool = False) -> dict:
+    """
+    Sorts a dictionary by key length first, breaking ties alphabetically.
+
+    Args:
+        d: Input dictionary with string keys.
+        reverse_length: If True, sort longer keys first.
+
+    Returns:
+        Sorted dictionary.
+
+    Example:
+        sort_by_key_length_then_alpha({"banana": 1, "apple": 2, "fig": 3})
+        -> {"fig": 3, "apple": 2, "banana": 1}
+    """
+    items = sorted(d.items(), key=lambda x: x[0])  # Alphabetical tie-breaker first
+    items = sorted(items, key=lambda x: len(str(x[0])), reverse=reverse_length)
+    return dict(items)
+
+
