@@ -54,3 +54,48 @@ def sort_by_keys_natural(d: dict) -> dict:
         ]
 
     return {k: d[k] for k in sorted(d.keys(), key=natural_key)}
+
+
+# ─── 2. Value & Attribute Sorting ──────────────────────────────────────────────
+
+
+def sort_by_values(d: dict, reverse: bool = False) -> dict:
+    """
+    Sorts a dictionary by its values in ascending or descending order.
+
+    Args:
+        d: Input dictionary.
+        reverse: If True, sort values in descending order.
+
+    Returns:
+        A new dictionary sorted by values.
+
+    Example:
+        sort_by_values({"a": 30, "b": 10, "c": 20}) -> {"b": 10, "c": 20, "a": 30}
+    """
+    return dict(sorted(d.items(), key=lambda item: item[1], reverse=reverse))
+
+
+def sort_by_value_attribute(d: dict, attr: str, reverse: bool = False) -> dict:
+    """
+    Sorts a dictionary where values are dictionaries or objects by a specific attribute/key.
+
+    Args:
+        d: Input dictionary whose values are dicts or objects with attribute `attr`.
+        attr: Key or attribute name in the nested value.
+        reverse: If True, sort in descending order.
+
+    Returns:
+        A new dictionary sorted by the nested attribute.
+
+    Example:
+        d = {"alice": {"age": 25}, "bob": {"age": 20}}
+        sort_by_value_attribute(d, "age") -> {"bob": {"age": 20}, "alice": {"age": 25}}
+    """
+    def get_attr(val: Any) -> Any:
+        if isinstance(val, dict):
+            return val[attr]
+        return getattr(val, attr)
+
+    return dict(sorted(d.items(), key=lambda item: get_attr(item[1]), reverse=reverse))
+
