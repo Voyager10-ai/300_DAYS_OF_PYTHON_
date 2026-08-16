@@ -153,3 +153,47 @@ def sort_by_key_length_then_alpha(d: dict, reverse_length: bool = False) -> dict
     return dict(items)
 
 
+# ─── 4. Custom Key Transformations & Frequency Sorting ───────────────────────
+
+
+def sort_by_custom_key(
+    d: dict, key_func: Callable[[Any, Any], Any], reverse: bool = False
+) -> dict:
+    """
+    Sorts a dictionary using a custom function `key_func(key, value)`.
+
+    Args:
+        d: Input dictionary.
+        key_func: Function accepting (key, value) and returning a sortable value.
+        reverse: If True, sort in descending order.
+
+    Returns:
+        Sorted dictionary.
+
+    Example:
+        sort_by_custom_key({"a": 5, "b": 10}, key_func=lambda k, v: v % 3)
+    """
+    return dict(sorted(d.items(), key=lambda item: key_func(item[0], item[1]), reverse=reverse))
+
+
+def sort_by_frequency_or_count(d: dict, reverse: bool = True) -> dict:
+    """
+    Sorts a frequency dictionary (element -> count) by count descending, then element ascending.
+
+    Args:
+        d: Input dictionary where values are integers (frequencies).
+        reverse: If True, higher frequencies come first.
+
+    Returns:
+        Sorted frequency dictionary.
+
+    Example:
+        sort_by_frequency_or_count({"apple": 3, "banana": 5, "cherry": 3})
+        -> {"banana": 5, "apple": 3, "cherry": 3}
+    """
+    items = sorted(d.items(), key=lambda x: x[0])  # Alphabetical tie-breaker
+    items = sorted(items, key=lambda x: x[1], reverse=reverse)
+    return dict(items)
+
+
+
