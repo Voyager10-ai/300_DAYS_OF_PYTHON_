@@ -374,6 +374,82 @@ def is_dictionary_sorted(d: dict, by: str = "key", reverse: bool = False) -> boo
     return True
 
 
+# ─── 8. Unit Tests ────────────────────────────────────────────────────────────
+
+
+class TestSortDictionary(unittest.TestCase):
+    def test_sort_by_keys(self):
+        d = {"c": 3, "a": 1, "b": 2}
+        self.assertEqual(list(sort_by_keys(d).keys()), ["a", "b", "c"])
+        self.assertEqual(list(sort_by_keys(d, reverse=True).keys()), ["c", "b", "a"])
+
+    def test_sort_by_keys_natural(self):
+        d = {"item10": 10, "item2": 2, "item1": 1}
+        self.assertEqual(list(sort_by_keys_natural(d).keys()), ["item1", "item2", "item10"])
+
+    def test_sort_by_values(self):
+        d = {"apple": 30, "banana": 10, "cherry": 20}
+        self.assertEqual(list(sort_by_values(d).items()), [("banana", 10), ("cherry", 20), ("apple", 30)])
+        self.assertEqual(list(sort_by_values(d, reverse=True).keys()), ["apple", "cherry", "banana"])
+
+    def test_sort_by_value_attribute(self):
+        d = {
+            "alice": {"score": 88},
+            "bob": {"score": 95},
+            "charlie": {"score": 72},
+        }
+        res = sort_by_value_attribute(d, "score")
+        self.assertEqual(list(res.keys()), ["charlie", "alice", "bob"])
+
+    def test_sort_by_value_then_key(self):
+        d = {"b": 10, "a": 10, "c": 5}
+        res = sort_by_value_then_key(d)
+        self.assertEqual(list(res.items()), [("c", 5), ("a", 10), ("b", 10)])
+
+    def test_sort_by_key_length_then_alpha(self):
+        d = {"banana": 1, "fig": 2, "apple": 3, "cat": 4}
+        res = sort_by_key_length_then_alpha(d)
+        self.assertEqual(list(res.keys()), ["cat", "fig", "apple", "banana"])
+
+    def test_sort_by_custom_key(self):
+        d = {"a": 12, "b": 5, "c": 8}
+        # Sort by remainder when divided by 5 (5->0, 12->2, 8->3)
+        res = sort_by_custom_key(d, key_func=lambda k, v: v % 5)
+        self.assertEqual(list(res.keys()), ["b", "a", "c"])
+
+
+    def test_sort_by_frequency_or_count(self):
+        d = {"apple": 3, "banana": 5, "cherry": 3}
+        res = sort_by_frequency_or_count(d)
+        self.assertEqual(list(res.keys()), ["banana", "apple", "cherry"])
+
+    def test_sort_nested_dictionary(self):
+        d = {"z": 1, "a": {"d": 4, "b": 2}}
+        res = sort_nested_dictionary(d, by="key")
+        self.assertEqual(list(res.keys()), ["a", "z"])
+        self.assertEqual(list(res["a"].keys()), ["b", "d"])
+
+    def test_top_and_bottom_k(self):
+        d = {"a": 10, "b": 50, "c": 30, "d": 20}
+        self.assertEqual(get_top_k_by_value(d, 2), {"b": 50, "c": 30})
+        self.assertEqual(get_bottom_k_by_value(d, 2), {"a": 10, "d": 20})
+
+    def test_sort_dictionary_in_chunks(self):
+        d = {"c": 3, "a": 1, "b": 2, "d": 4}
+        chunks = sort_dictionary_in_chunks(d, chunk_size=2, by="key")
+        self.assertEqual(len(chunks), 2)
+        self.assertEqual(chunks[0], {"a": 1, "b": 2})
+        self.assertEqual(chunks[1], {"c": 3, "d": 4})
+
+    def test_ordered_dict_and_verification(self):
+        d = {"c": 3, "a": 1, "b": 2}
+        od = sort_to_ordered_dict(d, by="key")
+        self.assertIsInstance(od, OrderedDict)
+        self.assertTrue(is_dictionary_sorted(od, by="key"))
+        self.assertFalse(is_dictionary_sorted(d, by="key"))
+
+
+
 
 
 
