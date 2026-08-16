@@ -508,6 +508,31 @@ public class GCD{
 //     }
 // }
 
+// Java Map Sorting Practice (Day 39)
+// class MapSorting {
+//     public static void main(String[] args) {
+//         Map<String, Integer> scores = new HashMap<>();
+//         scores.put("Charlie", 78);
+//         scores.put("Alice", 85);
+//         scores.put("Bob", 92);
+//
+//         // 1. Sort by Key using TreeMap
+//         Map<String, Integer> sortedByKey = new TreeMap<>(scores);
+//         System.out.println("Sorted by Key: " + sortedByKey);
+//
+//         // 2. Sort by Value using List<Map.Entry> and Stream/Comparator
+//         List<Map.Entry<String, Integer>> list = new ArrayList<>(scores.entrySet());
+//         list.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
+//         
+//         Map<String, Integer> sortedByValue = new LinkedHashMap<>();
+//         for (Map.Entry<String, Integer> entry : list) {
+//             sortedByValue.put(entry.getKey(), entry.getValue());
+//         }
+//         System.out.println("Sorted by Value Descending: " + sortedByValue);
+//     }
+// }
+
+
 
 
 

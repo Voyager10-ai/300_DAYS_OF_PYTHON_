@@ -449,6 +449,47 @@ class TestSortDictionary(unittest.TestCase):
         self.assertFalse(is_dictionary_sorted(d, by="key"))
 
 
+# ─── 9. Interactive CLI Demo Runner ───────────────────────────────────────────
+
+
+def main():
+    print("=" * 60)
+    print(" 🐍 Day 39: Sort Dictionary - Comprehensive Demo")
+    print("=" * 60)
+
+    sample_dict = {"banana": 5, "apple": 12, "cherry": 8, "date": 1}
+    print(f"\nOriginal Dictionary: {sample_dict}")
+
+    print(f"Sort by Keys (Asc): {sort_by_keys(sample_dict)}")
+    print(f"Sort by Keys (Desc): {sort_by_keys(sample_dict, reverse=True)}")
+    print(f"Sort by Values (Asc): {sort_by_values(sample_dict)}")
+    print(f"Sort by Values (Desc): {sort_by_values(sample_dict, reverse=True)}")
+
+    print("\nNatural Key Sorting:")
+    nat_dict = {"item10": 100, "item2": 20, "item1": 10}
+    print(f"  Standard key sort: {sort_by_keys(nat_dict)}")
+    print(f"  Natural key sort:  {sort_by_keys_natural(nat_dict)}")
+
+    print("\nTop-2 & Bottom-2 Elements by Value:")
+    print(f"  Top 2:    {get_top_k_by_value(sample_dict, 2)}")
+    print(f"  Bottom 2: {get_bottom_k_by_value(sample_dict, 2)}")
+
+    print("\nNested Dictionary Sorting:")
+    nested = {"z": 10, "a": {"sub_b": 2, "sub_a": 1}}
+    print(f"  Recursively sorted: {sort_nested_dictionary(nested, by='key')}")
+
+    print("\nRunning test suite...")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestSortDictionary)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+    print("\nDemo completed successfully!")
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 
