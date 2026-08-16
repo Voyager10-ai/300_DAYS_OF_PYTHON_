@@ -196,4 +196,57 @@ def sort_by_frequency_or_count(d: dict, reverse: bool = True) -> dict:
     return dict(items)
 
 
+# ─── 5. Recursive Nested Dictionary Sorting ──────────────────────────────────
+
+
+def sort_nested_dictionary(d: dict, by: str = "key", reverse: bool = False) -> dict:
+    """
+    Recursively sorts nested dictionaries at all levels by key or by value.
+
+    Args:
+        d: Input dictionary (can be nested).
+        by: 'key' or 'value'.
+        reverse: If True, sort in descending order.
+
+    Returns:
+        Recursively sorted dictionary.
+
+    Example:
+        d = {"z": 1, "a": {"c": 3, "b": 2}}
+        sort_nested_dictionary(d, by="key") -> {"a": {"b": 2, "c": 3}, "z": 1}
+    """
+    if not isinstance(d, dict):
+        return d
+
+    # First recursively process nested dictionary values
+    processed = {}
+    for k, v in d.items():
+        if isinstance(v, dict):
+            processed[k] = sort_nested_dictionary(v, by=by, reverse=reverse)
+        elif isinstance(v, list):
+            processed[k] = [
+                sort_nested_dictionary(elem, by=by, reverse=reverse)
+                if isinstance(elem, dict) else elem
+                for elem in v
+            ]
+        else:
+            processed[k] = v
+
+    # Now sort current level
+    if by == "key":
+        return dict(sorted(processed.items(), key=lambda x: x[0], reverse=reverse))
+    elif by == "value":
+        # String representation of values to allow comparing dicts/lists safely
+        return dict(
+            sorted(
+                processed.items(),
+                key=lambda x: (isinstance(x[1], (dict, list)), str(x[1])),
+                reverse=reverse,
+            )
+        )
+    else:
+        raise ValueError(f"Invalid sorting criterion: {by}. Choose 'key' or 'value'.")
+
+
+
 
