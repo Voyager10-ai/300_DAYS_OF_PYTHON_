@@ -279,4 +279,80 @@ def flatten_nested_square_dict(nested_d: Dict[int, Dict[int, int]]) -> Dict[Tupl
     }
 
 
+# ─── 5. Inplace Modification & Dictionary Updates ─────────────────────────────
+
+
+def square_dict_values_inplace(d: Dict[Any, Union[int, float]]) -> Dict[Any, Union[int, float]]:
+    """
+    Modifies an existing dictionary in-place by squaring all numeric values.
+
+    Args:
+        d: Input dictionary whose values are numeric.
+
+    Returns:
+        The mutated dictionary `d`.
+
+    Example:
+        d = {"a": 2, "b": 3}
+        square_dict_values_inplace(d) -> {"a": 4, "b": 9}
+    """
+    for k in d:
+        if isinstance(d[k], (int, float)):
+            d[k] = d[k] ** 2
+    return d
+
+
+def update_dict_with_squares(
+    d: Dict[int, int], keys: List[int]
+) -> Dict[int, int]:
+    """
+    Updates or inserts keys in dictionary `d` with their squared values.
+
+    Args:
+        d: Target dictionary.
+        keys: List of keys to update/add with key^2.
+
+    Returns:
+        Updated target dictionary.
+
+    Example:
+        d = {1: 1}
+        update_dict_with_squares(d, [2, 3]) -> {1: 1, 2: 4, 3: 9}
+    """
+    d.update({k: k * k for k in keys})
+    return d
+
+
+def merge_with_square_dict(
+    d: Dict[int, int], n: int, resolve_strategy: str = "sum"
+) -> Dict[int, int]:
+    """
+    Merges an existing dictionary `d` with a generated square dictionary from 1..n.
+
+    Args:
+        d: Input dictionary.
+        n: Upper limit for generated square dictionary.
+        resolve_strategy: Strategy for overlapping keys: 'sum', 'keep_existing', or 'overwrite'.
+
+    Returns:
+        Merged dictionary.
+
+    Example:
+        merge_with_square_dict({2: 10}, 3, "sum") -> {1: 1, 2: 14, 3: 9}
+    """
+    sq_dict = generate_square_dict(n)
+    result = dict(d)
+    for k, v in sq_dict.items():
+        if k in result:
+            if resolve_strategy == "sum":
+                result[k] += v
+            elif resolve_strategy == "overwrite":
+                result[k] = v
+            # 'keep_existing' does nothing
+        else:
+            result[k] = v
+    return result
+
+
+
 
