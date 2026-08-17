@@ -410,6 +410,72 @@ def dict_from_square_stream(
     return dict(gen)
 
 
+# ─── 7. Inverse Lookup & Mathematical Verification ─────────────────────────────
+
+
+def inverse_square_dict(d: Dict[Union[int, float], Union[int, float]]) -> Dict[Union[int, float], Union[int, float]]:
+    """
+    Inverts a square dictionary mapping {key: key**2} to {key**2: key}.
+
+    Args:
+        d: Input square dictionary.
+
+    Returns:
+        Inverted dictionary where values become keys and keys become values.
+
+    Example:
+        inverse_square_dict({1: 1, 2: 4, 3: 9}) -> {1: 1, 4: 2, 9: 3}
+    """
+    return {v: k for k, v in d.items()}
+
+
+def is_square_dictionary(d: Dict[Union[int, float], Union[int, float]]) -> bool:
+    """
+    Verifies whether all key-value pairs in a dictionary satisfy v == k ** 2.
+
+    Args:
+        d: Input dictionary to test.
+
+    Returns:
+        True if all values equal key squared, False otherwise.
+
+    Example:
+        is_square_dictionary({2: 4, 3: 9}) -> True
+        is_square_dictionary({2: 4, 3: 10}) -> False
+    """
+    if not d:
+        return True
+    for k, v in d.items():
+        if not isinstance(k, (int, float)) or not isinstance(v, (int, float)):
+            return False
+        if abs(v - (k ** 2)) > 1e-6:
+            return False
+    return True
+
+
+def find_closest_square_key(
+    d: Dict[Union[int, float], Union[int, float]], target_val: Union[int, float]
+) -> Optional[Union[int, float]]:
+    """
+    Finds the key in a square dictionary whose value is closest to `target_val`.
+
+    Args:
+        d: Input dictionary.
+        target_val: Target value to search for.
+
+    Returns:
+        Key corresponding to the closest value, or None if dictionary is empty.
+
+    Example:
+        d = {1: 1, 2: 4, 3: 9, 4: 16}
+        find_closest_square_key(d, 7) -> 3 (since 9 is closest to 7)
+    """
+    if not d:
+        return None
+    return min(d.keys(), key=lambda k: abs(d[k] - target_val))
+
+
+
 
 
 
