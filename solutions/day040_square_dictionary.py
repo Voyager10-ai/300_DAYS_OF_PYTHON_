@@ -475,6 +475,75 @@ def find_closest_square_key(
     return min(d.keys(), key=lambda k: abs(d[k] - target_val))
 
 
+# ─── 8. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestSquareDictionary(unittest.TestCase):
+    def test_generate_square_dict(self):
+        self.assertEqual(generate_square_dict(5), {1: 1, 2: 4, 3: 9, 4: 16, 5: 25})
+        self.assertEqual(generate_square_dict(1), {1: 1})
+        self.assertEqual(generate_square_dict(0), {})
+
+    def test_generate_square_dict_range(self):
+        self.assertEqual(generate_square_dict_range(2, 5), {2: 4, 3: 9, 4: 16})
+        self.assertEqual(generate_square_dict_range(1, 6, 2), {1: 1, 3: 9, 5: 25})
+
+    def test_generate_square_dict_from_list(self):
+        self.assertEqual(generate_square_dict_from_list([3, -4, 0]), {3: 9, -4: 16, 0: 0})
+
+    def test_generate_power_and_cube_dict(self):
+        self.assertEqual(generate_power_dict(3, 3), {1: 1, 2: 8, 3: 27})
+        self.assertEqual(generate_cube_dict(3), {1: 1, 2: 8, 3: 27})
+
+    def test_generate_custom_transform_dict(self):
+        res = generate_custom_transform_dict([1, 2, 3], key_func=lambda x: f"n_{x}")
+        self.assertEqual(res, {"n_1": 1, "n_2": 4, "n_3": 9})
+
+    def test_conditional_and_filtered(self):
+        self.assertEqual(filter_even_square_dict(6), {2: 4, 4: 16, 6: 36})
+        self.assertEqual(filter_odd_square_dict(5), {1: 1, 3: 9, 5: 25})
+        d = {1: 1, 2: 4, 3: 9, 4: 16, 5: 25}
+        self.assertEqual(filter_squares_by_value(d, min_val=4, max_val=16), {2: 4, 3: 9, 4: 16})
+
+    def test_nested_and_coordinate(self):
+        nested = generate_nested_square_dict(2, 2)
+        self.assertEqual(nested[1][2], 5)
+        self.assertEqual(nested[2][2], 8)
+        coords = generate_coordinate_square_dict(2)
+        self.assertEqual(coords[(2, 2)], 8)
+        flattened = flatten_nested_square_dict(nested)
+        self.assertEqual(flattened[(1, 2)], 5)
+
+    def test_inplace_and_updates(self):
+        d = {"a": 3, "b": 4}
+        square_dict_values_inplace(d)
+        self.assertEqual(d, {"a": 9, "b": 16})
+
+        base = {1: 1}
+        update_dict_with_squares(base, [2, 3])
+        self.assertEqual(base, {1: 1, 2: 4, 3: 9})
+
+        merged = merge_with_square_dict({2: 10}, 3, "sum")
+        self.assertEqual(merged, {1: 1, 2: 14, 3: 9})
+
+    def test_functional_and_stream(self):
+        mapped = square_dict_map_filter([1, 2, 3, 4], predicate=lambda x: x > 2)
+        self.assertEqual(mapped, {3: 9, 4: 16})
+
+        gen = square_generator_stream(3)
+        stream_dict = dict_from_square_stream(gen)
+        self.assertEqual(stream_dict, {1: 1, 2: 4, 3: 9})
+
+    def test_inverse_and_verification(self):
+        sq = {1: 1, 2: 4, 3: 9}
+        inv = inverse_square_dict(sq)
+        self.assertEqual(inv, {1: 1, 4: 2, 9: 3})
+        self.assertTrue(is_square_dictionary(sq))
+        self.assertFalse(is_square_dictionary({2: 4, 3: 10}))
+        self.assertEqual(find_closest_square_key(sq, 7), 3)
+
+
+
 
 
 
