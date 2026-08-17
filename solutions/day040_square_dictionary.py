@@ -354,5 +354,62 @@ def merge_with_square_dict(
     return result
 
 
+# ─── 6. Functional Mapping & Stream Generators ─────────────────────────────────
+
+
+def square_dict_map_filter(
+    iterable: List[int], predicate: Optional[Callable[[int], bool]] = None
+) -> Dict[int, int]:
+    """
+    Creates a square dictionary from an iterable using functional map() and filter().
+
+    Args:
+        iterable: List of integers.
+        predicate: Optional filtering function.
+
+    Returns:
+        Square dictionary.
+
+    Example:
+        square_dict_map_filter([1, 2, 3, 4], lambda x: x % 2 == 0) -> {2: 4, 4: 16}
+    """
+    filtered = filter(predicate, iterable) if predicate else iterable
+    pairs = map(lambda x: (x, x * x), filtered)
+    return dict(pairs)
+
+
+def square_generator_stream(n: int) -> Generator[Tuple[int, int], None, None]:
+    """
+    Lazy generator function that yields (key, key**2) tuples on demand up to n.
+
+    Args:
+        n: Upper limit integer (inclusive).
+
+    Yields:
+        Tuple (k, k**2).
+
+    Example:
+        list(square_generator_stream(3)) -> [(1, 1), (2, 4), (3, 9)]
+    """
+    for i in range(1, n + 1):
+        yield (i, i * i)
+
+
+def dict_from_square_stream(
+    gen: Generator[Tuple[int, int], None, None]
+) -> Dict[int, int]:
+    """
+    Consumes a square stream generator and returns a dictionary.
+
+    Args:
+        gen: Square stream generator.
+
+    Returns:
+        Dictionary created from generator output.
+    """
+    return dict(gen)
+
+
+
 
 
