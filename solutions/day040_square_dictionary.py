@@ -130,3 +130,89 @@ def generate_custom_transform_dict(
     """
     return {key_func(x): val_func(x) for x in items}
 
+
+# ─── 3. Conditional & Filtered Square Dictionaries ──────────────────────────
+
+
+def filter_even_square_dict(n: int) -> Dict[int, int]:
+    """
+    Generates a square dictionary containing only even numbers from 1 to n.
+
+    Args:
+        n: Upper limit integer (inclusive).
+
+    Returns:
+        Dictionary mapping even numbers to their squares.
+
+    Example:
+        filter_even_square_dict(6) -> {2: 4, 4: 16, 6: 36}
+    """
+    return {i: i * i for i in range(1, n + 1) if i % 2 == 0}
+
+
+def filter_odd_square_dict(n: int) -> Dict[int, int]:
+    """
+    Generates a square dictionary containing only odd numbers from 1 to n.
+
+    Args:
+        n: Upper limit integer (inclusive).
+
+    Returns:
+        Dictionary mapping odd numbers to their squares.
+
+    Example:
+        filter_odd_square_dict(5) -> {1: 1, 3: 9, 5: 25}
+    """
+    return {i: i * i for i in range(1, n + 1) if i % 2 != 0}
+
+
+def generate_conditional_square_dict(
+    n: int, predicate: Callable[[int], bool]
+) -> Dict[int, int]:
+    """
+    Generates a square dictionary filtering keys using an arbitrary predicate callable.
+
+    Args:
+        n: Upper limit integer (inclusive).
+        predicate: A function returning True if key should be included.
+
+    Returns:
+        Filtered square dictionary.
+
+    Example:
+        generate_conditional_square_dict(10, lambda x: x % 3 == 0)
+        -> {3: 9, 6: 36, 9: 81}
+    """
+    return {i: i * i for i in range(1, n + 1) if predicate(i)}
+
+
+def filter_squares_by_value(
+    d: Dict[Any, Union[int, float]],
+    min_val: Optional[Union[int, float]] = None,
+    max_val: Optional[Union[int, float]] = None,
+) -> Dict[Any, Union[int, float]]:
+    """
+    Filters an existing square dictionary keeping only pairs whose values fall in [min_val, max_val].
+
+    Args:
+        d: Input square dictionary.
+        min_val: Minimum acceptable value threshold (inclusive).
+        max_val: Maximum acceptable value threshold (inclusive).
+
+    Returns:
+        Filtered dictionary.
+
+    Example:
+        d = {1: 1, 2: 4, 3: 9, 4: 16}
+        filter_squares_by_value(d, min_val=4, max_val=10) -> {2: 4, 3: 9}
+    """
+    result = {}
+    for k, v in d.items():
+        if min_val is not None and v < min_val:
+            continue
+        if max_val is not None and v > max_val:
+            continue
+        result[k] = v
+    return result
+
+
