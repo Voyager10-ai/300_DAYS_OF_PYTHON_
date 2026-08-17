@@ -543,6 +543,53 @@ class TestSquareDictionary(unittest.TestCase):
         self.assertEqual(find_closest_square_key(sq, 7), 3)
 
 
+# ─── 9. Interactive CLI Demo Runner ───────────────────────────────────────────
+
+
+def main():
+    print("=" * 60)
+    print(" 🐍 Day 40: Square Dictionary - Comprehensive Demo")
+    print("=" * 60)
+
+    n = 5
+    sq_dict = generate_square_dict(n)
+    print(f"\n1. Core Square Dictionary (1..{n}):")
+    print(f"   {sq_dict}")
+
+    print("\n2. Custom Power Mappings:")
+    print(f"   Cubes (1..4): {generate_cube_dict(4)}")
+    print(f"   Power 1.5 (1..4): {generate_power_dict(4, 1.5)}")
+
+    print("\n3. Conditional & Filtered Square Dictionaries:")
+    print(f"   Even Squares (1..8): {filter_even_square_dict(8)}")
+    print(f"   Odd Squares (1..7):  {filter_odd_square_dict(7)}")
+
+    print("\n4. 2D Coordinate Square Distance Matrix (1..3):")
+    print(f"   {(generate_coordinate_square_dict(3))}")
+
+    print("\n5. Inplace Square Modification:")
+    sample = {"a": 3, "b": 7, "c": 10}
+    print(f"   Original: {sample}")
+    square_dict_values_inplace(sample)
+    print(f"   Inplace Squared: {sample}")
+
+    print("\n6. Inverse Square Lookup & Verification:")
+    print(f"   Inverted: {inverse_square_dict(sq_dict)}")
+    print(f"   Is Valid Square Dict: {is_square_dictionary(sq_dict)}")
+    print(f"   Closest Key to target 18: {find_closest_square_key(sq_dict, 18)}")
+
+    print("\n7. Running Test Suite...")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestSquareDictionary)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+    print("\nDemo completed successfully!")
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 
