@@ -216,3 +216,67 @@ def filter_squares_by_value(
     return result
 
 
+# ─── 4. Nested & Multi-Dimensional Square Dictionaries ────────────────────────
+
+
+def generate_nested_square_dict(rows: int, cols: int) -> Dict[int, Dict[int, int]]:
+    """
+    Generates a 2D nested dictionary where nested values are i * j or (i**2 + j**2).
+
+    Args:
+        rows: Number of row keys (1..rows).
+        cols: Number of column keys (1..cols).
+
+    Returns:
+        Nested dictionary {i: {j: i**2 + j**2}}.
+
+    Example:
+        generate_nested_square_dict(2, 2) -> {1: {1: 2, 2: 5}, 2: {1: 5, 2: 8}}
+    """
+    return {
+        i: {j: i ** 2 + j ** 2 for j in range(1, cols + 1)}
+        for i in range(1, rows + 1)
+    }
+
+
+def generate_coordinate_square_dict(n: int) -> Dict[Tuple[int, int], int]:
+    """
+    Generates a dictionary with 2D coordinate tuple keys mapped to Euclidean square distance (x^2 + y^2).
+
+    Args:
+        n: Dimension bounds (1..n for x and y).
+
+    Returns:
+        Dictionary mapping (x, y) -> x**2 + y**2.
+
+    Example:
+        generate_coordinate_square_dict(2) -> {(1, 1): 2, (1, 2): 5, (2, 1): 5, (2, 2): 8}
+    """
+    return {
+        (x, y): x ** 2 + y ** 2
+        for x in range(1, n + 1)
+        for y in range(1, n + 1)
+    }
+
+
+def flatten_nested_square_dict(nested_d: Dict[int, Dict[int, int]]) -> Dict[Tuple[int, int], int]:
+    """
+    Flattens a 2D nested dictionary into a single dictionary with (row, col) tuple keys.
+
+    Args:
+        nested_d: Nested dictionary structure {r: {c: val}}.
+
+    Returns:
+        Flattened dictionary with tuple keys.
+
+    Example:
+        flatten_nested_square_dict({1: {2: 5}}) -> {(1, 2): 5}
+    """
+    return {
+        (r, c): val
+        for r, row_dict in nested_d.items()
+        for c, val in row_dict.items()
+    }
+
+
+
