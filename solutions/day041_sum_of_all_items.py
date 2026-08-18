@@ -284,4 +284,62 @@ def sum_nested_dict_depth_weighted(d: Dict[Any, Any], current_depth: int = 1) ->
     return total
 
 
+# ─── 5. Container & Collection Value Summation ────────────────────────────────
+
+
+def sum_dict_list_values(d: Dict[Any, Union[List[Union[int, float]], Tuple[Union[int, float], ...]]]) -> Union[int, float]:
+    """
+    Sums all elements across dictionary values that are lists or tuples of numbers.
+
+    Args:
+        d: Input dictionary with list/tuple values.
+
+    Returns:
+        Total sum of all elements in all container values.
+
+    Example:
+        sum_dict_list_values({"a": [1, 2, 3], "b": [4, 5]}) -> 15
+    """
+    total = 0
+    for container in d.values():
+        if isinstance(container, (list, tuple, set)):
+            for elem in container:
+                if isinstance(elem, (int, float)) and not isinstance(elem, bool):
+                    total += elem
+    return total
+
+
+def flatten_and_sum_all_containers(d: Dict[Any, Any]) -> Union[int, float]:
+    """
+    Recursively flattens mixed scalars, lists, tuples, sets, and nested dicts into a single total sum.
+
+    Args:
+        d: Input dictionary with arbitrary mixed structure.
+
+    Returns:
+        Total sum of all numeric values anywhere in the structure.
+
+    Example:
+        d = {"a": 10, "b": [1, 2, {"c": 3}], "d": (4, 5)} -> 25
+    """
+    total = 0
+
+    def _traverse(val: Any):
+        nonlocal total
+        if isinstance(val, bool):
+            return
+        if isinstance(val, (int, float)):
+            total += val
+        elif isinstance(val, dict):
+            for item in val.values():
+                _traverse(item)
+        elif isinstance(val, (list, tuple, set)):
+            for item in val:
+                _traverse(item)
+
+    _traverse(d)
+    return total
+
+
+
 
