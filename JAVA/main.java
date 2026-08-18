@@ -688,21 +688,22 @@
 //         }
 //     }
 
-// Java Map Square Computation Practice (Day 40)
-// import java.util.*;
-// import java.util.stream.*;
-// class MapSquarePractice {
+// Java Map Summation Practice (Day 41)
+// class MapSummationPractice {
 //     public static void main(String[] args) {
-//         int n = 5;
-//         // Generate square map using Java 8 Streams
-//         Map<Integer, Integer> squareMap = IntStream.rangeClosed(1, n)
-//             .boxed()
-//             .collect(Collectors.toMap(i -> i, i -> i * i));
-//         System.out.println("Square Map (1..5): " + squareMap);
+//         Map<String, Double> prices = new HashMap<>();
+//         prices.put("apple", 1.50);
+//         prices.put("banana", 0.75);
+//         prices.put("cherry", 3.25);
+//
+//         // Sum values using Java 8 Stream API
+//         double totalSum = prices.values().stream().mapToDouble(Double::doubleValue).sum();
+//         System.out.println("Total Prices Sum: " + totalSum);
 //     }
 // }
 
 import java.util.*;
+
 public class main{
   public static void main(String[] args){
     Scanner sc = new Scanner(System.in);

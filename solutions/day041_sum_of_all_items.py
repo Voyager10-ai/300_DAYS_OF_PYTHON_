@@ -517,6 +517,49 @@ class TestSumOfAllItems(unittest.TestCase):
         self.assertEqual(running_sum_dict(d), {"a": 10, "b": 30, "c": 60})
 
 
+# ─── 9. Interactive CLI Demo Runner ───────────────────────────────────────────
+
+
+def main():
+    print("=" * 60)
+    print(" 🐍 Day 41: Sum of All Items - Comprehensive Demo")
+    print("=" * 60)
+
+    sample = {"a": 100, "b": 250, "c": 400, "d": 50}
+    print(f"\nOriginal Dictionary: {sample}")
+
+    print(f"1. Core Sum of Values: {sum_dict_values(sample)}")
+    print(f"2. Average of Values:  {average_dict_values(sample)}")
+    print(f"3. Summary Statistics: {summary_statistics_dict(sample)}")
+
+    mixed = {"item1": 50, "item2": "150.5", "item3": "invalid", "item4": 200}
+    print(f"\n4. Mixed/Safe Summation ({mixed}):")
+    print(f"   Safe Sum: {sum_dict_values_safe(mixed)}")
+    print(f"   Extracted Nums: {extract_numeric_values(mixed)}")
+
+    nested = {"sales_q1": 1000, "dept_b": {"sales_q2": 1500, "details": {"bonus": 200}}}
+    print(f"\n5. Nested Dictionary Summation:")
+    print(f"   Total Nested Sum: {sum_nested_dict_values(nested)}")
+
+    containers = {"groceries": [12.5, 45.0], "utilities": (100, 50)}
+    print(f"\n6. Container Values Summation ({containers}):")
+    print(f"   Container Sum: {sum_dict_list_values(containers)}")
+
+    print(f"\n7. Cumulative Running Sum:")
+    print(f"   {running_sum_dict(sample)}")
+
+    print("\n8. Running Unit Test Suite...")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestSumOfAllItems)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+    print("\nDemo completed successfully!")
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 
