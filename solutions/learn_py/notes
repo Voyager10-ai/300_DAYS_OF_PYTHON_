@@ -1,0 +1,99 @@
+# What are the VARIABLES in Python ?
+
+# Its type of containers there we can store differenct type of data values and once a variable is assignes 
+# a value you can use that variable in place of that value
+
+#variable_name = value  ---- Syntax
+#Greeting = "Hello"  
+#print(Greeting) ----- Example
+
+# VARIABLE NAMING RULES
+
+# 1. Must start with a letter or an underscore ( _ ).
+# 2. Can contain letters, numbers, and underscores.
+# 3. Case-sensitive (my_name and my_Name are different).
+# 4. Cannot be a reserved keyword (like for, if, while, etc.).
+
+# ‘for’ is a reserved word in Python 
+for = 26 ---- # this is wrong 
+
+# DATA TYPES
+# data types define the kind of value a variable can store
+
+# Basic Data Types in Python
+
+# 1) Numeric - which has an numeric value 
+int , float , complex
+
+# 2) Sequence - collection of similar/different data types
+string = "xyz" , list = [xyz] , tuple = (xyz) 
+
+# 3) Dictionary - a key value pair arrange in any order
+dict = {'name': 'Pradnyesh' , 'age' : '20' , 'hobbies' : 'coding' , 'reading' , 'web_development'}
+
+# 4) Sets - unorder collection of elements (add or remvove elements, not allow duplicates )
+set = {xyz}
+
+# 5) Boolean - True or False
+bool = True or False
+
+# TYPE CASTING 
+# its nothing but converting one data type into another data type
+
+num = 123   # it is integer type data 
+
+num = str(num) # converting int to string 
+print(type(num))    # <class 'str'>
+
+# Types of Typecasting
+
+# Implicit casting - Done automatically by Python, No fun is req
+# Explicit Casting - done by programmer manually, Uses functions like int(), float(), str(), list(), etc. 
+
+#1) 
+a = 10        # int
+b = 2.5       # float
+
+c = a + b
+
+print(c)
+print(type(c)) # Output - 12.5 <class 'float'>
+
+#2)
+age = "20"
+age = int(age)
+
+print(age)
+print(type(age)) # Output - 20 <class 'age'>
+
+# INPUT FUCNTIONS IN PYTHON
+# The input() function is used to take input from the user during program execution.
+
+input("Message") -- # Syntax
+
+# IMP - The input() function always returns data as a string (str), even if the user enters a number if want then need to convert it 
+
+# Example 1: Taking String Input
+name = input("Enter your name: ")
+print("Hello", name)
+
+# Example 2: Taking Integer Input
+age = int(input("Enter your age: ")) --- # By default, input() returns a string. To use it as a number, convert it using int().
+print("Your age is", age)
+
+# Example 3: Taking Float Input
+height = float(input("Enter your height: "))
+print("Height:", height)
+
+# Example 4: Adding Two Numbers
+a = int(input("Enter first number: "))
+b = int(input("Enter second number: "))
+
+sum = a + b
+
+print("Sum =", sum)
+
+
+
+
+
