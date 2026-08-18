@@ -72,3 +72,64 @@ def sum_dict_keys_and_values(d: Dict[Union[int, float], Union[int, float]]) -> U
         if isinstance(v, (int, float)) and not isinstance(v, bool):
             total += v
     return total
+
+
+# ─── 2. Safe Type Conversion & Robust Summation ──────────────────────────────
+
+
+def sum_dict_values_safe(d: Dict[Any, Any], default_val: float = 0.0) -> float:
+    """
+    Safely sums values in a dictionary by attempting to parse string representation
+    of numbers into floats. Ignores invalid non-numeric entries gracefully.
+
+    Args:
+        d: Input dictionary with potentially mixed types (ints, floats, numeric strings).
+        default_val: Default starting accumulator value.
+
+    Returns:
+        Total accumulated float sum.
+
+    Example:
+        sum_dict_values_safe({"a": 10, "b": "20.5", "c": "invalid", "d": 5}) -> 35.5
+    """
+    total = default_val
+    for v in d.values():
+        if isinstance(v, bool):
+            continue
+        if isinstance(v, (int, float)):
+            total += v
+        elif isinstance(v, str):
+            try:
+                total += float(v)
+            except ValueError:
+                pass
+    return total
+
+
+def extract_numeric_values(d: Dict[Any, Any]) -> List[Union[int, float]]:
+    """
+    Extracts all valid numeric values from a dictionary into a list.
+
+    Args:
+        d: Input dictionary.
+
+    Returns:
+        List of numeric values.
+
+    Example:
+        extract_numeric_values({"a": 10, "b": "hello", "c": 3.14}) -> [10, 3.14]
+    """
+    nums = []
+    for v in d.values():
+        if isinstance(v, bool):
+            continue
+        if isinstance(v, (int, float)):
+            nums.append(v)
+        elif isinstance(v, str):
+            try:
+                val = float(v)
+                nums.append(int(val) if val.is_integer() else val)
+            except ValueError:
+                pass
+    return nums
+
