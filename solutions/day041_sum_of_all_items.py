@@ -463,6 +463,62 @@ def running_sum_dict(d: Dict[Any, Union[int, float]]) -> Dict[Any, Union[int, fl
 
 
 
+# ─── 8. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestSumOfAllItems(unittest.TestCase):
+    def test_core_summation(self):
+        self.assertEqual(sum_dict_values({"a": 10, "b": 20, "c": 30}), 60)
+        self.assertEqual(sum_dict_keys({10: "x", 20: "y"}), 30)
+        self.assertEqual(sum_dict_keys_and_values({1: 10, 2: 20}), 33)
+        self.assertEqual(sum_dict_values({}), 0)
+
+    def test_safe_summation(self):
+        d = {"a": 10, "b": "20.5", "c": "invalid", "d": True}
+        self.assertEqual(sum_dict_values_safe(d), 30.5)
+        self.assertEqual(extract_numeric_values(d), [10, 20.5])
+
+    def test_conditional_summation(self):
+        d = {"a": 5, "b": 15, "c": 20, "d": 3}
+        self.assertEqual(sum_even_values(d), 20)
+        self.assertEqual(sum_odd_values(d), 23)
+        self.assertEqual(sum_values_above_threshold(d, 10), 35)
+        self.assertEqual(sum_dict_values_conditional(d, lambda k, v: k in ("a", "c")), 25)
+
+
+    def test_nested_summation(self):
+        nested = {"a": 10, "b": {"c": 20, "d": {"e": 30, "price": 100}}}
+        self.assertEqual(sum_nested_dict_values(nested), 160)
+        self.assertEqual(sum_nested_dict_by_key(nested, "price"), 100)
+        self.assertEqual(sum_nested_dict_depth_weighted({"a": 10, "b": {"c": 20}}), 50.0)
+
+    def test_container_summation(self):
+        d = {"a": [1, 2, 3], "b": (4, 5)}
+        self.assertEqual(sum_dict_list_values(d), 15)
+
+        mixed = {"a": 10, "b": [1, 2, {"c": 3}], "d": (4, 5)}
+        self.assertEqual(flatten_and_sum_all_containers(mixed), 25)
+
+    def test_weighted_and_stats(self):
+        scores = {"exam1": 80, "exam2": 90}
+        weights = {"exam1": 0.4, "exam2": 0.6}
+        self.assertAlmostEqual(weighted_sum_dict(scores, weights), 86.0)
+        self.assertEqual(average_dict_values({"a": 10, "b": 20, "c": 30}), 20.0)
+
+        stats = summary_statistics_dict({"a": 10, "b": 20, "c": 30})
+        self.assertEqual(stats["sum"], 60)
+        self.assertEqual(stats["count"], 3)
+        self.assertEqual(stats["min"], 10)
+        self.assertEqual(stats["max"], 30)
+
+    def test_reduce_and_running_sum(self):
+        d = {"a": 10, "b": 20, "c": 30}
+        self.assertEqual(sum_dict_functools_reduce(d), 60)
+        self.assertEqual(running_sum_dict(d), {"a": 10, "b": 30, "c": 60})
+
+
+
+
 
 
 
