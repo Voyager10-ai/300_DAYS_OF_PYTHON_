@@ -133,3 +133,80 @@ def extract_numeric_values(d: Dict[Any, Any]) -> List[Union[int, float]]:
                 pass
     return nums
 
+
+# ─── 3. Conditional & Filtered Summation ──────────────────────────────────────
+
+
+def sum_dict_values_conditional(
+    d: Dict[Any, Any], predicate: Callable[[Any, Any], bool]
+) -> Union[int, float]:
+    """
+    Sums values in a dictionary that satisfy a predicate function `predicate(key, value)`.
+
+    Args:
+        d: Input dictionary.
+        predicate: Callable taking (key, value) and returning bool.
+
+    Returns:
+        Sum of filtered numeric values.
+
+    Example:
+        sum_dict_values_conditional({"a": 10, "b": 25, "c": 30}, lambda k, v: v > 15) -> 55
+    """
+    total = 0
+    for k, v in d.items():
+        if isinstance(v, (int, float)) and not isinstance(v, bool):
+            if predicate(k, v):
+                total += v
+    return total
+
+
+def sum_even_values(d: Dict[Any, int]) -> int:
+    """
+    Sums only even integer values in a dictionary.
+
+    Args:
+        d: Input dictionary with integer values.
+
+    Returns:
+        Sum of even values.
+
+    Example:
+        sum_even_values({"a": 1, "b": 2, "c": 3, "d": 4}) -> 6
+    """
+    return sum(v for v in d.values() if isinstance(v, int) and not isinstance(v, bool) and v % 2 == 0)
+
+
+def sum_odd_values(d: Dict[Any, int]) -> int:
+    """
+    Sums only odd integer values in a dictionary.
+
+    Args:
+        d: Input dictionary with integer values.
+
+    Returns:
+        Sum of odd values.
+
+    Example:
+        sum_odd_values({"a": 1, "b": 2, "c": 3, "d": 4}) -> 4
+    """
+    return sum(v for v in d.values() if isinstance(v, int) and not isinstance(v, bool) and v % 2 != 0)
+
+
+def sum_values_above_threshold(d: Dict[Any, Union[int, float]], threshold: Union[int, float]) -> Union[int, float]:
+    """
+    Sums values strictly greater than a threshold value.
+
+    Args:
+        d: Input dictionary.
+        threshold: Numeric threshold cut-off.
+
+    Returns:
+        Sum of values > threshold.
+
+    Example:
+        sum_values_above_threshold({"a": 5, "b": 15, "c": 25}, 10) -> 40
+    """
+    return sum(v for v in d.values() if isinstance(v, (int, float)) and not isinstance(v, bool) and v > threshold)
+
+
