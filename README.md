@@ -43,6 +43,7 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 38: Iterate Over Dictionary
 - Day 39: Sort Dictionary
 - Day 40: Square Dictionary
+- Day 41: Sum of All Items
 
 
 
