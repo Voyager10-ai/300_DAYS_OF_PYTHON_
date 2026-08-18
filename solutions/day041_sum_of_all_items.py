@@ -341,5 +341,81 @@ def flatten_and_sum_all_containers(d: Dict[Any, Any]) -> Union[int, float]:
     return total
 
 
+# ─── 6. Weighted Sum, Average, & Statistical Aggregations ────────────────────
+
+
+def weighted_sum_dict(
+    d: Dict[Any, Union[int, float]], weights: Dict[Any, Union[int, float]]
+) -> float:
+    """
+    Computes a weighted sum of dictionary values based on a corresponding weights dictionary.
+
+    Args:
+        d: Input dictionary with values to weight.
+        weights: Dictionary mapping keys to numeric weight multipliers.
+
+    Returns:
+        Weighted total sum sum(d[k] * weights[k]).
+
+    Example:
+        weighted_sum_dict({"exam1": 80, "exam2": 90}, {"exam1": 0.4, "exam2": 0.6}) -> 86.0
+    """
+    total = 0.0
+    for k, v in d.items():
+        if isinstance(v, (int, float)) and not isinstance(v, bool) and k in weights:
+            w = weights[k]
+            if isinstance(w, (int, float)) and not isinstance(w, bool):
+                total += v * w
+    return total
+
+
+def average_dict_values(d: Dict[Any, Union[int, float]]) -> float:
+    """
+    Computes the arithmetic mean (average) of all numeric values in a dictionary.
+
+    Args:
+        d: Input dictionary.
+
+    Returns:
+        Mean average float, or 0.0 if empty/no valid numbers.
+
+    Example:
+        average_dict_values({"a": 10, "b": 20, "c": 30}) -> 20.0
+    """
+    nums = [v for v in d.values() if isinstance(v, (int, float)) and not isinstance(v, bool)]
+    if not nums:
+        return 0.0
+    return sum(nums) / len(nums)
+
+
+def summary_statistics_dict(d: Dict[Any, Union[int, float]]) -> Dict[str, Union[int, float]]:
+    """
+    Returns summary statistics for numeric values in a dictionary.
+
+    Args:
+        d: Input dictionary.
+
+    Returns:
+        Dictionary with keys: 'sum', 'count', 'mean', 'min', 'max'.
+
+    Example:
+        summary_statistics_dict({"a": 10, "b": 20, "c": 30})
+        -> {"sum": 60, "count": 3, "mean": 20.0, "min": 10, "max": 30}
+    """
+    nums = [v for v in d.values() if isinstance(v, (int, float)) and not isinstance(v, bool)]
+    if not nums:
+        return {"sum": 0, "count": 0, "mean": 0.0, "min": 0, "max": 0}
+
+    s = sum(nums)
+    return {
+        "sum": s,
+        "count": len(nums),
+        "mean": s / len(nums),
+        "min": min(nums),
+        "max": max(nums),
+    }
+
+
+
 
 
