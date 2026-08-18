@@ -210,3 +210,78 @@ def sum_values_above_threshold(d: Dict[Any, Union[int, float]], threshold: Union
     return sum(v for v in d.values() if isinstance(v, (int, float)) and not isinstance(v, bool) and v > threshold)
 
 
+# ─── 4. Recursive Nested Dictionary Summation ─────────────────────────────────
+
+
+def sum_nested_dict_values(d: Dict[Any, Any]) -> Union[int, float]:
+    """
+    Recursively sums all numeric values in an arbitrarily nested dictionary structure.
+
+    Args:
+        d: Input nested dictionary.
+
+    Returns:
+        Total sum of all nested numeric values.
+
+    Example:
+        nested = {"a": 10, "b": {"c": 20, "d": {"e": 30}}}
+        sum_nested_dict_values(nested) -> 60
+    """
+    total = 0
+    for v in d.values():
+        if isinstance(v, dict):
+            total += sum_nested_dict_values(v)
+        elif isinstance(v, (int, float)) and not isinstance(v, bool):
+            total += v
+    return total
+
+
+def sum_nested_dict_by_key(d: Dict[Any, Any], target_key: Any) -> Union[int, float]:
+    """
+    Recursively sums values associated with a specific `target_key` across a nested dictionary.
+
+    Args:
+        d: Input nested dictionary.
+        target_key: Key name to search and sum values for.
+
+    Returns:
+        Sum of values corresponding to target_key.
+
+    Example:
+        d = {"a": {"price": 10}, "b": {"price": 20, "tax": 5}}
+        sum_nested_dict_by_key(d, "price") -> 30
+    """
+    total = 0
+    for k, v in d.items():
+        if k == target_key and isinstance(v, (int, float)) and not isinstance(v, bool):
+            total += v
+        if isinstance(v, dict):
+            total += sum_nested_dict_by_key(v, target_key)
+    return total
+
+
+def sum_nested_dict_depth_weighted(d: Dict[Any, Any], current_depth: int = 1) -> float:
+    """
+    Sums values in a nested dictionary where values are multiplied by their nesting depth level.
+
+    Args:
+        d: Input nested dictionary.
+        current_depth: Current nesting depth level (starts at 1).
+
+    Returns:
+        Depth-weighted total sum.
+
+    Example:
+        d = {"a": 10, "b": {"c": 20}}  # 10*1 + 20*2 = 50
+        sum_nested_dict_depth_weighted(d) -> 50
+    """
+    total = 0.0
+    for v in d.values():
+        if isinstance(v, dict):
+            total += sum_nested_dict_depth_weighted(v, current_depth + 1)
+        elif isinstance(v, (int, float)) and not isinstance(v, bool):
+            total += v * current_depth
+    return total
+
+
+
