@@ -416,6 +416,53 @@ def summary_statistics_dict(d: Dict[Any, Union[int, float]]) -> Dict[str, Union[
     }
 
 
+# ─── 7. Functional Reduction & Cumulative Running Sums ───────────────────────
+
+
+def sum_dict_functools_reduce(d: Dict[Any, Union[int, float]]) -> Union[int, float]:
+    """
+    Computes total sum of dictionary values using `functools.reduce` and `operator.add`.
+
+    Args:
+        d: Input dictionary with numeric values.
+
+    Returns:
+        Total sum.
+
+    Example:
+        sum_dict_functools_reduce({"a": 10, "b": 20, "c": 30}) -> 60
+    """
+    nums = [v for v in d.values() if isinstance(v, (int, float)) and not isinstance(v, bool)]
+    if not nums:
+        return 0
+    return functools.reduce(operator.add, nums, 0)
+
+
+def running_sum_dict(d: Dict[Any, Union[int, float]]) -> Dict[Any, Union[int, float]]:
+    """
+    Computes a cumulative running sum dictionary where each key maps to the running total sum so far.
+
+    Args:
+        d: Input dictionary with numeric values.
+
+    Returns:
+        Dictionary mapping original keys to cumulative running sums.
+
+    Example:
+        running_sum_dict({"a": 10, "b": 20, "c": 30}) -> {"a": 10, "b": 30, "c": 60}
+    """
+    result = {}
+    current_total = 0
+    for k, v in d.items():
+        if isinstance(v, (int, float)) and not isinstance(v, bool):
+            current_total += v
+            result[k] = current_total
+        else:
+            result[k] = current_total
+    return result
+
+
+
 
 
 
