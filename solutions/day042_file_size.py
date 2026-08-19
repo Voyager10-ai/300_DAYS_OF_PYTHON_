@@ -273,3 +273,101 @@ def find_smallest_file(dir_path: Union[str, Path], recursive: bool = True) -> Op
     return smallest
 
 
+# ─── 4. Chunk-Based Streaming & File Comparison Utilities ────────────────────
+
+
+def count_bytes_by_streaming(file_path: Union[str, Path], chunk_size: int = 8192) -> int:
+    """
+    Calculates file size by physically reading byte chunks from disk.
+
+    Args:
+        file_path: Path to the file.
+        chunk_size: Size of chunk buffer in bytes (default 8KB).
+
+    Returns:
+        Total bytes read.
+
+    Example:
+        count_bytes_by_streaming("README.md") -> 1195
+    """
+    path = Path(file_path)
+    if not path.is_file():
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    total_bytes = 0
+    with open(path, "rb") as f:
+        while True:
+            chunk = f.read(chunk_size)
+            if not chunk:
+                break
+            total_bytes += len(chunk)
+    return total_bytes
+
+
+def count_line_and_char_byte_stats(file_path: Union[str, Path]) -> Dict[str, Union[int, float]]:
+    """
+    Returns detailed text file size statistics including bytes, chars, lines, and avg bytes per line.
+
+    Args:
+        file_path: Path to text file.
+
+    Returns:
+        Dict with keys: 'bytes', 'chars', 'lines', 'avg_bytes_per_line'.
+
+    Example:
+        count_line_and_char_byte_stats("README.md")
+    """
+    path = Path(file_path)
+    if not path.is_file():
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    total_bytes = path.stat().st_size
+    lines = 0
+    chars = 0
+    with open(path, "r", encoding="utf-8", errors="replace") as f:
+        for line in f:
+            lines += 1
+            chars += len(line)
+
+    avg_bytes = (total_bytes / lines) if lines > 0 else 0.0
+    return {
+        "bytes": total_bytes,
+        "chars": chars,
+        "lines": lines,
+        "avg_bytes_per_line": round(avg_bytes, 2),
+    }
+
+
+def compare_file_sizes(
+    file_path1: Union[str, Path], file_path2: Union[str, Path]
+) -> Dict[str, Any]:
+    """
+    Compares the size of two files.
+
+    Args:
+        file_path1: Path to first file.
+        file_path2: Path to second file.
+
+    Returns:
+        Dict with comparison statistics: 'size1', 'size2', 'difference', 'larger_file'.
+
+    Example:
+        compare_file_sizes("fileA.txt", "fileB.txt")
+    """
+    s1 = get_file_size_bytes(file_path1)
+    s2 = get_file_size_bytes(file_path2)
+
+    diff = abs(s1 - s2)
+    larger = (
+        str(file_path1) if s1 > s2 else (str(file_path2) if s2 > s1 else "equal")
+    )
+    return {
+        "size1": s1,
+        "size2": s2,
+        "difference_bytes": diff,
+        "larger_file": larger,
+        "ratio": round(s1 / s2, 2) if s2 > 0 else float("inf"),
+    }
+
+
+
