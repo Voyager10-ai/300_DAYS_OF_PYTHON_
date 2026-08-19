@@ -653,6 +653,68 @@ class TestFileSizeOperations(unittest.TestCase):
         self.assertGreaterEqual(pct, 0.0)
 
 
+# ─── 9. Interactive CLI Demo Runner ───────────────────────────────────────────
+
+
+def main():
+    print("=" * 60)
+    print(" 🐍 Day 42: File Size Analysis & Utilities - Comprehensive Demo")
+    print("=" * 60)
+
+    # 1. Project Directory Analysis
+    solutions_dir = Path("solutions")
+    if solutions_dir.exists():
+        total_b = get_directory_total_size(solutions_dir)
+        formatted = format_file_size(total_b)
+        print(f"\n1. 'solutions' Directory Total Size: {formatted} ({total_b:,} bytes)")
+
+        largest = find_largest_file(solutions_dir)
+        if largest:
+            print(f"   Largest File:  {Path(largest[0]).name} ({format_file_size(largest[1])})")
+
+        smallest = find_smallest_file(solutions_dir)
+        if smallest:
+            print(f"   Smallest File: {Path(smallest[0]).name} ({format_file_size(smallest[1])})")
+
+        print("\n2. Extension Breakdown in 'solutions':")
+        ext_breakdown = get_size_by_file_extension(solutions_dir)
+        for ext, sz in ext_breakdown.items():
+            print(f"   {ext:<10} : {format_file_size(sz)} ({sz:,} bytes)")
+
+        print("\n3. Size Distribution Bins:")
+        dist = get_file_size_distribution(solutions_dir)
+        for category, count in dist.items():
+            print(f"   {category:<15} : {count} file(s)")
+
+    # 2. Disk Usage Stats
+    print("\n4. Filesystem Disk Usage:")
+    disk = get_disk_usage_stats(".")
+    print(f"   Total Space: {disk['total_formatted']}")
+    print(f"   Used Space:  {disk['used_formatted']} ({disk['percent_used']}%)")
+    print(f"   Free Space:  {disk['free_formatted']}")
+
+    # 3. Temporary File Streaming Demo
+    with tempfile.NamedTemporaryFile(delete=False) as tmp:
+        tmp_path = tmp.name
+        create_dummy_file_with_size(tmp_path, 1024 * 512)  # 512 KB
+        streamed = count_bytes_by_streaming(tmp_path)
+        print(f"\n5. Temporary Dummy File Test (512 KB):")
+        print(f"   Formatted: {get_formatted_file_size(tmp_path)}")
+        print(f"   Streamed Byte Verification: {streamed:,} bytes")
+        safe_delete_file(tmp_path)
+
+    print("\n6. Running Unit Test Suite...")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestFileSizeOperations)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+    print("\nDemo completed successfully!")
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 

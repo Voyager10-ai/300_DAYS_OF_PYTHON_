@@ -688,21 +688,25 @@
 //         }
 //     }
 
-// Java Map Summation Practice (Day 41)
-// class MapSummationPractice {
-//     public static void main(String[] args) {
-//         Map<String, Double> prices = new HashMap<>();
-//         prices.put("apple", 1.50);
-//         prices.put("banana", 0.75);
-//         prices.put("cherry", 3.25);
-//
-//         // Sum values using Java 8 Stream API
-//         double totalSum = prices.values().stream().mapToDouble(Double::doubleValue).sum();
-//         System.out.println("Total Prices Sum: " + totalSum);
+// Java File Size Practice (Day 42)
+// import java.io.File;
+// import java.nio.file.Files;
+// import java.nio.file.Path;
+// import java.nio.file.Paths;
+// class FileSizePractice {
+//     public static void main(String[] args) throws Exception {
+//         File file = new File("README.md");
+//         if (file.exists()) {
+//             long bytesLegacy = file.length();
+//             long bytesNio = Files.size(Paths.get("README.md"));
+//             System.out.println("File size (File.length()): " + bytesLegacy + " bytes");
+//             System.out.println("File size (Files.size()):  " + bytesNio + " bytes");
+//         }
 //     }
 // }
 
 import java.util.*;
+
 
 public class main{
   public static void main(String[] args){
