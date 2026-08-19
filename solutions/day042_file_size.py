@@ -454,5 +454,69 @@ def get_file_size_distribution(
     return bins
 
 
+# ─── 6. Dummy File Creation & Size Integrity Validation ───────────────────────
+
+
+def create_dummy_file_with_size(file_path: Union[str, Path], target_size_bytes: int) -> str:
+    """
+    Creates a file with exact specified byte size for testing.
+
+    Args:
+        file_path: Destination file path.
+        target_size_bytes: Target byte size.
+
+    Returns:
+        Absolute string path to created file.
+
+    Example:
+        create_dummy_file_with_size("test_1024.dat", 1024)
+    """
+    path = Path(file_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "wb") as f:
+        f.seek(max(0, target_size_bytes - 1))
+        f.write(b"\0" if target_size_bytes > 0 else b"")
+    return str(path.resolve())
+
+
+def verify_file_size_integrity(file_path: Union[str, Path], expected_bytes: int) -> bool:
+    """
+    Verifies if a file exists and matches the exact expected size in bytes.
+
+    Args:
+        file_path: Path to the file.
+        expected_bytes: Expected byte count.
+
+    Returns:
+        True if file exists and size matches expected_bytes, False otherwise.
+
+    Example:
+        verify_file_size_integrity("README.md", 1195) -> True
+    """
+    try:
+        actual_size = get_file_size_bytes(file_path)
+        return actual_size == expected_bytes
+    except (FileNotFoundError, ValueError):
+        return False
+
+
+def safe_delete_file(file_path: Union[str, Path]) -> bool:
+    """
+    Safely deletes a file if it exists.
+
+    Args:
+        file_path: Path to file.
+
+    Returns:
+        True if file was deleted, False if file did not exist.
+    """
+    path = Path(file_path)
+    if path.is_file():
+        path.unlink()
+        return True
+    return False
+
+
+
 
 
