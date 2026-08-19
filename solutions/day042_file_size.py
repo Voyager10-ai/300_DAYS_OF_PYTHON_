@@ -517,6 +517,64 @@ def safe_delete_file(file_path: Union[str, Path]) -> bool:
     return False
 
 
+# ─── 7. Disk Usage & Partition Space Inspection ───────────────────────────────
+
+
+def get_disk_usage_stats(path: Union[str, Path] = ".") -> Dict[str, Union[int, str, float]]:
+    """
+    Returns disk usage statistics for the filesystem partition containing `path`.
+
+    Args:
+        path: Path in the filesystem (default current directory '.').
+
+    Returns:
+        Dict with keys: 'total_bytes', 'used_bytes', 'free_bytes', 'percent_used',
+                        'total_formatted', 'used_formatted', 'free_formatted'.
+
+    Example:
+        get_disk_usage_stats(".")
+    """
+    usage = shutil.disk_usage(path)
+    total = usage.total
+    used = usage.used
+    free = usage.free
+    pct = round((used / total * 100), 2) if total > 0 else 0.0
+
+    return {
+        "total_bytes": total,
+        "used_bytes": used,
+        "free_bytes": free,
+        "percent_used": pct,
+        "total_formatted": format_file_size(total),
+        "used_formatted": format_file_size(used),
+        "free_formatted": format_file_size(free),
+    }
+
+
+def get_file_size_percentage_of_disk(
+    file_path: Union[str, Path], disk_path: Union[str, Path] = "."
+) -> float:
+    """
+    Calculates percentage of total disk partition space occupied by a single file.
+
+    Args:
+        file_path: Path to target file.
+        disk_path: Disk partition path.
+
+    Returns:
+        Percentage float (0.0 to 100.0).
+
+    Example:
+        get_file_size_percentage_of_disk("README.md") -> 0.000002
+    """
+    file_size = get_file_size_bytes(file_path)
+    total_disk = shutil.disk_usage(disk_path).total
+    if total_disk == 0:
+        return 0.0
+    return round((file_size / total_disk) * 100, 6)
+
+
+
 
 
 
