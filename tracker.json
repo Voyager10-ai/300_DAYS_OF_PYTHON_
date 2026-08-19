@@ -1,6 +1,6 @@
 {
   "total_problems": 282,
-  "current_day": 41,
+  "current_day": 42,
   "problems": [
     {"day": 1, "title": "Print String", "status": "done"},
     {"day": 2, "title": "Input Age", "status": "done"},
@@ -49,7 +49,7 @@
 
     {"day": 40, "title": "Square Dictionary", "status": "done"},
     {"day": 41, "title": "Sum of All Items", "status": "done"},
-    {"day": 42, "title": "File Size", "status": "pending"},
+    {"day": 42, "title": "File Size", "status": "done"},
     {"day": 43, "title": "First N Lines", "status": "pending"},
     {"day": 44, "title": "Longest Word (File)", "status": "pending"},
     {"day": 45, "title": "Random Line", "status": "pending"},
