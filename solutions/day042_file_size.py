@@ -574,6 +574,86 @@ def get_file_size_percentage_of_disk(
     return round((file_size / total_disk) * 100, 6)
 
 
+# ─── 8. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestFileSizeOperations(unittest.TestCase):
+    def setUp(self):
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.temp_path = Path(self.temp_dir.name)
+
+        # Create dummy test files
+        self.file_100b = create_dummy_file_with_size(self.temp_path / "file100.txt", 100)
+        self.file_2000b = create_dummy_file_with_size(self.temp_path / "file2000.bin", 2000)
+        self.sub_dir = self.temp_path / "sub"
+        self.sub_dir.mkdir()
+        self.file_sub = create_dummy_file_with_size(self.sub_dir / "file_sub.py", 500)
+
+    def tearDown(self):
+        self.temp_dir.cleanup()
+
+    def test_get_file_size_and_format(self):
+        self.assertEqual(get_file_size_bytes(self.file_100b), 100)
+        self.assertEqual(format_file_size(0), "0 B")
+        self.assertEqual(format_file_size(500), "500 B")
+        self.assertEqual(format_file_size(1000), "1.00 KB")
+        self.assertEqual(format_file_size(1024, binary=True), "1.00 KiB")
+
+    def test_directory_size_and_breakdown(self):
+        # 100 + 2000 + 500 = 2600 bytes
+        total_size = get_directory_total_size(self.temp_path, recursive=True)
+        self.assertEqual(total_size, 2600)
+        breakdown = get_directory_size_breakdown(self.temp_path)
+        self.assertIn("file100.txt", breakdown)
+        self.assertEqual(breakdown["file100.txt"], 100)
+        self.assertIn("sub", breakdown)
+        self.assertEqual(breakdown["sub"], 500)
+
+    def test_filtering_and_search(self):
+        files_over_1k = filter_files_by_size(self.temp_path, min_bytes=1000)
+        self.assertEqual(len(files_over_1k), 1)
+        self.assertTrue(files_over_1k[0].endswith("file2000.bin"))
+
+        largest = find_largest_file(self.temp_path)
+        self.assertIsNotNone(largest)
+        self.assertEqual(largest[1], 2000)
+
+        smallest = find_smallest_file(self.temp_path)
+        self.assertIsNotNone(smallest)
+        self.assertEqual(smallest[1], 100)
+
+    def test_streaming_and_comparison(self):
+        streamed_bytes = count_bytes_by_streaming(self.file_2000b, chunk_size=256)
+        self.assertEqual(streamed_bytes, 2000)
+
+        comp = compare_file_sizes(self.file_2000b, self.file_100b)
+        self.assertEqual(comp["size1"], 2000)
+        self.assertEqual(comp["size2"], 100)
+        self.assertEqual(comp["difference_bytes"], 1900)
+
+    def test_extension_and_distribution(self):
+        ext_sizes = get_size_by_file_extension(self.temp_path)
+        self.assertEqual(ext_sizes[".txt"], 100)
+        self.assertEqual(ext_sizes[".bin"], 2000)
+        self.assertEqual(ext_sizes[".py"], 500)
+
+        dist = get_file_size_distribution(self.temp_path)
+        self.assertEqual(dist["< 1 KB"], 2)  # 100b and 500b
+        self.assertEqual(dist["1 KB - 100 KB"], 1)  # 2000b
+
+    def test_integrity_and_disk_usage(self):
+        self.assertTrue(verify_file_size_integrity(self.file_100b, 100))
+        self.assertFalse(verify_file_size_integrity(self.file_100b, 999))
+
+        disk_stats = get_disk_usage_stats(".")
+        self.assertIn("total_bytes", disk_stats)
+        self.assertGreater(disk_stats["total_bytes"], 0)
+
+        pct = get_file_size_percentage_of_disk(self.file_100b)
+        self.assertGreaterEqual(pct, 0.0)
+
+
+
 
 
 
