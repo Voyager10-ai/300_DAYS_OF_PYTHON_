@@ -370,4 +370,89 @@ def compare_file_sizes(
     }
 
 
+# ─── 5. Extension Breakdown & Size Statistics ─────────────────────────────────
+
+
+def get_size_by_file_extension(
+    dir_path: Union[str, Path], recursive: bool = True
+) -> Dict[str, int]:
+    """
+    Groups total accumulated file size by extension (e.g. '.py', '.txt', '.java').
+
+    Args:
+        dir_path: Directory path.
+        recursive: If True, scans recursively.
+
+    Returns:
+        Dict mapping extension (e.g. '.py') to total size in bytes.
+
+    Example:
+        get_size_by_file_extension("solutions") -> {".py": 450123}
+    """
+    path = Path(dir_path)
+    if not path.exists() or not path.is_dir():
+        raise ValueError(f"Invalid directory path: {dir_path}")
+
+    pattern = "**/*" if recursive else "*"
+    ext_sizes: Dict[str, int] = {}
+    for item in path.glob(pattern):
+        if item.is_file() and not item.is_symlink():
+            ext = item.suffix.lower() if item.suffix else "no_extension"
+            ext_sizes[ext] = ext_sizes.get(ext, 0) + item.stat().st_size
+    return ext_sizes
+
+
+def get_file_size_distribution(
+    dir_path: Union[str, Path], recursive: bool = True
+) -> Dict[str, int]:
+    """
+    Categorizes files in a directory into standard size bins.
+
+    Bins:
+        '< 1 KB'
+        '1 KB - 100 KB'
+        '100 KB - 1 MB'
+        '1 MB - 10 MB'
+        '> 10 MB'
+
+    Args:
+        dir_path: Directory path.
+        recursive: If True, scans recursively.
+
+    Returns:
+        Dict mapping category name to count of matching files.
+
+    Example:
+        get_file_size_distribution("solutions")
+    """
+    path = Path(dir_path)
+    if not path.exists() or not path.is_dir():
+        raise ValueError(f"Invalid directory path: {dir_path}")
+
+    bins = {
+        "< 1 KB": 0,
+        "1 KB - 100 KB": 0,
+        "100 KB - 1 MB": 0,
+        "1 MB - 10 MB": 0,
+        "> 10 MB": 0,
+    }
+
+    pattern = "**/*" if recursive else "*"
+    for item in path.glob(pattern):
+        if item.is_file() and not item.is_symlink():
+            size = item.stat().st_size
+            if size < 1024:
+                bins["< 1 KB"] += 1
+            elif size < 100 * 1024:
+                bins["1 KB - 100 KB"] += 1
+            elif size < 1024 * 1024:
+                bins["100 KB - 1 MB"] += 1
+            elif size < 10 * 1024 * 1024:
+                bins["1 MB - 10 MB"] += 1
+            else:
+                bins["> 10 MB"] += 1
+    return bins
+
+
+
 
