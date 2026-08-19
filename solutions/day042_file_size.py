@@ -96,3 +96,82 @@ def get_formatted_file_size(
     """
     bytes_size = get_file_size_bytes(file_path)
     return format_file_size(bytes_size, binary=binary, decimal_places=decimal_places)
+
+
+# ─── 2. Multi-File & Directory Size Calculations ──────────────────────────────
+
+
+def get_directory_total_size(dir_path: Union[str, Path], recursive: bool = True) -> int:
+    """
+    Calculates total size in bytes of all files in a directory.
+
+    Args:
+        dir_path: Path to the directory.
+        recursive: If True, recursively scans subdirectories.
+
+    Returns:
+        Total size in bytes.
+
+    Example:
+        get_directory_total_size("solutions") -> 450123
+    """
+    path = Path(dir_path)
+    if not path.exists():
+        raise FileNotFoundError(f"Directory not found: {dir_path}")
+    if not path.is_dir():
+        raise ValueError(f"Path is not a directory: {dir_path}")
+
+    total = 0
+    pattern = "**/*" if recursive else "*"
+    for item in path.glob(pattern):
+        if item.is_file() and not item.is_symlink():
+            total += item.stat().st_size
+    return total
+
+
+def get_files_total_size(file_paths: List[Union[str, Path]]) -> int:
+    """
+    Calculates the aggregate size of a list of file paths.
+
+    Args:
+        file_paths: List of file paths.
+
+    Returns:
+        Combined total size in bytes.
+
+    Example:
+        get_files_total_size(["file1.txt", "file2.txt"]) -> 2048
+    """
+    total = 0
+    for file_p in file_paths:
+        p = Path(file_p)
+        if p.is_file():
+            total += p.stat().st_size
+    return total
+
+
+def get_directory_size_breakdown(dir_path: Union[str, Path]) -> Dict[str, int]:
+    """
+    Returns a dictionary mapping immediate subfolder and file names in a directory to their byte sizes.
+
+    Args:
+        dir_path: Path to directory.
+
+    Returns:
+        Dictionary {item_name: size_in_bytes}.
+
+    Example:
+        get_directory_size_breakdown(".") -> {"README.md": 1195, "solutions": 450123}
+    """
+    path = Path(dir_path)
+    if not path.exists() or not path.is_dir():
+        raise ValueError(f"Invalid directory path: {dir_path}")
+
+    breakdown = {}
+    for item in path.iterdir():
+        if item.is_file() and not item.is_symlink():
+            breakdown[item.name] = item.stat().st_size
+        elif item.is_dir() and not item.is_symlink():
+            breakdown[item.name] = get_directory_total_size(item, recursive=True)
+    return breakdown
+
