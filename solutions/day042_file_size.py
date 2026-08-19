@@ -175,3 +175,101 @@ def get_directory_size_breakdown(dir_path: Union[str, Path]) -> Dict[str, int]:
             breakdown[item.name] = get_directory_total_size(item, recursive=True)
     return breakdown
 
+
+# ─── 3. File Size Filtering & Search Functions ────────────────────────────────
+
+
+def filter_files_by_size(
+    dir_path: Union[str, Path],
+    min_bytes: Optional[int] = None,
+    max_bytes: Optional[int] = None,
+    recursive: bool = True,
+) -> List[str]:
+    """
+    Filters files in a directory matching specified byte size boundaries [min_bytes, max_bytes].
+
+    Args:
+        dir_path: Directory to search.
+        min_bytes: Minimum size in bytes (inclusive), if any.
+        max_bytes: Maximum size in bytes (inclusive), if any.
+        recursive: If True, searches subdirectories.
+
+    Returns:
+        List of matching file path strings.
+
+    Example:
+        filter_files_by_size("solutions", min_bytes=10000, max_bytes=20000)
+    """
+    path = Path(dir_path)
+    if not path.exists() or not path.is_dir():
+        raise ValueError(f"Invalid directory path: {dir_path}")
+
+    pattern = "**/*" if recursive else "*"
+    matched = []
+    for item in path.glob(pattern):
+        if item.is_file() and not item.is_symlink():
+            size = item.stat().st_size
+            if min_bytes is not None and size < min_bytes:
+                continue
+            if max_bytes is not None and size > max_bytes:
+                continue
+            matched.append(str(item))
+    return matched
+
+
+def find_largest_file(dir_path: Union[str, Path], recursive: bool = True) -> Optional[Tuple[str, int]]:
+    """
+    Finds the largest file in a directory.
+
+    Args:
+        dir_path: Directory path.
+        recursive: If True, scans recursively.
+
+    Returns:
+        Tuple of (file_path_str, size_in_bytes) or None if directory is empty.
+
+    Example:
+        find_largest_file("solutions") -> ("solutions/day029_html_tag.py", 26065)
+    """
+    path = Path(dir_path)
+    if not path.exists() or not path.is_dir():
+        return None
+
+    pattern = "**/*" if recursive else "*"
+    largest: Optional[Tuple[str, int]] = None
+    for item in path.glob(pattern):
+        if item.is_file() and not item.is_symlink():
+            size = item.stat().st_size
+            if largest is None or size > largest[1]:
+                largest = (str(item), size)
+    return largest
+
+
+def find_smallest_file(dir_path: Union[str, Path], recursive: bool = True) -> Optional[Tuple[str, int]]:
+    """
+    Finds the smallest file in a directory.
+
+    Args:
+        dir_path: Directory path.
+        recursive: If True, scans recursively.
+
+    Returns:
+        Tuple of (file_path_str, size_in_bytes) or None if directory is empty.
+
+    Example:
+        find_smallest_file("solutions") -> ("solutions/day031_remove_nth_character.py", 378)
+    """
+    path = Path(dir_path)
+    if not path.exists() or not path.is_dir():
+        return None
+
+    pattern = "**/*" if recursive else "*"
+    smallest: Optional[Tuple[str, int]] = None
+    for item in path.glob(pattern):
+        if item.is_file() and not item.is_symlink():
+            size = item.stat().st_size
+            if smallest is None or size < smallest[1]:
+                smallest = (str(item), size)
+    return smallest
+
+
