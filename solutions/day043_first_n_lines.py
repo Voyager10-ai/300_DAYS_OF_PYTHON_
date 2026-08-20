@@ -276,3 +276,66 @@ def read_first_n_matching_lines(
     return matching_lines
 
 
+# ─── 4. Multi-File Operations & Directory Head Previews ───────────────────────
+
+
+def read_first_n_lines_multiple_files(
+    file_paths: List[Union[str, Path]],
+    n: int,
+    encoding: str = "utf-8",
+) -> Dict[str, List[str]]:
+    """
+    Reads the first n lines from multiple files and returns a dictionary mapping file path strings to line lists.
+
+    Args:
+        file_paths: List of file paths to process.
+        n: Number of lines per file.
+        encoding: File encoding.
+
+    Returns:
+        Dict mapping filename/path to first n lines.
+    """
+    results: Dict[str, List[str]] = {}
+    for fp in file_paths:
+        path = Path(fp)
+        if path.exists() and path.is_file():
+            results[str(path)] = read_first_n_lines(path, n, encoding=encoding)
+    return results
+
+
+def preview_directory_files_head(
+    directory_path: Union[str, Path],
+    n: int = 5,
+    file_extension: Optional[str] = None,
+    encoding: str = "utf-8",
+) -> Dict[str, List[str]]:
+    """
+    Scans a directory and returns the first n lines of files, optionally filtering by extension.
+
+    Args:
+        directory_path: Target directory to scan.
+        n: Number of lines to preview per file.
+        file_extension: Optional file extension filter (e.g. '.py', '.txt').
+        encoding: File encoding.
+
+    Returns:
+        Dict mapping file names to line lists.
+    """
+    dir_path = Path(directory_path)
+    if not dir_path.exists() or not dir_path.is_dir():
+        raise NotADirectoryError(f"Directory not found or invalid: {directory_path}")
+
+    previews: Dict[str, List[str]] = {}
+    for entry in sorted(dir_path.iterdir()):
+        if entry.is_file():
+            if file_extension and not entry.name.endswith(file_extension):
+                continue
+            try:
+                previews[entry.name] = read_first_n_lines(entry, n, encoding=encoding)
+            except Exception:
+                continue
+
+    return previews
+
+
+
