@@ -338,4 +338,113 @@ def preview_directory_files_head(
     return previews
 
 
+# ─── 5. Line Slicing, Header Skipping & File Tail ─────────────────────────────
+
+
+def read_line_range(
+    file_path: Union[str, Path],
+    start_line: int,
+    end_line: int,
+    encoding: str = "utf-8",
+) -> List[str]:
+    """
+    Reads lines from index start_line to end_line (1-indexed, inclusive).
+
+    Args:
+        file_path: Path to file.
+        start_line: Starting line number (1-based, >= 1).
+        end_line: Ending line number (1-based, >= start_line).
+        encoding: File encoding.
+
+    Returns:
+        List of line strings within the range.
+
+    Raises:
+        ValueError: If line ranges are invalid.
+    """
+    if start_line < 1:
+        raise ValueError(f"start_line must be >= 1, got {start_line}.")
+    if end_line < start_line:
+        raise ValueError(
+            f"end_line ({end_line}) must be >= start_line ({start_line})."
+        )
+
+    path = Path(file_path)
+    if not path.exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    selected: List[str] = []
+    with open(path, "r", encoding=encoding, errors="replace") as f:
+        for current_idx, line in enumerate(f, start=1):
+            if current_idx > end_line:
+                break
+            if current_idx >= start_line:
+                selected.append(line.rstrip("\r\n"))
+
+    return selected
+
+
+def skip_header_and_read_n_lines(
+    file_path: Union[str, Path],
+    header_lines: int,
+    n: int,
+    encoding: str = "utf-8",
+) -> List[str]:
+    """
+    Skips a designated number of header lines, then reads the next n lines.
+
+    Args:
+        file_path: Path to the file.
+        header_lines: Number of header lines to skip (>= 0).
+        n: Number of data lines to read (>= 0).
+        encoding: File encoding.
+
+    Returns:
+        List of n lines after header.
+    """
+    if header_lines < 0 or n < 0:
+        raise ValueError("header_lines and n must be non-negative.")
+
+    return read_line_range(
+        file_path,
+        start_line=header_lines + 1,
+        end_line=header_lines + n,
+        encoding=encoding,
+    )
+
+
+def read_last_n_lines(
+    file_path: Union[str, Path],
+    n: int,
+    encoding: str = "utf-8",
+) -> List[str]:
+    """
+    Reads the last n lines of a file (emulates Unix `tail`).
+
+    Args:
+        file_path: Path to the file.
+        n: Number of lines from the end to read.
+        encoding: File encoding.
+
+    Returns:
+        List of last n line strings.
+    """
+    if n < 0:
+        raise ValueError(f"n must be non-negative, got {n}.")
+    if n == 0:
+        return []
+
+    path = Path(file_path)
+    if not path.exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    from collections import deque
+
+    with open(path, "r", encoding=encoding, errors="replace") as f:
+        last_lines = deque(f, maxlen=n)
+
+    return [line.rstrip("\r\n") for line in last_lines]
+
+
+
 
