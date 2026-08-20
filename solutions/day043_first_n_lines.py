@@ -196,3 +196,83 @@ def stream_lines_batch(
         if current_batch:
             yield current_batch
 
+
+# ─── 3. Head-like Formatting & Predicate Filtering ─────────────────────────────
+
+
+def head_file(
+    file_path: Union[str, Path],
+    n: int = 10,
+    include_line_numbers: bool = False,
+    strip_trailing_whitespace: bool = False,
+    encoding: str = "utf-8",
+) -> List[str]:
+    """
+    Emulates the Unix `head` command by formatting the first n lines of a file.
+
+    Args:
+        file_path: Path to file.
+        n: Number of lines to preview (default: 10).
+        include_line_numbers: If True, prefixes lines with '  1: ', '  2: ', etc.
+        strip_trailing_whitespace: If True, strips trailing whitespace on each line.
+        encoding: File encoding.
+
+    Returns:
+        List of formatted lines.
+    """
+    raw_lines = read_first_n_lines(file_path, n, encoding=encoding, strip_newline=True)
+    result: List[str] = []
+
+    for idx, line in enumerate(raw_lines, start=1):
+        formatted_line = line.rstrip() if strip_trailing_whitespace else line
+        if include_line_numbers:
+            formatted_line = f"{idx:4d}: {formatted_line}"
+        result.append(formatted_line)
+
+    return result
+
+
+def read_first_n_matching_lines(
+    file_path: Union[str, Path],
+    n: int,
+    predicate: Callable[[str], bool],
+    encoding: str = "utf-8",
+) -> List[str]:
+    """
+    Reads the first n lines from a file that satisfy a given filter condition (predicate).
+
+    Args:
+        file_path: Path to the file.
+        n: Target number of matching lines to return.
+        predicate: Callable taking a line string and returning True if line matches.
+        encoding: File encoding.
+
+    Returns:
+        List of matching line strings.
+
+    Example:
+        >>> read_first_n_matching_lines("log.txt", 3, lambda line: "ERROR" in line)
+        ['ERROR: Out of memory', 'ERROR: Connection failed', 'ERROR: Timeout']
+    """
+    if n < 0:
+        raise ValueError(f"n must be non-negative, got {n}.")
+
+    path = Path(file_path)
+    if not path.exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    matching_lines: List[str] = []
+    if n == 0:
+        return matching_lines
+
+    with open(path, "r", encoding=encoding, errors="replace") as f:
+        for line in f:
+            clean_line = line.rstrip("\r\n")
+            if predicate(clean_line):
+                matching_lines.append(clean_line)
+                if len(matching_lines) == n:
+                    break
+
+    return matching_lines
+
+
