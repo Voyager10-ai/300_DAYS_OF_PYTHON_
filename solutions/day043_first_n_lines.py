@@ -534,6 +534,70 @@ def safe_delete_file(file_path: Union[str, Path]) -> bool:
         return False
 
 
+# ─── 7. Safe File Opening & Encoding Fallbacks ────────────────────────────────
+
+
+def inspect_file_head_bytes(
+    file_path: Union[str, Path],
+    max_bytes: int = 1024,
+) -> bytes:
+    """
+    Reads raw bytes from the beginning of a file up to max_bytes.
+
+    Args:
+        file_path: Path to file.
+        max_bytes: Maximum byte count to read.
+
+    Returns:
+        Bytes object.
+    """
+    path = Path(file_path)
+    if not path.exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    with open(path, "rb") as f:
+        return f.read(max_bytes)
+
+
+def safe_read_first_n_lines(
+    file_path: Union[str, Path],
+    n: int,
+    encodings: Optional[List[str]] = None,
+) -> Tuple[List[str], str]:
+    """
+    Attempts to read the first n lines using a series of candidate text encodings.
+
+    Args:
+        file_path: Path to the target file.
+        n: Number of lines to read.
+        encodings: Candidate encoding names (default: ['utf-8', 'latin-1', 'cp1252']).
+
+    Returns:
+        Tuple of (List of line strings, successfully used encoding string).
+
+    Raises:
+        UnicodeDecodeError: If all candidate encodings fail.
+    """
+    if encodings is None:
+        encodings = ["utf-8", "latin-1", "cp1252", "ascii"]
+
+    path = Path(file_path)
+    if not path.exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    for enc in encodings:
+        try:
+            lines = read_first_n_lines(path, n, encoding=enc, strip_newline=True)
+            return lines, enc
+        except (UnicodeDecodeError, UnicodeError):
+            continue
+
+    # Fallback with error replacement
+    lines = read_first_n_lines(path, n, encoding="utf-8", strip_newline=True)
+    return lines, "utf-8 (replace)"
+
+
+
 
 
 
