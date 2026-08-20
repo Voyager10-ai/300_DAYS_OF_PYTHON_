@@ -446,5 +446,94 @@ def read_last_n_lines(
     return [line.rstrip("\r\n") for line in last_lines]
 
 
+# ─── 6. Dummy File Generation & File Helpers ─────────────────────────────────
+
+
+def create_dummy_file_with_lines(
+    file_path: Union[str, Path],
+    lines_content: List[str],
+    encoding: str = "utf-8",
+) -> Path:
+    """
+    Creates a text file containing specified line contents for testing/demonstration.
+
+    Args:
+        file_path: Destination path.
+        lines_content: List of string lines to write.
+        encoding: File encoding.
+
+    Returns:
+        Path object to created file.
+    """
+    path = Path(file_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", encoding=encoding) as f:
+        for line in lines_content:
+            f.write(f"{line}\n")
+    return path
+
+
+def create_sample_file_with_n_generated_lines(
+    file_path: Union[str, Path],
+    count: int,
+    prefix: str = "Sample Line",
+) -> Path:
+    """
+    Generates a sample file with 'count' sequentially numbered lines.
+
+    Args:
+        file_path: Destination path.
+        count: Number of lines to generate.
+        prefix: Line text prefix.
+
+    Returns:
+        Path object to created file.
+    """
+    lines = [f"{prefix} #{i + 1}" for i in range(count)]
+    return create_dummy_file_with_lines(file_path, lines)
+
+
+def validate_file_line_count(
+    file_path: Union[str, Path],
+    expected_count: int,
+) -> bool:
+    """
+    Validates whether a file contains exactly the expected line count.
+
+    Args:
+        file_path: Path to the file.
+        expected_count: Expected number of lines.
+
+    Returns:
+        True if line count matches expected_count, False otherwise.
+    """
+    try:
+        actual = get_line_count(file_path)
+        return actual == expected_count
+    except (FileNotFoundError, IsADirectoryError):
+        return False
+
+
+def safe_delete_file(file_path: Union[str, Path]) -> bool:
+    """
+    Safely deletes a file if it exists.
+
+    Args:
+        file_path: Path to the file.
+
+    Returns:
+        True if deleted, False if file did not exist or failed to delete.
+    """
+    try:
+        path = Path(file_path)
+        if path.exists() and path.is_file():
+            path.unlink()
+            return True
+        return False
+    except OSError:
+        return False
+
+
+
 
 
