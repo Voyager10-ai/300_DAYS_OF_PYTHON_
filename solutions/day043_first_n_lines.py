@@ -597,6 +597,102 @@ def safe_read_first_n_lines(
     return lines, "utf-8 (replace)"
 
 
+# ─── 8. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestFirstNLinesOperations(unittest.TestCase):
+    """Unit test suite for Day 43 First N Lines operations."""
+
+    def setUp(self):
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.dir_path = Path(self.temp_dir.name)
+
+        # Create test files
+        self.file_10_lines = self.dir_path / "10_lines.txt"
+        create_sample_file_with_n_generated_lines(self.file_10_lines, 10, prefix="Row")
+
+        self.file_empty = self.dir_path / "empty.txt"
+        create_dummy_file_with_lines(self.file_empty, [])
+
+        self.file_logs = self.dir_path / "logs.txt"
+        create_dummy_file_with_lines(
+            self.file_logs,
+            [
+                "INFO: System boot",
+                "DEBUG: Checking memory",
+                "ERROR: Disk space low",
+                "INFO: User logged in",
+                "ERROR: Network timeout",
+                "ERROR: Database crash",
+            ],
+        )
+
+    def tearDown(self):
+        self.temp_dir.cleanup()
+
+    def test_read_first_n_lines(self):
+        lines = read_first_n_lines(self.file_10_lines, 3)
+        self.assertEqual(len(lines), 3)
+        self.assertEqual(lines, ["Row #1", "Row #2", "Row #3"])
+
+    def test_read_n_larger_than_total(self):
+        lines = read_first_n_lines(self.file_10_lines, 50)
+        self.assertEqual(len(lines), 10)
+
+    def test_read_zero_lines(self):
+        lines = read_first_n_lines(self.file_10_lines, 0)
+        self.assertEqual(lines, [])
+
+    def test_negative_n_raises_value_error(self):
+        with self.assertRaises(ValueError):
+            read_first_n_lines(self.file_10_lines, -5)
+
+    def test_nonexistent_file_raises_error(self):
+        with self.assertRaises(FileNotFoundError):
+            read_first_n_lines(self.dir_path / "nonexistent.txt", 5)
+
+    def test_read_first_n_lines_as_text(self):
+        text = read_first_n_lines_as_text(self.file_10_lines, 2)
+        self.assertEqual(text, "Row #1\nRow #2\n")
+
+    def test_stream_first_n_lines(self):
+        streamed = list(stream_first_n_lines(self.file_10_lines, 4))
+        self.assertEqual(streamed, ["Row #1", "Row #2", "Row #3", "Row #4"])
+
+    def test_head_file_formatting(self):
+        formatted = head_file(self.file_10_lines, n=2, include_line_numbers=True)
+        self.assertEqual(formatted, ["   1: Row #1", "   2: Row #2"])
+
+    def test_read_first_n_matching_lines(self):
+        errors = read_first_n_matching_lines(
+            self.file_logs, n=2, predicate=lambda line: "ERROR" in line
+        )
+        self.assertEqual(len(errors), 2)
+        self.assertEqual(errors, ["ERROR: Disk space low", "ERROR: Network timeout"])
+
+    def test_read_line_range(self):
+        slice_lines = read_line_range(self.file_10_lines, start_line=3, end_line=5)
+        self.assertEqual(slice_lines, ["Row #3", "Row #4", "Row #5"])
+
+    def test_skip_header_and_read_n_lines(self):
+        data = skip_header_and_read_n_lines(self.file_10_lines, header_lines=2, n=3)
+        self.assertEqual(data, ["Row #3", "Row #4", "Row #5"])
+
+    def test_read_last_n_lines(self):
+        tail = read_last_n_lines(self.file_10_lines, 3)
+        self.assertEqual(tail, ["Row #8", "Row #9", "Row #10"])
+
+    def test_validate_file_line_count(self):
+        self.assertTrue(validate_file_line_count(self.file_10_lines, 10))
+        self.assertFalse(validate_file_line_count(self.file_10_lines, 5))
+
+    def test_safe_read_first_n_lines(self):
+        lines, enc = safe_read_first_n_lines(self.file_10_lines, 2)
+        self.assertEqual(len(lines), 2)
+        self.assertEqual(enc, "utf-8")
+
+
+
 
 
 
