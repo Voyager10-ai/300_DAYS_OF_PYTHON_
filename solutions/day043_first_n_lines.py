@@ -113,3 +113,86 @@ def get_line_count(file_path: Union[str, Path], encoding: str = "utf-8") -> int:
         for _ in f:
             count += 1
     return count
+
+
+# ─── 2. Memory-Efficient Streaming & Generator Iterators ───────────────────────
+
+
+def stream_first_n_lines(
+    file_path: Union[str, Path],
+    n: int,
+    encoding: str = "utf-8",
+    strip_newline: bool = True,
+) -> Iterator[str]:
+    """
+    Yields lines one-by-one from a file up to n lines without loading the full file into memory.
+
+    Args:
+        file_path: Path to the target file.
+        n: Maximum number of lines to stream.
+        encoding: Text encoding.
+        strip_newline: If True, strips trailing newline characters.
+
+    Yields:
+        Line strings incrementally.
+
+    Raises:
+        ValueError: If n < 0.
+        FileNotFoundError: If file is missing.
+    """
+    if n < 0:
+        raise ValueError(f"Number of lines 'n' must be non-negative, got {n}.")
+
+    path = Path(file_path)
+    if not path.exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    if n == 0:
+        return
+
+    with open(path, "r", encoding=encoding, errors="replace") as f:
+        for count, line in enumerate(f):
+            if count >= n:
+                break
+            yield line.rstrip("\r\n") if strip_newline else line
+
+
+def stream_lines_batch(
+    file_path: Union[str, Path],
+    batch_size: int = 10,
+    max_batches: Optional[int] = None,
+    encoding: str = "utf-8",
+) -> Iterator[List[str]]:
+    """
+    Yields lines in batches (chunks of lines) up to an optional maximum number of batches.
+
+    Args:
+        file_path: Path to the file.
+        batch_size: Size of each batch of lines. Must be > 0.
+        max_batches: Optional ceiling on the number of batches to yield.
+        encoding: Text encoding.
+
+    Yields:
+        Lists of line strings.
+    """
+    if batch_size <= 0:
+        raise ValueError(f"batch_size must be positive, got {batch_size}.")
+
+    path = Path(file_path)
+    if not path.exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    batch_count = 0
+    with open(path, "r", encoding=encoding, errors="replace") as f:
+        current_batch: List[str] = []
+        for line in f:
+            current_batch.append(line.rstrip("\r\n"))
+            if len(current_batch) == batch_size:
+                yield current_batch
+                batch_count += 1
+                current_batch = []
+                if max_batches is not None and batch_count >= max_batches:
+                    return
+        if current_batch:
+            yield current_batch
+
