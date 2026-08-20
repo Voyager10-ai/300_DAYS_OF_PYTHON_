@@ -45,6 +45,7 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 40: Square Dictionary
 - Day 41: Sum of All Items
 - Day 42: File Size
+- Day 43: First N Lines
 
 
 
