@@ -692,6 +692,60 @@ class TestFirstNLinesOperations(unittest.TestCase):
         self.assertEqual(enc, "utf-8")
 
 
+# ─── 9. Interactive CLI Demo Runner ───────────────────────────────────────────
+
+
+def main():
+    print("=" * 60)
+    print(" 📖 Day 43: First N Lines File Reader - Interactive Demo")
+    print("=" * 60)
+
+    # 1. Previewing README.md
+    readme_path = Path("README.md")
+    if readme_path.exists():
+        print(f"\n1. First 5 Lines of README.md:")
+        lines = head_file(readme_path, n=5, include_line_numbers=True)
+        for line in lines:
+            print(f"   {line}")
+
+        total_lines = get_line_count(readme_path)
+        print(f"   (Total line count in README.md: {total_lines})")
+
+    # 2. Demonstration with Temporary File
+    print("\n2. Generator Streaming & Range Slicing Demo:")
+    with tempfile.NamedTemporaryFile(mode="w+", delete=False, suffix=".txt") as tmp:
+        tmp_path = tmp.name
+        create_sample_file_with_n_generated_lines(tmp_path, 20, prefix="Log Entry")
+
+        print("   Streamed First 3 Lines:")
+        for entry in stream_first_n_lines(tmp_path, 3):
+            print(f"     -> {entry}")
+
+        print("   Range Slice (Lines 8 to 12):")
+        sliced = read_line_range(tmp_path, start_line=8, end_line=12)
+        for s in sliced:
+            print(f"     [Slice] {s}")
+
+        print("   Skipping Header (Skip 15, Read 3):")
+        skipped = skip_header_and_read_n_lines(tmp_path, header_lines=15, n=3)
+        for sk in skipped:
+            print(f"     [Header Skipped] {sk}")
+
+        safe_delete_file(tmp_path)
+
+    # 3. Unit Test Execution
+    print("\n3. Executing Unit Test Suite:")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestFirstNLinesOperations)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+    print("\nDemo execution complete!")
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 

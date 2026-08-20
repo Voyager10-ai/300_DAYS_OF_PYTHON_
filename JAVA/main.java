@@ -705,7 +705,25 @@
 //     }
 // }
 
+// Java First N Lines Practice (Day 43)
+// import java.io.BufferedReader;
+// import java.io.FileReader;
+// import java.nio.file.Files;
+// import java.nio.file.Paths;
+// import java.util.List;
+// class FirstNLinesPractice {
+//     public static void main(String[] args) throws Exception {
+//         String filePath = "README.md";
+//         int n = 5;
+//         System.out.println("--- Reading First " + n + " Lines via Files.lines() ---");
+//         try (var lines = Files.lines(Paths.get(filePath)).limit(n)) {
+//             lines.forEach(System.out::println);
+//         }
+//     }
+// }
+
 import java.util.*;
+
 
 
 public class main{
