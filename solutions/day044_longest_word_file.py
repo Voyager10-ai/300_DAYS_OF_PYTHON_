@@ -438,4 +438,70 @@ def filter_words_by_length_range(
     return sorted(matching_words, key=lambda w: (-len(w), w.lower()))
 
 
+# ─── 5. Multi-File & Directory Longest Word Analysis ──────────────────────────
+
+
+def find_longest_words_across_files(
+    file_paths: List[Union[str, Path]],
+    encoding: str = "utf-8",
+) -> Dict[str, Optional[str]]:
+    """
+    Finds the longest word in each file from a list of file paths.
+
+    Args:
+        file_paths: List of target file paths.
+        encoding: File encoding.
+
+    Returns:
+        Dict mapping file path string -> longest word found.
+    """
+    results: Dict[str, Optional[str]] = {}
+    for fp in file_paths:
+        p = Path(fp)
+        if p.exists() and p.is_file():
+            results[str(p)] = find_longest_word_in_file(p, encoding=encoding)
+    return results
+
+
+def find_overall_longest_word_in_directory(
+    directory_path: Union[str, Path],
+    file_extension: Optional[str] = None,
+    encoding: str = "utf-8",
+) -> Tuple[Optional[str], Optional[str], int]:
+    """
+    Scans a directory to find the overall longest word across all matching files.
+
+    Args:
+        directory_path: Path to directory.
+        file_extension: Optional extension filter (e.g., '.py', '.txt').
+        encoding: File encoding.
+
+    Returns:
+        Tuple of (longest_word, source_file_path, length).
+    """
+    dir_path = Path(directory_path)
+    if not dir_path.exists() or not dir_path.is_dir():
+        raise NotADirectoryError(f"Invalid directory path: {directory_path}")
+
+    overall_longest: Optional[str] = None
+    source_file: Optional[str] = None
+    max_len = 0
+
+    for entry in dir_path.iterdir():
+        if entry.is_file():
+            if file_extension and not entry.name.endswith(file_extension):
+                continue
+            try:
+                word = find_longest_word_in_file(entry, encoding=encoding)
+                if word and len(word) > max_len:
+                    max_len = len(word)
+                    overall_longest = word
+                    source_file = entry.name
+            except Exception:
+                continue
+
+    return overall_longest, source_file, max_len
+
+
+
 
