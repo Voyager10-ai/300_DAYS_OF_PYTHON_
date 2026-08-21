@@ -322,3 +322,120 @@ def stream_longest_word_in_file(
     return longest_word, max_len
 
 
+# ─── 4. Regex Tokenization & Filtering ────────────────────────────────────────
+
+
+def find_longest_word_with_regex(
+    file_path: Union[str, Path],
+    pattern: str = r"\b[A-Za-z0-9'-]+\b",
+    encoding: str = "utf-8",
+) -> List[str]:
+    """
+    Extracts longest words matched by a custom regular expression pattern.
+
+    Args:
+        file_path: Path to the file.
+        pattern: Regex pattern matching valid words.
+        encoding: File encoding.
+
+    Returns:
+        List of unique longest words matching the pattern.
+    """
+    path = Path(file_path)
+    if not path.exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    regex = re.compile(pattern)
+    max_len = 0
+    longest_words: Set[str] = set()
+
+    with open(path, "r", encoding=encoding, errors="replace") as f:
+        for line in f:
+            matches = regex.findall(line)
+            for m in matches:
+                word_len = len(m)
+                if word_len > max_len:
+                    max_len = word_len
+                    longest_words = {m}
+                elif word_len == max_len and max_len > 0:
+                    longest_words.add(m)
+
+    return sorted(list(longest_words))
+
+
+def find_longest_word_matching_predicate(
+    file_path: Union[str, Path],
+    predicate: Callable[[str], bool],
+    encoding: str = "utf-8",
+) -> Optional[str]:
+    """
+    Finds the longest word in a file that satisfies a custom filter predicate.
+
+    Args:
+        file_path: Path to the file.
+        predicate: Callable function returning True if a word is eligible.
+        encoding: File encoding.
+
+    Returns:
+        The longest word satisfying predicate, or None if none match.
+
+    Example:
+        >>> find_longest_word_matching_predicate("data.txt", lambda w: w.startswith("a"))
+    """
+    path = Path(file_path)
+    if not path.exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    longest_word: Optional[str] = None
+    max_len = 0
+
+    with open(path, "r", encoding=encoding, errors="replace") as f:
+        for line in f:
+            for token in line.split():
+                cleaned = clean_word(token, strip_punctuation=True)
+                if cleaned and predicate(cleaned):
+                    if len(cleaned) > max_len:
+                        max_len = len(cleaned)
+                        longest_word = cleaned
+
+    return longest_word
+
+
+def filter_words_by_length_range(
+    file_path: Union[str, Path],
+    min_length: int = 1,
+    max_length: Optional[int] = None,
+    encoding: str = "utf-8",
+) -> List[str]:
+    """
+    Finds all unique words in a file whose length falls within [min_length, max_length].
+
+    Args:
+        file_path: Path to the file.
+        min_length: Minimum length (inclusive).
+        max_length: Optional maximum length (inclusive).
+        encoding: File encoding.
+
+    Returns:
+        List of unique words sorted by length descending then alphabetically.
+    """
+    path = Path(file_path)
+    if not path.exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    matching_words: Set[str] = set()
+
+    with open(path, "r", encoding=encoding, errors="replace") as f:
+        for line in f:
+            for token in line.split():
+                cleaned = clean_word(token, strip_punctuation=True)
+                if not cleaned:
+                    continue
+                w_len = len(cleaned)
+                if w_len >= min_length and (max_length is None or w_len <= max_length):
+                    matching_words.add(cleaned)
+
+    return sorted(matching_words, key=lambda w: (-len(w), w.lower()))
+
+
+
