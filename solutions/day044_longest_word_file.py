@@ -132,3 +132,118 @@ def get_max_word_length_in_file(
         file_path, strip_punctuation=strip_punctuation, encoding=encoding
     )
     return len(words[0]) if words else 0
+
+
+# ─── 2. Top-K Longest Words & Word Length Statistics ──────────────────────────
+
+
+def find_top_k_longest_words(
+    file_path: Union[str, Path],
+    k: int = 5,
+    strip_punctuation: bool = True,
+    encoding: str = "utf-8",
+) -> List[Tuple[str, int]]:
+    """
+    Returns the top-K longest unique words in a file along with their lengths.
+
+    Args:
+        file_path: Path to the file.
+        k: Maximum number of top words to return.
+        strip_punctuation: If True, cleans punctuation from tokens.
+        encoding: File encoding.
+
+    Returns:
+        List of (word, length) tuples sorted in descending order of length.
+    """
+    if k <= 0:
+        return []
+
+    path = Path(file_path)
+    if not path.exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    word_set: Set[str] = set()
+
+    with open(path, "r", encoding=encoding, errors="replace") as f:
+        for line in f:
+            for token in line.split():
+                cleaned = clean_word(token, strip_punctuation=strip_punctuation)
+                if cleaned:
+                    word_set.add(cleaned)
+
+    # Sort by length descending, then alphabetically ascending
+    sorted_words = sorted(word_set, key=lambda w: (-len(w), w.lower()))
+    return [(w, len(w)) for w in sorted_words[:k]]
+
+
+def get_word_length_statistics(
+    file_path: Union[str, Path],
+    encoding: str = "utf-8",
+) -> Dict[str, Any]:
+    """
+    Calculates word length statistics (total words, min length, max length, average length).
+
+    Args:
+        file_path: Path to the file.
+        encoding: File encoding.
+
+    Returns:
+        Dict containing statistical metrics.
+    """
+    path = Path(file_path)
+    if not path.exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    lengths: List[int] = []
+
+    with open(path, "r", encoding=encoding, errors="replace") as f:
+        for line in f:
+            for token in line.split():
+                cleaned = clean_word(token, strip_punctuation=True)
+                if cleaned:
+                    lengths.append(len(cleaned))
+
+    if not lengths:
+        return {
+            "total_words": 0,
+            "min_length": 0,
+            "max_length": 0,
+            "avg_length": 0.0,
+        }
+
+    return {
+        "total_words": len(lengths),
+        "min_length": min(lengths),
+        "max_length": max(lengths),
+        "avg_length": round(sum(lengths) / len(lengths), 2),
+    }
+
+
+def get_word_length_distribution(
+    file_path: Union[str, Path],
+    encoding: str = "utf-8",
+) -> Dict[int, int]:
+    """
+    Computes a histogram distribution of word lengths in a file.
+
+    Args:
+        file_path: Path to the file.
+        encoding: File encoding.
+
+    Returns:
+        Dict mapping length -> frequency count.
+    """
+    path = Path(file_path)
+    if not path.exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    freq: Counter = Counter()
+    with open(path, "r", encoding=encoding, errors="replace") as f:
+        for line in f:
+            for token in line.split():
+                cleaned = clean_word(token, strip_punctuation=True)
+                if cleaned:
+                    freq[len(cleaned)] += 1
+
+    return dict(sorted(freq.items()))
+
