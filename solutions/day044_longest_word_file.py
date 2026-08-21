@@ -503,5 +503,71 @@ def find_overall_longest_word_in_directory(
     return overall_longest, source_file, max_len
 
 
+# ─── 6. Dummy File Generation & File Helpers ─────────────────────────────────
+
+
+def create_dummy_file_with_text(
+    file_path: Union[str, Path],
+    text: str,
+    encoding: str = "utf-8",
+) -> Path:
+    """
+    Creates a text file containing specified text for testing.
+
+    Args:
+        file_path: Destination path.
+        text: Text string to write.
+        encoding: File encoding.
+
+    Returns:
+        Path object to created file.
+    """
+    path = Path(file_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", encoding=encoding) as f:
+        f.write(text)
+    return path
+
+
+def create_dummy_file_with_words(
+    file_path: Union[str, Path],
+    words: List[str],
+    encoding: str = "utf-8",
+) -> Path:
+    """
+    Creates a file containing space-separated words.
+
+    Args:
+        file_path: Destination path.
+        words: List of word strings.
+        encoding: File encoding.
+
+    Returns:
+        Path object to created file.
+    """
+    return create_dummy_file_with_text(file_path, " ".join(words), encoding=encoding)
+
+
+def safe_delete_file(file_path: Union[str, Path]) -> bool:
+    """
+    Safely deletes a file if it exists.
+
+    Args:
+        file_path: Target file path.
+
+    Returns:
+        True if deleted, False if file did not exist or failed to delete.
+    """
+    try:
+        path = Path(file_path)
+        if path.exists() and path.is_file():
+            path.unlink()
+            return True
+        return False
+    except OSError:
+        return False
+
+
+
 
 
