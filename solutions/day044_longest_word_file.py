@@ -243,7 +243,10 @@ def get_word_length_distribution(
             for token in line.split():
                 cleaned = clean_word(token, strip_punctuation=True)
                 if cleaned:
+                    freq[len(cleaned)] += 1
+
     return dict(sorted(freq.items()))
+
 
 
 # ─── 3. Streaming & Chunk-based Memory-Efficient Iterators ────────────────────
@@ -683,6 +686,55 @@ class TestLongestWordFileOperations(unittest.TestCase):
     def test_nonexistent_file_raises_error(self):
         with self.assertRaises(FileNotFoundError):
             find_longest_word_in_file(self.dir_path / "missing.txt")
+
+
+# ─── 9. Interactive CLI Demo Runner ───────────────────────────────────────────
+
+
+def main():
+    print("=" * 60)
+    print(" 🔍 Day 44: Longest Word in File Finder - Interactive Demo")
+    print("=" * 60)
+
+    # 1. Project README Analysis
+    readme_path = Path("README.md")
+    if readme_path.exists():
+        longest = find_longest_word_in_file(readme_path)
+        all_longest = find_all_longest_words_in_file(readme_path)
+        max_len = get_max_word_length_in_file(readme_path)
+        print(f"\n1. README.md Longest Word Analysis:")
+        print(f"   Single Longest Word: '{longest}' ({max_len} chars)")
+        print(f"   All Max Length Words: {all_longest}")
+
+        print("\n2. Top 5 Longest Words in README.md:")
+        top5 = find_top_k_longest_words(readme_path, k=5)
+        for rank, (w, length) in enumerate(top5, start=1):
+            print(f"   #{rank}: {w:<25} ({length} chars)")
+
+        print("\n3. Word Length Statistics for README.md:")
+        stats = get_word_length_statistics(readme_path)
+        for key, val in stats.items():
+            print(f"   {key:<15} : {val}")
+
+    # 2. Solutions Directory Analysis
+    solutions_dir = Path("solutions")
+    if solutions_dir.exists():
+        print("\n4. Overall Longest Word across 'solutions/' Directory:")
+        word, source, length = find_overall_longest_word_in_directory(solutions_dir, file_extension=".py")
+        print(f"   Longest Word : '{word}' ({length} chars)")
+        print(f"   Found in File: {source}")
+
+    # 3. Unit Test Suite Execution
+    print("\n5. Executing Unit Test Suite:")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestLongestWordFileOperations)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+    print("\nDemo execution complete!")
+
+
+if __name__ == "__main__":
+    main()
+
 
 
 

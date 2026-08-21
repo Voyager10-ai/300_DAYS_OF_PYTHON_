@@ -722,7 +722,26 @@
 //     }
 // }
 
+// Java Longest Word in File Practice (Day 44)
+// import java.nio.file.Files;
+// import java.nio.file.Paths;
+// import java.util.Arrays;
+// import java.util.Comparator;
+// class LongestWordFilePractice {
+//     public static void main(String[] args) throws Exception {
+//         String filePath = "README.md";
+//         String longest = Files.lines(Paths.get(filePath))
+//             .flatMap(line -> Arrays.stream(line.split("\\s+")))
+//             .map(word -> word.replaceAll("^[^a-zA-Z0-9]+|[^a-zA-Z0-9]+$", ""))
+//             .filter(w -> !w.isEmpty())
+//             .max(Comparator.comparingInt(String::length))
+//             .orElse("");
+//         System.out.println("Longest word in " + filePath + ": " + longest + " (length: " + longest.length() + ")");
+//     }
+// }
+
 import java.util.*;
+
 
 
 
