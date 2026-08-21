@@ -605,6 +605,87 @@ def safe_find_longest_word_in_file(
     return word, "utf-8 (replace)"
 
 
+# ─── 8. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestLongestWordFileOperations(unittest.TestCase):
+    """Unit test suite for Day 44 Longest Word in File operations."""
+
+    def setUp(self):
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.dir_path = Path(self.temp_dir.name)
+
+        # Sample test files
+        self.file_sample = self.dir_path / "sample.txt"
+        create_dummy_file_with_text(
+            self.file_sample,
+            "The quick brown fox jumps over the lazy dog.\n"
+            "Python programming language is extraordinarily versatile and powerful!",
+        )
+
+        self.file_ties = self.dir_path / "ties.txt"
+        create_dummy_file_with_words(self.file_ties, ["cat", "dog", "bat", "rat", "elephant", "dinosaur"])
+
+        self.file_empty = self.dir_path / "empty.txt"
+        create_dummy_file_with_text(self.file_empty, "")
+
+    def tearDown(self):
+        self.temp_dir.cleanup()
+
+    def test_find_longest_word_in_file(self):
+        longest = find_longest_word_in_file(self.file_sample)
+        self.assertEqual(longest, "extraordinarily")
+
+    def test_find_all_longest_words_in_file(self):
+        ties = find_all_longest_words_in_file(self.file_ties)
+        self.assertEqual(ties, ["dinosaur", "elephant"])
+
+    def test_get_max_word_length_in_file(self):
+        max_len = get_max_word_length_in_file(self.file_sample)
+        self.assertEqual(max_len, 15)  # "extraordinarily" = 15 chars
+
+    def test_empty_file_returns_none(self):
+        self.assertIsNone(find_longest_word_in_file(self.file_empty))
+        self.assertEqual(find_all_longest_words_in_file(self.file_empty), [])
+        self.assertEqual(get_max_word_length_in_file(self.file_empty), 0)
+
+    def test_find_top_k_longest_words(self):
+        top3 = find_top_k_longest_words(self.file_sample, k=3)
+        self.assertEqual(len(top3), 3)
+        self.assertEqual(top3[0], ("extraordinarily", 15))
+        self.assertEqual(top3[1], ("programming", 11))
+
+    def test_word_length_statistics(self):
+        stats = get_word_length_statistics(self.file_sample)
+        self.assertGreater(stats["total_words"], 0)
+        self.assertEqual(stats["max_length"], 15)
+        self.assertGreater(stats["avg_length"], 0.0)
+
+    def test_stream_longest_word_in_file(self):
+        word, length = stream_longest_word_in_file(self.file_sample, chunk_size=16)
+        self.assertEqual(word, "extraordinarily")
+        self.assertEqual(length, 15)
+
+    def test_find_longest_word_with_regex(self):
+        matches = find_longest_word_with_regex(self.file_sample, pattern=r"\b[a-z]{1,5}\b")
+        self.assertTrue(all(len(w) <= 5 for w in matches))
+
+    def test_find_longest_word_matching_predicate(self):
+        p_word = find_longest_word_matching_predicate(
+            self.file_sample, predicate=lambda w: w.startswith("p")
+        )
+        self.assertEqual(p_word, "programming")
+
+    def test_filter_words_by_length_range(self):
+        filtered = filter_words_by_length_range(self.file_sample, min_length=10, max_length=12)
+        self.assertIn("programming", filtered)
+
+    def test_nonexistent_file_raises_error(self):
+        with self.assertRaises(FileNotFoundError):
+            find_longest_word_in_file(self.dir_path / "missing.txt")
+
+
+
 
 
 
