@@ -243,7 +243,82 @@ def get_word_length_distribution(
             for token in line.split():
                 cleaned = clean_word(token, strip_punctuation=True)
                 if cleaned:
-                    freq[len(cleaned)] += 1
-
     return dict(sorted(freq.items()))
+
+
+# ─── 3. Streaming & Chunk-based Memory-Efficient Iterators ────────────────────
+
+
+def stream_words_from_file(
+    file_path: Union[str, Path],
+    chunk_size: int = 65536,
+    encoding: str = "utf-8",
+) -> Iterator[str]:
+    """
+    Streams individual cleaned words from a potentially huge file using chunked byte buffer reading.
+
+    Args:
+        file_path: Path to the file.
+        chunk_size: Size of chunk buffer in bytes (default: 64 KB).
+        encoding: File encoding.
+
+    Yields:
+        Cleaned word strings incrementally.
+    """
+    path = Path(file_path)
+    if not path.exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    remainder = ""
+    with open(path, "r", encoding=encoding, errors="replace") as f:
+        while True:
+            chunk = f.read(chunk_size)
+            if not chunk:
+                if remainder:
+                    cleaned = clean_word(remainder, strip_punctuation=True)
+                    if cleaned:
+                        yield cleaned
+                break
+
+            text = remainder + chunk
+            tokens = text.split()
+
+            # The last token might be incomplete across chunk boundaries
+            if not chunk.endswith((" ", "\n", "\r", "\t")):
+                remainder = tokens.pop() if tokens else ""
+            else:
+                remainder = ""
+
+            for token in tokens:
+                cleaned = clean_word(token, strip_punctuation=True)
+                if cleaned:
+                    yield cleaned
+
+
+def stream_longest_word_in_file(
+    file_path: Union[str, Path],
+    chunk_size: int = 65536,
+    encoding: str = "utf-8",
+) -> Tuple[Optional[str], int]:
+    """
+    Finds the longest word by streaming without loading the entire file into memory.
+
+    Args:
+        file_path: Path to the file.
+        chunk_size: Chunk size in bytes.
+        encoding: File encoding.
+
+    Returns:
+        Tuple of (longest_word, max_length).
+    """
+    longest_word: Optional[str] = None
+    max_len = 0
+
+    for word in stream_words_from_file(file_path, chunk_size=chunk_size, encoding=encoding):
+        if len(word) > max_len:
+            max_len = len(word)
+            longest_word = word
+
+    return longest_word, max_len
+
 
