@@ -346,4 +346,76 @@ def random_non_empty_line(
     )
 
 
+# ─── 5. Multi-File & Directory Random Line Sampler ─────────────────────────────
+
+
+def random_line_from_files(
+    file_paths: List[Union[str, Path]],
+    strip_newline: bool = True,
+    encoding: str = "utf-8",
+) -> Optional[Tuple[Path, int, str]]:
+    """
+    Selects a random line uniformly across multiple target text files.
+
+    Args:
+        file_paths: List of file paths.
+        strip_newline: If True, strips trailing newlines.
+        encoding: File encoding.
+
+    Returns:
+        Tuple of (selected_file_path, line_number, line_content), or None if no valid lines.
+    """
+    all_candidates: List[Tuple[Path, int, str]] = []
+
+    for fp in file_paths:
+        path = Path(fp)
+        if not path.is_file():
+            continue
+        try:
+            with open(path, "r", encoding=encoding, errors="replace") as f:
+                for line_num, line in enumerate(f, start=1):
+                    if strip_newline:
+                        line = line.rstrip("\r\n")
+                    all_candidates.append((path, line_num, line))
+        except Exception:
+            continue
+
+    if not all_candidates:
+        return None
+
+    return random.choice(all_candidates)
+
+
+def random_line_from_directory(
+    directory_path: Union[str, Path],
+    file_extension: str = ".txt",
+    recursive: bool = False,
+    encoding: str = "utf-8",
+) -> Optional[Tuple[Path, int, str]]:
+    """
+    Scans a directory for matching files and selects a random line uniformly.
+
+    Args:
+        directory_path: Directory path to scan.
+        file_extension: File extension filter (e.g., '.txt', '.py').
+        recursive: If True, recursively scans subdirectories.
+        encoding: File encoding.
+
+    Returns:
+        Tuple of (selected_file_path, line_number, line_content), or None if no files/lines found.
+    """
+    dir_path = Path(directory_path)
+    if not dir_path.exists() or not dir_path.is_dir():
+        raise NotADirectoryError(f"Directory not found: {directory_path}")
+
+    pattern = f"**/*{file_extension}" if recursive else f"*{file_extension}"
+    target_files = [f for f in dir_path.glob(pattern) if f.is_file()]
+
+    if not target_files:
+        return None
+
+    return random_line_from_files(target_files, encoding=encoding)
+
+
+
 
