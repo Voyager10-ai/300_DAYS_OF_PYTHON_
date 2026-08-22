@@ -260,3 +260,90 @@ def weighted_random_line(
     return random.choices(lines, weights=weights, k=1)[0]
 
 
+# ─── 4. Filtered Random Line Selection ─────────────────────────────────────────
+
+
+def random_line_matching_predicate(
+    file_path: Union[str, Path],
+    predicate: Callable[[str], bool],
+    strip_newline: bool = True,
+    encoding: str = "utf-8",
+) -> Optional[str]:
+    """
+    Selects a random line from a file that satisfies a predicate function.
+
+    Args:
+        file_path: Path to the file.
+        predicate: Callable returning True for valid candidate lines.
+        strip_newline: If True, strips trailing newlines.
+        encoding: File encoding.
+
+    Returns:
+        A randomly chosen matching line, or None if no lines match.
+    """
+    lines = read_all_lines_random(file_path, strip_newline=strip_newline, encoding=encoding)
+    matching = [line for line in lines if predicate(line)]
+    if not matching:
+        return None
+    return random.choice(matching)
+
+
+def random_line_matching_regex(
+    file_path: Union[str, Path],
+    pattern: str,
+    flags: int = 0,
+    strip_newline: bool = True,
+    encoding: str = "utf-8",
+) -> Optional[str]:
+    """
+    Selects a random line from a file that matches a regular expression pattern.
+
+    Args:
+        file_path: Path to the file.
+        pattern: Regex pattern string.
+        flags: Regex flags (e.g., re.IGNORECASE).
+        strip_newline: If True, strips trailing newlines.
+        encoding: File encoding.
+
+    Returns:
+        A randomly chosen regex-matching line, or None if no match found.
+    """
+    compiled_regex = re.compile(pattern, flags)
+    return random_line_matching_predicate(
+        file_path,
+        predicate=lambda line: bool(compiled_regex.search(line)),
+        strip_newline=strip_newline,
+        encoding=encoding,
+    )
+
+
+def random_non_empty_line(
+    file_path: Union[str, Path],
+    strip_whitespace: bool = True,
+    encoding: str = "utf-8",
+) -> Optional[str]:
+    """
+    Selects a random non-empty line from a text file.
+
+    Args:
+        file_path: Path to the file.
+        strip_whitespace: If True, considers whitespace-only lines as empty.
+        encoding: File encoding.
+
+    Returns:
+        A random non-empty line, or None if file contains only empty lines.
+    """
+    if strip_whitespace:
+        predicate = lambda line: bool(line.strip())
+    else:
+        predicate = lambda line: bool(line)
+
+    return random_line_matching_predicate(
+        file_path,
+        predicate=predicate,
+        strip_newline=True,
+        encoding=encoding,
+    )
+
+
+
