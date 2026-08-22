@@ -568,6 +568,140 @@ def safe_get_random_line(
     return (None, None)
 
 
+# ─── 8. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestRandomLineOperations(unittest.TestCase):
+    def setUp(self):
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.dir_path = Path(self.temp_dir.name)
+
+        self.file_sample = self.dir_path / "sample.txt"
+        self.sample_lines = [
+            "Alpha entry line one",
+            "Beta entry line two with extra text",
+            "Gamma line three",
+            "Delta line four with special characters !@#",
+            "Epsilon final line five",
+        ]
+        with open(self.file_sample, "w", encoding="utf-8") as f:
+            for line in self.sample_lines:
+                f.write(f"{line}\n")
+
+        self.file_empty = self.dir_path / "empty.txt"
+        self.file_empty.touch()
+
+        self.file_single = self.dir_path / "single.txt"
+        with open(self.file_single, "w", encoding="utf-8") as f:
+            f.write("Sole single line in file\n")
+
+    def tearDown(self):
+        self.temp_dir.cleanup()
+
+    def test_get_random_line(self):
+        line = get_random_line(self.file_sample)
+        self.assertIsNotNone(line)
+        self.assertIn(line, self.sample_lines)
+
+    def test_get_random_line_with_index(self):
+        result = get_random_line_with_index(self.file_sample)
+        self.assertIsNotNone(result)
+        line_num, line_content = result
+        self.assertTrue(1 <= line_num <= len(self.sample_lines))
+        self.assertEqual(self.sample_lines[line_num - 1], line_content)
+
+    def test_empty_file_returns_none(self):
+        self.assertIsNone(get_random_line(self.file_empty))
+        self.assertIsNone(get_random_line_with_index(self.file_empty))
+        self.assertIsNone(reservoir_sample_line(self.file_empty))
+        self.assertEqual(reservoir_sample_k_lines(self.file_empty, k=3), [])
+
+    def test_single_line_file(self):
+        self.assertEqual(get_random_line(self.file_single), "Sole single line in file")
+        res = get_random_line_with_index(self.file_single)
+        self.assertEqual(res, (1, "Sole single line in file"))
+
+    def test_reservoir_sample_line(self):
+        result = reservoir_sample_line(self.file_sample)
+        self.assertIsNotNone(result)
+        line_num, line_content = result
+        self.assertTrue(1 <= line_num <= len(self.sample_lines))
+        self.assertEqual(self.sample_lines[line_num - 1], line_content)
+
+    def test_reservoir_sample_k_lines(self):
+        k_samples = reservoir_sample_k_lines(self.file_sample, k=3)
+        self.assertEqual(len(k_samples), 3)
+        for num, content in k_samples:
+            self.assertTrue(1 <= num <= len(self.sample_lines))
+            self.assertEqual(self.sample_lines[num - 1], content)
+
+    def test_sample_k_random_lines(self):
+        # Without replacement
+        samples_no_rep = sample_k_random_lines(self.file_sample, k=3, replace=False)
+        self.assertEqual(len(samples_no_rep), 3)
+        self.assertEqual(len(set(samples_no_rep)), 3)
+
+        # With replacement
+        samples_rep = sample_k_random_lines(self.file_sample, k=10, replace=True)
+        self.assertEqual(len(samples_rep), 10)
+
+        # Exceeding k without replacement
+        with self.assertRaises(ValueError):
+            sample_k_random_lines(self.file_sample, k=10, replace=False)
+
+    def test_weighted_random_line(self):
+        line = weighted_random_line(self.file_sample)
+        self.assertIsNotNone(line)
+        self.assertIn(line, self.sample_lines)
+
+    def test_filtered_random_lines(self):
+        # Predicate
+        pred_line = random_line_matching_predicate(
+            self.file_sample, predicate=lambda l: "Beta" in l
+        )
+        self.assertEqual(pred_line, "Beta entry line two with extra text")
+
+        # Regex
+        regex_line = random_line_matching_regex(self.file_sample, pattern=r"special")
+        self.assertEqual(regex_line, "Delta line four with special characters !@#")
+
+        # Non-empty
+        non_empty = random_non_empty_line(self.file_sample)
+        self.assertIsNotNone(non_empty)
+
+    def test_line_indexer(self):
+        indexer = LineIndexer(self.file_sample)
+        self.assertEqual(indexer.total_lines, 5)
+        self.assertEqual(indexer.get_line_at(1), "Alpha entry line one")
+        self.assertEqual(indexer.get_line_at(5), "Epsilon final line five")
+
+        rand_line = indexer.get_random_line()
+        self.assertIn(rand_line, self.sample_lines)
+
+        with self.assertRaises(IndexError):
+            indexer.get_line_at(0)
+        with self.assertRaises(IndexError):
+            indexer.get_line_at(6)
+
+    def test_multi_file_and_directory_sampling(self):
+        f2 = self.dir_path / "sample2.txt"
+        with open(f2, "w", encoding="utf-8") as f:
+            f.write("Sample2 standalone line\n")
+
+        res_files = random_line_from_files([self.file_sample, f2])
+        self.assertIsNotNone(res_files)
+        path, num, content = res_files
+        self.assertTrue(path in [self.file_sample, f2])
+
+        res_dir = random_line_from_directory(self.dir_path, file_extension=".txt")
+        self.assertIsNotNone(res_dir)
+
+    def test_nonexistent_file_raises_error(self):
+        with self.assertRaises(FileNotFoundError):
+            get_random_line(self.dir_path / "nonexistent.txt")
+
+
+
 
 
 
