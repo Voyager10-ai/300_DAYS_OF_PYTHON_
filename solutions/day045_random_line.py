@@ -498,6 +498,77 @@ class LineIndexer:
         return (rand_idx, self.get_line_at(rand_idx, strip_newline=strip_newline))
 
 
+# ─── 7. Test Asset Helpers & Safe Encoding Fallbacks ──────────────────────────
+
+
+def create_dummy_text_file(
+    path: Union[str, Path],
+    num_lines: int = 10,
+    line_prefix: str = "Line",
+    encoding: str = "utf-8",
+) -> Path:
+    """
+    Creates a temporary dummy text file with N numbered lines for testing.
+
+    Args:
+        path: Path where the file should be created.
+        num_lines: Number of lines to write.
+        line_prefix: Prefix for each line.
+        encoding: File encoding.
+
+    Returns:
+        Path object of created file.
+    """
+    file_path = Path(path)
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(file_path, "w", encoding=encoding) as f:
+        for i in range(1, num_lines + 1):
+            f.write(f"{line_prefix} #{i}: Sample line text entry for testing.\n")
+    return file_path
+
+
+def clean_up_temp_file(path: Union[str, Path]) -> None:
+    """Safely removes a test file if it exists."""
+    file_path = Path(path)
+    if file_path.exists() and file_path.is_file():
+        try:
+            file_path.unlink()
+        except OSError:
+            pass
+
+
+def safe_get_random_line(
+    file_path: Union[str, Path],
+    encodings: Optional[List[str]] = None,
+) -> Tuple[Optional[str], Optional[str]]:
+    """
+    Attempts to read a random line using a list of fallback encodings.
+
+    Args:
+        file_path: Path to the file.
+        encodings: List of encodings to attempt in order (default: ['utf-8', 'latin-1', 'cp1252']).
+
+    Returns:
+        Tuple of (selected_line, encoding_used). Returns (None, None) if file read fails or file is empty.
+    """
+    if encodings is None:
+        encodings = ["utf-8", "latin-1", "cp1252"]
+
+    path = Path(file_path)
+    if not path.exists() or path.is_dir():
+        return (None, None)
+
+    for enc in encodings:
+        try:
+            line = get_random_line(path, encoding=enc)
+            return (line, enc)
+        except (UnicodeDecodeError, Exception):
+            continue
+
+    return (None, None)
+
+
+
 
 
 
