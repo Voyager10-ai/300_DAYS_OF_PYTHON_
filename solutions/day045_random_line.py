@@ -417,5 +417,87 @@ def random_line_from_directory(
     return random_line_from_files(target_files, encoding=encoding)
 
 
+# ─── 6. Fast Line Indexing & Byte-Offset Random Access ─────────────────────────
+
+
+class LineIndexer:
+    """
+    Scans a text file once to index line start byte offsets.
+    Enables O(1) random line retrieval without loading the whole file content into memory.
+    """
+
+    def __init__(self, file_path: Union[str, Path], encoding: str = "utf-8"):
+        self.file_path = Path(file_path)
+        self.encoding = encoding
+        if not self.file_path.exists():
+            raise FileNotFoundError(f"File not found: {file_path}")
+        if self.file_path.is_dir():
+            raise IsADirectoryError(f"Path is a directory, not a file: {file_path}")
+
+        self.offsets: List[int] = []
+        self._build_index()
+
+    def _build_index(self) -> None:
+        """Scans file in binary mode to record byte offset of each line's start."""
+        self.offsets = []
+        with open(self.file_path, "rb") as f:
+            offset = 0
+            self.offsets.append(offset)
+            while True:
+                line = f.readline()
+                if not line:
+                    break
+                offset += len(line)
+                self.offsets.append(offset)
+        # Remove the final EOF offset if file is non-empty
+        if len(self.offsets) > 1 and self.offsets[-1] == self.offsets[-2]:
+            self.offsets.pop()
+
+    @property
+    def total_lines(self) -> int:
+        """Returns total number of lines indexed in the file."""
+        return max(0, len(self.offsets) - 1)
+
+    def get_line_at(self, line_number: int, strip_newline: bool = True) -> str:
+        """
+        Retrieves line at 1-indexed line number in O(1) time using byte seeking.
+
+        Args:
+            line_number: 1-indexed line number (1 to total_lines).
+            strip_newline: If True, strips trailing newline characters.
+
+        Returns:
+            Line string at the given position.
+
+        Raises:
+            IndexError: If line_number is out of bounds.
+        """
+        if line_number < 1 or line_number > self.total_lines:
+            raise IndexError(f"Line number {line_number} out of range (1-{self.total_lines})")
+
+        start_offset = self.offsets[line_number - 1]
+        with open(self.file_path, "r", encoding=self.encoding, errors="replace") as f:
+            f.seek(start_offset)
+            line = f.readline()
+            if strip_newline:
+                return line.rstrip("\r\n")
+            return line
+
+    def get_random_line(self, strip_newline: bool = True) -> Optional[str]:
+        """Returns a random line using indexed byte offsets."""
+        if self.total_lines == 0:
+            return None
+        rand_idx = random.randint(1, self.total_lines)
+        return self.get_line_at(rand_idx, strip_newline=strip_newline)
+
+    def get_random_line_with_index(self, strip_newline: bool = True) -> Optional[Tuple[int, str]]:
+        """Returns (line_number, line_content) of a randomly indexed line."""
+        if self.total_lines == 0:
+            return None
+        rand_idx = random.randint(1, self.total_lines)
+        return (rand_idx, self.get_line_at(rand_idx, strip_newline=strip_newline))
+
+
+
 
 
