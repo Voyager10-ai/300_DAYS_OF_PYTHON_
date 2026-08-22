@@ -182,3 +182,81 @@ def reservoir_sample_k_lines(
 
     return reservoir
 
+
+# ─── 3. Multiple Random Lines & Weighted Sampling ──────────────────────────────
+
+
+def sample_k_random_lines(
+    file_path: Union[str, Path],
+    k: int,
+    replace: bool = False,
+    strip_newline: bool = True,
+    encoding: str = "utf-8",
+) -> List[str]:
+    """
+    Samples K random lines from a file, either with or without replacement.
+
+    Args:
+        file_path: Path to the file.
+        k: Number of lines to sample. Must be >= 0.
+        replace: If True, samples with replacement. If False, samples without replacement.
+        strip_newline: If True, strips trailing newlines.
+        encoding: File encoding.
+
+    Returns:
+        List of selected random line strings.
+
+    Raises:
+        ValueError: If k < 0 or if k > total lines when replace=False.
+    """
+    if k < 0:
+        raise ValueError("k must be non-negative")
+
+    lines = read_all_lines_random(file_path, strip_newline=strip_newline, encoding=encoding)
+    if k == 0 or not lines:
+        return []
+
+    if replace:
+        return random.choices(lines, k=k)
+    else:
+        if k > len(lines):
+            raise ValueError(f"Cannot sample {k} lines without replacement from a file with {len(lines)} lines")
+        return random.sample(lines, k)
+
+
+def weighted_random_line(
+    file_path: Union[str, Path],
+    weight_func: Optional[Callable[[str], float]] = None,
+    strip_newline: bool = True,
+    encoding: str = "utf-8",
+) -> Optional[str]:
+    """
+    Selects a random line weighted by a given weight function (default: line length).
+
+    Args:
+        file_path: Path to the file.
+        weight_func: Callable returning non-negative weight for a line string.
+                     If None, defaults to len(line).
+        strip_newline: If True, strips trailing newlines.
+        encoding: File encoding.
+
+    Returns:
+        A randomly chosen line weighted by weight_func, or None if file is empty.
+    """
+    lines = read_all_lines_random(file_path, strip_newline=strip_newline, encoding=encoding)
+    if not lines:
+        return None
+
+    if weight_func is None:
+        weight_func = lambda line: float(len(line))
+
+    weights = [max(0.0, float(weight_func(line))) for line in lines]
+    total_weight = sum(weights)
+
+    if total_weight <= 0:
+        # Fall back to uniform choice if all weights are 0
+        return random.choice(lines)
+
+    return random.choices(lines, weights=weights, k=1)[0]
+
+
