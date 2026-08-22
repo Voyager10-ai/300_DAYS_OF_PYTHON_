@@ -701,6 +701,63 @@ class TestRandomLineOperations(unittest.TestCase):
             get_random_line(self.dir_path / "nonexistent.txt")
 
 
+# ─── 9. Interactive CLI Demo Runner ───────────────────────────────────────────
+
+
+def main():
+    print("=" * 60)
+    print(" 🎲 Day 45: Random Line Reader - Interactive Demo")
+    print("=" * 60)
+
+    # 1. Standard Sampling from README.md
+    readme_path = Path("README.md")
+    if readme_path.exists():
+        rand_line = get_random_line(readme_path)
+        rand_num, rand_content = get_random_line_with_index(readme_path)
+        print("\n1. Standard Random Line Selection from README.md:")
+        print(f"   Single Random Line  : '{rand_line}'")
+        print(f"   Line with Index     : Line #{rand_num} -> '{rand_content}'")
+
+        # 2. Reservoir Sampling
+        res_num, res_content = reservoir_sample_line(readme_path)
+        k_res = reservoir_sample_k_lines(readme_path, k=3)
+        print("\n2. Reservoir Sampling (Algorithm R) on README.md:")
+        print(f"   Single Reservoir Line : Line #{res_num} -> '{res_content}'")
+        print("   3 Reservoir Sampled Lines:")
+        for num, content in k_res:
+            print(f"     • Line #{num}: '{content}'")
+
+        # 3. Line Indexer O(1) Access
+        indexer = LineIndexer(readme_path)
+        idx_num, idx_content = indexer.get_random_line_with_index()
+        print(
+            f"\n3. LineIndexer (Fast Byte-Offset Access) on README.md ({indexer.total_lines} lines total):"
+        )
+        print(f"   Random Indexed Line  : Line #{idx_num} -> '{idx_content}'")
+
+    # 4. Multi-file directory sampling
+    solutions_dir = Path("solutions")
+    if solutions_dir.exists():
+        res_dir = random_line_from_directory(solutions_dir, file_extension=".py")
+        if res_dir:
+            file_p, num, content = res_dir
+            print(f"\n4. Directory-Wide Random Line from 'solutions/':")
+            print(f"   File   : {file_p.name}")
+            print(f"   Line #{num}: '{content[:60]}...'")
+
+    # 5. Unit Test Suite Execution
+    print("\n5. Executing Unit Test Suite:")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestRandomLineOperations)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+    print("\nDemo execution complete!")
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 

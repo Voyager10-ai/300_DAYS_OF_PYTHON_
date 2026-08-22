@@ -740,7 +740,25 @@
 //     }
 // }
 
+// Java Random Line Practice (Day 45)
+// import java.nio.file.Files;
+// import java.nio.file.Paths;
+// import java.util.List;
+// import java.util.Random;
+// class RandomLinePractice {
+//     public static void main(String[] args) throws Exception {
+//         String filePath = "README.md";
+//         List<String> lines = Files.readAllLines(Paths.get(filePath));
+//         if (!lines.isEmpty()) {
+//             Random rand = new Random();
+//             int index = rand.nextInt(lines.size());
+//             System.out.println("Random line (" + (index + 1) + "/" + lines.size() + "): " + lines.get(index));
+//         }
+//     }
+// }
+
 import java.util.*;
+
 
 
 
