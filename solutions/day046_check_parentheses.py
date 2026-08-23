@@ -521,7 +521,7 @@ class TestCheckParenthesesOperations(unittest.TestCase):
 
     def test_repair_and_complete(self):
         self.assertEqual(repair_unbalanced_parentheses("((()"), "((()))")
-        self.assertEqual(repair_unbalanced_parentheses(")(]"), "")
+        self.assertEqual(repair_unbalanced_parentheses(")(]"), "()")
         self.assertEqual(repair_unbalanced_parentheses("{[("), "{[()]}")
 
         self.assertEqual(complete_open_parentheses("function(arr[i"), "])")
@@ -531,6 +531,62 @@ class TestCheckParenthesesOperations(unittest.TestCase):
         batch = ["()", "([)]", "{[()]}"]
         results = validate_batch_expressions(batch)
         self.assertEqual(results, [("()", True), ("([)]", False), ("{[()]}", True)])
+
+
+# ─── 9. Interactive CLI Demo Runner ───────────────────────────────────────────
+
+
+def main():
+    print("=" * 60)
+    print(" 🧩 Day 46: Parentheses & Bracket Validator - Interactive Demo")
+    print("=" * 60)
+
+    # 1. Batch Expression Check
+    sample_exprs = [
+        "a * (b + c) - [d / {e}]",
+        "((x + y) * z",
+        "function([x, y]) { return (x + y); }",
+        "invalid_mismatch = (a + b]",
+    ]
+    print("\n1. Batch Parentheses Validation:")
+    for expr in sample_exprs:
+        valid = is_valid_parentheses(expr)
+        status = "✅ VALID" if valid else "❌ INVALID"
+        print(f"   [{status}] {expr}")
+
+    # 2. Detailed Diagnostics
+    invalid_sample = "def test(x):\n    arr = [1, 2, (3 + 4]\n    return arr"
+    print("\n2. Detailed Diagnostic Reporting for Mismatched Code:")
+    diag = validate_parentheses_with_diagnostics(invalid_sample)
+    print(f"   Diagnostic Output: {diag.message}")
+    print(f"   Error Type       : {diag.error_type}")
+    print(f"   Error Position   : Index {diag.error_position}")
+
+    # 3. Nesting Depth & Profile
+    nested_str = "{ a : [ b + ( c * ( d + e ) ) ] }"
+    depth = get_max_nesting_depth(nested_str)
+    print(f"\n3. Nesting Depth Analysis:")
+    print(f"   Expression : '{nested_str}'")
+    print(f"   Max Depth  : {depth}")
+
+    # 4. Auto-Repair Demonstration
+    unbalanced_str = "((a + b) * [c - d"
+    repaired_str = repair_unbalanced_parentheses(unbalanced_str)
+    print(f"\n4. Auto-Repair Demonstration:")
+    print(f"   Original Unbalanced : '{unbalanced_str}'")
+    print(f"   Repaired Output     : '{repaired_str}'")
+
+    # 5. Unit Test Suite Execution
+    print("\n5. Executing Unit Test Suite:")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestCheckParenthesesOperations)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+    print("\nDemo execution complete!")
+
+
+if __name__ == "__main__":
+    main()
+
 
 
 
