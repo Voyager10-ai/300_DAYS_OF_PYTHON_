@@ -69,3 +69,75 @@ def is_balanced_simple(s: str) -> bool:
             if count < 0:
                 return False
     return count == 0
+
+
+# ─── 2. Detailed Syntax Error Diagnostic Reporter ──────────────────────────────
+
+
+@dataclass
+class ParenthesesDiagnosticResult:
+    """Detailed result structure for bracket validation diagnostic reporting."""
+
+    is_valid: bool
+    error_type: Optional[str] = None  # 'UNMATCHED_CLOSING', 'UNCLOSED_OPENING', 'MISMATCHED_BRACKET'
+    error_position: Optional[int] = None
+    found_char: Optional[str] = None
+    expected_char: Optional[str] = None
+    message: str = "Parentheses are balanced."
+
+
+def validate_parentheses_with_diagnostics(s: str) -> ParenthesesDiagnosticResult:
+    """
+    Validates parentheses in a string and returns detailed diagnostic info on syntax errors.
+
+    Args:
+        s: Input string.
+
+    Returns:
+        ParenthesesDiagnosticResult containing error position, expected vs found tokens.
+    """
+    stack: List[Tuple[str, int]] = []  # Stores (bracket_char, index)
+
+    for idx, char in enumerate(s):
+        if char in OPENING_BRACKETS:
+            stack.append((char, idx))
+        elif char in CLOSING_BRACKETS:
+            if not stack:
+                matching_open = DEFAULT_BRACKET_PAIRS[char]
+                return ParenthesesDiagnosticResult(
+                    is_valid=False,
+                    error_type="UNMATCHED_CLOSING",
+                    error_position=idx,
+                    found_char=char,
+                    expected_char=matching_open,
+                    message=f"Unmatched closing bracket '{char}' at index {idx} with no prior open bracket.",
+                )
+            top_open, top_idx = stack.pop()
+            expected_close = {v: k for k, v in DEFAULT_BRACKET_PAIRS.items()}[top_open]
+            if top_open != DEFAULT_BRACKET_PAIRS[char]:
+                return ParenthesesDiagnosticResult(
+                    is_valid=False,
+                    error_type="MISMATCHED_BRACKET",
+                    error_position=idx,
+                    found_char=char,
+                    expected_char=expected_close,
+                    message=(
+                        f"Mismatched bracket '{char}' at index {idx}; expected '{expected_close}' "
+                        f"to match '{top_open}' opened at index {top_idx}."
+                    ),
+                )
+
+    if stack:
+        unclosed_char, unclosed_idx = stack[-1]
+        expected_close = {v: k for k, v in DEFAULT_BRACKET_PAIRS.items()}[unclosed_char]
+        return ParenthesesDiagnosticResult(
+            is_valid=False,
+            error_type="UNCLOSED_OPENING",
+            error_position=unclosed_idx,
+            found_char=unclosed_char,
+            expected_char=expected_close,
+            message=f"Unclosed opening bracket '{unclosed_char}' at index {unclosed_idx}; expected '{expected_close}'.",
+        )
+
+    return ParenthesesDiagnosticResult(is_valid=True)
+
