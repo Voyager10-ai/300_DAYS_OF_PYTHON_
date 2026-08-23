@@ -457,6 +457,83 @@ def validate_batch_expressions(expressions: List[str]) -> List[Tuple[str, bool]]
     return [(expr, is_valid_parentheses(expr)) for expr in expressions]
 
 
+# ─── 8. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestCheckParenthesesOperations(unittest.TestCase):
+    def test_is_valid_parentheses_standard(self):
+        self.assertTrue(is_valid_parentheses("()"))
+        self.assertTrue(is_valid_parentheses("()[]{}"))
+        self.assertTrue(is_valid_parentheses("{[()]}"))
+        self.assertTrue(is_valid_parentheses("a * (b + c) - [d / {e}]"))
+        self.assertFalse(is_valid_parentheses("(]"))
+        self.assertFalse(is_valid_parentheses("([)]"))
+        self.assertFalse(is_valid_parentheses("{"))
+        self.assertFalse(is_valid_parentheses(")"))
+
+    def test_is_balanced_simple(self):
+        self.assertTrue(is_balanced_simple("((()))"))
+        self.assertTrue(is_balanced_simple("()()()"))
+        self.assertFalse(is_balanced_simple("((()"))
+        self.assertFalse(is_balanced_simple(")("))
+
+    def test_validate_parentheses_with_diagnostics(self):
+        # Valid
+        res_valid = validate_parentheses_with_diagnostics("{[()]}")
+        self.assertTrue(res_valid.is_valid)
+
+        # Unmatched closing
+        res_unmatched = validate_parentheses_with_diagnostics("()")
+        self.assertTrue(res_unmatched.is_valid)
+        res_orphan = validate_parentheses_with_diagnostics("())")
+        self.assertFalse(res_orphan.is_valid)
+        self.assertEqual(res_orphan.error_type, "UNMATCHED_CLOSING")
+        self.assertEqual(res_orphan.error_position, 2)
+
+        # Mismatched bracket
+        res_mismatch = validate_parentheses_with_diagnostics("(]")
+        self.assertFalse(res_mismatch.is_valid)
+        self.assertEqual(res_mismatch.error_type, "MISMATCHED_BRACKET")
+
+        # Unclosed opening
+        res_unclosed = validate_parentheses_with_diagnostics("{[(")
+        self.assertFalse(res_unclosed.is_valid)
+        self.assertEqual(res_unclosed.error_type, "UNCLOSED_OPENING")
+
+    def test_custom_bracket_pairs(self):
+        custom_pairs = [("<", ">"), ("«", "»")]
+        self.assertTrue(is_valid_parentheses_custom("<«text»>", pairs=custom_pairs))
+        self.assertFalse(is_valid_parentheses_custom("<«text>", pairs=custom_pairs))
+
+    def test_code_quote_comment_awareness(self):
+        code_sample = "x = '([)]' # comment with unmatched (\nprint(arr[0])"
+        diag = validate_parentheses_in_code(code_sample)
+        self.assertTrue(diag.is_valid)
+
+    def test_nesting_depth(self):
+        self.assertEqual(get_max_nesting_depth("((()))"), 3)
+        self.assertEqual(get_max_nesting_depth("{[()]}"), 3)
+        self.assertEqual(get_max_nesting_depth("(]"), -1)
+
+        profile, max_d = get_bracket_depth_profile("a(b[c]d)e")
+        self.assertEqual(max_d, 2)
+        self.assertEqual(len(profile), len("a(b[c]d)e"))
+
+    def test_repair_and_complete(self):
+        self.assertEqual(repair_unbalanced_parentheses("((()"), "((()))")
+        self.assertEqual(repair_unbalanced_parentheses(")(]"), "")
+        self.assertEqual(repair_unbalanced_parentheses("{[("), "{[()]}")
+
+        self.assertEqual(complete_open_parentheses("function(arr[i"), "])")
+        self.assertEqual(complete_open_parentheses("()"), "")
+
+    def test_batch_expressions(self):
+        batch = ["()", "([)]", "{[()]}"]
+        results = validate_batch_expressions(batch)
+        self.assertEqual(results, [("()", True), ("([)]", False), ("{[()]}", True)])
+
+
+
 
 
 
