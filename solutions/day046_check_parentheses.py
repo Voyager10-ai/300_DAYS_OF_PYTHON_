@@ -286,4 +286,66 @@ def validate_parentheses_in_code(code: str) -> ParenthesesDiagnosticResult:
     return validate_parentheses_with_diagnostics(clean_code)
 
 
+# ─── 5. Bracket Nesting Depth Analyzer ─────────────────────────────────────────
+
+
+def get_max_nesting_depth(s: str) -> int:
+    """
+    Calculates the maximum nesting depth of parentheses/brackets in a string.
+
+    Args:
+        s: Input string.
+
+    Returns:
+        Maximum integer depth >= 0, or -1 if the parentheses are unbalanced.
+    """
+    max_depth = 0
+    current_depth = 0
+    stack: List[str] = []
+
+    for char in s:
+        if char in OPENING_BRACKETS:
+            stack.append(char)
+            current_depth += 1
+            if current_depth > max_depth:
+                max_depth = current_depth
+        elif char in CLOSING_BRACKETS:
+            if not stack or stack[-1] != DEFAULT_BRACKET_PAIRS[char]:
+                return -1
+            stack.pop()
+            current_depth -= 1
+
+    return max_depth if len(stack) == 0 else -1
+
+
+def get_bracket_depth_profile(s: str) -> Tuple[List[int], int]:
+    """
+    Generates a depth profile mapping each character position to its current nesting depth.
+
+    Args:
+        s: Input string.
+
+    Returns:
+        Tuple of (depths_list, max_depth).
+    """
+    depths: List[int] = []
+    current_depth = 0
+    max_depth = 0
+
+    for char in s:
+        if char in OPENING_BRACKETS:
+            current_depth += 1
+            if current_depth > max_depth:
+                max_depth = current_depth
+            depths.append(current_depth)
+        elif char in CLOSING_BRACKETS:
+            depths.append(current_depth)
+            current_depth = max(0, current_depth - 1)
+        else:
+            depths.append(current_depth)
+
+    return (depths, max_depth)
+
+
+
 
