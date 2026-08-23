@@ -347,5 +347,69 @@ def get_bracket_depth_profile(s: str) -> Tuple[List[int], int]:
     return (depths, max_depth)
 
 
+# ─── 6. Auto-Repair & Completion Utilities ────────────────────────────────────
+
+
+def repair_unbalanced_parentheses(s: str) -> str:
+    """
+    Repairs an unbalanced string by removing orphan closing brackets and appending
+    missing closing brackets for unclosed opening brackets.
+
+    Args:
+        s: Input string.
+
+    Returns:
+        Repaired string that is guaranteed to be valid/balanced.
+    """
+    open_to_close = {v: k for k, v in DEFAULT_BRACKET_PAIRS.items()}
+
+    # First pass: Filter out unmatched closing brackets
+    clean_chars: List[str] = []
+    stack: List[str] = []
+
+    for char in s:
+        if char in OPENING_BRACKETS:
+            stack.append(char)
+            clean_chars.append(char)
+        elif char in CLOSING_BRACKETS:
+            if stack and stack[-1] == DEFAULT_BRACKET_PAIRS[char]:
+                stack.pop()
+                clean_chars.append(char)
+            # Else ignore orphan closing bracket
+        else:
+            clean_chars.append(char)
+
+    # Second pass: Append missing closing brackets for remaining unclosed open brackets
+    missing_closing = [open_to_close[open_char] for open_char in reversed(stack)]
+    return "".join(clean_chars) + "".join(missing_closing)
+
+
+def complete_open_parentheses(s: str) -> str:
+    """
+    Appends only the required closing brackets to complete any unclosed opening brackets.
+
+    Args:
+        s: Expression string.
+
+    Returns:
+        Suffix string of missing closing brackets, or empty string if already complete/invalid.
+    """
+    open_to_close = {v: k for k, v in DEFAULT_BRACKET_PAIRS.items()}
+    stack: List[str] = []
+
+    for char in s:
+        if char in OPENING_BRACKETS:
+            stack.append(char)
+        elif char in CLOSING_BRACKETS:
+            if stack and stack[-1] == DEFAULT_BRACKET_PAIRS[char]:
+                stack.pop()
+            else:
+                return ""
+
+    missing_closing = [open_to_close[open_char] for open_char in reversed(stack)]
+    return "".join(missing_closing)
+
+
+
 
 
