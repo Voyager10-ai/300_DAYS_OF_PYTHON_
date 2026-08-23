@@ -200,3 +200,90 @@ def is_valid_parentheses_custom(
     return len(stack) == 0
 
 
+# ─── 4. Quote & Comment Aware Code Bracket Parser ─────────────────────────────
+
+
+def strip_comments_and_strings(code: str) -> str:
+    """
+    Strips string literals ("...", '...') and Python comments (# ...) from code text,
+    replacing their contents with spaces to avoid false-positive bracket mismatches.
+
+    Args:
+        code: Source code string.
+
+    Returns:
+        Code string with strings and comments neutralized.
+    """
+    result: List[str] = []
+    in_single_quote = False
+    in_double_quote = False
+    in_comment = False
+    escape = False
+
+    for char in code:
+        if in_comment:
+            if char == "\n":
+                in_comment = False
+                result.append("\n")
+            else:
+                result.append(" ")
+            continue
+
+        if in_single_quote:
+            if escape:
+                escape = False
+                result.append(" ")
+            elif char == "\\":
+                escape = True
+                result.append(" ")
+            elif char == "'":
+                in_single_quote = False
+                result.append(" ")
+            else:
+                result.append(" ")
+            continue
+
+        if in_double_quote:
+            if escape:
+                escape = False
+                result.append(" ")
+            elif char == "\\":
+                escape = True
+                result.append(" ")
+            elif char == '"':
+                in_double_quote = False
+                result.append(" ")
+            else:
+                result.append(" ")
+            continue
+
+        if char == "#":
+            in_comment = True
+            result.append(" ")
+        elif char == "'":
+            in_single_quote = True
+            result.append(" ")
+        elif char == '"':
+            in_double_quote = True
+            result.append(" ")
+        else:
+            result.append(char)
+
+    return "".join(result)
+
+
+def validate_parentheses_in_code(code: str) -> ParenthesesDiagnosticResult:
+    """
+    Validates bracket balance in source code, ignoring brackets embedded in strings or comments.
+
+    Args:
+        code: Python source code or structured text.
+
+    Returns:
+        ParenthesesDiagnosticResult containing detailed status.
+    """
+    clean_code = strip_comments_and_strings(code)
+    return validate_parentheses_with_diagnostics(clean_code)
+
+
+
