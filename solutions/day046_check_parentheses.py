@@ -141,3 +141,62 @@ def validate_parentheses_with_diagnostics(s: str) -> ParenthesesDiagnosticResult
 
     return ParenthesesDiagnosticResult(is_valid=True)
 
+
+# ─── 3. Custom Bracket Pair Mappings & Configuration ──────────────────────────
+
+
+def build_bracket_mapping(pairs: List[Tuple[str, str]]) -> Dict[str, str]:
+    """
+    Builds a closing-to-opening bracket dictionary from a list of (open, close) tuple pairs.
+
+    Args:
+        pairs: List of tuples, e.g. [("(", ")"), ("<", ">"), ("«", "»")].
+
+    Returns:
+        Dictionary mapping closing char -> opening char.
+    """
+    return {close_char: open_char for open_char, close_char in pairs}
+
+
+def is_valid_parentheses_custom(
+    s: str,
+    pairs: Optional[List[Tuple[str, str]]] = None,
+    allow_same_delimiters: bool = False,
+) -> bool:
+    """
+    Validates parentheses using custom user-defined bracket pairs.
+
+    Args:
+        s: Input string.
+        pairs: List of (open, close) pairs. Defaults to standard (), {}, [].
+        allow_same_delimiters: If True, supports identical open/close delimiters (e.g. '|', '"').
+
+    Returns:
+        True if string is balanced according to custom rules, False otherwise.
+    """
+    if pairs is None:
+        close_to_open = DEFAULT_BRACKET_PAIRS
+    else:
+        close_to_open = build_bracket_mapping(pairs)
+
+    open_chars = set(close_to_open.values())
+    close_chars = set(close_to_open.keys())
+
+    stack: List[str] = []
+    for char in s:
+        if allow_same_delimiters and char in open_chars and char in close_chars:
+            # Handle identical open/close pair (like quote or pipe "|")
+            if stack and stack[-1] == char:
+                stack.pop()
+            else:
+                stack.append(char)
+        elif char in open_chars:
+            stack.append(char)
+        elif char in close_chars:
+            if not stack or stack[-1] != close_to_open[char]:
+                return False
+            stack.pop()
+
+    return len(stack) == 0
+
+
