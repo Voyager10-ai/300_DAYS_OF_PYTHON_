@@ -410,6 +410,54 @@ def complete_open_parentheses(s: str) -> str:
     return "".join(missing_closing)
 
 
+# ─── 7. File-Based & Batch Parentheses Validator ──────────────────────────────
+
+
+def validate_file_parentheses(
+    file_path: Union[str, Path],
+    encoding: str = "utf-8",
+) -> Dict[int, ParenthesesDiagnosticResult]:
+    """
+    Validates parentheses line by line in a target text file.
+
+    Args:
+        file_path: Path to the target file.
+        encoding: File encoding.
+
+    Returns:
+        Dictionary mapping line_number (1-indexed) to diagnostic results for invalid lines.
+    """
+    path = Path(file_path)
+    if not path.exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+    if path.is_dir():
+        raise IsADirectoryError(f"Path is a directory, not a file: {file_path}")
+
+    invalid_lines: Dict[int, ParenthesesDiagnosticResult] = {}
+
+    with open(path, "r", encoding=encoding, errors="replace") as f:
+        for line_num, line in enumerate(f, start=1):
+            diag = validate_parentheses_in_code(line)
+            if not diag.is_valid:
+                invalid_lines[line_num] = diag
+
+    return invalid_lines
+
+
+def validate_batch_expressions(expressions: List[str]) -> List[Tuple[str, bool]]:
+    """
+    Validates a list of math/code expressions in batch.
+
+    Args:
+        expressions: List of input string expressions.
+
+    Returns:
+        List of tuples (expression, is_valid).
+    """
+    return [(expr, is_valid_parentheses(expr)) for expr in expressions]
+
+
+
 
 
 
