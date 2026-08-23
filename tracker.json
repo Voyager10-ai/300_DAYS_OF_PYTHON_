@@ -1,6 +1,6 @@
 {
   "total_problems": 282,
-  "current_day": 45,
+  "current_day": 46,
   "problems": [
     {"day": 1, "title": "Print String", "status": "done"},
     {"day": 2, "title": "Input Age", "status": "done"},
@@ -55,7 +55,7 @@
 
 
     {"day": 45, "title": "Random Line", "status": "done"},
-    {"day": 46, "title": "Check Parentheses", "status": "pending"},
+    {"day": 46, "title": "Check Parentheses", "status": "done"},
     {"day": 47, "title": "Circle", "status": "pending"},
     {"day": 48, "title": "Convert to Int", "status": "pending"},
     {"day": 49, "title": "Convert to Roman", "status": "pending"},

@@ -48,6 +48,7 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 43: First N Lines
 - Day 44: Longest Word (File)
 - Day 45: Random Line
+- Day 46: Check Parentheses
 
 
 
