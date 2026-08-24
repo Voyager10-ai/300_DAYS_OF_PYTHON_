@@ -400,6 +400,87 @@ class Circle:
         return "\n".join(lines)
 
 
+# ─── 8. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestCircleOperations(unittest.TestCase):
+    def setUp(self):
+        self.c1 = Circle(radius=5.0, center_x=0.0, center_y=0.0)
+        self.c2 = Circle(radius=3.0, center_x=4.0, center_y=0.0)
+
+    def test_circle_basic_properties(self):
+        c = Circle(5.0)
+        self.assertEqual(c.radius, 5.0)
+        self.assertEqual(c.diameter, 10.0)
+        self.assertAlmostEqual(c.area, math.pi * 25.0)
+        self.assertAlmostEqual(c.perimeter, 2.0 * math.pi * 5.0)
+
+        c.diameter = 12.0
+        self.assertEqual(c.radius, 6.0)
+
+    def test_negative_radius_raises_error(self):
+        with self.assertRaises(ValueError):
+            Circle(-1.0)
+        with self.assertRaises(ValueError):
+            Circle.from_area(-10.0)
+
+    def test_factory_constructors(self):
+        c_dia = Circle.from_diameter(10.0)
+        self.assertEqual(c_dia.radius, 5.0)
+
+        c_area = Circle.from_area(math.pi * 16.0)
+        self.assertAlmostEqual(c_area.radius, 4.0)
+
+        c_perim = Circle.from_perimeter(2.0 * math.pi * 7.0)
+        self.assertAlmostEqual(c_perim.radius, 7.0)
+
+        c_3pts = Circle.from_three_points((0, 1), (1, 0), (0, -1))
+        self.assertAlmostEqual(c_3pts.radius, 1.0)
+        self.assertAlmostEqual(c_3pts.center_x, 0.0)
+        self.assertAlmostEqual(c_3pts.center_y, 0.0)
+
+    def test_collision_and_spatial_methods(self):
+        self.assertTrue(self.c1.contains_point(3.0, 4.0))
+        self.assertFalse(self.c1.contains_point(6.0, 0.0))
+
+        # Intersection test
+        self.assertTrue(self.c1.intersects_circle(self.c2))
+
+        # Bounding box
+        bbox = self.c1.bounding_box()
+        self.assertEqual(bbox, (-5.0, -5.0, 5.0, 5.0))
+
+    def test_sector_and_segment_trigonometry(self):
+        c = Circle(10.0)
+        self.assertAlmostEqual(c.arc_length(180), math.pi * 10.0)
+        self.assertAlmostEqual(c.sector_area(180), 0.5 * math.pi * 100.0)
+
+    def test_operator_overloading(self):
+        c_sum = self.c1 + self.c2  # r1=5 (area 25pi), r2=3 (area 9pi) -> combined area 34pi -> r = sqrt(34)
+        self.assertAlmostEqual(c_sum.radius, math.sqrt(34))
+
+        c_scaled = self.c1 * 2.0
+        self.assertEqual(c_scaled.radius, 10.0)
+
+        self.assertTrue(self.c2 < self.c1)
+
+    def test_polygon_and_sampling(self):
+        vertices = self.c1.approximate_polygon(n_vertices=4)
+        self.assertEqual(len(vertices), 4)
+
+        pt = self.c1.sample_random_interior_point(seed=42)
+        self.assertTrue(self.c1.contains_point(pt[0], pt[1]))
+
+    def test_serialization(self):
+        json_str = self.c1.to_json()
+        restored = Circle.from_json(json_str)
+        self.assertEqual(self.c1, restored)
+
+        report = self.c1.format_report()
+        self.assertIn("Circle Geometry Summary Report", report)
+
+
+
 
 
 
