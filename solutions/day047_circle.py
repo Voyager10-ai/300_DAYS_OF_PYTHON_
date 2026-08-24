@@ -257,4 +257,54 @@ class Circle:
         return sector - triangle
 
 
+# ─── 5. Operator Overloading & Dunder Magic Methods ────────────────────────────
+
+
+    def __repr__(self) -> str:
+        return f"Circle(radius={self.radius}, center_x={self.center_x}, center_y={self.center_y})"
+
+    def __str__(self) -> str:
+        return f"Circle(r={self.radius:.2f}, center=({self.center_x:.2f}, {self.center_y:.2f}), area={self.area:.2f})"
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, Circle):
+            return False
+        return (
+            math.isclose(self.radius, other.radius, rel_tol=1e-7)
+            and math.isclose(self.center_x, other.center_x, rel_tol=1e-7)
+            and math.isclose(self.center_y, other.center_y, rel_tol=1e-7)
+        )
+
+    def __lt__(self, other: Any) -> bool:
+        if not isinstance(other, Circle):
+            return NotImplemented
+        return self.radius < other.radius
+
+    def __le__(self, other: Any) -> bool:
+        if not isinstance(other, Circle):
+            return NotImplemented
+        return self.radius <= other.radius
+
+    def __add__(self, other: Any) -> "Circle":
+        """Adds areas of two circles to form a new combined Circle."""
+        if isinstance(other, Circle):
+            new_radius = math.sqrt(self.radius**2 + other.radius**2)
+            return Circle(radius=new_radius, center_x=self.center_x, center_y=self.center_y)
+        elif isinstance(other, (int, float)):
+            return Circle(radius=self.radius + float(other), center_x=self.center_x, center_y=self.center_y)
+        return NotImplemented
+
+    def __mul__(self, factor: float) -> "Circle":
+        """Scales circle radius by a scalar factor."""
+        if not isinstance(factor, (int, float)):
+            return NotImplemented
+        if factor < 0:
+            raise ValueError(f"Scaling factor cannot be negative, got {factor}")
+        return Circle(radius=self.radius * float(factor), center_x=self.center_x, center_y=self.center_y)
+
+    def __rmul__(self, factor: float) -> "Circle":
+        return self.__mul__(factor)
+
+
+
 
