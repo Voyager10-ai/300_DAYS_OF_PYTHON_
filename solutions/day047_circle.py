@@ -353,6 +353,54 @@ class Circle:
         return (self.center_x + r * math.cos(theta), self.center_y + r * math.sin(theta))
 
 
+# ─── 7. Serialization & Report Formatting ──────────────────────────────────────
+
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Converts circle parameters and computed geometric properties into a dictionary."""
+        return {
+            "radius": self.radius,
+            "diameter": self.diameter,
+            "center": {"x": self.center_x, "y": self.center_y},
+            "area": round(self.area, 6),
+            "perimeter": round(self.perimeter, 6),
+            "bounding_box": self.bounding_box(),
+        }
+
+    def to_json(self, indent: int = 2) -> str:
+        """Serializes circle representation into a JSON string."""
+        return json.dumps(self.to_dict(), indent=indent)
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "Circle":
+        """Instantiates a Circle from a dictionary payload."""
+        radius = data["radius"]
+        center = data.get("center", {"x": 0.0, "y": 0.0})
+        return cls(radius=radius, center_x=center.get("x", 0.0), center_y=center.get("y", 0.0))
+
+    @classmethod
+    def from_json(cls, json_str: str) -> "Circle":
+        """Instantiates a Circle from a JSON string."""
+        data = json.loads(json_str)
+        return cls.from_dict(data)
+
+    def format_report(self) -> str:
+        """Formats a clean summary report string for the Circle object."""
+        min_x, min_y, max_x, max_y = self.bounding_box()
+        lines = [
+            f"=== 🔴 Circle Geometry Summary Report ===",
+            f"  Center Coordinates : ({self.center_x:.4f}, {self.center_y:.4f})",
+            f"  Radius (r)         : {self.radius:.4f}",
+            f"  Diameter (d)       : {self.diameter:.4f}",
+            f"  Area (A)           : {self.area:.4f} sq units",
+            f"  Perimeter (C)      : {self.perimeter:.4f} units",
+            f"  Bounding Box AABB  : X:[{min_x:.2f}, {max_x:.2f}], Y:[{min_y:.2f}, {max_y:.2f}]",
+            f"========================================",
+        ]
+        return "\n".join(lines)
+
+
+
 
 
 
