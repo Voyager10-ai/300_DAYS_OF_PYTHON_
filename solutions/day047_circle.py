@@ -137,3 +137,66 @@ class Circle:
         radius = math.hypot(x1 - ux, y1 - uy)
         return cls(radius=radius, center_x=ux, center_y=uy)
 
+
+# ─── 3. Collision Detection & Spatial Geometry ─────────────────────────────────
+
+
+    def distance_to_center(self, x: float, y: float) -> float:
+        """Calculates Euclidean distance from circle center to point (x, y)."""
+        return math.hypot(x - self.center_x, y - self.center_y)
+
+    def distance_between_centers(self, other: "Circle") -> float:
+        """Calculates Euclidean distance between centers of two circles."""
+        return self.distance_to_center(other.center_x, other.center_y)
+
+    def contains_point(self, x: float, y: float, include_boundary: bool = True) -> bool:
+        """
+        Checks if a 2D point (x, y) lies inside (or on the boundary of) the circle.
+
+        Args:
+            x: X-coordinate of test point.
+            y: Y-coordinate of test point.
+            include_boundary: If True, points on boundary are considered inside.
+
+        Returns:
+            True if point is contained, False otherwise.
+        """
+        dist = self.distance_to_center(x, y)
+        if include_boundary:
+            return dist <= self._radius + 1e-9
+        return dist < self._radius - 1e-9
+
+    def contains_circle(self, other: "Circle") -> bool:
+        """Checks if another circle is completely contained within this circle."""
+        dist = self.distance_between_centers(other)
+        return dist + other.radius <= self._radius + 1e-9
+
+    def intersects_circle(self, other: "Circle") -> bool:
+        """
+        Checks if this circle intersects or touches another circle.
+
+        Returns:
+            True if circles overlap or touch, False otherwise.
+        """
+        dist = self.distance_between_centers(other)
+        return (abs(self.radius - other.radius) - 1e-9 <= dist <= self.radius + other.radius + 1e-9)
+
+    def concentric_with(self, other: "Circle", tolerance: float = 1e-7) -> bool:
+        """Checks if two circles share the same center coordinates within tolerance."""
+        return self.distance_between_centers(other) <= tolerance
+
+    def bounding_box(self) -> Tuple[float, float, float, float]:
+        """
+        Calculates the axis-aligned bounding box (AABB) of the circle.
+
+        Returns:
+            Tuple of (min_x, min_y, max_x, max_y).
+        """
+        return (
+            self.center_x - self.radius,
+            self.center_y - self.radius,
+            self.center_x + self.radius,
+            self.center_y + self.radius,
+        )
+
+
