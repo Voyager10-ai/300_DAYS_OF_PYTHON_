@@ -200,3 +200,61 @@ class Circle:
         )
 
 
+# ─── 4. Arc, Sector, Segment & Chord Trigonometry ──────────────────────────────
+
+
+    def arc_length(self, angle_degrees: float) -> float:
+        """
+        Calculates arc length for a given central angle in degrees.
+
+        Args:
+            angle_degrees: Central angle in degrees (0 to 360).
+
+        Returns:
+            Arc length string value.
+        """
+        rad = math.radians(angle_degrees)
+        return self.radius * abs(rad)
+
+    def sector_area(self, angle_degrees: float) -> float:
+        """
+        Calculates the area of a circular sector for a given angle in degrees.
+
+        Args:
+            angle_degrees: Central angle in degrees.
+
+        Returns:
+            Sector area value.
+        """
+        return 0.5 * (self.radius ** 2) * abs(math.radians(angle_degrees))
+
+    def chord_length(self, angle_degrees: float) -> float:
+        """
+        Calculates length of a chord subtended by central angle in degrees (2 * r * sin(θ/2)).
+
+        Args:
+            angle_degrees: Central angle in degrees.
+
+        Returns:
+            Chord length.
+        """
+        rad = math.radians(angle_degrees)
+        return 2.0 * self.radius * math.sin(abs(rad) / 2.0)
+
+    def segment_area(self, angle_degrees: float) -> float:
+        """
+        Calculates the area of a circular segment (region bounded by chord and arc).
+
+        Args:
+            angle_degrees: Central angle in degrees.
+
+        Returns:
+            Segment area value.
+        """
+        rad = abs(math.radians(angle_degrees))
+        sector = 0.5 * (self.radius ** 2) * rad
+        triangle = 0.5 * (self.radius ** 2) * math.sin(rad)
+        return sector - triangle
+
+
+
