@@ -778,7 +778,23 @@
 //     }
 // }
 
+// Java Circle Practice (Day 47)
+// class CirclePractice {
+//     private double radius;
+//     public CirclePractice(double radius) {
+//         if (radius < 0) throw new IllegalArgumentException("Radius cannot be negative");
+//         this.radius = radius;
+//     }
+//     public double getArea() { return Math.PI * radius * radius; }
+//     public double getPerimeter() { return 2 * Math.PI * radius; }
+//     public static void main(String[] args) {
+//         CirclePractice c = new CirclePractice(7.5);
+//         System.out.println("Radius: " + c.radius + ", Area: " + c.getArea() + ", Perimeter: " + c.getPerimeter());
+//     }
+// }
+
 import java.util.*;
+
 
 
 

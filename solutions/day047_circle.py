@@ -480,6 +480,53 @@ class TestCircleOperations(unittest.TestCase):
         self.assertIn("Circle Geometry Summary Report", report)
 
 
+# ─── 9. Interactive CLI Demo Runner ───────────────────────────────────────────
+
+
+def main():
+    print("=" * 60)
+    print(" 🔴 Day 47: Circle Geometry & Area/Perimeter Calculator - Demo")
+    print("=" * 60)
+
+    # 1. Circle Properties
+    c = Circle(radius=7.5, center_x=2.0, center_y=3.0)
+    print("\n1. Circle Properties & Computations:")
+    print(f"   Radius       : {c.radius}")
+    print(f"   Diameter     : {c.diameter}")
+    print(f"   Area         : {c.area:.4f} sq units")
+    print(f"   Perimeter    : {c.perimeter:.4f} units")
+    print(f"   Bounding Box : {c.bounding_box()}")
+
+    # 2. Sector & Trigonometry
+    angle = 60.0
+    print(f"\n2. Sector & Trigonometric Computations (Angle = {angle}°):")
+    print(f"   Arc Length   : {c.arc_length(angle):.4f}")
+    print(f"   Sector Area  : {c.sector_area(angle):.4f}")
+    print(f"   Chord Length : {c.chord_length(angle):.4f}")
+    print(f"   Segment Area : {c.segment_area(angle):.4f}")
+
+    # 3. Factory Constructors
+    c3 = Circle.from_three_points((0, 3), (3, 0), (0, -3))
+    print(f"\n3. Circumcircle from 3 Points (0,3), (3,0), (0,-3):")
+    print(f"   Radius : {c3.radius:.4f}, Center: ({c3.center_x}, {c3.center_y})")
+
+    # 4. Summary Report Output
+    print("\n4. Formatted Summary Report:")
+    print(c.format_report())
+
+    # 5. Unit Test Suite Execution
+    print("\n5. Executing Unit Test Suite:")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestCircleOperations)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+    print("\nDemo execution complete!")
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 
