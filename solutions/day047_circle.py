@@ -306,5 +306,53 @@ class Circle:
         return self.__mul__(factor)
 
 
+# ─── 6. Polygon Approximation & Point Sampling Utilities ───────────────────────
+
+
+    def approximate_polygon(self, n_vertices: int = 36) -> List[Tuple[float, float]]:
+        """
+        Approximates circle with an inscribed regular n-gon of vertices.
+
+        Args:
+            n_vertices: Number of polygon vertices (must be >= 3).
+
+        Returns:
+            List of (x, y) vertex coordinates.
+        """
+        if n_vertices < 3:
+            raise ValueError(f"n_vertices must be at least 3, got {n_vertices}")
+
+        vertices: List[Tuple[float, float]] = []
+        angle_step = (2.0 * math.pi) / n_vertices
+        for i in range(n_vertices):
+            angle = i * angle_step
+            vx = self.center_x + self.radius * math.cos(angle)
+            vy = self.center_y + self.radius * math.sin(angle)
+            vertices.append((vx, vy))
+        return vertices
+
+    def sample_points_on_perimeter(self, n_points: int = 12) -> List[Tuple[float, float]]:
+        """Samples n evenly spaced 2D points along the circle perimeter."""
+        return self.approximate_polygon(n_vertices=n_points)
+
+    def sample_random_interior_point(self, seed: Optional[int] = None) -> Tuple[float, float]:
+        """
+        Samples a 2D point uniformly at random within the interior of the circle.
+
+        Args:
+            seed: Optional random seed.
+
+        Returns:
+            Tuple of (x, y) coordinates inside circle.
+        """
+        rng = random.Random(seed)
+        u = rng.random()
+        v = rng.random()
+        r = self.radius * math.sqrt(u)
+        theta = 2.0 * math.pi * v
+        return (self.center_x + r * math.cos(theta), self.center_y + r * math.sin(theta))
+
+
+
 
 
