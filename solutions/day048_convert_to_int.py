@@ -459,6 +459,66 @@ def bounded_str_to_int(
     return val
 
 
+# ─── 8. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestConvertToIntOperations(unittest.TestCase):
+    def test_custom_atoi(self):
+        self.assertEqual(custom_atoi("42"), 42)
+        self.assertEqual(custom_atoi("   -12345extra"), -12345)
+        self.assertEqual(custom_atoi("+99"), 99)
+        with self.assertRaises(ValueError):
+            custom_atoi("words")
+        with self.assertRaises(ValueError):
+            custom_atoi("")
+
+    def test_safe_str_to_int(self):
+        self.assertEqual(safe_str_to_int("100"), 100)
+        self.assertEqual(safe_str_to_int(12.7), 12)
+        self.assertIsNone(safe_str_to_int("invalid"))
+        self.assertEqual(safe_str_to_int("invalid", default=-1), -1)
+
+    def test_convert_base_to_int(self):
+        self.assertEqual(convert_base_to_int("1010", base=2), 10)
+        self.assertEqual(convert_base_to_int("0b1010", base=2), 10)
+        self.assertEqual(convert_base_to_int("0x1A", base=16), 26)
+        self.assertEqual(convert_base_to_int("z", base=36), 35)
+
+        val, base = auto_detect_base_convert("0x3E8")
+        self.assertEqual(val, 1000)
+        self.assertEqual(base, 16)
+
+    def test_words_to_int(self):
+        self.assertEqual(words_to_int("forty-two"), 42)
+        self.assertEqual(words_to_int("one hundred twenty-three"), 123)
+        self.assertEqual(words_to_int("minus five thousand four hundred six"), -5406)
+
+    def test_roman_to_int(self):
+        self.assertEqual(roman_to_int("IV"), 4)
+        self.assertEqual(roman_to_int("MCMXCIV"), 1994)
+        with self.assertRaises(ValueError):
+            roman_to_int("IIII")
+
+    def test_collection_conversions(self):
+        items = ["10", "20.5", "invalid", "30"]
+        self.assertEqual(convert_list_to_ints(items, ignore_errors=True), [10, 20, 30])
+
+        d = {"a": "1", "b": "$2.5", "c": "3"}
+        self.assertEqual(convert_dict_values_to_ints({"a": "1", "c": "3"}), {"a": 1, "c": 3})
+
+    def test_clean_numeric_str_to_int(self):
+        self.assertEqual(clean_numeric_str_to_int("$1,234,567.89"), 1234567)
+        self.assertEqual(clean_numeric_str_to_int("1e4"), 10000)
+        self.assertEqual(clean_numeric_str_to_int("  4.9  ", rounding_mode="round"), 5)
+
+    def test_bounded_str_to_int(self):
+        self.assertEqual(bounded_str_to_int("50", min_val=0, max_val=100), 50)
+        with self.assertRaises(ValueError):
+            bounded_str_to_int("150", max_val=100)
+        self.assertEqual(bounded_str_to_int("150", max_val=100, clamp=True), 100)
+
+
+
 
 
 
