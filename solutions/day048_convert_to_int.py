@@ -420,6 +420,46 @@ def clean_numeric_str_to_int(s: str, rounding_mode: str = "trunc") -> int:
         raise ValueError(f"Unknown rounding mode: '{rounding_mode}'")
 
 
+# ─── 7. Range-Bounded Integer Conversion & Clamping ───────────────────────────
+
+
+def bounded_str_to_int(
+    s: str,
+    min_val: Optional[int] = None,
+    max_val: Optional[int] = None,
+    clamp: bool = False,
+) -> int:
+    """
+    Converts a string to integer and enforces minimum and maximum boundary bounds.
+
+    Args:
+        s: Input string representation of an integer.
+        min_val: Optional lower bound (inclusive).
+        max_val: Optional upper bound (inclusive).
+        clamp: If True, clamps out-of-bound values to min_val/max_val instead of raising error.
+
+    Returns:
+        Bounded or clamped integer value.
+
+    Raises:
+        ValueError: If value is out of bounds and clamp=False.
+    """
+    val = custom_atoi(s)
+
+    if min_val is not None and val < min_val:
+        if clamp:
+            return min_val
+        raise ValueError(f"Value {val} is below minimum allowed bound {min_val}")
+
+    if max_val is not None and val > max_val:
+        if clamp:
+            return max_val
+        raise ValueError(f"Value {val} exceeds maximum allowed bound {max_val}")
+
+    return val
+
+
+
 
 
 
