@@ -321,4 +321,60 @@ def roman_to_int(s: str) -> int:
     return total
 
 
+# ─── 5. Collection & Dictionary Integer Conversion Utilities ──────────────────
+
+
+def convert_list_to_ints(
+    items: List[Any],
+    ignore_errors: bool = False,
+    default: Optional[int] = None,
+) -> List[int]:
+    """
+    Converts a list of mixed element types (strings, floats, numbers) into integers.
+
+    Args:
+        items: Iterable list of items.
+        ignore_errors: If True, skips items that fail to convert.
+        default: Fallback value if item conversion fails and ignore_errors=False.
+
+    Returns:
+        List of converted integer values.
+    """
+    result: List[int] = []
+    for item in items:
+        converted = safe_str_to_int(item, default=default)
+        if converted is not None:
+            result.append(converted)
+        elif not ignore_errors and default is None:
+            raise ValueError(f"Could not convert item '{item}' to int")
+    return result
+
+
+def convert_dict_values_to_ints(
+    d: Dict[Any, Any],
+    ignore_errors: bool = False,
+    default: Optional[int] = None,
+) -> Dict[Any, int]:
+    """
+    Converts values of a dictionary to integers.
+
+    Args:
+        d: Input dictionary.
+        ignore_errors: If True, omits keys whose values fail conversion.
+        default: Default fallback value if conversion fails and ignore_errors=False.
+
+    Returns:
+        New dictionary with converted integer values.
+    """
+    result: Dict[Any, int] = {}
+    for k, v in d.items():
+        converted = safe_str_to_int(v, default=default)
+        if converted is not None:
+            result[k] = converted
+        elif not ignore_errors and default is None:
+            raise ValueError(f"Could not convert value '{v}' for key '{k}' to int")
+    return result
+
+
+
 
