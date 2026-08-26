@@ -271,3 +271,54 @@ def words_to_int(s: str) -> int:
     return sign * (total + current)
 
 
+# ─── 4. Roman Numeral to Integer Converter ────────────────────────────────────
+
+
+ROMAN_VALUES: Dict[str, int] = {
+    "I": 1,
+    "V": 5,
+    "X": 10,
+    "L": 50,
+    "C": 100,
+    "D": 500,
+    "M": 1000,
+}
+
+
+def roman_to_int(s: str) -> int:
+    """
+    Converts a Roman numeral string (e.g. 'MCMXCIV') to integer.
+
+    Args:
+        s: Roman numeral string.
+
+    Returns:
+        Converted integer (1 to 3999).
+
+    Raises:
+        ValueError: If string is not a valid Roman numeral.
+    """
+    clean_s = s.strip().upper()
+    if not clean_s:
+        raise ValueError("Cannot convert empty Roman numeral string")
+
+    # Basic regex validation for standard Roman numerals (1 - 3999)
+    roman_pattern = r"^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$"
+    if not re.match(roman_pattern, clean_s):
+        raise ValueError(f"Invalid Roman numeral string: '{s}'")
+
+    total = 0
+    prev_value = 0
+
+    for char in reversed(clean_s):
+        value = ROMAN_VALUES[char]
+        if value < prev_value:
+            total -= value
+        else:
+            total += value
+            prev_value = value
+
+    return total
+
+
+
