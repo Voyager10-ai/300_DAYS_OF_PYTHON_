@@ -793,7 +793,32 @@
 //     }
 // }
 
+// Java Convert to Int Practice (Day 48)
+// class ConvertToIntPractice {
+//     public static int customAtoi(String s) {
+//         if (s == null) throw new IllegalArgumentException("Input string is null");
+//         s = s.trim();
+//         if (s.isEmpty()) throw new IllegalArgumentException("Input string is empty");
+//         int sign = 1, idx = 0;
+//         if (s.charAt(0) == '-') { sign = -1; idx++; }
+//         else if (s.charAt(0) == '+') { idx++; }
+//         long res = 0;
+//         while (idx < s.length() && Character.isDigit(s.charAt(idx))) {
+//             res = res * 10 + (s.charAt(idx) - '0');
+//             if (sign * res > Integer.MAX_VALUE) return Integer.MAX_VALUE;
+//             if (sign * res < Integer.MIN_VALUE) return Integer.MIN_VALUE;
+//             idx++;
+//         }
+//         return (int) (sign * res);
+//     }
+//     public static void main(String[] args) {
+//         String s = "  -42";
+//         System.out.println("String: '" + s + "' -> int: " + customAtoi(s));
+//     }
+// }
+
 import java.util.*;
+
 
 
 

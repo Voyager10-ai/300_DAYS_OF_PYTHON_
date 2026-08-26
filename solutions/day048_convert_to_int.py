@@ -518,6 +518,58 @@ class TestConvertToIntOperations(unittest.TestCase):
         self.assertEqual(bounded_str_to_int("150", max_val=100, clamp=True), 100)
 
 
+# ─── 9. Interactive CLI Demo Runner ───────────────────────────────────────────
+
+
+def main():
+    print("=" * 60)
+    print(" 🔢 Day 48: Convert String to Int Utilities - Interactive Demo")
+    print("=" * 60)
+
+    # 1. Custom atoi
+    sample_str = "   -42999 extra trailing text"
+    converted_atoi = custom_atoi(sample_str)
+    print(f"\n1. Custom atoi Parsing:")
+    print(f"   Input String : '{sample_str}'")
+    print(f"   Parsed Int   : {converted_atoi}")
+
+    # 2. Base Conversions
+    hex_str = "0x7E4"
+    hex_val, detected_base = auto_detect_base_convert(hex_str)
+    bin_val = convert_base_to_int("110101", base=2)
+    print(f"\n2. Arbitrary Base Conversions:")
+    print(f"   '{hex_str}' (auto-detected base {detected_base}) -> {hex_val}")
+    print(f"   '110101' (base 2) -> {bin_val}")
+
+    # 3. English Words & Roman Numerals
+    words = "two million five hundred thousand three hundred forty-five"
+    word_val = words_to_int(words)
+    roman_str = "MCMXCIV"
+    roman_val = roman_to_int(roman_str)
+    print(f"\n3. Textual & Roman Numeral Conversion:")
+    print(f"   Words: '{words}' -> {word_val:,}")
+    print(f"   Roman: '{roman_str}' -> {roman_val}")
+
+    # 4. Formatted Currency Cleaning
+    currency_str = "  $ 1,234,567.89  "
+    clean_val = clean_numeric_str_to_int(currency_str, rounding_mode="round")
+    print(f"\n4. Currency & Formatted String Cleaning:")
+    print(f"   Formatted Input : '{currency_str}'")
+    print(f"   Cleaned Int     : {clean_val:,}")
+
+    # 5. Unit Test Suite Execution
+    print("\n5. Executing Unit Test Suite:")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestConvertToIntOperations)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+    print("\nDemo execution complete!")
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 
