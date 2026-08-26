@@ -181,3 +181,93 @@ def auto_detect_base_convert(s: str) -> Tuple[int, int]:
     val = convert_base_to_int(s_clean, base=base)
     return (val, base)
 
+
+# ─── 3. English Word Number to Integer Converter ───────────────────────────────
+
+
+WORD_NUMBER_MAP: Dict[str, int] = {
+    "zero": 0,
+    "one": 1,
+    "two": 2,
+    "three": 3,
+    "four": 4,
+    "five": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+    "nine": 9,
+    "ten": 10,
+    "eleven": 11,
+    "twelve": 12,
+    "thirteen": 13,
+    "fourteen": 14,
+    "fifteen": 15,
+    "sixteen": 16,
+    "seventeen": 17,
+    "eighteen": 18,
+    "nineteen": 19,
+    "twenty": 20,
+    "thirty": 30,
+    "forty": 40,
+    "fifty": 50,
+    "sixty": 60,
+    "seventy": 70,
+    "eighty": 80,
+    "ninety": 90,
+}
+
+WORD_MULTIPLIERS: Dict[str, int] = {
+    "hundred": 100,
+    "thousand": 1000,
+    "million": 1000000,
+    "billion": 1000000000,
+}
+
+
+def words_to_int(s: str) -> int:
+    """
+    Converts English word numbers (e.g. 'one hundred twenty-three') to integer.
+
+    Args:
+        s: String of word number tokens.
+
+    Returns:
+        Converted integer.
+
+    Raises:
+        ValueError: If words cannot be parsed into a valid number.
+    """
+    clean_str = s.lower().replace("-", " ").strip()
+    if not clean_str:
+        raise ValueError("Cannot convert empty word string")
+
+    words = clean_str.split()
+    sign = 1
+    if words[0] in ("negative", "minus"):
+        sign = -1
+        words = words[1:]
+
+    if not words:
+        raise ValueError("No valid word tokens found after sign")
+
+    total = 0
+    current = 0
+
+    for word in words:
+        if word == "and":
+            continue
+        if word in WORD_NUMBER_MAP:
+            current += WORD_NUMBER_MAP[word]
+        elif word in WORD_MULTIPLIERS:
+            scale = WORD_MULTIPLIERS[word]
+            if scale == 100:
+                current = (current if current != 0 else 1) * 100
+            else:
+                total += (current if current != 0 else 1) * scale
+                current = 0
+        else:
+            raise ValueError(f"Unrecognized number word: '{word}'")
+
+    return sign * (total + current)
+
+
