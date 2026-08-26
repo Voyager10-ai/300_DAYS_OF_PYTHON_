@@ -376,5 +376,50 @@ def convert_dict_values_to_ints(
     return result
 
 
+# ─── 6. Formatted Numeric String Cleaning & Float Conversion ───────────────────
+
+
+def clean_numeric_str_to_int(s: str, rounding_mode: str = "trunc") -> int:
+    """
+    Cleans formatted currency/number strings (e.g. '$1,234,567.89', '  1e5  ') and converts to int.
+
+    Args:
+        s: Raw input string containing digits, commas, currency symbols, floats, or sci notation.
+        rounding_mode: How float components are rounded: 'trunc', 'round', 'floor', 'ceil'.
+
+    Returns:
+        Converted integer.
+
+    Raises:
+        ValueError: If cleaning fails to yield a valid number.
+    """
+    if not isinstance(s, str):
+        raise TypeError(f"Expected string, got {type(s).__name__}")
+
+    # Remove commas, currency symbols, spaces
+    cleaned = re.sub(r"[$,\s]", "", s.strip())
+
+    # Handle scientific notation or float strings
+    try:
+        val_float = float(cleaned)
+    except ValueError:
+        raise ValueError(f"Unable to parse formatted numeric string: '{s}'")
+
+    if math.isnan(val_float) or math.isinf(val_float):
+        raise ValueError(f"Cannot convert non-finite float value '{val_float}' to integer")
+
+    if rounding_mode == "trunc":
+        return int(val_float)
+    elif rounding_mode == "round":
+        return round(val_float)
+    elif rounding_mode == "floor":
+        return math.floor(val_float)
+    elif rounding_mode == "ceil":
+        return math.ceil(val_float)
+    else:
+        raise ValueError(f"Unknown rounding mode: '{rounding_mode}'")
+
+
+
 
 
