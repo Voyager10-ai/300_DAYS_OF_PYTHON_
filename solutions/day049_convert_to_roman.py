@@ -60,3 +60,50 @@ def int_to_roman(num: int) -> str:
             remaining -= val
 
     return "".join(result)
+
+
+# ─── 2. Additive Roman Numeral Variant ─────────────────────────────────────────
+
+
+ADDITIVE_ROMAN_TABLE: List[Tuple[int, str]] = [
+    (1000, "M"),
+    (500, "D"),
+    (100, "C"),
+    (50, "L"),
+    (10, "X"),
+    (5, "V"),
+    (1, "I"),
+]
+
+
+def int_to_roman_additive(num: int) -> str:
+    """
+    Converts an integer to an additive Roman numeral string (without subtractive pairs like IV or IX).
+    For example: 4 -> 'IIII', 9 -> 'VIIII', 40 -> 'XXXX'.
+
+    Args:
+        num: Integer between 1 and 3999.
+
+    Returns:
+        Additive Roman numeral string.
+
+    Raises:
+        ValueError: If num is outside range 1 to 3999.
+    """
+    if not isinstance(num, int) or isinstance(num, bool):
+        raise TypeError(f"Expected integer input, got {type(num).__name__}")
+
+    if not (1 <= num <= 3999):
+        raise ValueError(f"Additive Roman conversion requires 1 <= num <= 3999, got {num}")
+
+    result: List[str] = []
+    remaining = num
+
+    for val, symbol in ADDITIVE_ROMAN_TABLE:
+        count = remaining // val
+        if count > 0:
+            result.append(symbol * count)
+            remaining %= val
+
+    return "".join(result)
+
