@@ -171,3 +171,84 @@ def int_to_extended_roman(num: int) -> str:
     return "".join(result)
 
 
+# ─── 4. Roman Numeral Validator & Round-Trip Verifier ─────────────────────────
+
+
+ROMAN_PARSER_VALUES: Dict[str, int] = {
+    "I": 1,
+    "V": 5,
+    "X": 10,
+    "L": 50,
+    "C": 100,
+    "D": 500,
+    "M": 1000,
+}
+
+
+def is_valid_roman(s: str) -> bool:
+    """
+    Validates if a string is a syntactically correct standard Roman numeral (1 to 3999).
+
+    Args:
+        s: Input string.
+
+    Returns:
+        True if valid standard Roman numeral, False otherwise.
+    """
+    if not isinstance(s, str):
+        return False
+    clean_s = s.strip().upper()
+    pattern = r"^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$"
+    return bool(re.match(pattern, clean_s)) and len(clean_s) > 0
+
+
+def roman_to_int(s: str) -> int:
+    """
+    Converts a standard Roman numeral string to integer (1 to 3999).
+
+    Args:
+        s: Roman numeral string.
+
+    Returns:
+        Converted integer.
+
+    Raises:
+        ValueError: If string is invalid.
+    """
+    if not is_valid_roman(s):
+        raise ValueError(f"Invalid Roman numeral string: '{s}'")
+
+    clean_s = s.strip().upper()
+    total = 0
+    prev_val = 0
+
+    for char in reversed(clean_s):
+        val = ROMAN_PARSER_VALUES[char]
+        if val < prev_val:
+            total -= val
+        else:
+            total += val
+            prev_val = val
+
+    return total
+
+
+def round_trip_verify(num: int) -> bool:
+    """
+    Verifies that converting num to Roman and back to integer yields the original number.
+
+    Args:
+        num: Integer (1 to 3999).
+
+    Returns:
+        True if round-trip conversion is loss-less and accurate.
+    """
+    try:
+        roman_str = int_to_roman(num)
+        reconstructed = roman_to_int(roman_str)
+        return reconstructed == num
+    except Exception:
+        return False
+
+
+
