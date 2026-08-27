@@ -344,6 +344,42 @@ def generate_roman_range(start: int, stop: int, step: int = 1) -> List[str]:
     return [int_to_roman(i) for i in range(start, stop, step)]
 
 
+# ─── 7. Text Extractor & Year Formatter Utilities ──────────────────────────────
+
+
+def extract_roman_numerals_from_text(text: str) -> List[Tuple[str, int]]:
+    """
+    Extracts all valid Roman numeral tokens from a text block and evaluates their values.
+
+    Args:
+        text: Freeform text string.
+
+    Returns:
+        List of tuples (roman_token, integer_value).
+    """
+    pattern = r"\b(?=[MDCLXVI])M{0,3}(?:CM|CD|D?C{0,3})(?:XC|XL|L?X{0,3})(?:IX|IV|V?I{0,3})\b"
+    tokens = re.findall(pattern, text, flags=re.IGNORECASE)
+    results: List[Tuple[str, int]] = []
+    for token in tokens:
+        if token and is_valid_roman(token):
+            results.append((token.upper(), roman_to_int(token)))
+    return results
+
+
+def format_roman_year(year: int) -> str:
+    """
+    Formats a calendar year as a Roman numeral (e.g. 2026 -> 'MMXXVI').
+
+    Args:
+        year: Year integer (1 to 3999).
+
+    Returns:
+        Formatted year string.
+    """
+    return f"Anno Domini {int_to_roman(year)} (AD {year})"
+
+
+
 
 
 
