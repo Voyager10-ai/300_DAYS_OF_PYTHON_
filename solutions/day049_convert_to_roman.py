@@ -311,5 +311,39 @@ def roman_multiply(r1: str, r2: str) -> str:
     return int_to_roman(product)
 
 
+# ─── 6. Collection Roman Converters & Range Generator ──────────────────────────
+
+
+def convert_list_to_roman(numbers: List[int], additive: bool = False) -> List[str]:
+    """
+    Converts a list of integers to Roman numerals.
+
+    Args:
+        numbers: List of integers.
+        additive: If True, uses additive Roman notation.
+
+    Returns:
+        List of Roman numeral strings.
+    """
+    converter = int_to_roman_additive if additive else int_to_roman
+    return [converter(n) for n in numbers]
+
+
+def generate_roman_range(start: int, stop: int, step: int = 1) -> List[str]:
+    """
+    Generates a list of Roman numerals for integers in range(start, stop, step).
+
+    Args:
+        start: Start integer (inclusive).
+        stop: Stop integer (exclusive).
+        step: Step value.
+
+    Returns:
+        List of Roman numerals.
+    """
+    return [int_to_roman(i) for i in range(start, stop, step)]
+
+
+
 
 
