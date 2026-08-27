@@ -379,6 +379,67 @@ def format_roman_year(year: int) -> str:
     return f"Anno Domini {int_to_roman(year)} (AD {year})"
 
 
+# ─── 8. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestConvertToRomanOperations(unittest.TestCase):
+    def test_int_to_roman_standard(self):
+        self.assertEqual(int_to_roman(1), "I")
+        self.assertEqual(int_to_roman(4), "IV")
+        self.assertEqual(int_to_roman(9), "IX")
+        self.assertEqual(int_to_roman(58), "LVIII")
+        self.assertEqual(int_to_roman(1994), "MCMXCIV")
+        self.assertEqual(int_to_roman(3999), "MMMCMXCIX")
+
+    def test_int_to_roman_boundary_errors(self):
+        with self.assertRaises(ValueError):
+            int_to_roman(0)
+        with self.assertRaises(ValueError):
+            int_to_roman(4000)
+        with self.assertRaises(TypeError):
+            int_to_roman("100")
+        with self.assertRaises(TypeError):
+            int_to_roman(True)
+
+    def test_int_to_roman_additive(self):
+        self.assertEqual(int_to_roman_additive(4), "IIII")
+        self.assertEqual(int_to_roman_additive(9), "VIIII")
+        self.assertEqual(int_to_roman_additive(40), "XXXX")
+
+    def test_extended_roman(self):
+        self.assertEqual(int_to_extended_roman(5000), "(V)")
+        self.assertEqual(int_to_extended_roman(1000000), "(M)")
+
+    def test_validator_and_round_trip(self):
+        self.assertTrue(is_valid_roman("MCMXCIV"))
+        self.assertFalse(is_valid_roman("IIII"))
+        self.assertEqual(roman_to_int("MCMXCIV"), 1994)
+
+        # Spot check round-trips
+        for test_num in [1, 49, 99, 400, 500, 900, 2026, 3999]:
+            self.assertTrue(round_trip_verify(test_num))
+
+    def test_roman_arithmetic(self):
+        self.assertEqual(roman_add("X", "V"), "XV")
+        self.assertEqual(roman_subtract("XX", "V"), "XV")
+        self.assertEqual(roman_multiply("V", "V"), "XXV")
+        with self.assertRaises(ValueError):
+            roman_subtract("V", "V")
+
+    def test_collection_and_range(self):
+        self.assertEqual(convert_list_to_roman([1, 4, 10]), ["I", "IV", "X"])
+        self.assertEqual(generate_roman_range(1, 4), ["I", "II", "III"])
+
+    def test_text_extractor_and_year(self):
+        text = "Built in MCMXCIV and renovated in MMXXVI."
+        extracted = extract_roman_numerals_from_text(text)
+        self.assertEqual(extracted, [("MCMXCIV", 1994), ("MMXXVI", 2026)])
+
+        formatted_year = format_roman_year(2026)
+        self.assertIn("MMXXVI", formatted_year)
+
+
+
 
 
 
