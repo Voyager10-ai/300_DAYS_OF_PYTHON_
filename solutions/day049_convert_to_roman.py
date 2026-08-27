@@ -107,3 +107,67 @@ def int_to_roman_additive(num: int) -> str:
 
     return "".join(result)
 
+
+# ─── 3. Extended Roman Numerals for Large Numbers (up to 1,000,000) ───────────
+
+
+EXTENDED_ROMAN_TABLE: List[Tuple[int, str]] = [
+    (1000000, "(M)"),
+    (900000, "(CM)"),
+    (500000, "(D)"),
+    (400000, "(CD)"),
+    (100000, "(C)"),
+    (90000, "(XC)"),
+    (50000, "(L)"),
+    (40000, "(XL)"),
+    (10000, "(X)"),
+    (9000, "(IX)"),
+    (5000, "(V)"),
+    (4000, "(IV)"),
+    (1000, "M"),
+    (900, "CM"),
+    (500, "D"),
+    (400, "CD"),
+    (100, "C"),
+    (90, "XC"),
+    (50, "L"),
+    (40, "XL"),
+    (10, "X"),
+    (9, "IX"),
+    (5, "V"),
+    (4, "IV"),
+    (1, "I"),
+]
+
+
+def int_to_extended_roman(num: int) -> str:
+    """
+    Converts numbers up to 1,000,000 to Extended Roman numerals using bracket Vinculum notation.
+    For example: 5000 -> '(V)', 10500 -> '(X)D', 1000000 -> '(M)'.
+
+    Args:
+        num: Integer between 1 and 1,000,000.
+
+    Returns:
+        Extended Roman numeral string.
+
+    Raises:
+        ValueError: If num is outside range 1 to 1,000,000.
+    """
+    if not isinstance(num, int) or isinstance(num, bool):
+        raise TypeError(f"Expected integer input, got {type(num).__name__}")
+
+    if not (1 <= num <= 1000000):
+        raise ValueError(f"Extended Roman conversion requires 1 <= num <= 1,000,000, got {num}")
+
+    result: List[str] = []
+    remaining = num
+
+    for val, symbol in EXTENDED_ROMAN_TABLE:
+        while remaining >= val:
+            result.append(symbol)
+            remaining -= val
+
+    return "".join(result)
+
+
