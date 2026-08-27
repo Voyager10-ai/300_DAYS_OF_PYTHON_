@@ -439,6 +439,54 @@ class TestConvertToRomanOperations(unittest.TestCase):
         self.assertIn("MMXXVI", formatted_year)
 
 
+# ─── 9. Interactive CLI Demo Runner ───────────────────────────────────────────
+
+
+def main():
+    print("=" * 60)
+    print(" 🏛️ Day 49: Convert Integer to Roman Numeral - Interactive Demo")
+    print("=" * 60)
+
+    # 1. Standard Conversion Samples
+    samples = [4, 9, 49, 99, 500, 1994, 2026, 3999]
+    print("\n1. Standard Subtractive vs Additive Conversions:")
+    for num in samples:
+        subt = int_to_roman(num)
+        addt = int_to_roman_additive(num)
+        print(f"   {num:>4} -> Standard: {subt:<12} Additive: {addt}")
+
+    # 2. Large Number Extended Notation
+    large_num = 125400
+    ext_roman = int_to_extended_roman(large_num)
+    print(f"\n2. Extended Vinculum Notation for Large Numbers:")
+    print(f"   {large_num:,} -> {ext_roman}")
+
+    # 3. Roman Arithmetic
+    r1, r2 = "XIV", "XXVI"
+    r_sum = roman_add(r1, r2)
+    r_prod = roman_multiply("XV", "XV")
+    print(f"\n3. Roman Numeral Arithmetic:")
+    print(f"   {r1} (14) + {r2} (26) = {r_sum} (40)")
+    print(f"   XV (15) * XV (15) = {r_prod} (225)")
+
+    # 4. Text Extraction & Year Formatting
+    year_str = format_roman_year(2026)
+    print(f"\n4. Calendar Year & Text Extraction:")
+    print(f"   Formatted Year: {year_str}")
+
+    # 5. Unit Test Suite Execution
+    print("\n5. Executing Unit Test Suite:")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestConvertToRomanOperations)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+    print("\nDemo execution complete!")
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 
