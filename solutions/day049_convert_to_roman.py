@@ -251,4 +251,65 @@ def round_trip_verify(num: int) -> bool:
         return False
 
 
+# ─── 5. Roman Numeral Arithmetic Operations ───────────────────────────────────
+
+
+def roman_add(r1: str, r2: str) -> str:
+    """
+    Adds two Roman numeral strings and returns the result as a Roman numeral.
+
+    Args:
+        r1: First Roman numeral.
+        r2: Second Roman numeral.
+
+    Returns:
+        Sum represented as a Roman numeral string.
+    """
+    v1 = roman_to_int(r1)
+    v2 = roman_to_int(r2)
+    return int_to_roman(v1 + v2)
+
+
+def roman_subtract(r1: str, r2: str) -> str:
+    """
+    Subtracts second Roman numeral from the first (r1 - r2).
+
+    Args:
+        r1: Minuend Roman numeral.
+        r2: Subtrahend Roman numeral.
+
+    Returns:
+        Difference represented as a Roman numeral string.
+
+    Raises:
+        ValueError: If difference <= 0 (Roman numerals have no zero or negative values).
+    """
+    v1 = roman_to_int(r1)
+    v2 = roman_to_int(r2)
+    diff = v1 - v2
+    if diff <= 0:
+        raise ValueError(f"Roman arithmetic subtraction resulted in non-positive value ({diff})")
+    return int_to_roman(diff)
+
+
+def roman_multiply(r1: str, r2: str) -> str:
+    """
+    Multiplies two Roman numeral strings (r1 * r2).
+
+    Args:
+        r1: First Roman numeral.
+        r2: Second Roman numeral.
+
+    Returns:
+        Product represented as a Roman numeral string.
+    """
+    v1 = roman_to_int(r1)
+    v2 = roman_to_int(r2)
+    product = v1 * v2
+    if product > 3999:
+        return int_to_extended_roman(product)
+    return int_to_roman(product)
+
+
+
 
