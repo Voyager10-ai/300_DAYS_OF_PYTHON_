@@ -838,7 +838,29 @@
 //     }
 // }
 
+// Java Get and Print Practice (Day 50)
+// import java.util.Scanner;
+// class GetAndPrintPractice {
+//     private String text;
+//     public void getString(Scanner sc) {
+//         System.out.print("Enter string: ");
+//         this.text = sc.nextLine();
+//     }
+//     public void printString() {
+//         if (this.text != null) {
+//             System.out.println(this.text.toUpperCase());
+//         }
+//     }
+//     public static void main(String[] args) {
+//         GetAndPrintPractice obj = new GetAndPrintPractice();
+//         // Scanner sc = new Scanner(System.in);
+//         // obj.getString(sc);
+//         // obj.printString();
+//     }
+// }
+
 import java.util.*;
+
 
 
 

@@ -10,6 +10,7 @@ import sys
 import io
 import re
 import unittest
+from pathlib import Path
 from typing import List, Dict, Tuple, Set, Any, Optional, Union, Callable, TextIO
 
 
@@ -464,12 +465,61 @@ class TestGetAndPrintOperations(unittest.TestCase):
             .replace("ON", "ON 300")
             .to_string()
         )
-        self.assertEqual(res, "PYTH ON 300")
+        self.assertEqual(res, "PYTHON 300")
 
     def test_batch_processing(self):
         batch = BatchStringProcessor(["apple", "banana"])
         processed = batch.get_processed_list("upper")
         self.assertEqual(processed, ["APPLE", "BANANA"])
+
+
+# ─── 9. Interactive CLI Demo Runner ───────────────────────────────────────────
+
+
+def main():
+    print("=" * 60)
+    print(" 🔤 Day 50: Get and Print String Processor - Interactive Demo")
+    print("=" * 60)
+
+    # 1. Core StringProcessor Demo with Mock Inputs
+    mock_inputs = ["welcome to 300 days of python!"]
+    mock = MockIO(mock_inputs)
+
+    sp = StringProcessor()
+    acquired = sp.get_string(prompt="Simulated User Input: ", input_func=mock.input_func)
+    print(f"\n1. Core String Acquisition & Uppercase Printing:")
+    print(f"   Acquired String : '{acquired}'")
+    print("   print_string()  : ", end="")
+    sp.print_string(uppercase=True)
+
+    # 2. Boxed & Aligned Output
+    print("\n2. Boxed Border Output:")
+    sp.print_boxed(border_char="*")
+
+    print("\n3. Aligned Text Output:")
+    sp.print_aligned(width=50, align="center")
+
+    # 4. Fluent Chainable API
+    chain_res = (
+        StringProcessorChain("hello world")
+        .upper()
+        .reverse()
+        .to_string()
+    )
+    print(f"\n4. Fluent Chaining Demo:")
+    print(f"   'hello world' -> .upper().reverse() -> '{chain_res}'")
+
+    # 5. Unit Test Suite Execution
+    print("\n5. Executing Unit Test Suite:")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestGetAndPrintOperations)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+    print("\nDemo execution complete!")
+
+
+if __name__ == "__main__":
+    main()
+
 
 
 
