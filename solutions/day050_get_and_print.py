@@ -286,4 +286,59 @@ class StringProcessor:
         return output
 
 
+# ─── 5. Fluent Chainable API Interface ─────────────────────────────────────────
+
+
+class StringProcessorChain:
+    """
+    Fluent builder interface enabling chained calls like:
+    StringProcessorChain().set_text('hello').upper().reverse().print()
+    """
+
+    def __init__(self, initial_text: str = ""):
+        self._text = str(initial_text)
+
+    def set_text(self, text: str) -> "StringProcessorChain":
+        self._text = str(text)
+        return self
+
+    def get_string(self, prompt: str = "Enter string: ", input_func: Callable[[str], str] = input) -> "StringProcessorChain":
+        self._text = input_func(prompt)
+        return self
+
+    def upper(self) -> "StringProcessorChain":
+        self._text = self._text.upper()
+        return self
+
+    def lower(self) -> "StringProcessorChain":
+        self._text = self._text.lower()
+        return self
+
+    def title(self) -> "StringProcessorChain":
+        self._text = self._text.title()
+        return self
+
+    def reverse(self) -> "StringProcessorChain":
+        self._text = self._text[::-1]
+        return self
+
+    def strip(self) -> "StringProcessorChain":
+        self._text = self._text.strip()
+        return self
+
+    def replace(self, old: str, new: str) -> "StringProcessorChain":
+        self._text = self._text.replace(old, new)
+        return self
+
+    def print(self, output_stream: Optional[TextIO] = None) -> "StringProcessorChain":
+        if output_stream is None:
+            output_stream = sys.stdout
+        print(self._text, file=output_stream)
+        return self
+
+    def to_string(self) -> str:
+        return self._text
+
+
+
 
