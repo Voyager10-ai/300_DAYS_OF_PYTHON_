@@ -340,5 +340,44 @@ class StringProcessorChain:
         return self._text
 
 
+# ─── 6. Batch String Collector & Bulk Processor ────────────────────────────────
+
+
+class BatchStringProcessor:
+    """
+    Manages a collection of strings and processes/prints them in bulk.
+    """
+
+    def __init__(self, initial_list: Optional[List[str]] = None):
+        self.strings: List[str] = list(initial_list) if initial_list else []
+
+    def add_string(self, text: str) -> None:
+        self.strings.append(str(text))
+
+    def add_strings(self, texts: List[str]) -> None:
+        self.strings.extend([str(t) for t in texts])
+
+    def print_all_uppercase(self, output_stream: Optional[TextIO] = None) -> List[str]:
+        if output_stream is None:
+            output_stream = sys.stdout
+
+        upper_list = [s.upper() for s in self.strings]
+        for s in upper_list:
+            print(s, file=output_stream)
+        return upper_list
+
+    def get_processed_list(self, case_mode: str = "upper") -> List[str]:
+        if case_mode == "upper":
+            return [s.upper() for s in self.strings]
+        elif case_mode == "lower":
+            return [s.lower() for s in self.strings]
+        elif case_mode == "title":
+            return [s.title() for s in self.strings]
+        elif case_mode == "reverse":
+            return [s[::-1] for s in self.strings]
+        return list(self.strings)
+
+
+
 
 
