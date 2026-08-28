@@ -79,3 +79,71 @@ class StringProcessor:
         output = self._text.upper() if uppercase else self._text
         print(output, file=output_stream)
         return output
+
+
+# ─── 2. Advanced Input Handlers & Validation ───────────────────────────────────
+
+
+    def get_string_with_validation(
+        self,
+        prompt: str = "Enter a valid string: ",
+        validator: Optional[Callable[[str], bool]] = None,
+        max_retries: int = 3,
+        default_value: str = "",
+        input_func: Callable[[str], str] = input,
+    ) -> str:
+        """
+        Gets a string from user input with optional validation function and retry count.
+
+        Args:
+            prompt: Display prompt.
+            validator: Callable returning True for valid input.
+            max_retries: Number of allowed retries before falling back to default.
+            default_value: Default fallback value if validation fails after retries.
+            input_func: Input provider function.
+
+        Returns:
+            Validated string input or default fallback.
+        """
+        if validator is None:
+            validator = lambda s: len(s.strip()) > 0
+
+        for _ in range(max_retries):
+            candidate = input_func(prompt)
+            if validator(candidate):
+                self._text = candidate
+                return self._text
+
+        self._text = default_value
+        return self._text
+
+    def get_multiline_string(
+        self,
+        prompt: str = "Enter multiline text (type 'END' on a new line to finish):\n",
+        stop_word: str = "END",
+        input_func: Callable[[str], str] = input,
+    ) -> str:
+        """
+        Gets multiline text from user input until stop_word is encountered on its own line.
+
+        Args:
+            prompt: Prompt message.
+            stop_word: Line content signaling end of multiline input.
+            input_func: Input function provider.
+
+        Returns:
+            Combined multiline string text.
+        """
+        print(prompt, end="")
+        lines: List[str] = []
+        while True:
+            try:
+                line = input_func("")
+                if line.strip() == stop_word:
+                    break
+                lines.append(line)
+            except EOFError:
+                break
+        self._text = "\n".join(lines)
+        return self._text
+
