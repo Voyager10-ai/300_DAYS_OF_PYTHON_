@@ -244,3 +244,46 @@ class StringProcessor:
         return aligned
 
 
+# ─── 4. Stream Redirection & File Logging Output ───────────────────────────────
+
+
+    def print_to_string_io(self, uppercase: bool = True) -> str:
+        """
+        Prints current string into an in-memory io.StringIO buffer and returns the captured output.
+
+        Args:
+            uppercase: If True, converts text to uppercase.
+
+        Returns:
+            Captured buffer content string.
+        """
+        buffer = io.StringIO()
+        self.print_string(uppercase=uppercase, output_stream=buffer)
+        return buffer.getvalue()
+
+    def log_string_to_file(
+        self,
+        file_path: Union[str, Path],
+        mode: str = "a",
+        encoding: str = "utf-8",
+        uppercase: bool = True,
+    ) -> str:
+        """
+        Appends or writes the formatted text to a target file.
+
+        Args:
+            file_path: Path to target file.
+            mode: File mode ('a' for append, 'w' for overwrite).
+            encoding: Text file encoding.
+            uppercase: If True, writes in uppercase.
+
+        Returns:
+            Written string payload.
+        """
+        output = self._text.upper() if uppercase else self._text
+        with open(file_path, mode, encoding=encoding) as f:
+            f.write(output + "\n")
+        return output
+
+
+
