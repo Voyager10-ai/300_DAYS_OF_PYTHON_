@@ -406,6 +406,73 @@ class MockIO:
         return self.output_buffer.getvalue()
 
 
+# ─── 8. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestGetAndPrintOperations(unittest.TestCase):
+    def test_get_string_and_print_uppercase(self):
+        sp = StringProcessor()
+        mock = MockIO(["hello python"])
+        sp.get_string(input_func=mock.input_func)
+        self.assertEqual(sp.text, "hello python")
+
+        printed = sp.print_string(uppercase=True, output_stream=mock.output_stream)
+        self.assertEqual(printed, "HELLO PYTHON")
+        self.assertIn("HELLO PYTHON", mock.get_printed_output())
+
+    def test_validated_input(self):
+        sp = StringProcessor()
+        # First 2 fail validator (len < 5), 3rd passes
+        mock = MockIO(["abc", "123", "valid_length"])
+        res = sp.get_string_with_validation(
+            validator=lambda s: len(s) >= 5,
+            input_func=mock.input_func,
+        )
+        self.assertEqual(res, "valid_length")
+
+    def test_multiline_string_input(self):
+        sp = StringProcessor()
+        mock = MockIO(["Line 1", "Line 2", "END"])
+        res = sp.get_multiline_string(stop_word="END", input_func=mock.input_func)
+        self.assertEqual(res, "Line 1\nLine 2")
+
+    def test_format_string(self):
+        sp = StringProcessor("hello world")
+        self.assertEqual(sp.format_string(case_mode="upper"), "HELLO WORLD")
+        self.assertEqual(sp.format_string(case_mode="title"), "Hello World")
+        self.assertEqual(sp.format_string(case_mode="reverse"), "dlrow olleh")
+
+    def test_print_boxed_and_aligned(self):
+        sp = StringProcessor("test")
+        mock = MockIO()
+        boxed = sp.print_boxed(border_char="#", output_stream=mock.output_stream)
+        self.assertIn("TEST", boxed)
+
+        aligned = sp.print_aligned(width=20, align="center", output_stream=mock.output_stream)
+        self.assertEqual(len(aligned), 20)
+
+    def test_string_io_and_file_logging(self):
+        sp = StringProcessor("logged message")
+        output = sp.print_to_string_io(uppercase=True)
+        self.assertEqual(output.strip(), "LOGGED MESSAGE")
+
+    def test_fluent_chaining(self):
+        res = (
+            StringProcessorChain()
+            .set_text("python")
+            .upper()
+            .replace("ON", "ON 300")
+            .to_string()
+        )
+        self.assertEqual(res, "PYTH ON 300")
+
+    def test_batch_processing(self):
+        batch = BatchStringProcessor(["apple", "banana"])
+        processed = batch.get_processed_list("upper")
+        self.assertEqual(processed, ["APPLE", "BANANA"])
+
+
+
 
 
 
