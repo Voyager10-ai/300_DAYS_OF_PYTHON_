@@ -378,6 +378,35 @@ class BatchStringProcessor:
         return list(self.strings)
 
 
+# ─── 7. Mock IO Testing Helper ─────────────────────────────────────────────────
+
+
+class MockIO:
+    """
+    Simulates input stream injection and output capture for unit testing StringProcessor.
+    """
+
+    def __init__(self, inputs: Optional[List[str]] = None):
+        self.inputs: List[str] = list(inputs) if inputs else []
+        self.output_buffer: io.StringIO = io.StringIO()
+        self._index = 0
+
+    def input_func(self, prompt: str = "") -> str:
+        if self._index >= len(self.inputs):
+            raise EOFError("No more mock inputs available")
+        val = self.inputs[self._index]
+        self._index += 1
+        return val
+
+    @property
+    def output_stream(self) -> io.StringIO:
+        return self.output_buffer
+
+    def get_printed_output(self) -> str:
+        return self.output_buffer.getvalue()
+
+
+
 
 
 
