@@ -147,3 +147,100 @@ class StringProcessor:
         self._text = "\n".join(lines)
         return self._text
 
+
+# ─── 3. Text Formatting Styles, Borders & Alignment ────────────────────────────
+
+
+    def format_string(
+        self,
+        case_mode: str = "upper",
+        prefix: str = "",
+        suffix: str = "",
+    ) -> str:
+        """
+        Formats current text according to specified case mode, prefix, and suffix.
+
+        Args:
+            case_mode: 'upper', 'lower', 'title', 'swapcase', 'reverse', or 'raw'.
+            prefix: Optional prefix string.
+            suffix: Optional suffix string.
+
+        Returns:
+            Formatted string content.
+        """
+        text = self._text
+        if case_mode == "upper":
+            text = text.upper()
+        elif case_mode == "lower":
+            text = text.lower()
+        elif case_mode == "title":
+            text = text.title()
+        elif case_mode == "swapcase":
+            text = text.swapcase()
+        elif case_mode == "reverse":
+            text = text[::-1]
+
+        return f"{prefix}{text}{suffix}"
+
+    def print_boxed(
+        self,
+        border_char: str = "*",
+        padding: int = 2,
+        output_stream: Optional[TextIO] = None,
+    ) -> str:
+        """
+        Prints the text centered inside a decorative ASCII border box.
+
+        Args:
+            border_char: Character for the box border.
+            padding: Space padding inside border.
+            output_stream: Target stream.
+
+        Returns:
+            Boxed string content.
+        """
+        if output_stream is None:
+            output_stream = sys.stdout
+
+        text = self._text.upper()
+        line_width = len(text) + (padding * 2)
+        top_bottom = border_char * (line_width + 2)
+        pad_spaces = " " * padding
+        content_line = f"{border_char}{pad_spaces}{text}{pad_spaces}{border_char}"
+
+        boxed_result = f"{top_bottom}\n{content_line}\n{top_bottom}"
+        print(boxed_result, file=output_stream)
+        return boxed_result
+
+    def print_aligned(
+        self,
+        width: int = 60,
+        align: str = "center",
+        output_stream: Optional[TextIO] = None,
+    ) -> str:
+        """
+        Prints text aligned within a fixed column width.
+
+        Args:
+            width: Column width integer.
+            align: 'left', 'center', or 'right'.
+            output_stream: Target stream.
+
+        Returns:
+            Aligned string.
+        """
+        if output_stream is None:
+            output_stream = sys.stdout
+
+        text = self._text.upper()
+        if align == "center":
+            aligned = text.center(width)
+        elif align == "right":
+            aligned = text.rjust(width)
+        else:
+            aligned = text.ljust(width)
+
+        print(aligned, file=output_stream)
+        return aligned
+
+
