@@ -251,4 +251,65 @@ class Rectangle:
         return Rectangle(length=self.length, width=self.width, x=self.x + dx, y=self.y + dy)
 
 
+# ─── 5. Operator Overloading & Dunder Methods ──────────────────────────────────
+
+
+    def __eq__(self, other: Any) -> bool:
+        if not isinstance(other, Rectangle):
+            return False
+        return (
+            math.isclose(self.length, other.length, rel_tol=1e-7)
+            and math.isclose(self.width, other.width, rel_tol=1e-7)
+            and math.isclose(self.x, other.x, rel_tol=1e-7)
+            and math.isclose(self.y, other.y, rel_tol=1e-7)
+        )
+
+    def __lt__(self, other: "Rectangle") -> bool:
+        if not isinstance(other, Rectangle):
+            return NotImplemented
+        return self.area < other.area
+
+    def __le__(self, other: "Rectangle") -> bool:
+        if not isinstance(other, Rectangle):
+            return NotImplemented
+        return self.area <= other.area or math.isclose(self.area, other.area, rel_tol=1e-7)
+
+    def __add__(self, other: "Rectangle") -> "Rectangle":
+        """
+        Operator '+' computes minimum bounding box rectangle enclosing both rectangles.
+        """
+        if not isinstance(other, Rectangle):
+            return NotImplemented
+        min_x1, min_y1, max_x1, max_y1 = self.bounding_box()
+        min_x2, min_y2, max_x2, max_y2 = other.bounding_box()
+
+        union_min_x = min(min_x1, min_x2)
+        union_min_y = min(min_y1, min_y2)
+        union_max_x = max(max_x1, max_x2)
+        union_max_y = max(max_y1, max_y2)
+
+        return Rectangle(
+            length=union_max_x - union_min_x,
+            width=union_max_y - union_min_y,
+            x=union_min_x,
+            y=union_min_y,
+        )
+
+    def __mul__(self, scalar: float) -> "Rectangle":
+        """Operator '*' scales length and width by scalar."""
+        if not isinstance(scalar, (int, float)):
+            return NotImplemented
+        return self.scale(float(scalar))
+
+    def __rmul__(self, scalar: float) -> "Rectangle":
+        return self.__mul__(scalar)
+
+    def __repr__(self) -> str:
+        return f"Rectangle(length={self.length}, width={self.width}, x={self.x}, y={self.y})"
+
+    def __str__(self) -> str:
+        return f"Rectangle [{self.length}x{self.width} at ({self.x}, {self.y}), Area={self.area}]"
+
+
+
 
