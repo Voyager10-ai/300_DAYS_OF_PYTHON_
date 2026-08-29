@@ -132,3 +132,76 @@ class Rectangle:
         length = width * aspect_ratio
         return cls(length=length, width=width, x=x, y=y)
 
+
+# ─── 3. Collision Detection & Spatial Geometry ─────────────────────────────────
+
+
+    def bounding_box(self) -> Tuple[float, float, float, float]:
+        """
+        Calculates axis-aligned bounding box tuple (min_x, min_y, max_x, max_y).
+        """
+        return (self.x, self.y, self.x + self.length, self.y + self.width)
+
+    def contains_point(self, px: float, py: float, include_boundary: bool = True) -> bool:
+        """
+        Checks if a 2D point (px, py) lies inside or on boundary of rectangle.
+
+        Args:
+            px: X-coordinate of test point.
+            py: Y-coordinate of test point.
+            include_boundary: If True, points on edge are inside.
+
+        Returns:
+            True if contained, False otherwise.
+        """
+        min_x, min_y, max_x, max_y = self.bounding_box()
+        if include_boundary:
+            return min_x - 1e-9 <= px <= max_x + 1e-9 and min_y - 1e-9 <= py <= max_y + 1e-9
+        return min_x + 1e-9 < px < max_x - 1e-9 and min_y + 1e-9 < py < max_y - 1e-9
+
+    def contains_rectangle(self, other: "Rectangle") -> bool:
+        """Checks if another rectangle is completely enclosed within this rectangle."""
+        min_x, min_y, max_x, max_y = self.bounding_box()
+        o_min_x, o_min_y, o_max_x, o_max_y = other.bounding_box()
+        return (
+            min_x - 1e-9 <= o_min_x
+            and o_max_x <= max_x + 1e-9
+            and min_y - 1e-9 <= o_min_y
+            and o_max_y <= max_y + 1e-9
+        )
+
+    def intersects_rectangle(self, other: "Rectangle") -> bool:
+        """Checks if this rectangle overlaps or touches another rectangle."""
+        min_x, min_y, max_x, max_y = self.bounding_box()
+        o_min_x, o_min_y, o_max_x, o_max_y = other.bounding_box()
+        return not (max_x < o_min_x or o_max_x < min_x or max_y < o_min_y or o_max_y < min_y)
+
+    def intersection_rectangle(self, other: "Rectangle") -> Optional["Rectangle"]:
+        """
+        Computes overlapping Rectangle region between this and another rectangle.
+
+        Returns:
+            Intersecting Rectangle object, or None if no overlap.
+        """
+        if not self.intersects_rectangle(other):
+            return None
+
+        min_x, min_y, max_x, max_y = self.bounding_box()
+        o_min_x, o_min_y, o_max_x, o_max_y = other.bounding_box()
+
+        int_min_x = max(min_x, o_min_x)
+        int_max_x = min(max_x, o_max_x)
+        int_min_y = max(min_y, o_min_y)
+        int_max_y = min(max_y, o_max_y)
+
+        if int_max_x < int_min_x or int_max_y < int_min_y:
+            return None
+
+        return Rectangle(
+            length=int_max_x - int_min_x,
+            width=int_max_y - int_min_y,
+            x=int_min_x,
+            y=int_min_y,
+        )
+
+
