@@ -516,6 +516,50 @@ class TestRectangleOperations(unittest.TestCase):
         self.assertIn("Area             : 72.00", report)
 
 
+# ─── 9. Interactive CLI Demo Runner ───────────────────────────────────────────
+
+
+def main():
+    print("=" * 60)
+    print(" 📐 Day 51: 2D Rectangle Geometry - Interactive Demo")
+    print("=" * 60)
+
+    # 1. Instantiate Core Rectangle
+    rect = Rectangle(length=12.0, width=8.0, x=2.0, y=3.0)
+    print(f"\n1. Rectangle Initialized:\n{rect.format_report()}")
+
+    # 2. Collision & Intersection
+    r2 = Rectangle(length=10.0, width=10.0, x=8.0, y=5.0)
+    inter = rect.intersection_rectangle(r2)
+    print(f"\n2. Rectangle Collision & Overlap:")
+    print(f"   Rect 1: {rect}")
+    print(f"   Rect 2: {r2}")
+    print(f"   Intersects? {rect.intersects_rectangle(r2)}")
+    print(f"   Overlap Box: {inter}")
+
+    # 3. Geometric Transformations
+    scaled = rect.scale(1.5)
+    rotated = rect.rotate_90()
+    print(f"\n3. Transformations:")
+    print(f"   Scaled (1.5x) : {scaled}")
+    print(f"   Rotated 90°   : {rotated}")
+
+    # 4. JSON Representation
+    print(f"\n4. JSON Representation:\n{rect.to_json()}")
+
+    # 5. Unit Test Suite Execution
+    print("\n5. Executing Unit Test Suite:")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestRectangleOperations)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+    print("\nDemo execution complete!")
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 

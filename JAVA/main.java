@@ -859,7 +859,27 @@
 //     }
 // }
 
+// Java Rectangle Practice (Day 51)
+// class RectanglePractice {
+//     private double length;
+//     private double width;
+//     public RectanglePractice(double length, double width) {
+//         if (length < 0 || width < 0) throw new IllegalArgumentException("Dimensions cannot be negative");
+//         this.length = length;
+//         this.width = width;
+//     }
+//     public double getArea() { return length * width; }
+//     public double getPerimeter() { return 2 * (length + width); }
+//     public double getDiagonal() { return Math.hypot(length, width); }
+//     public boolean isSquare() { return Math.abs(length - width) < 1e-7; }
+//     public static void main(String[] args) {
+//         RectanglePractice r = new RectanglePractice(12.0, 8.0);
+//         System.out.println("Area: " + r.getArea() + ", Perimeter: " + r.getPerimeter() + ", IsSquare: " + r.isSquare());
+//     }
+// }
+
 import java.util.*;
+
 
 
 
