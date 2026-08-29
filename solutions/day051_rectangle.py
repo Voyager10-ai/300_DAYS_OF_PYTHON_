@@ -311,5 +311,59 @@ class Rectangle:
         return f"Rectangle [{self.length}x{self.width} at ({self.x}, {self.y}), Area={self.area}]"
 
 
+# ─── 6. Vertex Generator & Point Sampling ──────────────────────────────────────
+
+
+    def vertices(self) -> List[Tuple[float, float]]:
+        """
+        Returns four corner vertices of rectangle in counter-clockwise order:
+        [Bottom-Left, Bottom-Right, Top-Right, Top-Left].
+        """
+        min_x, min_y, max_x, max_y = self.bounding_box()
+        return [
+            (min_x, min_y),
+            (max_x, min_y),
+            (max_x, max_y),
+            (min_x, max_y),
+        ]
+
+    def sample_grid_points(self, rows: int = 5, cols: int = 5) -> List[Tuple[float, float]]:
+        """
+        Generates a grid of evenly spaced (x, y) coordinates inside and on boundary.
+
+        Args:
+            rows: Number of grid divisions along y-axis.
+            cols: Number of grid divisions along x-axis.
+
+        Returns:
+            List of 2D coordinate tuples.
+        """
+        if rows < 1 or cols < 1:
+            raise ValueError("Rows and cols must be >= 1")
+
+        min_x, min_y, max_x, max_y = self.bounding_box()
+        x_step = self.length / cols if cols > 1 else 0
+        y_step = self.width / rows if rows > 1 else 0
+
+        points: List[Tuple[float, float]] = []
+        for r in range(rows + 1):
+            py = min_y + r * y_step
+            for c in range(cols + 1):
+                px = min_x + c * x_step
+                points.append((round(px, 6), round(py, 6)))
+
+        return points
+
+    def sample_random_interior_point(self, seed: Optional[int] = None) -> Tuple[float, float]:
+        """Samples a uniformly distributed random point strictly inside rectangle."""
+        if seed is not None:
+            random.seed(seed)
+
+        rx = self.x + random.uniform(0, self.length)
+        ry = self.y + random.uniform(0, self.width)
+        return (rx, ry)
+
+
+
 
 
