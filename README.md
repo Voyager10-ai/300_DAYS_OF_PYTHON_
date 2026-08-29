@@ -53,6 +53,7 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 48: Convert to Int
 - Day 49: Convert to Roman
 - Day 50: Get and Print
+- Day 51: Rectangle
 
 
 
