@@ -88,3 +88,47 @@ class Rectangle:
     def is_square(self) -> bool:
         """Checks if rectangle is a square (length == width within tolerance)."""
         return math.isclose(self._length, self._width, rel_tol=1e-7)
+
+
+# ─── 2. Factory Constructors & Creation Utilities ──────────────────────────────
+
+
+    @classmethod
+    def from_square(cls, side: float, x: float = 0.0, y: float = 0.0) -> "Rectangle":
+        """Creates a square Rectangle with equal sides."""
+        return cls(length=side, width=side, x=x, y=y)
+
+    @classmethod
+    def from_points(cls, p1: Tuple[float, float], p2: Tuple[float, float]) -> "Rectangle":
+        """
+        Creates a Rectangle from two opposite diagonal corner points (x1, y1) and (x2, y2).
+        """
+        x1, y1 = p1
+        x2, y2 = p2
+        min_x, max_x = min(x1, x2), max(x1, x2)
+        min_y, max_y = min(y1, y2), max(y1, y2)
+        return cls(length=max_x - min_x, width=max_y - min_y, x=min_x, y=min_y)
+
+    @classmethod
+    def from_area_aspect_ratio(
+        cls,
+        area: float,
+        aspect_ratio: float = 1.0,
+        x: float = 0.0,
+        y: float = 0.0,
+    ) -> "Rectangle":
+        """
+        Creates a Rectangle given target area and aspect ratio (length / width).
+
+        Raises:
+            ValueError: If area or aspect_ratio <= 0.
+        """
+        if area < 0:
+            raise ValueError(f"Area cannot be negative, got {area}")
+        if aspect_ratio <= 0:
+            raise ValueError(f"Aspect ratio must be positive, got {aspect_ratio}")
+
+        width = math.sqrt(area / aspect_ratio)
+        length = width * aspect_ratio
+        return cls(length=length, width=width, x=x, y=y)
+
