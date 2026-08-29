@@ -364,6 +364,59 @@ class Rectangle:
         return (rx, ry)
 
 
+# ─── 7. Serialization & Formatted Reports ──────────────────────────────────────
+
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Serializes rectangle state into a dictionary."""
+        return {
+            "length": self.length,
+            "width": self.width,
+            "x": self.x,
+            "y": self.y,
+            "area": self.area,
+            "perimeter": self.perimeter,
+            "diagonal": self.diagonal,
+            "is_square": self.is_square,
+        }
+
+    def to_json(self, indent: Optional[int] = 2) -> str:
+        """Serializes rectangle state into JSON format."""
+        return json.dumps(self.to_dict(), indent=indent)
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "Rectangle":
+        """Deserializes a Rectangle object from a dictionary."""
+        return cls(
+            length=data["length"],
+            width=data["width"],
+            x=data.get("x", 0.0),
+            y=data.get("y", 0.0),
+        )
+
+    @classmethod
+    def from_json(cls, json_str: str) -> "Rectangle":
+        """Deserializes a Rectangle object from a JSON string."""
+        data = json.loads(json_str)
+        return cls.from_dict(data)
+
+    def format_report(self) -> str:
+        """Generates a detailed multi-line text summary report of rectangle properties."""
+        lines = [
+            f"📐 Rectangle Geometry Report",
+            f"   Position (x, y)  : ({self.x:.2f}, {self.y:.2f})",
+            f"   Length (x-axis)  : {self.length:.2f}",
+            f"   Width (y-axis)   : {self.width:.2f}",
+            f"   Area             : {self.area:.2f}",
+            f"   Perimeter        : {self.perimeter:.2f}",
+            f"   Diagonal Length  : {self.diagonal:.2f}",
+            f"   Aspect Ratio     : {self.aspect_ratio():.2f}",
+            f"   Is Square?       : {'Yes' if self.is_square else 'No'}",
+        ]
+        return "\n".join(lines)
+
+
+
 
 
 
