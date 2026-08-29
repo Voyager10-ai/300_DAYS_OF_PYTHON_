@@ -416,6 +416,107 @@ class Rectangle:
         return "\n".join(lines)
 
 
+# ─── 8. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestRectangleOperations(unittest.TestCase):
+    def test_rectangle_initialization_and_properties(self):
+        r = Rectangle(10, 5, 1, 2)
+        self.assertEqual(r.length, 10.0)
+        self.assertEqual(r.width, 5.0)
+        self.assertEqual(r.area, 50.0)
+        self.assertEqual(r.perimeter, 30.0)
+        self.assertAlmostEqual(r.diagonal, math.sqrt(125))
+        self.assertFalse(r.is_square)
+
+    def test_invalid_dimensions(self):
+        with self.assertRaises(ValueError):
+            Rectangle(-5, 10)
+        with self.assertRaises(ValueError):
+            Rectangle(10, -5)
+
+    def test_factory_constructors(self):
+        sq = Rectangle.from_square(6)
+        self.assertTrue(sq.is_square)
+        self.assertEqual(sq.area, 36.0)
+
+        pts = Rectangle.from_points((1, 2), (5, 8))
+        self.assertEqual(pts.length, 4.0)
+        self.assertEqual(pts.width, 6.0)
+
+        ratio = Rectangle.from_area_aspect_ratio(200, aspect_ratio=2.0)
+        self.assertAlmostEqual(ratio.length, 20.0)
+        self.assertAlmostEqual(ratio.width, 10.0)
+
+    def test_spatial_geometry(self):
+        r1 = Rectangle(10, 10, 0, 0)
+        self.assertTrue(r1.contains_point(5, 5))
+        self.assertFalse(r1.contains_point(15, 5))
+
+        r2 = Rectangle(4, 4, 2, 2)
+        self.assertTrue(r1.contains_rectangle(r2))
+
+        r3 = Rectangle(5, 5, 8, 8)
+        self.assertTrue(r1.intersects_rectangle(r3))
+
+        inter = r1.intersection_rectangle(r3)
+        self.assertIsNotNone(inter)
+        self.assertEqual(inter.length, 2.0)
+        self.assertEqual(inter.width, 2.0)
+
+    def test_geometric_transformations(self):
+        r = Rectangle(10, 5, 0, 0)
+        scaled = r.scale(2)
+        self.assertEqual(scaled.length, 20.0)
+        self.assertEqual(scaled.width, 10.0)
+
+        rot = r.rotate_90()
+        self.assertEqual(rot.length, 5.0)
+        self.assertEqual(rot.width, 10.0)
+
+        trans = r.translate(5, -5)
+        self.assertEqual(trans.x, 5.0)
+        self.assertEqual(trans.y, -5.0)
+
+    def test_operators(self):
+        r1 = Rectangle(10, 5, 0, 0)
+        r2 = Rectangle(10, 5, 0, 0)
+        self.assertEqual(r1, r2)
+
+        r3 = Rectangle(2, 2, 0, 0)
+        self.assertTrue(r3 < r1)
+
+        union = r1 + Rectangle(10, 5, 10, 10)
+        self.assertEqual(union.length, 20.0)
+        self.assertEqual(union.width, 15.0)
+
+        scaled_mul = r1 * 3
+        self.assertEqual(scaled_mul.length, 30.0)
+
+    def test_vertex_and_grid_sampling(self):
+        r = Rectangle(4, 4, 0, 0)
+        verts = r.vertices()
+        self.assertEqual(len(verts), 4)
+        self.assertEqual(verts[0], (0.0, 0.0))
+        self.assertEqual(verts[2], (4.0, 4.0))
+
+        grid = r.sample_grid_points(rows=2, cols=2)
+        self.assertEqual(len(grid), 9)
+
+        rx, ry = r.sample_random_interior_point(seed=42)
+        self.assertTrue(r.contains_point(rx, ry))
+
+    def test_serialization_and_reports(self):
+        r = Rectangle(12, 6, 3, 4)
+        r_json = r.to_json()
+        reconstructed = Rectangle.from_json(r_json)
+        self.assertEqual(r, reconstructed)
+
+        report = r.format_report()
+        self.assertIn("Area             : 72.00", report)
+
+
+
 
 
 
