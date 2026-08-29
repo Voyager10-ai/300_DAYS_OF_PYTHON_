@@ -205,3 +205,50 @@ class Rectangle:
         )
 
 
+# ─── 4. Geometric Transformations ──────────────────────────────────────────────
+
+
+    def aspect_ratio(self) -> float:
+        """Returns aspect ratio (length / width). Returns float('inf') if width == 0."""
+        if self._width == 0:
+            return float("inf")
+        return self._length / self._width
+
+    def scale(self, factor_x: float, factor_y: Optional[float] = None) -> "Rectangle":
+        """
+        Returns a new scaled Rectangle.
+
+        Args:
+            factor_x: Scaling factor for length.
+            factor_y: Scaling factor for width (defaults to factor_x).
+
+        Returns:
+            New scaled Rectangle.
+        """
+        if factor_y is None:
+            factor_y = factor_x
+
+        if factor_x < 0 or factor_y < 0:
+            raise ValueError("Scale factors cannot be negative")
+
+        return Rectangle(
+            length=self.length * factor_x,
+            width=self.width * factor_y,
+            x=self.x,
+            y=self.y,
+        )
+
+    def rotate_90(self) -> "Rectangle":
+        """
+        Rotates the rectangle by 90 degrees around its origin corner (swaps length and width).
+        """
+        return Rectangle(length=self.width, width=self.length, x=self.x, y=self.y)
+
+    def translate(self, dx: float, dy: float) -> "Rectangle":
+        """
+        Translates (shifts) the rectangle position by (dx, dy).
+        """
+        return Rectangle(length=self.length, width=self.width, x=self.x + dx, y=self.y + dy)
+
+
+
