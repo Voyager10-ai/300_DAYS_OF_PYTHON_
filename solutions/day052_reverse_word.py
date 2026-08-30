@@ -62,3 +62,40 @@ def reverse_entire_string(s: str) -> str:
     if not isinstance(s, str):
         raise TypeError(f"Expected string input, got {type(s).__name__}")
     return s[::-1]
+
+
+# ─── 2. Punctuation & Position Preserving Word Reverser ───────────────────────
+
+
+def reverse_words_preserve_punctuation(s: str) -> str:
+    """
+    Reverses alphabetical characters within each word token while keeping punctuation,
+    digits, and whitespace symbols in their exact original indices.
+    For example: 'Hello, World!' -> 'Olleh, Dlrow!'.
+
+    Args:
+        s: Input text string.
+
+    Returns:
+        String with word characters reversed while punctuation remains in-place.
+    """
+    if not isinstance(s, str):
+        raise TypeError(f"Expected string input, got {type(s).__name__}")
+
+    def reverse_token(token: str) -> str:
+        letters = [ch for ch in token if ch.isalpha()]
+        letters.reverse()
+        result = []
+        letter_idx = 0
+        for ch in token:
+            if ch.isalpha():
+                result.append(letters[letter_idx])
+                letter_idx += 1
+            else:
+                result.append(ch)
+        return "".join(result)
+
+    # Tokenize by word bounds using regex while keeping spaces/punctuation intact
+    tokens = re.split(r"(\s+)", s)
+    return "".join(reverse_token(tok) for tok in tokens)
+
