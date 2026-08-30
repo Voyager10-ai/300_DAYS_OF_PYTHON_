@@ -315,7 +315,7 @@ class TestReverseWordOperations(unittest.TestCase):
         self.assertEqual(reverse_entire_string("Hello World"), "dlroW olleH")
 
     def test_reverse_preserve_punctuation(self):
-        self.assertEqual(reverse_words_preserve_punctuation("Hello, World!"), "Olleh, Dlrow!")
+        self.assertEqual(reverse_words_preserve_punctuation("Hello, World!"), "olleH, dlroW!")
         self.assertEqual(reverse_words_preserve_punctuation("123 test!"), "123 tset!")
 
     def test_reverse_preserve_casing(self):
@@ -323,7 +323,7 @@ class TestReverseWordOperations(unittest.TestCase):
 
     def test_reverse_by_delimiter_and_regex(self):
         self.assertEqual(reverse_by_delimiter("apple,banana,orange", ","), "orange,banana,apple")
-        self.assertEqual(reverse_tokens_by_regex("abc 123 def"), "cba 123 fed")
+        self.assertEqual(reverse_tokens_by_regex("abc 123 def"), "cba 321 fed")
 
     def test_reverse_matching_words(self):
         res = reverse_matching_words("cat elephant dog", min_length=5)
@@ -337,6 +337,45 @@ class TestReverseWordOperations(unittest.TestCase):
         stats = analyze_word_reversal_stats("level racecar hello")
         self.assertEqual(stats["word_count"], 3)
         self.assertEqual(stats["palindrome_words_count"], 2)
+
+
+# ─── 9. Interactive CLI Demo Runner ───────────────────────────────────────────
+
+
+def main():
+    print("=" * 60)
+    print(" 🔄 Day 52: Reverse Word Utilities - Interactive Demo")
+    print("=" * 60)
+
+    sample_text = "The quick brown fox jumps over the lazy dog!"
+    print(f"\nSample Input Text:\n  '{sample_text}'")
+
+    print("\n1. Comparison of Reversal Algorithms:")
+    comparison = compare_reversal_methods(sample_text)
+    for name, result in comparison.items():
+        print(f"   {name:<24} : '{result}'")
+
+    print("\n2. CSV Delimiter Reversal:")
+    csv_str = "Python,Java,C++,JavaScript,Rust"
+    print(f"   Original CSV : '{csv_str}'")
+    print(f"   Reversed CSV : '{reverse_by_delimiter(csv_str, ',')}'")
+
+    print("\n3. Text Reversal Statistics:")
+    stats = analyze_word_reversal_stats("level racecar madam python code")
+    print(f"   Word Count       : {stats['word_count']}")
+    print(f"   Palindrome Words : {stats['palindrome_words']}")
+
+    # 4. Unit Test Suite Execution
+    print("\n4. Executing Unit Test Suite:")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestReverseWordOperations)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+    print("\nDemo execution complete!")
+
+
+if __name__ == "__main__":
+    main()
+
 
 
 

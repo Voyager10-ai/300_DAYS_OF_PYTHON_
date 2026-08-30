@@ -878,7 +878,37 @@
 //     }
 // }
 
+// Java Reverse Word Practice (Day 52)
+// class ReverseWordPractice {
+//     public static String reverseWordsOrder(String s) {
+//         if (s == null || s.trim().isEmpty()) return s;
+//         String[] words = s.trim().split("\\s+");
+//         StringBuilder sb = new StringBuilder();
+//         for (int i = words.length - 1; i >= 0; i--) {
+//             sb.append(words[i]);
+//             if (i > 0) sb.append(" ");
+//         }
+//         return sb.toString();
+//     }
+//     public static String reverseEachWord(String s) {
+//         if (s == null) return null;
+//         String[] words = s.split(" ");
+//         StringBuilder sb = new StringBuilder();
+//         for (int i = 0; i < words.length; i++) {
+//             sb.append(new StringBuilder(words[i]).reverse().toString());
+//             if (i < words.length - 1) sb.append(" ");
+//         }
+//         return sb.toString();
+//     }
+//     public static void main(String[] args) {
+//         String input = "The quick brown fox";
+//         System.out.println("Reversed Word Order: " + reverseWordsOrder(input));
+//         System.out.println("Reversed Each Word : " + reverseEachWord(input));
+//     }
+// }
+
 import java.util.*;
+
 
 
 
