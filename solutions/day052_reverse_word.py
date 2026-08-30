@@ -250,6 +250,55 @@ class BatchWordReverser:
         return [func(txt) for txt in self.texts]
 
 
+# ─── 7. Reversal Statistics & Comparison Utilities ───────────────────────────
+
+
+def analyze_word_reversal_stats(s: str) -> Dict[str, Any]:
+    """
+    Analyzes character, word, and palindrome metrics before and after word reversal.
+
+    Args:
+        s: Input text string.
+
+    Returns:
+        Dictionary of text analysis statistics.
+    """
+    words = s.split()
+    total_words = len(words)
+    palindromes = [w for w in words if w.lower() == w[::-1].lower() and len(w) > 1]
+
+    return {
+        "original_text": s,
+        "character_count": len(s),
+        "word_count": total_words,
+        "palindrome_words_count": len(palindromes),
+        "palindrome_words": palindromes,
+        "reversed_words_order": reverse_words_order(s),
+        "reversed_each_word": reverse_each_word(s),
+        "reversed_entire_string": reverse_entire_string(s),
+    }
+
+
+def compare_reversal_methods(s: str) -> Dict[str, str]:
+    """
+    Executes all reversal algorithms on string s and returns a mapping of method_name -> result.
+
+    Args:
+        s: Input text string.
+
+    Returns:
+        Dictionary mapping method names to reversed outputs.
+    """
+    return {
+        "Word Order Reversed": reverse_words_order(s),
+        "Each Word Reversed": reverse_each_word(s),
+        "Entire String Reversed": reverse_entire_string(s),
+        "Preserve Punctuation": reverse_words_preserve_punctuation(s),
+        "Preserve Casing": reverse_words_preserve_casing(s),
+    }
+
+
+
 
 
 
