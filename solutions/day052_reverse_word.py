@@ -298,6 +298,48 @@ def compare_reversal_methods(s: str) -> Dict[str, str]:
     }
 
 
+# ─── 8. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestReverseWordOperations(unittest.TestCase):
+    def test_reverse_words_order(self):
+        self.assertEqual(reverse_words_order("The quick brown fox"), "fox brown quick The")
+        self.assertEqual(reverse_words_order("Python"), "Python")
+        self.assertEqual(reverse_words_order(""), "")
+
+    def test_reverse_each_word(self):
+        self.assertEqual(reverse_each_word("hello world"), "olleh dlrow")
+        self.assertEqual(reverse_each_word("a b c"), "a b c")
+
+    def test_reverse_entire_string(self):
+        self.assertEqual(reverse_entire_string("Hello World"), "dlroW olleH")
+
+    def test_reverse_preserve_punctuation(self):
+        self.assertEqual(reverse_words_preserve_punctuation("Hello, World!"), "Olleh, Dlrow!")
+        self.assertEqual(reverse_words_preserve_punctuation("123 test!"), "123 tset!")
+
+    def test_reverse_preserve_casing(self):
+        self.assertEqual(reverse_words_preserve_casing("Python Code"), "Nohtyp Edoc")
+
+    def test_reverse_by_delimiter_and_regex(self):
+        self.assertEqual(reverse_by_delimiter("apple,banana,orange", ","), "orange,banana,apple")
+        self.assertEqual(reverse_tokens_by_regex("abc 123 def"), "cba 123 fed")
+
+    def test_reverse_matching_words(self):
+        res = reverse_matching_words("cat elephant dog", min_length=5)
+        self.assertEqual(res, "cat tnahpele dog")
+
+    def test_batch_and_stats(self):
+        batch = BatchWordReverser(["hello world", "foo bar"])
+        res = batch.process_all("each_word")
+        self.assertEqual(res, ["olleh dlrow", "oof rab"])
+
+        stats = analyze_word_reversal_stats("level racecar hello")
+        self.assertEqual(stats["word_count"], 3)
+        self.assertEqual(stats["palindrome_words_count"], 2)
+
+
+
 
 
 
