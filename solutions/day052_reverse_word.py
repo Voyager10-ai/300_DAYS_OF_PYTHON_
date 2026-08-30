@@ -99,3 +99,35 @@ def reverse_words_preserve_punctuation(s: str) -> str:
     tokens = re.split(r"(\s+)", s)
     return "".join(reverse_token(tok) for tok in tokens)
 
+
+# ─── 3. Case-Preserving Word Reverser ──────────────────────────────────────────
+
+
+def reverse_words_preserve_casing(s: str) -> str:
+    """
+    Reverses characters of each word while preserving the original capitalization pattern.
+    For example: 'Python' -> 'Nohtyp' (index 0 was uppercase 'P', so new index 0 'N' becomes 'N').
+
+    Args:
+        s: Input text string.
+
+    Returns:
+        String with reversed words adhering to original casing map.
+    """
+    if not isinstance(s, str):
+        raise TypeError(f"Expected string input, got {type(s).__name__}")
+
+    def apply_casing(word: str) -> str:
+        reversed_chars = list(word[::-1].lower())
+        result = []
+        for orig_ch, rev_ch in zip(word, reversed_chars):
+            if orig_ch.isupper():
+                result.append(rev_ch.upper())
+            else:
+                result.append(rev_ch.lower())
+        return "".join(result)
+
+    words = s.split(" ")
+    return " ".join(apply_casing(w) for w in words)
+
+
