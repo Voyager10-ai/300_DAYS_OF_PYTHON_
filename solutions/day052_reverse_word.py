@@ -210,5 +210,46 @@ def reverse_matching_words(
     return " ".join(result)
 
 
+# ─── 6. Batch Word Reverser & Sentence Collection Processor ───────────────────
+
+
+class BatchWordReverser:
+    """
+    Manages a collection of sentences/paragraphs and batch processes them with selectable reversal strategies.
+    """
+
+    def __init__(self, initial_texts: Optional[List[str]] = None):
+        self.texts: List[str] = list(initial_texts) if initial_texts else []
+
+    def add_text(self, text: str) -> None:
+        self.texts.append(str(text))
+
+    def add_texts(self, texts: List[str]) -> None:
+        self.texts.extend([str(t) for t in texts])
+
+    def process_all(self, mode: str = "words_order") -> List[str]:
+        """
+        Processes all collected texts using specified reversal mode.
+
+        Args:
+            mode: Reversal strategy: 'words_order', 'each_word', 'entire_string',
+                  'preserve_punctuation', or 'preserve_casing'.
+
+        Returns:
+            List of processed strings.
+        """
+        mode_map: Dict[str, Callable[[str], str]] = {
+            "words_order": reverse_words_order,
+            "each_word": reverse_each_word,
+            "entire_string": reverse_entire_string,
+            "preserve_punctuation": reverse_words_preserve_punctuation,
+            "preserve_casing": reverse_words_preserve_casing,
+        }
+
+        func = mode_map.get(mode, reverse_words_order)
+        return [func(txt) for txt in self.texts]
+
+
+
 
 
