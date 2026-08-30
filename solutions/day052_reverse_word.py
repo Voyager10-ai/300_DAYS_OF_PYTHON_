@@ -131,3 +131,45 @@ def reverse_words_preserve_casing(s: str) -> str:
     return " ".join(apply_casing(w) for w in words)
 
 
+# ─── 4. Custom Delimiter & Regex Token Reverser ───────────────────────────────
+
+
+def reverse_by_delimiter(s: str, delimiter: str = ",") -> str:
+    """
+    Reverses the sequence of tokens separated by a specific delimiter string.
+    For example: 'apple,banana,cherry' with delimiter=',' -> 'cherry,banana,apple'.
+
+    Args:
+        s: Input text string.
+        delimiter: Delimiter token.
+
+    Returns:
+        Reversed delimited string.
+    """
+    if not isinstance(s, str):
+        raise TypeError(f"Expected string input, got {type(s).__name__}")
+    tokens = s.split(delimiter)
+    return delimiter.join(reversed(tokens))
+
+
+def reverse_tokens_by_regex(s: str, pattern: str = r"\b\w+\b") -> str:
+    """
+    Reverses all token matches found by a regex pattern while preserving surrounding non-matching text.
+
+    Args:
+        s: Input text string.
+        pattern: Regex pattern for tokens to reverse.
+
+    Returns:
+        String with regex matched tokens reversed in-place.
+    """
+    if not isinstance(s, str):
+        raise TypeError(f"Expected string input, got {type(s).__name__}")
+
+    def replacer(match: re.Match) -> str:
+        return match.group(0)[::-1]
+
+    return re.sub(pattern, replacer, s)
+
+
+
