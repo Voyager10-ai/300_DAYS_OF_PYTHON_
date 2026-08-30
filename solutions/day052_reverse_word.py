@@ -172,4 +172,43 @@ def reverse_tokens_by_regex(s: str, pattern: str = r"\b\w+\b") -> str:
     return re.sub(pattern, replacer, s)
 
 
+# ─── 5. Predicate-Filtered Word Reverser ───────────────────────────────────────
+
+
+def reverse_matching_words(
+    s: str,
+    condition: Optional[Callable[[str], bool]] = None,
+    min_length: int = 0,
+) -> str:
+    """
+    Reverses only words in a string that satisfy a given filter predicate function or minimum length.
+    Words that do not match the predicate are left untouched.
+
+    Args:
+        s: Input text string.
+        condition: Callable returning True for words that should be reversed.
+        min_length: Minimum word character length threshold for reversal.
+
+    Returns:
+        String with conditionally reversed words.
+    """
+    if not isinstance(s, str):
+        raise TypeError(f"Expected string input, got {type(s).__name__}")
+
+    if condition is None:
+        condition = lambda w: len(w) >= min_length
+
+    words = s.split(" ")
+    result = []
+    for w in words:
+        clean_w = w.strip(string.punctuation)
+        if condition(clean_w):
+            result.append(w[::-1])
+        else:
+            result.append(w)
+
+    return " ".join(result)
+
+
+
 
