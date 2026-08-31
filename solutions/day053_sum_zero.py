@@ -222,3 +222,49 @@ def has_zero_sum_subarray(nums: List[int]) -> bool:
     return False
 
 
+# ─── 4. 3Sum Closest to Target Solver ──────────────────────────────────────────
+
+
+def three_sum_closest(nums: List[int], target: int = 0) -> int:
+    """
+    Finds three integers in nums such that the sum is closest to target.
+
+    Args:
+        nums: List of integers.
+        target: Target sum.
+
+    Returns:
+        The sum of the three integers closest to target.
+
+    Raises:
+        ValueError: If len(nums) < 3.
+    """
+    if not isinstance(nums, list):
+        raise TypeError(f"Expected list input, got {type(nums).__name__}")
+    if len(nums) < 3:
+        raise ValueError(f"List must contain at least 3 integers, got {len(nums)}")
+
+    sorted_nums = sorted(nums)
+    closest_sum = sorted_nums[0] + sorted_nums[1] + sorted_nums[2]
+    n = len(sorted_nums)
+
+    for i in range(n - 2):
+        left = i + 1
+        right = n - 1
+        while left < right:
+            current_sum = sorted_nums[i] + sorted_nums[left] + sorted_nums[right]
+
+            if abs(current_sum - target) < abs(closest_sum - target):
+                closest_sum = current_sum
+
+            if current_sum == target:
+                return current_sum
+            elif current_sum < target:
+                left += 1
+            else:
+                right -= 1
+
+    return closest_sum
+
+
+
