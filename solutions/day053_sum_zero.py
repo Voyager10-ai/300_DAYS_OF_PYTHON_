@@ -434,11 +434,57 @@ class TestSumZeroOperations(unittest.TestCase):
     def test_matrix_analyzer_and_validator(self):
         matrix = [
             [1, -1],
-            [2, -2],
+            [-1, 1],
         ]
         analyzer = ZeroSumMatrixAnalyzer(matrix)
         self.assertEqual(analyzer.zero_sum_rows(), [0, 1])
         self.assertTrue(analyzer.is_perfect_zero_sum_matrix())
+
+
+# ─── 9. Interactive CLI Demo Runner ───────────────────────────────────────────
+
+
+def main():
+    print("=" * 60)
+    print(" 🔢 Day 53: Sum Zero (3Sum / K-Sum) - Interactive Demo")
+    print("=" * 60)
+
+    sample_nums = [-1, 0, 1, 2, -1, -4, 3, -2]
+    print(f"\n1. Input Array:\n   {sample_nums}")
+
+    # 2. 2Sum and 3Sum Zero Solutions
+    print("\n2. Unique Pairs Summing to 0 (2Sum):")
+    print(f"   {two_sum_zero(sample_nums)}")
+
+    print("\n3. Unique Triplets Summing to 0 (3Sum):")
+    triplets = three_sum(sample_nums)
+    for trip in triplets:
+        print(f"   {trip} -> sum = {sum(trip)}")
+
+    # 4. 4Sum Zero Solutions
+    print("\n4. Unique Quadruplets Summing to 0 (4Sum):")
+    quads = four_sum_zero(sample_nums)
+    for q in quads:
+        print(f"   {q} -> sum = {sum(q)}")
+
+    # 5. Continuous Subarray Zero Sum
+    print("\n5. Contiguous Subarrays Summing to 0:")
+    sub_ranges = subarray_sum_zero(sample_nums)
+    for start, end in sub_ranges:
+        sub_arr = sample_nums[start : end + 1]
+        print(f"   Indices [{start}:{end}] -> {sub_arr} (sum = {sum(sub_arr)})")
+
+    # 6. Unit Test Suite Execution
+    print("\n6. Executing Unit Test Suite:")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestSumZeroOperations)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+    print("\nDemo execution complete!")
+
+
+if __name__ == "__main__":
+    main()
+
 
 
 
