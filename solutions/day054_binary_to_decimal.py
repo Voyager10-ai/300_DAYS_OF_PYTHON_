@@ -276,5 +276,50 @@ def binary_shift_right(bin_str: str, shift: int) -> str:
     return decimal_to_binary(val >> shift)
 
 
+# ─── 6. Universal Multi-Base Converter (Bases 2 to 36) ─────────────────────────
+
+
+BASE_DIGITS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+
+def convert_base(val_str: str, from_base: int, to_base: int) -> str:
+    """
+    Converts a number string representation from one base (2-36) to another (2-36).
+
+    Args:
+        val_str: Source value string.
+        from_base: Source base integer (2 to 36).
+        to_base: Target base integer (2 to 36).
+
+    Returns:
+        Converted value string in target base.
+
+    Raises:
+        ValueError: If bases are invalid or string contains invalid digits for base.
+    """
+    if not (2 <= from_base <= 36) or not (2 <= to_base <= 36):
+        raise ValueError(f"Bases must be between 2 and 36, got from={from_base}, to={to_base}")
+
+    clean_str = val_str.strip().upper()
+    if not clean_str:
+        raise ValueError("Value string cannot be empty")
+
+    # Step 1: Convert source string to decimal integer
+    decimal_val = int(clean_str, from_base)
+
+    if decimal_val == 0:
+        return "0"
+
+    # Step 2: Convert decimal integer to target base
+    res_digits = []
+    curr = decimal_val
+    while curr > 0:
+        curr, remainder = divmod(curr, to_base)
+        res_digits.append(BASE_DIGITS[remainder])
+
+    return "".join(reversed(res_digits))
+
+
+
 
 
