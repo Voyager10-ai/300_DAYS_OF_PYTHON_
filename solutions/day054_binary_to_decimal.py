@@ -113,3 +113,52 @@ def binary_float_to_decimal(binary_str: str) -> float:
 
     return int_val + frac_val
 
+
+# ─── 3. Two's Complement Signed Binary Converter ───────────────────────────────
+
+
+def twos_complement_to_decimal(binary_str: str, bits: Optional[int] = None) -> int:
+    """
+    Converts a Two's Complement signed binary string to a signed decimal integer.
+    If MSB (most significant bit) is 1, returns negative integer value.
+
+    Args:
+        binary_str: Signed binary string (e.g. '11111111' -> -1 for 8 bits).
+        bits: Explicit bit width (defaults to len(binary_str)).
+
+    Returns:
+        Signed decimal integer.
+    """
+    val = binary_to_decimal(binary_str)
+    num_bits = bits if bits is not None else len(binary_str.strip().lower().replace("0b", ""))
+
+    if val & (1 << (num_bits - 1)):
+        val -= 1 << num_bits
+    return val
+
+
+def decimal_to_twos_complement(val: int, bits: int = 8) -> str:
+    """
+    Converts a signed decimal integer to its N-bit Two's Complement binary string representation.
+
+    Args:
+        val: Signed integer.
+        bits: Bit width integer (e.g. 8, 16, 32).
+
+    Returns:
+        N-bit binary string.
+
+    Raises:
+        ValueError: If val is out of bounds for the given bit width.
+    """
+    min_val = -(1 << (bits - 1))
+    max_val = (1 << (bits - 1)) - 1
+    if not (min_val <= val <= max_val):
+        raise ValueError(f"Value {val} out of bounds for {bits}-bit Two's Complement [{min_val}, {max_val}]")
+
+    if val < 0:
+        val = (1 << bits) + val
+
+    return format(val, f"0{bits}b")
+
+
