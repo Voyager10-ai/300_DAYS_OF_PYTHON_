@@ -267,4 +267,40 @@ def three_sum_closest(nums: List[int], target: int = 0) -> int:
     return closest_sum
 
 
+# ─── 5. Subset Sum Zero Powerset Generator ─────────────────────────────────────
+
+
+def subset_sum_zero(nums: List[int], max_length: Optional[int] = None) -> List[Tuple[int, ...]]:
+    """
+    Finds all non-empty unique subsets (combinations) of nums that sum to zero.
+
+    Args:
+        nums: List of integers.
+        max_length: Maximum subset size limit (optional).
+
+    Returns:
+        Sorted list of unique tuples summing to 0.
+    """
+    if not isinstance(nums, list):
+        raise TypeError(f"Expected list input, got {type(nums).__name__}")
+
+    results: Set[Tuple[int, ...]] = set()
+    n = len(nums)
+    limit = max_length if max_length is not None else n
+
+    def backtrack(index: int, current_subset: List[int], current_sum: int):
+        if current_subset and current_sum == 0:
+            results.add(tuple(sorted(current_subset)))
+
+        if index >= n or len(current_subset) >= limit:
+            return
+
+        for i in range(index, n):
+            backtrack(i + 1, current_subset + [nums[i]], current_sum + nums[i])
+
+    backtrack(0, [], 0)
+    return sorted(list(results), key=lambda t: (len(t), t))
+
+
+
 
