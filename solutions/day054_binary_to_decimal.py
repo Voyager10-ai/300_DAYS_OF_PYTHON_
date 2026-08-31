@@ -360,6 +360,56 @@ class BitBuffer:
         return len(self._bits)
 
 
+# ─── 8. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestBinaryToDecimalOperations(unittest.TestCase):
+    def test_binary_to_decimal_standard(self):
+        self.assertEqual(binary_to_decimal("0"), 0)
+        self.assertEqual(binary_to_decimal("1"), 1)
+        self.assertEqual(binary_to_decimal("1010"), 10)
+        self.assertEqual(binary_to_decimal("11111111"), 255)
+        self.assertEqual(binary_to_decimal("0b1101"), 13)
+
+    def test_binary_to_decimal_errors(self):
+        with self.assertRaises(ValueError):
+            binary_to_decimal("10201")
+        with self.assertRaises(ValueError):
+            binary_to_decimal("")
+        with self.assertRaises(TypeError):
+            binary_to_decimal(1010)  # type: ignore
+
+    def test_binary_float_to_decimal(self):
+        self.assertEqual(binary_float_to_decimal("101.101"), 5.625)
+        self.assertEqual(binary_float_to_decimal("0.1"), 0.5)
+
+    def test_twos_complement(self):
+        self.assertEqual(twos_complement_to_decimal("11111111", bits=8), -1)
+        self.assertEqual(twos_complement_to_decimal("01111111", bits=8), 127)
+        self.assertEqual(decimal_to_twos_complement(-1, bits=8), "11111111")
+
+    def test_decimal_to_binary(self):
+        self.assertEqual(decimal_to_binary(10), "1010")
+        self.assertEqual(decimal_float_to_binary(5.625), "101.101")
+
+    def test_bitwise_ops(self):
+        self.assertEqual(count_set_bits("101101"), 4)
+        self.assertEqual(binary_bitwise_and("1100", "1010"), "1000")
+        self.assertEqual(binary_bitwise_or("1100", "1010"), "1110")
+        self.assertEqual(binary_bitwise_xor("1100", "1010"), "0110")
+
+    def test_convert_base(self):
+        self.assertEqual(convert_base("101010", from_base=2, to_base=16), "2A")
+        self.assertEqual(convert_base("2A", from_base=16, to_base=10), "42")
+
+    def test_bit_buffer(self):
+        buf = BitBuffer("1010")
+        buf.push_bits("1100")
+        self.assertEqual(buf.pop_int(4), 10)  # pops '1010'
+        self.assertEqual(buf.to_decimal(), 12)  # '1100' remaining
+
+
+
 
 
 
