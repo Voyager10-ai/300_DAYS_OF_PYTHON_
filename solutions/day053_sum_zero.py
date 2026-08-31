@@ -302,5 +302,43 @@ def subset_sum_zero(nums: List[int], max_length: Optional[int] = None) -> List[T
     return sorted(list(results), key=lambda t: (len(t), t))
 
 
+# ─── 6. Matrix Balance & Zero-Sum Analyzer ─────────────────────────────────────
+
+
+class ZeroSumMatrixAnalyzer:
+    """
+    Analyzes 2D integer matrices for zero-sum rows, columns, and overall balance.
+    """
+
+    def __init__(self, matrix: List[List[int]]):
+        if not isinstance(matrix, list) or not all(isinstance(row, list) for row in matrix):
+            raise TypeError("Matrix must be a list of lists")
+
+        self.matrix = matrix
+        self.rows = len(matrix)
+        self.cols = len(matrix[0]) if self.rows > 0 else 0
+
+    def zero_sum_rows(self) -> List[int]:
+        """Returns row indices whose elements sum to zero."""
+        return [r for r, row in enumerate(self.matrix) if sum(row) == 0]
+
+    def zero_sum_cols(self) -> List[int]:
+        """Returns column indices whose elements sum to zero."""
+        results = []
+        for c in range(self.cols):
+            col_sum = sum(self.matrix[r][c] for r in range(self.rows))
+            if col_sum == 0:
+                results.append(c)
+        return results
+
+    def is_perfect_zero_sum_matrix(self) -> bool:
+        """True if all rows and all columns independently sum to zero."""
+        return (
+            len(self.zero_sum_rows()) == self.rows
+            and len(self.zero_sum_cols()) == self.cols
+        )
+
+
+
 
 
