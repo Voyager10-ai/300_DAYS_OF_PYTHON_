@@ -165,3 +165,60 @@ def four_sum_zero(nums: List[int]) -> List[Tuple[int, int, int, int]]:
     """Convenience function for 4Sum Zero."""
     return [tuple(t) for t in k_sum_zero(nums, k=4, target=0)]  # type: ignore
 
+
+# ─── 3. Continuous Subarray Sum Zero Finder ────────────────────────────────────
+
+
+def subarray_sum_zero(nums: List[int]) -> List[Tuple[int, int]]:
+    """
+    Finds index ranges (start_idx, end_idx) of all contiguous subarrays that sum to zero.
+    Uses O(N) prefix sum hash map index tracking.
+
+    Args:
+        nums: List of integers.
+
+    Returns:
+        List of (start_idx, end_idx) inclusive index ranges summing to 0.
+    """
+    if not isinstance(nums, list):
+        raise TypeError(f"Expected list input, got {type(nums).__name__}")
+
+    prefix_map: Dict[int, List[int]] = {0: [-1]}
+    current_sum = 0
+    results: List[Tuple[int, int]] = []
+
+    for i, num in enumerate(nums):
+        current_sum += num
+        if current_sum in prefix_map:
+            for prev_idx in prefix_map[current_sum]:
+                results.append((prev_idx + 1, i))
+            prefix_map[current_sum].append(i)
+        else:
+            prefix_map[current_sum] = [i]
+
+    return results
+
+
+def has_zero_sum_subarray(nums: List[int]) -> bool:
+    """
+    Checks if list contains at least one contiguous subarray with zero sum.
+
+    Args:
+        nums: List of integers.
+
+    Returns:
+        True if zero sum subarray exists, False otherwise.
+    """
+    if not isinstance(nums, list):
+        raise TypeError(f"Expected list input, got {type(nums).__name__}")
+
+    seen_sums: Set[int] = {0}
+    current_sum = 0
+    for num in nums:
+        current_sum += num
+        if current_sum in seen_sums:
+            return True
+        seen_sums.add(current_sum)
+    return False
+
+
