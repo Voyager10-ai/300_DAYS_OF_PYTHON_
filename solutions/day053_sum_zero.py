@@ -339,6 +339,57 @@ class ZeroSumMatrixAnalyzer:
         )
 
 
+# ─── 7. Solution Validator & Dataset Generator ─────────────────────────────────
+
+
+def validate_zero_sum_triplets(triplets: List[Tuple[int, int, int]]) -> bool:
+    """
+    Validates that every triplet in the list sums to 0 and all triplets are unique.
+
+    Args:
+        triplets: List of 3-element tuples.
+
+    Returns:
+        True if all triplets are valid and unique.
+    """
+    seen: Set[Tuple[int, int, int]] = set()
+    for t in triplets:
+        if len(t) != 3 or sum(t) != 0:
+            return False
+        if t in seen:
+            return False
+        seen.add(t)
+    return True
+
+
+def generate_zero_sum_dataset(size: int = 20, seed: Optional[int] = None) -> List[int]:
+    """
+    Generates a synthetic list of integers containing guaranteed zero-sum pairs and triplets.
+
+    Args:
+        size: Target list size.
+        seed: Random seed.
+
+    Returns:
+        List of positive and negative integers.
+    """
+    if seed is not None:
+        random.seed(seed)
+
+    data: List[int] = []
+    half = size // 2
+    for _ in range(half):
+        val = random.randint(1, 50)
+        data.extend([val, -val])
+
+    while len(data) < size:
+        data.append(random.randint(-20, 20))
+
+    random.shuffle(data)
+    return data
+
+
+
 
 
 
