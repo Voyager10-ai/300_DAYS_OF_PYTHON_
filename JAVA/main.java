@@ -936,7 +936,28 @@
 //     }
 // }
 
+// Java Binary to Decimal Practice (Day 54)
+// class BinaryToDecimalPractice {
+//     public static int binaryToDecimal(String binaryStr) {
+//         if (binaryStr == null || binaryStr.isEmpty()) throw new IllegalArgumentException("Invalid binary string");
+//         int decimal = 0;
+//         int length = binaryStr.length();
+//         for (int i = 0; i < length; i++) {
+//             char c = binaryStr.charAt(i);
+//             if (c != '0' && c != '1') throw new IllegalArgumentException("Non-binary char: " + c);
+//             int bit = c - '0';
+//             decimal += bit * Math.pow(2, length - 1 - i);
+//         }
+//         return decimal;
+//     }
+//     public static void main(String[] args) {
+//         String b = "110101";
+//         System.out.println("Binary: '" + b + "' -> Decimal: " + binaryToDecimal(b));
+//     }
+// }
+
 import java.util.*;
+
 
 
 

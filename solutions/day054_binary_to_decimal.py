@@ -409,6 +409,53 @@ class TestBinaryToDecimalOperations(unittest.TestCase):
         self.assertEqual(buf.to_decimal(), 12)  # '1100' remaining
 
 
+# ─── 9. Interactive CLI Demo Runner ───────────────────────────────────────────
+
+
+def main():
+    print("=" * 60)
+    print(" 🔢 Day 54: Binary to Decimal Conversion - Interactive Demo")
+    print("=" * 60)
+
+    # 1. Standard Conversion
+    sample_bin = "110101"
+    dec_val = binary_to_decimal(sample_bin)
+    print(f"\n1. Standard Integer Conversion:")
+    print(f"   Binary   : '{sample_bin}'")
+    print(f"   Decimal  : {dec_val}")
+
+    # 2. Fractional Float Conversion
+    frac_bin = "101.101"
+    frac_dec = binary_float_to_decimal(frac_bin)
+    print(f"\n2. Fractional Binary Float Conversion:")
+    print(f"   Binary Float  : '{frac_bin}'")
+    print(f"   Decimal Float : {frac_dec}")
+
+    # 3. Two's Complement Signed Binary
+    tc_bin = "11110000"
+    tc_dec = twos_complement_to_decimal(tc_bin, bits=8)
+    print(f"\n3. Two's Complement Signed Binary:")
+    print(f"   8-Bit Binary  : '{tc_bin}'")
+    print(f"   Signed Dec    : {tc_dec}")
+
+    # 4. Multi-Base Conversion
+    hex_val = convert_base("101010111100", 2, 16)
+    print(f"\n4. Multi-Base Conversion (Base 2 -> Base 16):")
+    print(f"   Binary '101010111100' -> Hex 0x{hex_val}")
+
+    # 5. Unit Test Suite Execution
+    print("\n5. Executing Unit Test Suite:")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestBinaryToDecimalOperations)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+    print("\nDemo execution complete!")
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 
