@@ -227,4 +227,54 @@ def decimal_float_to_binary(val: float, precision: int = 8) -> str:
     return f"{int_bin}.{''.join(frac_bits)}"
 
 
+# ─── 5. Bitwise Operations & Bit Manipulations ────────────────────────────────
+
+
+def count_set_bits(binary_str: str) -> int:
+    """Returns the number of set bits ('1's) in a binary string."""
+    val = binary_to_decimal(binary_str)
+    count = 0
+    while val > 0:
+        val &= val - 1
+        count += 1
+    return count
+
+
+def binary_bitwise_and(bin1: str, bin2: str) -> str:
+    """Performs bitwise AND between two binary strings."""
+    v1 = binary_to_decimal(bin1)
+    v2 = binary_to_decimal(bin2)
+    max_len = max(len(bin1), len(bin2))
+    return decimal_to_binary(v1 & v2, min_bits=max_len)
+
+
+def binary_bitwise_or(bin1: str, bin2: str) -> str:
+    """Performs bitwise OR between two binary strings."""
+    v1 = binary_to_decimal(bin1)
+    v2 = binary_to_decimal(bin2)
+    max_len = max(len(bin1), len(bin2))
+    return decimal_to_binary(v1 | v2, min_bits=max_len)
+
+
+def binary_bitwise_xor(bin1: str, bin2: str) -> str:
+    """Performs bitwise XOR between two binary strings."""
+    v1 = binary_to_decimal(bin1)
+    v2 = binary_to_decimal(bin2)
+    max_len = max(len(bin1), len(bin2))
+    return decimal_to_binary(v1 ^ v2, min_bits=max_len)
+
+
+def binary_shift_left(bin_str: str, shift: int) -> str:
+    """Shifts binary string to the left by shift positions."""
+    val = binary_to_decimal(bin_str)
+    return decimal_to_binary(val << shift)
+
+
+def binary_shift_right(bin_str: str, shift: int) -> str:
+    """Shifts binary string to the right by shift positions."""
+    val = binary_to_decimal(bin_str)
+    return decimal_to_binary(val >> shift)
+
+
+
 
