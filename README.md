@@ -55,6 +55,7 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 50: Get and Print
 - Day 51: Rectangle
 - Day 52: Reverse Word
+- Day 53: Sum Zero
 
 
 
