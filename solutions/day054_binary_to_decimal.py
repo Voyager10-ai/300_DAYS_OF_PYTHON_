@@ -162,3 +162,69 @@ def decimal_to_twos_complement(val: int, bits: int = 8) -> str:
     return format(val, f"0{bits}b")
 
 
+# ─── 4. Reverse Decimal to Binary Converters ───────────────────────────────────
+
+
+def decimal_to_binary(n: int, min_bits: Optional[int] = None, prefix: bool = False) -> str:
+    """
+    Converts a non-negative decimal integer to binary string.
+
+    Args:
+        n: Non-negative integer.
+        min_bits: Minimum padded bit length.
+        prefix: If True, includes '0b' prefix.
+
+    Returns:
+        Binary string.
+
+    Raises:
+        ValueError: If n < 0.
+    """
+    if not isinstance(n, int) or isinstance(n, bool):
+        raise TypeError(f"Expected integer input, got {type(n).__name__}")
+    if n < 0:
+        raise ValueError(f"decimal_to_binary expects non-negative integer, got {n}")
+
+    bin_str = bin(n)[2:]
+    if min_bits is not None and len(bin_str) < min_bits:
+        bin_str = bin_str.zfill(min_bits)
+
+    return f"0b{bin_str}" if prefix else bin_str
+
+
+def decimal_float_to_binary(val: float, precision: int = 8) -> str:
+    """
+    Converts a decimal float to a binary string representation with specified fractional precision.
+    For example: 5.625 -> '101.101'.
+
+    Args:
+        val: Non-negative float value.
+        precision: Maximum number of fractional binary digits.
+
+    Returns:
+        Binary float string.
+    """
+    if val < 0:
+        raise ValueError("Non-negative float required")
+
+    int_part = int(val)
+    frac_part = val - int_part
+
+    int_bin = decimal_to_binary(int_part)
+    if frac_part == 0:
+        return int_bin
+
+    frac_bits = []
+    curr = frac_part
+    for _ in range(precision):
+        if curr == 0:
+            break
+        curr *= 2
+        bit = int(curr)
+        frac_bits.append(str(bit))
+        curr -= bit
+
+    return f"{int_bin}.{''.join(frac_bits)}"
+
+
+
