@@ -320,6 +320,47 @@ def convert_base(val_str: str, from_base: int, to_base: int) -> str:
     return "".join(reversed(res_digits))
 
 
+# ─── 7. BitBuffer Stream Packing & Unpacking Class ─────────────────────────────
+
+
+class BitBuffer:
+    """
+    Simulates a FIFO bit-level stream buffer for bit packing, unpacking, and decimal conversion.
+    """
+
+    def __init__(self, initial_bits: str = ""):
+        self._bits: List[str] = [b for b in initial_bits if b in "01"]
+
+    def push_bits(self, bin_str: str) -> None:
+        """Pushes binary digits into buffer stream."""
+        for b in bin_str:
+            if b in "01":
+                self._bits.append(b)
+
+    def pop_int(self, num_bits: int) -> int:
+        """Pops num_bits from start of buffer and evaluates as decimal integer."""
+        if num_bits > len(self._bits):
+            raise ValueError(f"Not enough bits in buffer (requested {num_bits}, available {len(self._bits)})")
+
+        popped = "".join(self._bits[:num_bits])
+        self._bits = self._bits[num_bits:]
+        return binary_to_decimal(popped)
+
+    def peek_binary(self) -> str:
+        """Returns current binary stream string."""
+        return "".join(self._bits)
+
+    def to_decimal(self) -> int:
+        """Evaluates entire current bit buffer stream as decimal integer."""
+        if not self._bits:
+            return 0
+        return binary_to_decimal(self.peek_binary())
+
+    def __len__(self) -> int:
+        return len(self._bits)
+
+
+
 
 
 
