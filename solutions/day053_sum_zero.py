@@ -93,3 +93,75 @@ def three_sum(nums: List[int]) -> List[Tuple[int, int, int]]:
                 right -= 1
 
     return triplets
+
+
+# ─── 2. Generalized K-Sum & 4Sum Zero Solver ───────────────────────────────────
+
+
+def k_sum_zero(nums: List[int], k: int = 4, target: int = 0) -> List[Tuple[int, ...]]:
+    """
+    Generalized K-Sum algorithm finding all unique K-tuples that sum to target.
+
+    Args:
+        nums: List of integers.
+        k: Number of elements in tuple (k >= 2).
+        target: Target sum (default 0).
+
+    Returns:
+        List of unique k-tuples summing to target.
+    """
+    if not isinstance(nums, list):
+        raise TypeError(f"Expected list input, got {type(nums).__name__}")
+    if k < 2:
+        raise ValueError(f"k must be >= 2, got {k}")
+
+    nums_sorted = sorted(nums)
+
+    def helper(start: int, k_val: int, target_val: int) -> List[List[int]]:
+        res: List[List[int]] = []
+        n = len(nums_sorted)
+
+        if start >= n:
+            return res
+
+        # Average value bounds check
+        average_value = target_val // k_val
+        if nums_sorted[start] > average_value or average_value > nums_sorted[-1]:
+            return res
+
+        if k_val == 2:
+            left = start
+            right = n - 1
+            while left < right:
+                s = nums_sorted[left] + nums_sorted[right]
+                if s == target_val:
+                    res.append([nums_sorted[left], nums_sorted[right]])
+                    while left < right and nums_sorted[left] == nums_sorted[left + 1]:
+                        left += 1
+                    while left < right and nums_sorted[right] == nums_sorted[right - 1]:
+                        right -= 1
+                    left += 1
+                    right -= 1
+                elif s < target_val:
+                    left += 1
+                else:
+                    right -= 1
+            return res
+
+        for i in range(start, n - k_val + 1):
+            if i > start and nums_sorted[i] == nums_sorted[i - 1]:
+                continue
+            sub_results = helper(i + 1, k_val - 1, target_val - nums_sorted[i])
+            for sub in sub_results:
+                res.append([nums_sorted[i]] + sub)
+
+        return res
+
+    results = helper(0, k, target)
+    return [tuple(r) for r in results]
+
+
+def four_sum_zero(nums: List[int]) -> List[Tuple[int, int, int, int]]:
+    """Convenience function for 4Sum Zero."""
+    return [tuple(t) for t in k_sum_zero(nums, k=4, target=0)]  # type: ignore
+
