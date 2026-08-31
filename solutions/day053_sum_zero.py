@@ -1,0 +1,95 @@
+# Day 53: Sum Zero
+#
+# Problem:
+#   Write a Python program to find all unique triplets in an array that sum to zero (3Sum).
+#   Includes 2Sum, generalized K-Sum, continuous subarray sum zero, 3Sum closest,
+#   subset sum zero, matrix balance analyzer, unit tests, and Java practice.
+
+import random
+import unittest
+from typing import List, Dict, Tuple, Set, Any, Optional, Union, Callable
+
+
+# ─── 1. Core 3Sum & 2Sum Zero Algorithms ───────────────────────────────────────
+
+
+def two_sum_zero(nums: List[int]) -> List[Tuple[int, int]]:
+    """
+    Finds all unique pairs (a, b) in the list such that a + b == 0.
+
+    Args:
+        nums: List of integers.
+
+    Returns:
+        Sorted list of unique integer pairs summing to 0.
+    """
+    if not isinstance(nums, list):
+        raise TypeError(f"Expected list input, got {type(nums).__name__}")
+
+    seen: Set[int] = set()
+    pairs: Set[Tuple[int, int]] = set()
+
+    for num in nums:
+        target = -num
+        if target in seen:
+            pair = (min(num, target), max(num, target))
+            pairs.add(pair)
+        seen.add(num)
+
+    return sorted(list(pairs))
+
+
+def three_sum(nums: List[int]) -> List[Tuple[int, int, int]]:
+    """
+    Finds all unique triplets [a, b, c] in the list such that a + b + c == 0 using O(N^2) two-pointer technique.
+
+    Args:
+        nums: List of integers.
+
+    Returns:
+        Sorted list of unique 3-element tuples summing to 0.
+    """
+    if not isinstance(nums, list):
+        raise TypeError(f"Expected list input, got {type(nums).__name__}")
+
+    if len(nums) < 3:
+        return []
+
+    sorted_nums = sorted(nums)
+    triplets: List[Tuple[int, int, int]] = []
+    n = len(sorted_nums)
+
+    for i in range(n - 2):
+        # Skip duplicate first elements
+        if i > 0 and sorted_nums[i] == sorted_nums[i - 1]:
+            continue
+
+        # Pruning optimization
+        if sorted_nums[i] + sorted_nums[i + 1] + sorted_nums[i + 2] > 0:
+            break
+        if sorted_nums[i] + sorted_nums[n - 2] + sorted_nums[n - 1] < 0:
+            continue
+
+        left = i + 1
+        right = n - 1
+
+        while left < right:
+            current_sum = sorted_nums[i] + sorted_nums[left] + sorted_nums[right]
+
+            if current_sum == 0:
+                triplets.append((sorted_nums[i], sorted_nums[left], sorted_nums[right]))
+
+                # Skip duplicates for left and right
+                while left < right and sorted_nums[left] == sorted_nums[left + 1]:
+                    left += 1
+                while left < right and sorted_nums[right] == sorted_nums[right - 1]:
+                    right -= 1
+
+                left += 1
+                right -= 1
+            elif current_sum < 0:
+                left += 1
+            else:
+                right -= 1
+
+    return triplets
