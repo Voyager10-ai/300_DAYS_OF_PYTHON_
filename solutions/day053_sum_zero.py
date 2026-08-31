@@ -389,6 +389,59 @@ def generate_zero_sum_dataset(size: int = 20, seed: Optional[int] = None) -> Lis
     return data
 
 
+# ─── 8. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestSumZeroOperations(unittest.TestCase):
+    def test_two_sum_zero(self):
+        nums = [-3, -1, 0, 1, 3, 5]
+        pairs = two_sum_zero(nums)
+        self.assertEqual(pairs, [(-3, 3), (-1, 1)])
+
+    def test_three_sum_standard(self):
+        nums = [-1, 0, 1, 2, -1, -4]
+        triplets = three_sum(nums)
+        expected = [(-1, -1, 2), (-1, 0, 1)]
+        self.assertEqual(triplets, expected)
+        self.assertTrue(validate_zero_sum_triplets(triplets))
+
+    def test_three_sum_edge_cases(self):
+        self.assertEqual(three_sum([0, 0, 0, 0]), [(0, 0, 0)])
+        self.assertEqual(three_sum([1, 2, 3]), [])
+        self.assertEqual(three_sum([1]), [])
+
+    def test_k_sum_and_four_sum(self):
+        nums = [1, 0, -1, 0, -2, 2]
+        quads = four_sum_zero(nums)
+        expected = [(-2, -1, 1, 2), (-2, 0, 0, 2), (-1, 0, 0, 1)]
+        self.assertEqual(quads, expected)
+
+    def test_subarray_sum_zero(self):
+        nums = [4, 2, -3, 1, 6]
+        self.assertTrue(has_zero_sum_subarray(nums))
+        ranges = subarray_sum_zero(nums)
+        self.assertIn((1, 3), ranges)  # 2 + (-3) + 1 = 0
+
+    def test_three_sum_closest(self):
+        nums = [-1, 2, 1, -4]
+        self.assertEqual(three_sum_closest(nums, target=1), 2)
+
+    def test_subset_sum_zero(self):
+        nums = [-2, 1, 1]
+        subsets = subset_sum_zero(nums)
+        self.assertIn((-2, 1, 1), subsets)
+
+    def test_matrix_analyzer_and_validator(self):
+        matrix = [
+            [1, -1],
+            [2, -2],
+        ]
+        analyzer = ZeroSumMatrixAnalyzer(matrix)
+        self.assertEqual(analyzer.zero_sum_rows(), [0, 1])
+        self.assertTrue(analyzer.is_perfect_zero_sum_matrix())
+
+
+
 
 
 
