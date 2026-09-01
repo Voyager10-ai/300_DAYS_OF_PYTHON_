@@ -241,4 +241,61 @@ class BinomialCoinModel:
         return math.sqrt(self.variance)
 
 
+# ─── 5. Hypothesis Testing for Coin Fairness ───────────────────────────────────
+
+
+def test_coin_fairness(heads_count: int, total_flips: int, alpha: float = 0.05) -> Dict[str, Any]:
+    """
+    Performs Chi-Square Goodness-of-Fit and Z-Test for proportion to evaluate coin fairness.
+
+    Null Hypothesis (H0): The coin is fair (p = 0.5).
+    Alternative Hypothesis (H1): The coin is biased (p != 0.5).
+
+    Args:
+        heads_count: Number of observed Heads.
+        total_flips: Total number of flips (total_flips > 0).
+        alpha: Significance level (default 0.05).
+
+    Returns:
+        Dictionary containing Chi-Square stat, Z-score, p-hat, and decision verdict.
+
+    Raises:
+        ValueError: If inputs are invalid.
+    """
+    if total_flips <= 0:
+        raise ValueError(f"Total flips must be > 0, got {total_flips}")
+    if not (0 <= heads_count <= total_flips):
+        raise ValueError(f"Heads count {heads_count} out of range [0, {total_flips}]")
+
+    tails_count = total_flips - heads_count
+    expected_heads = total_flips * 0.5
+    expected_tails = total_flips * 0.5
+
+    # Chi-Square Statistic: sum((O - E)^2 / E)
+    chi2_stat = (((heads_count - expected_heads) ** 2) / expected_heads) + (
+        ((tails_count - expected_tails) ** 2) / expected_tails
+    )
+
+    # Z-Statistic for one-sample proportion test: (p_hat - p0) / sqrt(p0*(1-p0)/n)
+    p_hat = heads_count / total_flips
+    z_stat = (p_hat - 0.5) / math.sqrt(0.25 / total_flips)
+
+    # Critical Chi2 value for df=1 at alpha=0.05 is ~3.841, alpha=0.01 is ~6.635
+    critical_chi2_05 = 3.8415
+    is_fair = chi2_stat <= critical_chi2_05
+
+    return {
+        "total_flips": total_flips,
+        "observed_heads": heads_count,
+        "observed_tails": tails_count,
+        "sample_proportion_heads": round(p_hat, 4),
+        "chi2_stat": round(chi2_stat, 4),
+        "z_stat": round(z_stat, 4),
+        "alpha": alpha,
+        "null_hypothesis_accepted": is_fair,
+        "verdict": "Fair Coin (Fail to reject H0)" if is_fair else "Biased Coin (Reject H0)",
+    }
+
+
+
 
