@@ -416,6 +416,63 @@ class WeightedCoin:
         return random.choices(self.outcomes, weights=self.weights, k=count)
 
 
+# ─── 8. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestFlipACoinOperations(unittest.TestCase):
+    def test_flip_coin(self):
+        f = flip_coin(bias=0.5, seed=42)
+        self.assertIn(f, ["Heads", "Tails"])
+        with self.assertRaises(ValueError):
+            flip_coin(bias=1.5)
+
+    def test_flip_coins_batch(self):
+        flips = flip_coins_batch(100, bias=0.5, seed=123)
+        self.assertEqual(len(flips), 100)
+        self.assertTrue(all(f in ("Heads", "Tails") for f in flips))
+
+    def test_analyze_coin_flips(self):
+        seq = ["Heads", "Heads", "Tails", "Heads", "Tails", "Tails", "Tails"]
+        stats = analyze_coin_flips(seq)
+        self.assertEqual(stats["heads_count"], 3)
+        self.assertEqual(stats["tails_count"], 4)
+        self.assertEqual(stats["max_heads_streak"], 2)
+        self.assertEqual(stats["max_tails_streak"], 3)
+
+    def test_simulate_streaks(self):
+        flips_needed, history = simulate_streaks(target_streak=3, target_outcome="Heads", bias=0.5, seed=42)
+        self.assertEqual(history[-3:], ["Heads", "Heads", "Heads"])
+        self.assertEqual(flips_needed, len(history))
+
+    def test_binomial_model(self):
+        model = BinomialCoinModel(n_flips=10, p_heads=0.5)
+        self.assertAlmostEqual(model.mean, 5.0)
+        self.assertAlmostEqual(model.variance, 2.5)
+        pmf_sum = sum(model.pmf(k) for k in range(11))
+        self.assertAlmostEqual(pmf_sum, 1.0)
+
+    def test_hypothesis_fairness(self):
+        fair_res = test_coin_fairness(heads_count=50, total_flips=100)
+        self.assertTrue(fair_res["null_hypothesis_accepted"])
+        biased_res = test_coin_fairness(heads_count=80, total_flips=100)
+        self.assertFalse(biased_res["null_hypothesis_accepted"])
+
+    def test_random_walk_and_gamblers_ruin(self):
+        walk = CoinRandomWalk(start_position=0, bias=0.5)
+        trajectory = walk.simulate_steps(num_steps=10, seed=10)
+        self.assertEqual(len(trajectory), 11)
+
+        ruin_res = CoinRandomWalk.simulate_gamblers_ruin(start_capital=5, target_goal=10, seed=99)
+        self.assertIn(ruin_res["outcome"], ["ruin", "victory"])
+
+    def test_weighted_coin(self):
+        wc = WeightedCoin(outcomes=["H", "T", "E"], weights=[0.49, 0.49, 0.02])
+        flips = wc.flip_batch(100, seed=7)
+        self.assertEqual(len(flips), 100)
+        self.assertTrue(all(f in ["H", "T", "E"] for f in flips))
+
+
+
 
 
 
