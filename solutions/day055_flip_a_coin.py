@@ -185,3 +185,60 @@ def simulate_streaks(
     return len(history), history
 
 
+# ─── 4. Binomial Coin Probability Model ────────────────────────────────────────
+
+
+class BinomialCoinModel:
+    """
+    Theoretical Binomial distribution model for coin flipping experiments.
+    Evaluates probability mass function (PMF), cumulative distribution (CDF),
+    expected mean, variance, and standard deviation.
+    """
+
+    def __init__(self, n_flips: int, p_heads: float = 0.5):
+        if n_flips < 0:
+            raise ValueError(f"Number of flips must be >= 0, got {n_flips}")
+        if not (0.0 <= p_heads <= 1.0):
+            raise ValueError(f"Probability p must be in [0, 1], got {p_heads}")
+
+        self.n = n_flips
+        self.p = p_heads
+
+    def pmf(self, k: int) -> float:
+        """
+        Calculates Probability Mass Function P(X = k) = C(n, k) * p^k * (1-p)^(n-k).
+        """
+        if not (0 <= k <= self.n):
+            return 0.0
+
+        comb = math.comb(self.n, k)
+        return comb * (self.p ** k) * ((1.0 - self.p) ** (self.n - k))
+
+    def cdf(self, k: int) -> float:
+        """
+        Calculates Cumulative Distribution Function P(X <= k).
+        """
+        if k < 0:
+            return 0.0
+        if k >= self.n:
+            return 1.0
+
+        return sum(self.pmf(j) for j in range(k + 1))
+
+    @property
+    def mean(self) -> float:
+        """Expected mean E[X] = n * p."""
+        return self.n * self.p
+
+    @property
+    def variance(self) -> float:
+        """Variance Var(X) = n * p * (1-p)."""
+        return self.n * self.p * (1.0 - self.p)
+
+    @property
+    def std_dev(self) -> float:
+        """Standard deviation SD(X) = sqrt(n * p * (1-p))."""
+        return math.sqrt(self.variance)
+
+
+
