@@ -472,6 +472,63 @@ class TestFlipACoinOperations(unittest.TestCase):
         self.assertTrue(all(f in ["H", "T", "E"] for f in flips))
 
 
+# ─── 9. Interactive CLI Demo Runner ───────────────────────────────────────────
+
+
+def main():
+    print("=" * 60)
+    print(" 🪙 Day 55: Flip a Coin Simulator - Interactive Demo")
+    print("=" * 60)
+
+    # 1. Single & Batch Flips
+    print("\n1. Single & Batch Coin Flips:")
+    print(f"   Single Flip (Fair)   : {flip_coin(bias=0.5, seed=10)}")
+    print(f"   Single Flip (Biased) : {flip_coin(bias=0.8, seed=10)}")
+    batch_flips = flip_coins_batch(20, bias=0.5, seed=42)
+    print(f"   Batch of 20 Flips    : {batch_flips}")
+
+    # 2. Sequence Analysis
+    print("\n2. Sequence & Streak Analysis (1000 Flips):")
+    sim_1000 = flip_coins_batch(1000, bias=0.5, seed=99)
+    stats = analyze_coin_flips(sim_1000)
+    print(f"   Heads Count      : {stats['heads_count']} ({stats['heads_percentage']}%)")
+    print(f"   Tails Count      : {stats['tails_count']} ({stats['tails_percentage']}%)")
+    print(f"   Max Heads Streak : {stats['max_heads_streak']}")
+    print(f"   Max Tails Streak : {stats['max_tails_streak']}")
+
+    # 3. Binomial Distribution Model
+    print("\n3. Binomial Probability Model (10 Flips, p=0.5):")
+    model = BinomialCoinModel(10, 0.5)
+    print(f"   Expected Mean     : {model.mean}")
+    print(f"   Standard Dev      : {round(model.std_dev, 4)}")
+    print(f"   P(X = 5 Heads)    : {round(model.pmf(5), 4)}")
+    print(f"   P(X <= 5 Heads)   : {round(model.cdf(5), 4)}")
+
+    # 4. Hypothesis Testing for Fairness
+    print("\n4. Hypothesis Test for Coin Fairness:")
+    fair_test = test_coin_fairness(heads_count=520, total_flips=1000)
+    print(f"   520/1000 Heads -> {fair_test['verdict']} (Chi2 = {fair_test['chi2_stat']})")
+    biased_test = test_coin_fairness(heads_count=650, total_flips=1000)
+    print(f"   650/1000 Heads -> {biased_test['verdict']} (Chi2 = {biased_test['chi2_stat']})")
+
+    # 5. Gambler's Ruin
+    print("\n5. Gambler's Ruin Simulation:")
+    ruin = CoinRandomWalk.simulate_gamblers_ruin(start_capital=10, target_goal=20, bias=0.5, seed=123)
+    print(f"   Start $10 -> Goal $20: Outcome = {ruin['outcome'].upper()} in {ruin['rounds_played']} rounds")
+
+    # 6. Unit Test Suite Execution
+    print("\n6. Executing Unit Test Suite:")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestFlipACoinOperations)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+    print("\nDemo execution complete!")
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 

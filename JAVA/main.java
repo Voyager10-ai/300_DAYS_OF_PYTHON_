@@ -956,7 +956,29 @@
 //     }
 // }
 
+// Java Flip a Coin Practice (Day 55)
+// class FlipACoinPractice {
+//     public static String flipCoin(double bias) {
+//         return Math.random() < bias ? "Heads" : "Tails";
+//     }
+//     public static Map<String, Integer> flipBatch(int count, double bias) {
+//         Map<String, Integer> counts = new HashMap<>();
+//         counts.put("Heads", 0);
+//         counts.put("Tails", 0);
+//         for (int i = 0; i < count; i++) {
+//             String res = flipCoin(bias);
+//             counts.put(res, counts.get(res) + 1);
+//         }
+//         return counts;
+//     }
+//     public static void main(String[] args) {
+//         System.out.println("Single Flip: " + flipCoin(0.5));
+//         System.out.println("Batch 100 Flips: " + flipBatch(100, 0.5));
+//     }
+// }
+
 import java.util.*;
+
 
 
 
