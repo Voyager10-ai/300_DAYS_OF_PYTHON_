@@ -1,6 +1,6 @@
 {
   "total_problems": 282,
-  "current_day": 54,
+  "current_day": 55,
   "problems": [
     {"day": 1, "title": "Print String", "status": "done"},
     {"day": 2, "title": "Input Age", "status": "done"},
@@ -64,7 +64,7 @@
     {"day": 52, "title": "Reverse Word", "status": "done"},
     {"day": 53, "title": "Sum Zero", "status": "done"},
     {"day": 54, "title": "Binary to Decimal", "status": "done"},
-    {"day": 55, "title": "Flip a Coin", "status": "pending"},
+    {"day": 55, "title": "Flip a Coin", "status": "done"},
     {"day": 56, "title": "Random Number", "status": "pending"},
     {"day": 57, "title": "Round Up", "status": "pending"},
     {"day": 58, "title": "Standard Deviation", "status": "pending"},
