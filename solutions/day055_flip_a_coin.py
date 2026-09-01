@@ -297,5 +297,87 @@ def test_coin_fairness(heads_count: int, total_flips: int, alpha: float = 0.05) 
     }
 
 
+# ─── 6. 1D Coin Random Walk & Gambler's Ruin Simulator ─────────────────────────
+
+
+class CoinRandomWalk:
+    """
+    Simulates a 1D Random Walk driven by coin flips (+1 for Heads, -1 for Tails)
+    and models Gambler's Ruin problems.
+    """
+
+    def __init__(self, start_position: int = 0, bias: float = 0.5):
+        self.start_pos = start_position
+        self.bias = bias
+
+    def simulate_steps(self, num_steps: int, seed: Optional[int] = None) -> List[int]:
+        """
+        Simulates N steps of random walk returning position trajectory path.
+
+        Args:
+            num_steps: Number of steps to walk.
+            seed: Optional random seed.
+
+        Returns:
+            List of positions starting from start_position.
+        """
+        if seed is not None:
+            random.seed(seed)
+
+        trajectory = [self.start_pos]
+        curr = self.start_pos
+        for _ in range(num_steps):
+            step = 1 if flip_coin(bias=self.bias) == "Heads" else -1
+            curr += step
+            trajectory.append(curr)
+
+        return trajectory
+
+    @staticmethod
+    def simulate_gamblers_ruin(
+        start_capital: int,
+        target_goal: int,
+        bias: float = 0.5,
+        max_rounds: int = 100000,
+        seed: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """
+        Simulates Gambler's Ruin: game ends when capital reaches 0 (ruin) or target_goal (victory).
+
+        Args:
+            start_capital: Initial capital (> 0).
+            target_goal: Target capital (> start_capital).
+            bias: Win probability per coin flip.
+            max_rounds: Round limit safety cutoff.
+            seed: Optional random seed.
+
+        Returns:
+            Dictionary with result ('ruin'/'victory'), rounds_played, and trajectory.
+        """
+        if not (0 < start_capital < target_goal):
+            raise ValueError(f"Must have 0 < start_capital ({start_capital}) < target_goal ({target_goal})")
+
+        if seed is not None:
+            random.seed(seed)
+
+        capital = start_capital
+        history = [capital]
+        rounds = 0
+
+        while 0 < capital < target_goal and rounds < max_rounds:
+            rounds += 1
+            capital += 1 if flip_coin(bias=bias) == "Heads" else -1
+            history.append(capital)
+
+        outcome = "victory" if capital >= target_goal else ("ruin" if capital <= 0 else "unfinished")
+        return {
+            "outcome": outcome,
+            "rounds_played": rounds,
+            "final_capital": capital,
+            "trajectory": history,
+        }
+
+
+
 
 
