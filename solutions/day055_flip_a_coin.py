@@ -378,6 +378,45 @@ class CoinRandomWalk:
         }
 
 
+# ─── 7. Weighted Multi-Outcome Custom Coin Model ───────────────────────────────
+
+
+class WeightedCoin:
+    """
+    Simulates a generalized coin or die with custom outcomes and probabilities (weights).
+    For example: Custom outcomes ['Heads', 'Tails', 'Edge'] with weights [0.49, 0.49, 0.02].
+    """
+
+    def __init__(self, outcomes: List[str], weights: List[float]):
+        if not outcomes or not weights:
+            raise ValueError("Outcomes and weights lists cannot be empty")
+        if len(outcomes) != len(weights):
+            raise ValueError(f"Lengths mismatch: {len(outcomes)} outcomes vs {len(weights)} weights")
+        if any(w < 0 for w in weights):
+            raise ValueError("Weights cannot be negative")
+        total_w = sum(weights)
+        if total_w <= 0:
+            raise ValueError("Sum of weights must be > 0")
+
+        self.outcomes = outcomes
+        self.weights = [w / total_w for w in weights]  # Normalize weights
+
+    def flip(self, seed: Optional[int] = None) -> str:
+        """Flips weighted coin once."""
+        if seed is not None:
+            random.seed(seed)
+        return random.choices(self.outcomes, weights=self.weights, k=1)[0]
+
+    def flip_batch(self, count: int, seed: Optional[int] = None) -> List[str]:
+        """Flips weighted coin N times."""
+        if count < 1:
+            raise ValueError(f"Count must be >= 1, got {count}")
+        if seed is not None:
+            random.seed(seed)
+        return random.choices(self.outcomes, weights=self.weights, k=count)
+
+
+
 
 
 
