@@ -133,3 +133,55 @@ def analyze_coin_flips(flips: List[str]) -> Dict[str, Any]:
         "transitions": transitions,
     }
 
+
+# ─── 3. Streak Target Simulator ────────────────────────────────────────────────
+
+
+def simulate_streaks(
+    target_streak: int,
+    target_outcome: str = "Heads",
+    bias: float = 0.5,
+    seed: Optional[int] = None,
+    max_flips: int = 100000,
+) -> Tuple[int, List[str]]:
+    """
+    Simulates coin flips until a target consecutive streak length of target_outcome is achieved.
+
+    Args:
+        target_streak: Target consecutive streak length (e.g. 5 consecutive Heads).
+        target_outcome: 'Heads' or 'Tails'.
+        bias: Probability of Heads.
+        seed: Optional random seed.
+        max_flips: Safety limit to prevent infinite loops.
+
+    Returns:
+        Tuple of (total_flips_required, flip_history_sequence).
+
+    Raises:
+        ValueError: If parameters are out of valid bounds.
+    """
+    if target_streak < 1:
+        raise ValueError(f"Target streak must be >= 1, got {target_streak}")
+    if target_outcome not in ("Heads", "Tails"):
+        raise ValueError(f"Target outcome must be 'Heads' or 'Tails', got {target_outcome}")
+
+    if seed is not None:
+        random.seed(seed)
+
+    history: List[str] = []
+    current_streak = 0
+
+    for _ in range(max_flips):
+        flip = flip_coin(bias=bias)
+        history.append(flip)
+
+        if flip == target_outcome:
+            current_streak += 1
+            if current_streak == target_streak:
+                return len(history), history
+        else:
+            current_streak = 0
+
+    return len(history), history
+
+
