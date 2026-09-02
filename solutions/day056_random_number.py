@@ -248,4 +248,54 @@ def generate_exponential_random(
     return -scale * math.log(1.0 - u)
 
 
+# ─── 5. Random Sample Statistical Analyzer & Uniformity Test ────────────────────
+
+
+def analyze_random_sample(sample: List[Union[int, float]]) -> Dict[str, Any]:
+    """
+    Computes comprehensive descriptive statistics and empirical metrics for a random sample.
+
+    Args:
+        sample: List of numeric values.
+
+    Returns:
+        Dictionary containing sample metrics (min, max, mean, median, variance, std_dev, etc.).
+
+    Raises:
+        ValueError: If sample is empty.
+    """
+    if not isinstance(sample, list):
+        raise TypeError(f"Expected list sample, got {type(sample).__name__}")
+    if not sample:
+        raise ValueError("Sample list cannot be empty")
+
+    n = len(sample)
+    min_val = min(sample)
+    max_val = max(sample)
+    val_range = max_val - min_val
+
+    mean_val = sum(sample) / n
+
+    sorted_sample = sorted(sample)
+    if n % 2 == 1:
+        median_val = float(sorted_sample[n // 2])
+    else:
+        median_val = (sorted_sample[(n // 2) - 1] + sorted_sample[n // 2]) / 2.0
+
+    variance_val = sum((x - mean_val) ** 2 for x in sample) / (n - 1) if n > 1 else 0.0
+    std_dev_val = math.sqrt(variance_val)
+
+    return {
+        "sample_size": n,
+        "min": min_val,
+        "max": max_val,
+        "range": val_range,
+        "mean": round(mean_val, 4),
+        "median": round(median_val, 4),
+        "variance": round(variance_val, 4),
+        "std_dev": round(std_dev_val, 4),
+    }
+
+
+
 
