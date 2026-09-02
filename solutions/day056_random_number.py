@@ -180,3 +180,72 @@ def generate_random_matrix(
     return [[random.randint(min_val, max_val) for _ in range(cols)] for _ in range(rows)]
 
 
+# ─── 4. Non-Uniform Probability Distribution Generators ────────────────────────
+
+
+def generate_normal_random(
+    mean: float = 0.0,
+    std_dev: float = 1.0,
+    seed: Optional[int] = None,
+) -> float:
+    """
+    Generates a Gaussian/Normal random variate N(mean, std_dev^2) using Box-Muller transform:
+    Z0 = sqrt(-2 * ln(U1)) * cos(2 * pi * U2)
+
+    Args:
+        mean: Distribution mean (mu).
+        std_dev: Standard deviation (sigma > 0).
+        seed: Optional random seed.
+
+    Returns:
+        Gaussian random float value.
+
+    Raises:
+        ValueError: If std_dev <= 0.
+    """
+    if std_dev <= 0:
+        raise ValueError(f"Standard deviation must be > 0, got {std_dev}")
+
+    if seed is not None:
+        random.seed(seed)
+
+    u1 = random.random()
+    u2 = random.random()
+
+    # Prevent log(0)
+    while u1 == 0.0:
+        u1 = random.random()
+
+    z0 = math.sqrt(-2.0 * math.log(u1)) * math.cos(2.0 * math.pi * u2)
+    return mean + (z0 * std_dev)
+
+
+def generate_exponential_random(
+    scale: float = 1.0,
+    seed: Optional[int] = None,
+) -> float:
+    """
+    Generates an Exponential random variate Exp(1/scale) using Inverse Transform Sampling:
+    X = -scale * ln(1 - U)
+
+    Args:
+        scale: Scale parameter (beta = 1/lambda > 0).
+        seed: Optional random seed.
+
+    Returns:
+        Exponential random float value.
+    """
+    if scale <= 0:
+        raise ValueError(f"Scale parameter must be > 0, got {scale}")
+
+    if seed is not None:
+        random.seed(seed)
+
+    u = random.random()
+    while u >= 1.0 or u == 0.0:
+        u = random.random()
+
+    return -scale * math.log(1.0 - u)
+
+
+
