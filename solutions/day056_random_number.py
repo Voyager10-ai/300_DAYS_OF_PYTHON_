@@ -345,6 +345,39 @@ def random_shuffle(items: List[T], seed: Optional[int] = None) -> List[T]:
     return arr
 
 
+# ─── 7. Cryptographically Secure & Precision Decimal Generator ────────────────
+
+
+def generate_crypto_random_bytes(num_bytes: int) -> bytes:
+    """Generates num_bytes of cryptographically secure random bytes using secrets."""
+    if num_bytes <= 0:
+        raise ValueError(f"num_bytes must be > 0, got {num_bytes}")
+    return secrets.token_bytes(num_bytes)
+
+
+def generate_crypto_random_int(min_val: int, max_val: int) -> int:
+    """Generates a cryptographically secure random integer in inclusive range [min_val, max_val]."""
+    if min_val > max_val:
+        raise ValueError(f"min_val ({min_val}) cannot be > max_val ({max_val})")
+    span = max_val - min_val + 1
+    return min_val + secrets.randbelow(span)
+
+
+def generate_random_decimal(
+    min_val: float,
+    max_val: float,
+    decimal_places: int = 2,
+    seed: Optional[int] = None,
+) -> float:
+    """Generates a random float value rounded precisely to decimal_places."""
+    if decimal_places < 0:
+        raise ValueError(f"decimal_places must be >= 0, got {decimal_places}")
+    val = generate_random_float(min_val, max_val, precision=None, seed=seed)
+    factor = 10**decimal_places
+    return math.floor(val * factor + 0.5) / factor
+
+
+
 
 
 
