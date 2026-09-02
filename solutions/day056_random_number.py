@@ -47,3 +47,63 @@ class CustomLCG:
         """Generates a random float in range [0.0, 1.0)."""
         self.state = (self.a * self.state + self.c) % self.m
         return self.state / self.m
+
+
+# ─── 2. Uniform Random Integer & Float Generators ─────────────────────────────
+
+
+def generate_random_int(min_val: int, max_val: int, seed: Optional[int] = None) -> int:
+    """
+    Generates a uniform random integer in inclusive range [min_val, max_val].
+
+    Args:
+        min_val: Lower bound.
+        max_val: Upper bound.
+        seed: Optional random seed.
+
+    Returns:
+        Random integer.
+
+    Raises:
+        ValueError: If min_val > max_val.
+    """
+    if not isinstance(min_val, int) or not isinstance(max_val, int):
+        raise TypeError("min_val and max_val must be integers")
+    if min_val > max_val:
+        raise ValueError(f"min_val ({min_val}) cannot be greater than max_val ({max_val})")
+
+    if seed is not None:
+        random.seed(seed)
+
+    return random.randint(min_val, max_val)
+
+
+def generate_random_float(
+    min_val: float = 0.0,
+    max_val: float = 1.0,
+    precision: Optional[int] = 4,
+    seed: Optional[int] = None,
+) -> float:
+    """
+    Generates a uniform random float in range [min_val, max_val] with specified precision.
+
+    Args:
+        min_val: Lower bound.
+        max_val: Upper bound.
+        precision: Rounding decimal places (optional).
+        seed: Optional random seed.
+
+    Returns:
+        Random float.
+    """
+    if min_val > max_val:
+        raise ValueError(f"min_val ({min_val}) cannot be greater than max_val ({max_val})")
+
+    if seed is not None:
+        random.seed(seed)
+
+    val = min_val + (random.random() * (max_val - min_val))
+    if precision is not None:
+        return round(val, precision)
+    return val
+
