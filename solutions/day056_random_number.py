@@ -107,3 +107,76 @@ def generate_random_float(
         return round(val, precision)
     return val
 
+
+# ─── 3. Random Sequence & Matrix Sampler ───────────────────────────────────────
+
+
+def generate_random_list(
+    count: int,
+    min_val: int,
+    max_val: int,
+    unique: bool = False,
+    seed: Optional[int] = None,
+) -> List[int]:
+    """
+    Generates a list of random integers.
+
+    Args:
+        count: Number of integers to generate.
+        min_val: Minimum value.
+        max_val: Maximum value.
+        unique: If True, all elements must be unique.
+        seed: Optional random seed.
+
+    Returns:
+        List of random integers.
+
+    Raises:
+        ValueError: If unique=True and count exceeds range size (max_val - min_val + 1).
+    """
+    if count < 0:
+        raise ValueError(f"Count must be >= 0, got {count}")
+    if min_val > max_val:
+        raise ValueError(f"min_val ({min_val}) cannot be > max_val ({max_val})")
+
+    if seed is not None:
+        random.seed(seed)
+
+    if unique:
+        range_size = max_val - min_val + 1
+        if count > range_size:
+            raise ValueError(f"Cannot generate {count} unique numbers in range size {range_size}")
+        return random.sample(range(min_val, max_val + 1), count)
+
+    return [random.randint(min_val, max_val) for _ in range(count)]
+
+
+def generate_random_matrix(
+    rows: int,
+    cols: int,
+    min_val: int,
+    max_val: int,
+    seed: Optional[int] = None,
+) -> List[List[int]]:
+    """
+    Generates a 2D matrix (list of lists) filled with random integers.
+
+    Args:
+        rows: Number of rows (rows >= 1).
+        cols: Number of columns (cols >= 1).
+        min_val: Minimum integer value.
+        max_val: Maximum integer value.
+        seed: Optional random seed.
+
+    Returns:
+        2D matrix of shape (rows, cols).
+    """
+    if rows < 1 or cols < 1:
+        raise ValueError(f"Rows and cols must be >= 1, got rows={rows}, cols={cols}")
+
+    if seed is not None:
+        random.seed(seed)
+
+    return [[random.randint(min_val, max_val) for _ in range(cols)] for _ in range(rows)]
+
+
