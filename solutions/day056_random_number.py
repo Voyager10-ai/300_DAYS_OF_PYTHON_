@@ -297,5 +297,54 @@ def analyze_random_sample(sample: List[Union[int, float]]) -> Dict[str, Any]:
     }
 
 
+# ─── 6. Fisher-Yates Random Shuffle & Sampling ─────────────────────────────────
+
+
+def random_choice(items: List[T], seed: Optional[int] = None) -> T:
+    """Selects a single random item from a non-empty list."""
+    if not items:
+        raise ValueError("Cannot select random choice from empty list")
+    if seed is not None:
+        random.seed(seed)
+    idx = random.randint(0, len(items) - 1)
+    return items[idx]
+
+
+def random_sample(items: List[T], k: int, seed: Optional[int] = None) -> List[T]:
+    """Selects k unique random elements from items list without replacement."""
+    if k < 0:
+        raise ValueError(f"k must be >= 0, got {k}")
+    if k > len(items):
+        raise ValueError(f"Sample size k ({k}) cannot be larger than list size ({len(items)})")
+    if seed is not None:
+        random.seed(seed)
+    return random.sample(items, k)
+
+
+def random_shuffle(items: List[T], seed: Optional[int] = None) -> List[T]:
+    """
+    Shuffles a list using Fisher-Yates (Knuth) shuffling algorithm:
+    For i from n-1 down to 1: swap items[i] with items[j] (0 <= j <= i).
+
+    Args:
+        items: List to shuffle.
+        seed: Optional random seed.
+
+    Returns:
+        New shuffled list copy.
+    """
+    if seed is not None:
+        random.seed(seed)
+
+    arr = list(items)
+    n = len(arr)
+    for i in range(n - 1, 0, -1):
+        j = random.randint(0, i)
+        arr[i], arr[j] = arr[j], arr[i]
+
+    return arr
+
+
+
 
 
