@@ -977,7 +977,22 @@
 //     }
 // }
 
+// Java Random Number Practice (Day 56)
+// class RandomNumberPractice {
+//     public static int getRandomInt(int min, int max) {
+//         return (int) (Math.random() * (max - min + 1)) + min;
+//     }
+//     public static double getRandomDouble(double min, double max) {
+//         return min + (Math.random() * (max - min));
+//     }
+//     public static void main(String[] args) {
+//         System.out.println("Random Int [1, 100]: " + getRandomInt(1, 100));
+//         System.out.println("Random Double [0.0, 1.0]: " + getRandomDouble(0.0, 1.0));
+//     }
+// }
+
 import java.util.*;
+
 
 
 

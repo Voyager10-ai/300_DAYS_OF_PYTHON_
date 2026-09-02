@@ -436,6 +436,64 @@ class TestRandomNumberOperations(unittest.TestCase):
         self.assertTrue(1.0 <= dec <= 10.0)
 
 
+# ─── 9. Interactive CLI Demo Runner ───────────────────────────────────────────
+
+
+def main():
+    print("=" * 60)
+    print(" 🎲 Day 56: Random Number Generator Engine - Interactive Demo")
+    print("=" * 60)
+
+    # 1. Custom LCG Generator
+    print("\n1. Custom LCG Engine (Seed=12345):")
+    lcg = CustomLCG(seed=12345)
+    lcg_samples = [lcg.next_int(1, 100) for _ in range(5)]
+    print(f"   Generated 5 LCG Ints [1-100] : {lcg_samples}")
+    print(f"   Generated LCG Float [0.0-1.0): {round(lcg.next_float(), 4)}")
+
+    # 2. Uniform Int & Float Generators
+    print("\n2. Uniform Integer & Float Generation:")
+    print(f"   Random Int [50, 100]  : {generate_random_int(50, 100, seed=42)}")
+    print(f"   Random Float [0, 10]  : {generate_random_float(0.0, 10.0, precision=4, seed=42)}")
+
+    # 3. Random Matrix Generation
+    print("\n3. 3x3 Random Integer Matrix [1-9]:")
+    matrix = generate_random_matrix(3, 3, 1, 9, seed=100)
+    for row in matrix:
+        print(f"   {row}")
+
+    # 4. Non-Uniform Probability Distributions
+    print("\n4. Probability Distributions (Normal & Exponential):")
+    norm_sample = [generate_normal_random(mean=100, std_dev=15, seed=i) for i in range(5)]
+    exp_sample = [generate_exponential_random(scale=2.5, seed=i) for i in range(5)]
+    print(f"   Normal N(100, 15^2)      : {[round(x, 2) for x in norm_sample]}")
+    print(f"   Exponential Exp(1/2.5)   : {[round(x, 2) for x in exp_sample]}")
+
+    # 5. Fisher-Yates Shuffle & Statistical Analysis
+    print("\n5. Fisher-Yates Shuffle & Sample Analysis:")
+    deck = list(range(1, 11))
+    shuffled = random_shuffle(deck, seed=7)
+    print(f"   Original Deck : {deck}")
+    print(f"   Shuffled Deck : {shuffled}")
+
+    large_sample = generate_random_list(1000, 1, 100, seed=42)
+    stats = analyze_random_sample(large_sample)
+    print(f"\n   1000-Sample Statistics:")
+    print(f"   Mean: {stats['mean']} | Median: {stats['median']} | StdDev: {stats['std_dev']}")
+
+    # 6. Unit Test Suite Execution
+    print("\n6. Executing Unit Test Suite:")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestRandomNumberOperations)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+    print("\nDemo execution complete!")
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 
