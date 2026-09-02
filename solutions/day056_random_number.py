@@ -377,6 +377,66 @@ def generate_random_decimal(
     return math.floor(val * factor + 0.5) / factor
 
 
+# ─── 8. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestRandomNumberOperations(unittest.TestCase):
+    def test_custom_lcg(self):
+        lcg = CustomLCG(seed=42)
+        val = lcg.next_int(1, 10)
+        self.assertTrue(1 <= val <= 10)
+        flt = lcg.next_float()
+        self.assertTrue(0.0 <= flt < 1.0)
+
+    def test_uniform_int_and_float(self):
+        val = generate_random_int(5, 15, seed=10)
+        self.assertTrue(5 <= val <= 15)
+        flt = generate_random_float(1.0, 5.0, precision=2, seed=10)
+        self.assertTrue(1.0 <= flt <= 5.0)
+
+    def test_random_list_and_matrix(self):
+        lst = generate_random_list(count=10, min_val=1, max_val=20, unique=True, seed=99)
+        self.assertEqual(len(lst), 10)
+        self.assertEqual(len(set(lst)), 10)
+
+        mat = generate_random_matrix(rows=3, cols=4, min_val=0, max_val=9, seed=1)
+        self.assertEqual(len(mat), 3)
+        self.assertEqual(len(mat[0]), 4)
+
+    def test_normal_and_exponential(self):
+        norm = generate_normal_random(mean=10.0, std_dev=2.0, seed=42)
+        self.assertIsInstance(norm, float)
+        exp = generate_exponential_random(scale=5.0, seed=42)
+        self.assertTrue(exp > 0.0)
+
+    def test_analyze_random_sample(self):
+        sample = [10, 20, 30, 40, 50]
+        stats = analyze_random_sample(sample)
+        self.assertEqual(stats["min"], 10)
+        self.assertEqual(stats["max"], 50)
+        self.assertEqual(stats["mean"], 30.0)
+        self.assertEqual(stats["median"], 30.0)
+
+    def test_fisher_yates_shuffle_and_sample(self):
+        items = [1, 2, 3, 4, 5]
+        choice = random_choice(items, seed=7)
+        self.assertIn(choice, items)
+
+        shuffled = random_shuffle(items, seed=7)
+        self.assertEqual(sorted(shuffled), items)
+
+    def test_crypto_and_decimal(self):
+        cbytes = generate_crypto_random_bytes(8)
+        self.assertEqual(len(cbytes), 8)
+
+        cint = generate_crypto_random_int(1, 100)
+        self.assertTrue(1 <= cint <= 100)
+
+        dec = generate_random_decimal(1.0, 10.0, decimal_places=3, seed=12)
+        self.assertTrue(1.0 <= dec <= 10.0)
+
+
+
 
 
 
