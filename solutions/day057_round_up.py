@@ -199,4 +199,42 @@ def calculate_batch_production(order_quantity: int, batch_size: int) -> Dict[str
     }
 
 
+# ─── 5. List & Matrix Rounding Transformers ───────────────────────────────────
+
+
+def round_up_list(numbers: List[float], decimals: int = 0) -> List[float]:
+    """
+    Rounds up every numeric element in a list to specified decimals.
+
+    Args:
+        numbers: List of floats/ints.
+        decimals: Decimal places (decimals >= 0).
+
+    Returns:
+        New list with rounded values.
+    """
+    if not isinstance(numbers, list):
+        raise TypeError(f"Expected list, got {type(numbers).__name__}")
+
+    return [round_up_to_decimals(num, decimals) for num in numbers]
+
+
+def round_up_matrix(matrix: List[List[float]], decimals: int = 0) -> List[List[float]]:
+    """
+    Rounds up every numeric element in a 2D matrix to specified decimals.
+
+    Args:
+        matrix: List of lists of numbers.
+        decimals: Decimal places.
+
+    Returns:
+        New 2D matrix with rounded values.
+    """
+    if not isinstance(matrix, list) or not all(isinstance(row, list) for row in matrix):
+        raise TypeError("Matrix must be a list of lists")
+
+    return [round_up_list(row, decimals) for row in matrix]
+
+
+
 
