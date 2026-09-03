@@ -147,3 +147,56 @@ def round_up_pricing_charm(val: float, charm_offset: float = 0.01) -> float:
     return round(charm_price, 2)
 
 
+# ─── 4. Container Capacity & Batch Production Estimators ───────────────────────
+
+
+def calculate_containers_needed(items_count: int, container_capacity: int) -> int:
+    """
+    Calculates minimum number of containers needed to hold items_count items.
+
+    Args:
+        items_count: Total items to store/ship (items_count >= 0).
+        container_capacity: Storage capacity per container (container_capacity > 0).
+
+    Returns:
+        Number of containers required.
+    """
+    if items_count < 0:
+        raise ValueError(f"items_count must be >= 0, got {items_count}")
+    if container_capacity <= 0:
+        raise ValueError(f"container_capacity must be > 0, got {container_capacity}")
+
+    if items_count == 0:
+        return 0
+
+    return round_up_int(items_count / container_capacity)
+
+
+def calculate_batch_production(order_quantity: int, batch_size: int) -> Dict[str, int]:
+    """
+    Calculates batch production requirements given minimum order quantity and fixed batch size.
+
+    Args:
+        order_quantity: Required units (>= 0).
+        batch_size: Fixed units per production run (> 0).
+
+    Returns:
+        Dictionary with batches_needed, total_produced, and excess_units.
+    """
+    if order_quantity < 0 or batch_size <= 0:
+        raise ValueError("Invalid order quantity or batch size")
+
+    batches = calculate_containers_needed(order_quantity, batch_size)
+    total_produced = batches * batch_size
+    excess = total_produced - order_quantity
+
+    return {
+        "order_quantity": order_quantity,
+        "batch_size": batch_size,
+        "batches_needed": batches,
+        "total_produced": total_produced,
+        "excess_units": excess,
+    }
+
+
+
