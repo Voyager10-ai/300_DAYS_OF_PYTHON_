@@ -324,6 +324,55 @@ class PrecisionRounder:
         return cls.ceil(val, decimals=2)
 
 
+# ─── 8. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestRoundUpOperations(unittest.TestCase):
+    def test_round_up_int(self):
+        self.assertEqual(round_up_int(4.1), 5)
+        self.assertEqual(round_up_int(4.0), 4)
+        self.assertEqual(round_up_int(-4.1), -4)
+        self.assertEqual(round_up_int(0.0), 0)
+
+    def test_round_up_decimals(self):
+        self.assertEqual(round_up_to_decimals(3.14159, 2), 3.15)
+        self.assertEqual(round_up_to_decimals(3.100, 2), 3.10)
+
+    def test_round_up_multiple(self):
+        self.assertEqual(round_up_to_multiple(17, 5), 20)
+        self.assertEqual(round_up_to_multiple(12.1, 0.5), 12.5)
+        with self.assertRaises(ValueError):
+            round_up_to_multiple(10, 0)
+
+    def test_currency_and_charm(self):
+        self.assertEqual(round_up_currency(14.213, 0.05), 14.25)
+        self.assertEqual(round_up_pricing_charm(14.20), 14.99)
+
+    def test_container_capacity(self):
+        self.assertEqual(calculate_containers_needed(105, 20), 6)
+        prod = calculate_batch_production(105, 20)
+        self.assertEqual(prod["batches_needed"], 6)
+        self.assertEqual(prod["total_produced"], 120)
+        self.assertEqual(prod["excess_units"], 15)
+
+    def test_list_and_matrix(self):
+        self.assertEqual(round_up_list([1.1, 2.2, 3.3]), [2.0, 3.0, 4.0])
+        mat = [[1.12, 2.23], [3.34, 4.45]]
+        self.assertEqual(round_up_matrix(mat, 1), [[1.2, 2.3], [3.4, 4.5]])
+
+    def test_custom_rounding_modes(self):
+        self.assertEqual(custom_rounding(3.14, 1, mode="up"), 3.2)
+        self.assertEqual(custom_rounding(3.14, 1, mode="down"), 3.1)
+        self.assertEqual(custom_rounding(3.15, 1, mode="half_up"), 3.2)
+        self.assertEqual(custom_rounding(3.14, 1, mode="truncate"), 3.1)
+
+    def test_precision_rounder(self):
+        self.assertEqual(PrecisionRounder.ceil("3.14159", 2), Decimal("3.15"))
+        self.assertEqual(PrecisionRounder.floor("3.14159", 2), Decimal("3.14"))
+        self.assertEqual(PrecisionRounder.round_currency("14.201"), Decimal("14.21"))
+
+
+
 
 
 
