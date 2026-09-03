@@ -59,6 +59,7 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 54: Binary to Decimal
 - Day 55: Flip a Coin
 - Day 56: Random Number
+- Day 57: Round Up
 
 
 
