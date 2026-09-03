@@ -372,6 +372,52 @@ class TestRoundUpOperations(unittest.TestCase):
         self.assertEqual(PrecisionRounder.round_currency("14.201"), Decimal("14.21"))
 
 
+# ─── 9. Interactive CLI Demo Runner ───────────────────────────────────────────
+
+
+def main():
+    print("=" * 60)
+    print(" ⬆️ Day 57: Round Up Calculator & Engine - Interactive Demo")
+    print("=" * 60)
+
+    # 1. Core Round Up
+    print("\n1. Core Integer & Decimal Round Up:")
+    print(f"   round_up_int(4.1)          : {round_up_int(4.1)}")
+    print(f"   round_up_to_decimals(3.14159, 2) : {round_up_to_decimals(3.14159, 2)}")
+
+    # 2. Step & Multiple Rounding
+    print("\n2. Step & Multiple Rounding:")
+    print(f"   round_up_to_multiple(17, 5)   : {round_up_to_multiple(17, 5)}")
+    print(f"   round_up_to_multiple(12.1, 0.5): {round_up_to_multiple(12.1, 0.5)}")
+
+    # 3. Currency & Charm Pricing
+    print("\n3. Currency & Charm Pricing:")
+    print(f"   round_up_currency(14.213, 0.05): ${round_up_currency(14.213, 0.05)}")
+    print(f"   round_up_pricing_charm(14.20) : ${round_up_pricing_charm(14.20)}")
+
+    # 4. Container Capacity Estimator
+    print("\n4. Container & Batch Production Estimator:")
+    prod = calculate_batch_production(order_quantity=105, batch_size=20)
+    print(f"   Order 105 units @ Batch 20 -> {prod['batches_needed']} batches ({prod['total_produced']} units, excess {prod['excess_units']})")
+
+    # 5. Multi-Mode Custom Rounding
+    print("\n5. Multi-Mode Rounding Modes (Val = 3.14159, Decimals = 2):")
+    for mode in ["up", "down", "half_up", "half_even", "truncate"]:
+        print(f"   Mode '{mode:<9}': {custom_rounding(3.14159, 2, mode=mode)}")
+
+    # 6. Unit Test Suite Execution
+    print("\n6. Executing Unit Test Suite:")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestRoundUpOperations)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+    print("\nDemo execution complete!")
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 

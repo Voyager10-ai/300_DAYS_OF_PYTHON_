@@ -991,7 +991,22 @@
 //     }
 // }
 
+// Java Round Up Practice (Day 57)
+// class RoundUpPractice {
+//     public static int roundUpInt(double val) {
+//         return (int) Math.ceil(val);
+//     }
+//     public static double roundUpToMultiple(double val, double multiple) {
+//         return Math.ceil(val / multiple) * multiple;
+//     }
+//     public static void main(String[] args) {
+//         System.out.println("Round Up (4.1): " + roundUpInt(4.1));
+//         System.out.println("Round Up to Multiple (17, 5): " + roundUpToMultiple(17, 5));
+//     }
+// }
+
 import java.util.*;
+
 
 
 
