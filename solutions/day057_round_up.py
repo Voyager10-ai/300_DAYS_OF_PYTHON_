@@ -282,6 +282,49 @@ def custom_rounding(val: float, decimals: int = 0, mode: str = "up") -> float:
         raise ValueError(f"Unknown rounding mode '{mode}'. Options: 'up', 'down', 'half_up', 'half_even', 'truncate'")
 
 
+# ─── 7. PrecisionRounder Class Using Decimal Module ───────────────────────────
+
+
+class PrecisionRounder:
+    """
+    High-precision financial rounding wrapper using Python's decimal.Decimal module
+    to eliminate floating-point representation errors.
+    """
+
+    @staticmethod
+    def _to_decimal(val: Union[str, float, Decimal]) -> Decimal:
+        if isinstance(val, Decimal):
+            return val
+        return Decimal(str(val))
+
+    @classmethod
+    def ceil(cls, val: Union[str, float, Decimal], decimals: int = 0) -> Decimal:
+        """Rounds up towards positive infinity using Decimal ROUND_CEILING."""
+        d = cls._to_decimal(val)
+        exp = Decimal("1") if decimals == 0 else Decimal(f"1e-{decimals}")
+        return d.quantize(exp, rounding=ROUND_CEILING)
+
+    @classmethod
+    def floor(cls, val: Union[str, float, Decimal], decimals: int = 0) -> Decimal:
+        """Rounds down towards negative infinity using Decimal ROUND_FLOOR."""
+        d = cls._to_decimal(val)
+        exp = Decimal("1") if decimals == 0 else Decimal(f"1e-{decimals}")
+        return d.quantize(exp, rounding=ROUND_FLOOR)
+
+    @classmethod
+    def half_up(cls, val: Union[str, float, Decimal], decimals: int = 0) -> Decimal:
+        """Standard half-up arithmetic rounding using Decimal ROUND_HALF_UP."""
+        d = cls._to_decimal(val)
+        exp = Decimal("1") if decimals == 0 else Decimal(f"1e-{decimals}")
+        return d.quantize(exp, rounding=ROUND_HALF_UP)
+
+    @classmethod
+    def round_currency(cls, val: Union[str, float, Decimal]) -> Decimal:
+        """Rounds up to 2 decimal currency places (Cents)."""
+        return cls.ceil(val, decimals=2)
+
+
+
 
 
 
