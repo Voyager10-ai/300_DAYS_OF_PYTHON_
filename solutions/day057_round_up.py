@@ -66,3 +66,37 @@ def round_up_to_decimals(val: float, decimals: int = 0) -> float:
 
     factor = 10**decimals
     return math.ceil(val * factor) / factor
+
+
+# ─── 2. Step & Multiple Round Up Algorithm ─────────────────────────────────────
+
+
+def round_up_to_multiple(
+    val: Union[int, float], multiple: Union[int, float]
+) -> Union[int, float]:
+    """
+    Rounds up a value to the next smallest multiple of a step size.
+
+    Args:
+        val: Input number.
+        multiple: Step size / multiple (multiple > 0).
+
+    Returns:
+        Rounded up value (int if both inputs are int, float otherwise).
+
+    Raises:
+        ValueError: If multiple <= 0.
+    """
+    if not isinstance(val, (int, float)) or not isinstance(multiple, (int, float)):
+        raise TypeError("val and multiple must be numeric")
+    if multiple <= 0:
+        raise ValueError(f"Multiple must be > 0, got {multiple}")
+
+    quotient = val / multiple
+    ceil_q = math.ceil(quotient)
+    result = ceil_q * multiple
+
+    if isinstance(val, int) and isinstance(multiple, int):
+        return int(result)
+    return result
+
