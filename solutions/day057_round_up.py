@@ -236,5 +236,52 @@ def round_up_matrix(matrix: List[List[float]], decimals: int = 0) -> List[List[f
     return [round_up_list(row, decimals) for row in matrix]
 
 
+# ─── 6. Multi-Mode Custom Rounding Dispatcher ──────────────────────────────────
+
+
+def custom_rounding(val: float, decimals: int = 0, mode: str = "up") -> float:
+    """
+    Rounds a float using different configurable rounding modes:
+    - 'up' / 'ceil': Always rounds towards positive infinity.
+    - 'down' / 'floor': Always rounds towards negative infinity.
+    - 'half_up': Standard arithmetic rounding (.5 rounds away from zero).
+    - 'half_even': Banker's rounding (.5 rounds to nearest even integer).
+    - 'truncate': Truncates fractional digits towards zero.
+
+    Args:
+        val: Input number.
+        decimals: Target decimal places.
+        mode: Rounding mode string.
+
+    Returns:
+        Rounded float value.
+
+    Raises:
+        ValueError: If mode is unknown.
+    """
+    mode_clean = mode.strip().lower()
+    factor = 10**decimals
+
+    if mode_clean in ("up", "ceil"):
+        return math.ceil(val * factor) / factor
+    elif mode_clean in ("down", "floor"):
+        return math.floor(val * factor) / factor
+    elif mode_clean == "half_up":
+        # Shift, add 0.5, floor for positive (or subtract for negative)
+        scaled = val * factor
+        if scaled >= 0:
+            return math.floor(scaled + 0.5) / factor
+        else:
+            return math.ceil(scaled - 0.5) / factor
+    elif mode_clean == "half_even":
+        return round(val, decimals)
+    elif mode_clean in ("truncate", "trunc"):
+        scaled = val * factor
+        return math.trunc(scaled) / factor
+    else:
+        raise ValueError(f"Unknown rounding mode '{mode}'. Options: 'up', 'down', 'half_up', 'half_even', 'truncate'")
+
+
+
 
 
