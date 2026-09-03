@@ -100,3 +100,50 @@ def round_up_to_multiple(
         return int(result)
     return result
 
+
+# ─── 3. Financial Currency & Charm Pricing Rounding ────────────────────────────
+
+
+def round_up_currency(val: float, currency_unit: float = 0.01) -> float:
+    """
+    Rounds up financial amounts to the nearest currency unit (default 0.01 for cents).
+
+    Args:
+        val: Monetary amount.
+        currency_unit: Smallest currency denomination (e.g. 0.01, 0.05, 0.25).
+
+    Returns:
+        Rounded monetary amount.
+    """
+    if currency_unit <= 0:
+        raise ValueError(f"Currency unit must be > 0, got {currency_unit}")
+
+    res = round_up_to_multiple(val, currency_unit)
+    return round(float(res), 4)
+
+
+def round_up_pricing_charm(val: float, charm_offset: float = 0.01) -> float:
+    """
+    Rounds up a price to end in a charm pricing figure (e.g. $14.20 -> $14.99).
+
+    Args:
+        val: Base price.
+        charm_offset: Offset below next dollar (default 0.01 for .99 ending).
+
+    Returns:
+        Charm price.
+    """
+    if val <= 0:
+        return 0.0
+
+    ceil_dollar = math.ceil(val)
+    if ceil_dollar == val:
+        ceil_dollar += 1
+
+    charm_price = ceil_dollar - charm_offset
+    if charm_price < val:
+        charm_price += 1.0
+
+    return round(charm_price, 2)
+
+
