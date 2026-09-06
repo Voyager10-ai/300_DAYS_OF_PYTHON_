@@ -1005,7 +1005,29 @@
 //     }
 // }
 
+// class StandardDeviationPractice {
+//     public static double calculateMean(double[] data) {
+//         double sum = 0.0;
+//         for (double x : data) sum += x;
+//         return sum / data.length;
+//     }
+//     public static double calculateStdDev(double[] data, boolean isSample) {
+//         double mean = calculateMean(data);
+//         double sumSq = 0.0;
+//         for (double x : data) sumSq += Math.pow(x - mean, 2);
+//         double divisor = isSample ? (data.length - 1) : data.length;
+//         return Math.sqrt(sumSq / divisor);
+//     }
+//     public static void main(String[] args) {
+//         double[] arr = {10.0, 12.0, 23.0, 23.0, 16.0, 23.0, 21.0, 16.0};
+//         System.out.println("Mean: " + calculateMean(arr));
+//         System.out.println("Sample Std Dev: " + calculateStdDev(arr, true));
+//         System.out.println("Population Std Dev: " + calculateStdDev(arr, false));
+//     }
+// }
+
 import java.util.*;
+
 
 
 

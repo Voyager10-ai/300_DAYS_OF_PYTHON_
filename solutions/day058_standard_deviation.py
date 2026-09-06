@@ -624,6 +624,77 @@ class TestStandardDeviationOperations(unittest.TestCase):
             calculate_mean([1, "invalid", 3])
 
 
+# ─── 9. Interactive CLI Runner ───────────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates all standard deviation capabilities with rich outputs."""
+    print("=" * 70)
+    print(" DAY 58: STANDARD DEVIATION & STATISTICAL VARIANCE TOOLKIT")
+    print("=" * 70)
+
+    raw_data = [10.0, 12.0, 23.0, 23.0, 16.0, 23.0, 21.0, 16.0]
+    print(f"\n1. Raw Sample Data ({len(raw_data)} points): {raw_data}")
+    
+    mean_val = calculate_mean(raw_data)
+    sample_var = calculate_variance(raw_data, is_sample=True)
+    pop_var = calculate_variance(raw_data, is_sample=False)
+    sample_std = calculate_std_dev(raw_data, is_sample=True)
+    pop_std = calculate_std_dev(raw_data, is_sample=False)
+
+    print(f"   • Mean (x̄): {mean_val:.4f}")
+    print(f"   • Sample Variance (s²): {sample_var:.4f}")
+    print(f"   • Population Variance (σ²): {pop_var:.4f}")
+    print(f"   • Sample Std Dev (s): {sample_std:.4f}")
+    print(f"   • Population Std Dev (σ): {pop_std:.4f}")
+
+    print("\n2. Streaming Welford Accumulator:")
+    acc = WelfordAccumulator()
+    for item in raw_data:
+        acc.update(item)
+    print(f"   • Count: {acc.count}")
+    print(f"   • Streaming Mean: {acc.mean:.4f}")
+    print(f"   • Streaming Sample Std Dev: {acc.std_dev_sample:.4f}")
+
+    print("\n3. Grouped Frequency Data:")
+    values = [5.0, 15.0, 25.0]
+    freqs = [2, 5, 3]
+    grp_mean = calculate_grouped_mean(values, freqs)
+    grp_std = calculate_grouped_std_dev(values, freqs, is_sample=True)
+    print(f"   • Midpoints: {values}, Frequencies: {freqs}")
+    print(f"   • Grouped Mean: {grp_mean:.4f}")
+    print(f"   • Grouped Sample Std Dev: {grp_std:.4f}")
+
+    print("\n4. Z-Scores & Outlier Detection:")
+    data_with_outlier = [10.0, 12.0, 11.0, 10.5, 12.5, 95.0]
+    z_scores = calculate_z_scores(data_with_outlier)
+    outliers = detect_outliers_zscore(data_with_outlier, threshold=2.0)
+    print(f"   • Dataset: {data_with_outlier}")
+    print(f"   • Z-Scores: {[round(z, 2) for z in z_scores]}")
+    print(f"   • Outliers (|Z| >= 2.0): {outliers}")
+
+    print("\n5. Standard Error of the Mean (SEM) & 95% Confidence Interval:")
+    sem = calculate_sem(raw_data)
+    ci_low, ci_high = calculate_confidence_interval(raw_data, confidence=0.95)
+    print(f"   • SEM: {sem:.4f}")
+    print(f"   • 95% CI for Mean: [{ci_low:.4f}, {ci_high:.4f}]")
+
+    print("\n6. Matrix Column-wise Standard Deviation:")
+    mat = [[1.0, 10.0], [3.0, 20.0], [5.0, 30.0]]
+    mat_std = matrix_std_dev(mat, axis=0, is_sample=True)
+    print(f"   • Matrix: {mat}")
+    print(f"   • Column Sample Std Devs: {[round(s, 4) for s in mat_std]}")
+
+    print("\n" + "=" * 70)
+
+
+if __name__ == "__main__":
+    unittest.main(exit=False)
+    print()
+    main()
+
+
+
 
 
 
