@@ -170,3 +170,80 @@ class WelfordAccumulator:
         self._mean = 0.0
         self._M2 = 0.0
 
+
+# ─── 3. Frequency Table / Grouped Data Standard Deviation ────────────────────
+
+
+def calculate_grouped_mean(values: List[float], frequencies: List[int]) -> float:
+    """
+    Calculates the mean of grouped / frequency-table data.
+
+    Args:
+        values: List of midpoints or distinct values.
+        frequencies: List of corresponding frequencies for each value.
+
+    Returns:
+        Weighted mean as a float.
+
+    Raises:
+        ValueError: If lists differ in length, are empty, or total frequency is <= 0.
+    """
+    if len(values) != len(frequencies):
+        raise ValueError("Values and frequencies lists must have the same length.")
+    if not values:
+        raise ValueError("Cannot calculate mean of empty frequency dataset.")
+
+    total_freq = sum(frequencies)
+    if total_freq <= 0:
+        raise ValueError("Total frequency must be greater than zero.")
+
+    weighted_sum = sum(v * f for v, f in zip(values, frequencies))
+    return weighted_sum / total_freq
+
+
+def calculate_grouped_variance(
+    values: List[float], frequencies: List[int], is_sample: bool = True
+) -> float:
+    """
+    Calculates the variance of grouped / frequency-table data.
+
+    Args:
+        values: List of midpoints or distinct values.
+        frequencies: List of corresponding frequencies.
+        is_sample: If True, calculates sample variance. Else population.
+
+    Returns:
+        Grouped variance as a float.
+
+    Raises:
+        ValueError: If total frequency is insufficient (<= 1 for sample).
+    """
+    mean = calculate_grouped_mean(values, frequencies)
+    total_freq = sum(frequencies)
+
+    if is_sample and total_freq < 2:
+        raise ValueError("Grouped sample variance requires a total frequency >= 2.")
+
+    sum_sq_diff = sum(f * ((v - mean) ** 2) for v, f in zip(values, frequencies))
+    divisor = (total_freq - 1) if is_sample else total_freq
+    return sum_sq_diff / divisor
+
+
+def calculate_grouped_std_dev(
+    values: List[float], frequencies: List[int], is_sample: bool = True
+) -> float:
+    """
+    Calculates the standard deviation of grouped / frequency-table data.
+
+    Args:
+        values: List of midpoints or distinct values.
+        frequencies: List of corresponding frequencies.
+        is_sample: If True, returns sample standard deviation. Else population.
+
+    Returns:
+        Grouped standard deviation as a float.
+    """
+    var = calculate_grouped_variance(values, frequencies, is_sample=is_sample)
+    return math.sqrt(var)
+
+
