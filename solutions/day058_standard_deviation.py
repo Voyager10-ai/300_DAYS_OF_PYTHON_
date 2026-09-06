@@ -85,3 +85,88 @@ def calculate_std_dev(data: List[float], is_sample: bool = True) -> float:
     """
     var = calculate_variance(data, is_sample=is_sample)
     return math.sqrt(var)
+
+
+# ─── 2. Welford's Single-Pass Online Accumulator ─────────────────────────────
+
+
+class WelfordAccumulator:
+    """
+    Implements Welford's algorithm for computing streaming mean, variance, and
+    standard deviation in a single numerical-stable pass without storing history.
+    """
+
+    def __init__(self) -> None:
+        """Initializes an empty Welford accumulator."""
+        self._count: int = 0
+        self._mean: float = 0.0
+        self._M2: float = 0.0  # Sum of squared differences from current mean
+
+    def update(self, x: float) -> None:
+        """
+        Updates the accumulator with a new value x.
+
+        Args:
+            x: Numerical value to stream in.
+        """
+        if not isinstance(x, (int, float)) or isinstance(x, bool):
+            raise TypeError(f"Expected numeric input, got {type(x).__name__}")
+
+        self._count += 1
+        delta = x - self._mean
+        self._mean += delta / self._count
+        delta2 = x - self._mean
+        self._M2 += delta * delta2
+
+    def update_batch(self, data: List[float]) -> None:
+        """
+        Updates the accumulator with a list of values.
+
+        Args:
+            data: List of numerical values.
+        """
+        for val in data:
+            self.update(val)
+
+    @property
+    def count(self) -> int:
+        """Returns the number of elements processed."""
+        return self._count
+
+    @property
+    def mean(self) -> float:
+        """Returns the current streaming mean."""
+        if self._count == 0:
+            raise ValueError("No data points accumulated yet.")
+        return self._mean
+
+    @property
+    def variance_sample(self) -> float:
+        """Returns the current sample variance (s^2)."""
+        if self._count < 2:
+            raise ValueError("Sample variance requires at least 2 data points.")
+        return self._M2 / (self._count - 1)
+
+    @property
+    def variance_population(self) -> float:
+        """Returns the current population variance (sigma^2)."""
+        if self._count < 1:
+            raise ValueError("Population variance requires at least 1 data point.")
+        return self._M2 / self._count
+
+    @property
+    def std_dev_sample(self) -> float:
+        """Returns the current sample standard deviation (s)."""
+        return math.sqrt(self.variance_sample)
+
+    @property
+    def std_dev_population(self) -> float:
+        """Returns the current population standard deviation (sigma)."""
+        return math.sqrt(self.variance_population)
+
+    def reset(self) -> None:
+        """Resets the accumulator state."""
+        self._count = 0
+        self._mean = 0.0
+        self._M2 = 0.0
+
