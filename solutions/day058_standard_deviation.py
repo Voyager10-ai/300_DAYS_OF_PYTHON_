@@ -355,5 +355,90 @@ def calculate_confidence_interval(
     return (mean - margin_of_error, mean + margin_of_error)
 
 
+# ─── 6. Multi-Column / Matrix Axis-Wise Standard Deviation ──────────────────
+
+
+def matrix_std_dev(
+    matrix: List[List[float]], axis: int = 0, is_sample: bool = True
+) -> List[float]:
+    """
+    Computes standard deviation along a matrix axis.
+
+    Args:
+        matrix: 2D list of numbers (rows x cols).
+        axis: 0 for column-wise std dev, 1 for row-wise std dev.
+        is_sample: If True, calculates sample std dev.
+
+    Returns:
+        List of standard deviations for each slice along the specified axis.
+
+    Raises:
+        ValueError: If matrix is empty, irregular (ragged), or axis invalid.
+    """
+    if not matrix or not matrix[0]:
+        raise ValueError("Matrix cannot be empty.")
+
+    num_rows = len(matrix)
+    num_cols = len(matrix[0])
+
+    for row in matrix:
+        if len(row) != num_cols:
+            raise ValueError("All rows in the matrix must have the same length.")
+
+    if axis == 0:
+        # Column-wise std dev
+        col_std_devs = []
+        for col_idx in range(num_cols):
+            col_data = [matrix[row_idx][col_idx] for row_idx in range(num_rows)]
+            col_std_devs.append(calculate_std_dev(col_data, is_sample=is_sample))
+        return col_std_devs
+
+    elif axis == 1:
+        # Row-wise std dev
+        return [calculate_std_dev(row, is_sample=is_sample) for row in matrix]
+
+    else:
+        raise ValueError(f"Invalid axis {axis}. Must be 0 (column-wise) or 1 (row-wise).")
+
+
+def normalize_matrix_zscore(
+    matrix: List[List[float]], axis: int = 0, is_sample: bool = True
+) -> List[List[float]]:
+    """
+    Normalizes a 2D matrix by converting values to Z-scores along the specified axis.
+
+    Args:
+        matrix: 2D list of numbers (rows x cols).
+        axis: 0 for column-wise normalization, 1 for row-wise normalization.
+        is_sample: If True, uses sample std dev.
+
+    Returns:
+        New 2D matrix with Z-score normalized values.
+    """
+    if not matrix or not matrix[0]:
+        raise ValueError("Matrix cannot be empty.")
+
+    num_rows = len(matrix)
+    num_cols = len(matrix[0])
+
+    if axis == 0:
+        # Normalize each column
+        normalized = [[0.0] * num_cols for _ in range(num_rows)]
+        for j in range(num_cols):
+            col = [matrix[i][j] for i in range(num_rows)]
+            col_z = calculate_z_scores(col, is_sample=is_sample)
+            for i in range(num_rows):
+                normalized[i][j] = col_z[i]
+        return normalized
+
+    elif axis == 1:
+        # Normalize each row
+        return [calculate_z_scores(row, is_sample=is_sample) for row in matrix]
+
+    else:
+        raise ValueError(f"Invalid axis {axis}. Must be 0 or 1.")
+
+
+
 
 
