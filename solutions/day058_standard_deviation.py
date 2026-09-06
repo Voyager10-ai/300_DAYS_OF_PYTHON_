@@ -439,6 +439,89 @@ def normalize_matrix_zscore(
         raise ValueError(f"Invalid axis {axis}. Must be 0 or 1.")
 
 
+# ─── 7. Synthetic Dataset Generator & Summary Engine ─────────────────────────
+
+
+def generate_normal_dataset(
+    n: int, target_mean: float = 0.0, target_std_dev: float = 1.0, seed: Optional[int] = None
+) -> List[float]:
+    """
+    Generates a pseudo-random dataset approximating a normal distribution (Box-Muller transform).
+
+    Args:
+        n: Number of samples to generate (must be >= 2).
+        target_mean: Target mean for distribution.
+        target_std_dev: Target standard deviation for distribution.
+        seed: Random seed for reproducibility.
+
+    Returns:
+        List of floats drawn from normal distribution.
+    """
+    if n < 2:
+        raise ValueError("n must be at least 2 to generate distribution.")
+    if target_std_dev < 0:
+        raise ValueError("Target standard deviation cannot be negative.")
+
+    if seed is not None:
+        random.seed(seed)
+
+    samples = []
+    while len(samples) < n:
+        u1 = random.random()
+        u2 = random.random()
+        # Avoid log(0)
+        while u1 == 0:
+            u1 = random.random()
+
+        # Box-Muller transform
+        z0 = math.sqrt(-2.0 * math.log(u1)) * math.cos(2.0 * math.pi * u2)
+        z1 = math.sqrt(-2.0 * math.log(u1)) * math.sin(2.0 * math.pi * u2)
+
+        samples.append(target_mean + z0 * target_std_dev)
+        if len(samples) < n:
+            samples.append(target_mean + z1 * target_std_dev)
+
+    return samples
+
+
+def summary_statistics(data: List[float]) -> Dict[str, float]:
+    """
+    Computes a comprehensive statistical summary dictionary for a dataset.
+
+    Args:
+        data: List of numerical values.
+
+    Returns:
+        Dictionary containing count, mean, sample_var, pop_var, sample_std, pop_std, sem, min, max, range.
+    """
+    if not data:
+        raise ValueError("Cannot generate summary for an empty dataset.")
+
+    n = len(data)
+    mean_val = calculate_mean(data)
+    sample_var = calculate_variance(data, is_sample=True) if n >= 2 else 0.0
+    pop_var = calculate_variance(data, is_sample=False)
+    sample_std = calculate_std_dev(data, is_sample=True) if n >= 2 else 0.0
+    pop_std = calculate_std_dev(data, is_sample=False)
+    sem_val = calculate_sem(data, is_sample=True) if n >= 2 else 0.0
+    min_val = min(data)
+    max_val = max(data)
+
+    return {
+        "count": float(n),
+        "mean": mean_val,
+        "sample_variance": sample_var,
+        "population_variance": pop_var,
+        "sample_std_dev": sample_std,
+        "population_std_dev": pop_std,
+        "sem": sem_val,
+        "min": float(min_val),
+        "max": float(max_val),
+        "range": float(max_val - min_val),
+    }
+
+
+
 
 
 
