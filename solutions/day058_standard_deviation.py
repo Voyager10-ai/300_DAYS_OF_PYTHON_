@@ -521,6 +521,110 @@ def summary_statistics(data: List[float]) -> Dict[str, float]:
     }
 
 
+# ─── 8. Unit Tests ───────────────────────────────────────────────────────────
+
+
+class TestStandardDeviationOperations(unittest.TestCase):
+    """Unit tests for all standard deviation modules and helper functions."""
+
+    def setUp(self) -> None:
+        self.sample_data = [10.0, 12.0, 23.0, 23.0, 16.0, 23.0, 21.0, 16.0]
+        # Mean = 18.0
+        # Sum((x - 18)^2) = 64 + 36 + 25 + 25 + 4 + 25 + 9 + 4 = 192.0
+        # Pop Var = 192 / 8 = 24.0, Pop Std = sqrt(24) ~ 4.898979485566356
+        # Sample Var = 192 / 7 = 27.428571428571427, Sample Std ~ 5.237225546830482
+
+    def test_core_mean_variance_std_dev(self) -> None:
+        self.assertAlmostEqual(calculate_mean(self.sample_data), 18.0)
+        self.assertAlmostEqual(calculate_variance(self.sample_data, is_sample=False), 24.0)
+        self.assertAlmostEqual(calculate_variance(self.sample_data, is_sample=True), 192.0 / 7.0)
+        self.assertAlmostEqual(calculate_std_dev(self.sample_data, is_sample=False), math.sqrt(24.0))
+        self.assertAlmostEqual(calculate_std_dev(self.sample_data, is_sample=True), math.sqrt(192.0 / 7.0))
+
+    def test_welford_accumulator(self) -> None:
+        acc = WelfordAccumulator()
+        for x in self.sample_data:
+            acc.update(x)
+        
+        self.assertEqual(acc.count, 8)
+        self.assertAlmostEqual(acc.mean, 18.0)
+        self.assertAlmostEqual(acc.variance_population, 24.0)
+        self.assertAlmostEqual(acc.variance_sample, 192.0 / 7.0)
+        self.assertAlmostEqual(acc.std_dev_population, math.sqrt(24.0))
+        self.assertAlmostEqual(acc.std_dev_sample, math.sqrt(192.0 / 7.0))
+
+        acc.reset()
+        self.assertEqual(acc.count, 0)
+        acc.update_batch(self.sample_data)
+        self.assertAlmostEqual(acc.mean, 18.0)
+
+    def test_grouped_data(self) -> None:
+        values = [5.0, 15.0, 25.0]
+        frequencies = [2, 5, 3]  # total = 10
+        # Mean = (10 + 75 + 75) / 10 = 16.0
+        # Sum sq diff = 2*(5-16)^2 + 5*(15-16)^2 + 3*(25-16)^2 = 2*121 + 5*1 + 3*81 = 242 + 5 + 243 = 490
+        # Pop var = 490 / 10 = 49.0 -> std = 7.0
+        # Sample var = 490 / 9 -> std = sqrt(490/9)
+        self.assertAlmostEqual(calculate_grouped_mean(values, frequencies), 16.0)
+        self.assertAlmostEqual(calculate_grouped_variance(values, frequencies, is_sample=False), 49.0)
+        self.assertAlmostEqual(calculate_grouped_std_dev(values, frequencies, is_sample=False), 7.0)
+        self.assertAlmostEqual(calculate_grouped_variance(values, frequencies, is_sample=True), 490.0 / 9.0)
+
+    def test_z_scores_and_outliers(self) -> None:
+        data = [10.0, 10.0, 10.0, 10.0, 100.0]
+        z_scores = calculate_z_scores(data, is_sample=False)
+        self.assertEqual(len(z_scores), 5)
+        self.assertAlmostEqual(sum(z_scores), 0.0)  # Sum of Z-scores is always 0
+
+        outliers = detect_outliers_zscore(data, threshold=1.5, is_sample=False)
+        self.assertEqual(len(outliers), 1)
+        self.assertEqual(outliers[0][0], 4)
+        self.assertEqual(outliers[0][1], 100.0)
+
+    def test_sem_and_confidence_intervals(self) -> None:
+        sem = calculate_sem(self.sample_data, is_sample=False)
+        expected_sem = math.sqrt(24.0) / math.sqrt(8)
+        self.assertAlmostEqual(sem, expected_sem)
+
+        ci_low, ci_high = calculate_confidence_interval(self.sample_data, confidence=0.95, is_sample=True)
+        self.assertTrue(ci_low < 18.0 < ci_high)
+
+    def test_matrix_std_dev_and_norm(self) -> None:
+        matrix = [
+            [1.0, 10.0],
+            [3.0, 20.0],
+            [5.0, 30.0],
+        ]
+        # col 0: [1, 3, 5], mean=3, pop_var=((4+0+4)/3)=8/3, pop_std=sqrt(8/3)
+        col_std = matrix_std_dev(matrix, axis=0, is_sample=False)
+        self.assertAlmostEqual(col_std[0], math.sqrt(8.0 / 3.0))
+
+        row_std = matrix_std_dev(matrix, axis=1, is_sample=False)
+        self.assertEqual(len(row_std), 3)
+
+        norm_mat = normalize_matrix_zscore(matrix, axis=0, is_sample=False)
+        # Column 0 Z-scores for [1, 3, 5]: (1-3)/std, (3-3)/std, (5-3)/std
+        self.assertAlmostEqual(norm_mat[1][0], 0.0)
+
+    def test_dataset_generator_and_summary(self) -> None:
+        ds = generate_normal_dataset(n=100, target_mean=50.0, target_std_dev=5.0, seed=42)
+        self.assertEqual(len(ds), 100)
+        summary = summary_statistics(ds)
+        self.assertEqual(summary["count"], 100.0)
+        self.assertAlmostEqual(summary["mean"], 50.0, delta=1.5)
+
+    def test_edge_cases_and_exceptions(self) -> None:
+        with self.assertRaises(ValueError):
+            calculate_mean([])
+        with self.assertRaises(ValueError):
+            calculate_variance([5.0], is_sample=True)
+        with self.assertRaises(ValueError):
+            calculate_z_scores([5.0, 5.0, 5.0])
+        with self.assertRaises(TypeError):
+            calculate_mean([1, "invalid", 3])
+
+
+
 
 
 
