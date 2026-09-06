@@ -296,4 +296,64 @@ def detect_outliers_zscore(
     return outliers
 
 
+# ─── 5. Standard Error of the Mean & Confidence Intervals ────────────────────
+
+
+def calculate_sem(data: List[float], is_sample: bool = True) -> float:
+    """
+    Calculates the Standard Error of the Mean (SEM).
+    SEM = std_dev / sqrt(n)
+
+    Args:
+        data: List of numerical values.
+        is_sample: If True, uses sample standard deviation.
+
+    Returns:
+        Standard Error of the Mean as a float.
+
+    Raises:
+        ValueError: If data is empty.
+    """
+    if not data:
+        raise ValueError("Cannot calculate SEM of an empty dataset.")
+    std_dev = calculate_std_dev(data, is_sample=is_sample)
+    return std_dev / math.sqrt(len(data))
+
+
+def calculate_confidence_interval(
+    data: List[float], confidence: float = 0.95, is_sample: bool = True
+) -> Tuple[float, float]:
+    """
+    Calculates the confidence interval for the sample mean using standard normal Z-critical values.
+
+    Supported confidence levels: 0.90 (Z=1.645), 0.95 (Z=1.960), 0.99 (Z=2.576).
+
+    Args:
+        data: List of numerical values.
+        confidence: Confidence level (0.90, 0.95, or 0.99).
+        is_sample: If True, uses sample standard deviation.
+
+    Returns:
+        Tuple of (lower_bound, upper_bound).
+
+    Raises:
+        ValueError: If unsupported confidence level is specified.
+    """
+    z_critical_map = {
+        0.90: 1.6448536269514722,
+        0.95: 1.959963984540054,
+        0.99: 2.5758293035489004,
+    }
+
+    if confidence not in z_critical_map:
+        raise ValueError(f"Unsupported confidence level {confidence}. Choose from {list(z_critical_map.keys())}.")
+
+    mean = calculate_mean(data)
+    sem = calculate_sem(data, is_sample=is_sample)
+    margin_of_error = z_critical_map[confidence] * sem
+
+    return (mean - margin_of_error, mean + margin_of_error)
+
+
+
 
