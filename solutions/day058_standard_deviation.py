@@ -247,3 +247,53 @@ def calculate_grouped_std_dev(
     return math.sqrt(var)
 
 
+# ─── 4. Z-Score Standardization & Outlier Detection ──────────────────────────
+
+
+def calculate_z_scores(data: List[float], is_sample: bool = True) -> List[float]:
+    """
+    Calculates Z-scores (standard scores) for each element in a dataset.
+    Z = (X - mean) / std_dev
+
+    Args:
+        data: List of numerical values.
+        is_sample: If True, uses sample std dev. Else population std dev.
+
+    Returns:
+        List of Z-scores corresponding to each element in data.
+
+    Raises:
+        ValueError: If standard deviation is zero (all elements equal).
+    """
+    mean = calculate_mean(data)
+    std_dev = calculate_std_dev(data, is_sample=is_sample)
+
+    if std_dev == 0.0:
+        raise ValueError("Standard deviation is zero; Z-score cannot be calculated (constant dataset).")
+
+    return [(x - mean) / std_dev for x in data]
+
+
+def detect_outliers_zscore(
+    data: List[float], threshold: float = 3.0, is_sample: bool = True
+) -> List[Tuple[int, float, float]]:
+    """
+    Identifies outliers in a dataset based on Z-score magnitude.
+
+    Args:
+        data: List of numerical values.
+        threshold: Absolute Z-score threshold (default is 3.0).
+        is_sample: If True, uses sample std dev. Else population.
+
+    Returns:
+        List of tuples: (index, value, z_score) for each detected outlier.
+    """
+    z_scores = calculate_z_scores(data, is_sample=is_sample)
+    outliers = []
+    for idx, (val, z) in enumerate(zip(data, z_scores)):
+        if abs(z) >= threshold:
+            outliers.append((idx, val, z))
+    return outliers
+
+
+
