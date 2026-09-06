@@ -60,6 +60,8 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 55: Flip a Coin
 - Day 56: Random Number
 - Day 57: Round Up
+- Day 58: Standard Deviation
+
 
 
 
