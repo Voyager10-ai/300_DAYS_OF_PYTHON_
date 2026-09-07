@@ -288,4 +288,84 @@ def to_utc(
     return convert_timezone(dt, target_tz=timezone.utc, source_tz=source_tz)
 
 
+# ─── 5. Relative Time Difference & Humanizer ("Time Ago") ────────────────────
+
+
+def humanize_timedelta(td: timedelta) -> str:
+    """
+    Converts a timedelta object into a human-readable duration string.
+    (e.g., '2 days, 3 hours', '45 seconds', 'just now').
+
+    Args:
+        td: Input timedelta object.
+
+    Returns:
+        Human-readable duration string.
+    """
+    total_seconds = int(td.total_seconds())
+
+    if abs(total_seconds) < 5:
+        return "just now"
+
+    is_negative = total_seconds < 0
+    seconds = abs(total_seconds)
+
+    days, remainder = divmod(seconds, 86400)
+    hours, remainder = divmod(remainder, 3600)
+    minutes, secs = divmod(remainder, 60)
+
+    parts = []
+    if days > 0:
+        parts.append(f"{days} day{'s' if days > 1 else ''}")
+    if hours > 0:
+        parts.append(f"{hours} hour{'s' if hours > 1 else ''}")
+    if minutes > 0 and days == 0:  # Include minutes if under a day
+        parts.append(f"{minutes} minute{'s' if minutes > 1 else ''}")
+    if secs > 0 and days == 0 and hours == 0:  # Include seconds if under an hour
+        parts.append(f"{secs} second{'s' if secs > 1 else ''}")
+
+    result = ", ".join(parts)
+    return f"{result} ago" if is_negative else result
+
+
+def time_ago(dt: datetime, reference_dt: Optional[datetime] = None) -> str:
+    """
+    Calculates the relative time difference between a datetime and a reference point (default current time).
+
+    Args:
+        dt: Target datetime.
+        reference_dt: Reference datetime (defaults to current UTC/local time matching dt's timezone status).
+
+    Returns:
+        String such as '5 minutes ago', 'in 2 hours', or 'just now'.
+    """
+    if not isinstance(dt, datetime):
+        raise TypeError(f"Expected datetime object, got {type(dt).__name__}")
+
+    if reference_dt is None:
+        reference_dt = datetime.now(dt.tzinfo) if dt.tzinfo else datetime.now()
+    else:
+        # Align timezones if one is naive and the other is aware
+        if dt.tzinfo and not reference_dt.tzinfo:
+            reference_dt = reference_dt.replace(tzinfo=dt.tzinfo)
+        elif not dt.tzinfo and reference_dt.tzinfo:
+            reference_dt = reference_dt.replace(tzinfo=None)
+
+    diff = reference_dt - dt
+    total_seconds = int(diff.total_seconds())
+
+    if abs(total_seconds) < 5:
+        return "just now"
+
+    if total_seconds > 0:
+        # Past event
+        duration_str = humanize_timedelta(diff)
+        return f"{duration_str} ago"
+    else:
+        # Future event
+        duration_str = humanize_timedelta(-diff)
+        return f"in {duration_str}"
+
+
+
 
