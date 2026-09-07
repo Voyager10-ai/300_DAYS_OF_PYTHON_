@@ -367,5 +367,92 @@ def time_ago(dt: datetime, reference_dt: Optional[datetime] = None) -> str:
         return f"in {duration_str}"
 
 
+# ─── 6. Business Days & Holiday Calculator ───────────────────────────────────
+
+
+def is_business_day(
+    d: Union[date, datetime],
+    custom_holidays: Optional[Set[date]] = None,
+) -> bool:
+    """
+    Checks whether a given date or datetime is a business day (Monday - Friday and not a holiday).
+
+    Args:
+        d: Date or datetime object.
+        custom_holidays: Optional set of date objects representing holidays.
+
+    Returns:
+        True if business day, False otherwise.
+    """
+    check_date = d.date() if isinstance(d, datetime) else d
+    # Monday=0, Sunday=6
+    if check_date.weekday() >= 5:
+        return False
+    if custom_holidays and check_date in custom_holidays:
+        return False
+    return True
+
+
+def add_business_days(
+    start_date: Union[date, datetime],
+    num_days: int,
+    custom_holidays: Optional[Set[date]] = None,
+) -> date:
+    """
+    Adds (or subtracts) N business days to/from a starting date.
+
+    Args:
+        start_date: Initial date or datetime.
+        num_days: Number of business days to add (positive) or subtract (negative).
+        custom_holidays: Optional set of holiday dates to skip.
+
+    Returns:
+        Resulting date object after adding N business days.
+    """
+    curr = start_date.date() if isinstance(start_date, datetime) else start_date
+    step = 1 if num_days >= 0 else -1
+    remaining = abs(num_days)
+
+    while remaining > 0:
+        curr += timedelta(days=step)
+        if is_business_day(curr, custom_holidays=custom_holidays):
+            remaining -= 1
+
+    return curr
+
+
+def count_business_days(
+    start_date: Union[date, datetime],
+    end_date: Union[date, datetime],
+    custom_holidays: Optional[Set[date]] = None,
+) -> int:
+    """
+    Counts the number of business days between start_date and end_date (inclusive of start, exclusive of end).
+
+    Args:
+        start_date: Starting date/datetime.
+        end_date: Ending date/datetime.
+        custom_holidays: Optional set of holiday dates.
+
+    Returns:
+        Count of business days.
+    """
+    d1 = start_date.date() if isinstance(start_date, datetime) else start_date
+    d2 = end_date.date() if isinstance(end_date, datetime) else end_date
+
+    if d1 > d2:
+        return -count_business_days(d2, d1, custom_holidays=custom_holidays)
+
+    count = 0
+    curr = d1
+    while curr < d2:
+        if is_business_day(curr, custom_holidays=custom_holidays):
+            count += 1
+        curr += timedelta(days=1)
+
+    return count
+
+
+
 
 
