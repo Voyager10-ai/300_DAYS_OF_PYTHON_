@@ -517,6 +517,124 @@ def get_period_bounds(dt: datetime, period: str = "day") -> Tuple[datetime, date
         raise ValueError(f"Invalid period '{period}'. Choose from 'day', 'week', 'month', 'quarter', 'year'.")
 
 
+# ─── 8. Unit Test Suite ──────────────────────────────────────────────────────
+
+
+class TestDateTimeConverters(unittest.TestCase):
+    """Comprehensive unit test suite for all datetime conversion utilities."""
+
+    def test_parse_datetime_string(self) -> None:
+        # ISO format
+        dt1 = parse_datetime_string("2026-09-07T14:30:00")
+        self.assertEqual((dt1.year, dt1.month, dt1.day, dt1.hour, dt1.minute), (2026, 9, 7, 14, 30))
+
+        # Standard SQL
+        dt2 = parse_datetime_string("2026-09-07 14:30:00")
+        self.assertEqual(dt2.year, 2026)
+
+        # Date only
+        dt3 = parse_datetime_string("2026-09-07")
+        self.assertEqual((dt3.year, dt3.month, dt3.day), (2026, 9, 7))
+
+        # Custom format
+        dt4 = parse_datetime_string("07/09/2026 14-30", custom_format="%d/%m/%Y %H-%M")
+        self.assertEqual((dt4.day, dt4.month, dt4.year, dt4.hour), (7, 9, 2026, 14))
+
+    def test_format_datetime_and_standards(self) -> None:
+        dt = datetime(2026, 9, 7, 14, 30, 0, tzinfo=timezone.utc)
+        self.assertEqual(format_datetime(dt, "%Y/%m/%d"), "2026/09/07")
+        self.assertEqual(to_iso8601(dt), "2026-09-07T14:30:00+00:00")
+        self.assertIn("Mon, 07 Sep 2026 14:30:00", to_rfc2822(dt))
+
+    def test_epoch_conversions(self) -> None:
+        dt = datetime(2026, 9, 7, 12, 0, 0, tzinfo=timezone.utc)
+        sec = datetime_to_epoch(dt, unit="seconds")
+        ms = datetime_to_epoch(dt, unit="milliseconds")
+        self.assertEqual(ms, sec * 1000)
+
+        dt_reconstructed = epoch_to_datetime(sec, unit="seconds", tz=timezone.utc)
+        self.assertEqual(dt, dt_reconstructed)
+
+        dt_ms_reconstructed = epoch_to_datetime(ms, unit="milliseconds", tz=timezone.utc)
+        self.assertEqual(dt, dt_ms_reconstructed)
+
+    def test_timezone_conversions(self) -> None:
+        dt_utc = datetime(2026, 9, 7, 12, 0, 0, tzinfo=timezone.utc)
+        dt_ny = convert_timezone(dt_utc, target_tz="America/New_York")
+        # NY is UTC-4 in September (EDT)
+        self.assertEqual(dt_ny.hour, 8)
+
+        # Convert back to UTC
+        dt_back = to_utc(dt_ny)
+        self.assertEqual(dt_back.hour, 12)
+
+    def test_humanize_and_time_ago(self) -> None:
+        ref = datetime(2026, 9, 7, 12, 0, 0)
+        past_dt = datetime(2026, 9, 7, 10, 0, 0)
+        future_dt = datetime(2026, 9, 7, 15, 0, 0)
+
+        self.assertEqual(time_ago(past_dt, reference_dt=ref), "2 hours ago")
+        self.assertEqual(time_ago(future_dt, reference_dt=ref), "in 3 hours")
+
+        td = timedelta(days=2, hours=5)
+        self.assertEqual(humanize_timedelta(td), "2 days, 5 hours")
+
+    def test_business_days(self) -> None:
+        # Monday Sept 7, 2026
+        mon = date(2026, 9, 7)
+        fri = date(2026, 9, 11)
+        sat = date(2026, 9, 12)
+
+        self.assertTrue(is_business_day(mon))
+        self.assertFalse(is_business_day(sat))
+
+        # Add 5 business days from Monday Sept 7 -> should land on Monday Sept 14
+        next_mon = add_business_days(mon, 5)
+        self.assertEqual(next_mon, date(2026, 9, 14))
+
+        # Count business days mon to fri (5 days: Mon, Tue, Wed, Thu, Fri)
+        self.assertEqual(count_business_days(mon, date(2026, 9, 12)), 5)
+
+        # Custom holiday test
+        holidays = {date(2026, 9, 8)}  # Tuesday is a holiday
+        self.assertFalse(is_business_day(date(2026, 9, 8), custom_holidays=holidays))
+        self.assertEqual(count_business_days(mon, date(2026, 9, 12), custom_holidays=holidays), 4)
+
+    def test_period_bounds(self) -> None:
+        dt = datetime(2026, 9, 7, 14, 30, 45)
+        
+        # Day bounds
+        d_start, d_end = get_period_bounds(dt, "day")
+        self.assertEqual((d_start.hour, d_start.minute, d_start.second), (0, 0, 0))
+        self.assertEqual((d_end.hour, d_end.minute, d_end.second), (23, 59, 59))
+
+        # Month bounds (Sept has 30 days)
+        m_start, m_end = get_period_bounds(dt, "month")
+        self.assertEqual(m_start.day, 1)
+        self.assertEqual(m_end.day, 30)
+
+        # Quarter bounds (Sept is Q3: July 1 - Sept 30)
+        q_start, q_end = get_period_bounds(dt, "quarter")
+        self.assertEqual((q_start.month, q_start.day), (7, 1))
+        self.assertEqual((q_end.month, q_end.day), (9, 30))
+
+        # Year bounds
+        y_start, y_end = get_period_bounds(dt, "year")
+        self.assertEqual((y_start.month, y_start.day), (1, 1))
+        self.assertEqual((y_end.month, y_end.day), (12, 31))
+
+    def test_exceptions_and_edge_cases(self) -> None:
+        with self.assertRaises(ValueError):
+            parse_datetime_string("invalid-date-string-12345")
+        with self.assertRaises(TypeError):
+            format_datetime("not-a-datetime")  # type: ignore
+        with self.assertRaises(ValueError):
+            get_period_bounds(datetime.now(), "decade")
+        with self.assertRaises(ValueError):
+            convert_timezone(datetime.now(), "NonExistent/Timezone")
+
+
+
 
 
 
