@@ -1026,7 +1026,22 @@
 //     }
 // }
 
+// class DateTimeConvertPractice {
+//     public static String formatISO(java.time.LocalDateTime dt) {
+//         return dt.format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+//     }
+//     public static long toEpochMilli(java.time.Instant instant) {
+//         return instant.toEpochMilli();
+//     }
+//     public static void main(String[] args) {
+//         java.time.LocalDateTime now = java.time.LocalDateTime.now();
+//         System.out.println("ISO Format: " + formatISO(now));
+//         System.out.println("Epoch Milli: " + toEpochMilli(java.time.Instant.now()));
+//     }
+// }
+
 import java.util.*;
+
 
 
 

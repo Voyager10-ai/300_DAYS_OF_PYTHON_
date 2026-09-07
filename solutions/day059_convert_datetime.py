@@ -634,6 +634,71 @@ class TestDateTimeConverters(unittest.TestCase):
             convert_timezone(datetime.now(), "NonExistent/Timezone")
 
 
+# ─── 9. Interactive CLI Runner ───────────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates all datetime parsing, formatting, and conversion capabilities."""
+    print("=" * 70)
+    print(" DAY 59: DATETIME CONVERSION & TIMEZONE TOOLKIT")
+    print("=" * 70)
+
+    raw_str = "2026-09-07T15:45:30.123456+00:00"
+    parsed_dt = parse_datetime_string(raw_str)
+    print(f"\n1. String Parsing:")
+    print(f"   • Raw Input String: '{raw_str}'")
+    print(f"   • Parsed Datetime:  {parsed_dt} (tzinfo={parsed_dt.tzinfo})")
+
+    print("\n2. Formatting & Standards:")
+    print(f"   • ISO 8601:  {to_iso8601(parsed_dt)}")
+    print(f"   • RFC 2822:  {to_rfc2822(parsed_dt)}")
+    print(f"   • Custom:    {format_datetime(parsed_dt, '%A, %B %d, %Y at %I:%M %p')}")
+
+    print("\n3. Unix Epoch Timestamps:")
+    sec = datetime_to_epoch(parsed_dt, unit="seconds")
+    ms = datetime_to_epoch(parsed_dt, unit="milliseconds")
+    print(f"   • Epoch Seconds:      {sec}")
+    print(f"   • Epoch Milliseconds: {ms}")
+    print(f"   • Reconstructed DT:   {epoch_to_datetime(ms, unit='milliseconds')}")
+
+    print("\n4. Timezone Conversions:")
+    ny_dt = convert_timezone(parsed_dt, target_tz="America/New_York")
+    tokyo_dt = convert_timezone(parsed_dt, target_tz="Asia/Tokyo")
+    kolkata_dt = convert_timezone(parsed_dt, target_tz="Asia/Kolkata")
+    print(f"   • New York (EDT):    {ny_dt.strftime('%Y-%m-%d %H:%M:%S %Z')}")
+    print(f"   • Tokyo (JST):       {tokyo_dt.strftime('%Y-%m-%d %H:%M:%S %Z')}")
+    print(f"   • Kolkata (IST):     {kolkata_dt.strftime('%Y-%m-%d %H:%M:%S %Z')}")
+
+    print("\n5. Relative Time & Humanizer:")
+    past_event = parsed_dt - timedelta(hours=3, minutes=15)
+    future_event = parsed_dt + timedelta(days=5, hours=2)
+    print(f"   • Past Event:   {time_ago(past_event, reference_dt=parsed_dt)}")
+    print(f"   • Future Event: {time_ago(future_event, reference_dt=parsed_dt)}")
+
+    print("\n6. Business Days Calculation:")
+    start_date = parsed_dt.date()
+    holidays = {start_date + timedelta(days=1)}  # Tomorrow is a holiday
+    added_date = add_business_days(start_date, 5, custom_holidays=holidays)
+    print(f"   • Start Date:       {start_date} ({start_date.strftime('%A')})")
+    print(f"   • Custom Holiday:   {list(holidays)[0]}")
+    print(f"   • +5 Business Days: {added_date} ({added_date.strftime('%A')})")
+
+    print("\n7. Period Bounds (Month & Quarter):")
+    m_start, m_end = get_period_bounds(parsed_dt, "month")
+    q_start, q_end = get_period_bounds(parsed_dt, "quarter")
+    print(f"   • Month Range:   [{m_start}] -> [{m_end}]")
+    print(f"   • Quarter Range: [{q_start}] -> [{q_end}]")
+
+    print("\n" + "=" * 70)
+
+
+if __name__ == "__main__":
+    unittest.main(exit=False)
+    print()
+    main()
+
+
+
 
 
 
