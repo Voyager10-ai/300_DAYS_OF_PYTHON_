@@ -145,3 +145,78 @@ def to_rfc2822(dt: datetime) -> str:
         dt = dt.replace(tzinfo=timezone.utc)
     return dt.strftime("%a, %d %b %Y %H:%M:%S %z")
 
+
+# ─── 3. Unix Epoch Timestamp Converters ──────────────────────────────────────
+
+
+def datetime_to_epoch(dt: datetime, unit: str = "seconds") -> Union[int, float]:
+    """
+    Converts a datetime object into a Unix epoch timestamp.
+
+    Args:
+        dt: Input datetime object (naive datetimes are treated as UTC).
+        unit: Output unit ('seconds', 'milliseconds', 'microseconds', 'float_seconds').
+
+    Returns:
+        Integer or float timestamp value.
+
+    Raises:
+        ValueError: If unsupported unit is specified.
+        TypeError: If dt is not a datetime object.
+    """
+    if not isinstance(dt, datetime):
+        raise TypeError(f"Expected datetime object, got {type(dt).__name__}")
+
+    # Treat naive datetimes as UTC
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+
+    ts_float = dt.timestamp()
+
+    if unit == "seconds":
+        return int(ts_float)
+    elif unit == "float_seconds":
+        return ts_float
+    elif unit == "milliseconds":
+        return int(ts_float * 1000)
+    elif unit == "microseconds":
+        return int(ts_float * 1_000_000)
+    else:
+        raise ValueError(f"Invalid unit '{unit}'. Supported units: 'seconds', 'float_seconds', 'milliseconds', 'microseconds'.")
+
+
+def epoch_to_datetime(
+    timestamp: Union[int, float],
+    unit: str = "seconds",
+    tz: Optional[Union[timezone, ZoneInfo]] = timezone.utc,
+) -> datetime:
+    """
+    Converts a Unix epoch timestamp into a timezone-aware datetime object.
+
+    Args:
+        timestamp: Integer or float epoch timestamp.
+        unit: Input unit ('seconds', 'milliseconds', 'microseconds').
+        tz: Target timezone for output datetime (defaults to UTC).
+
+    Returns:
+        Timezone-aware datetime object.
+
+    Raises:
+        ValueError: If unsupported unit is specified.
+        TypeError: If timestamp is non-numeric.
+    """
+    if not isinstance(timestamp, (int, float)) or isinstance(timestamp, bool):
+        raise TypeError(f"Expected numeric timestamp, got {type(timestamp).__name__}")
+
+    if unit == "seconds":
+        seconds = float(timestamp)
+    elif unit == "milliseconds":
+        seconds = float(timestamp) / 1000.0
+    elif unit == "microseconds":
+        seconds = float(timestamp) / 1_000_000.0
+    else:
+        raise ValueError(f"Invalid unit '{unit}'. Supported units: 'seconds', 'milliseconds', 'microseconds'.")
+
+    return datetime.fromtimestamp(seconds, tz=tz)
+
+
