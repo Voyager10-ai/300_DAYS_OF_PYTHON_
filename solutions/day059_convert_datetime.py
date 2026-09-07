@@ -220,3 +220,72 @@ def epoch_to_datetime(
     return datetime.fromtimestamp(seconds, tz=tz)
 
 
+# ─── 4. Timezone Conversion Engine ───────────────────────────────────────────
+
+
+def _resolve_tz(tz_input: Union[str, timezone, ZoneInfo]) -> Union[timezone, ZoneInfo]:
+    """Helper to convert string timezone names (e.g., 'America/New_York', 'UTC', 'Asia/Kolkata') to tzinfo."""
+    if isinstance(tz_input, (timezone, ZoneInfo)):
+        return tz_input
+    if isinstance(tz_input, str):
+        clean_tz = tz_input.strip()
+        if clean_tz.upper() == "UTC":
+            return timezone.utc
+        try:
+            return ZoneInfo(clean_tz)
+        except Exception as e:
+            raise ValueError(f"Unknown or invalid timezone name '{tz_input}': {e}")
+    raise TypeError(f"Expected timezone as string, timezone, or ZoneInfo; got {type(tz_input).__name__}")
+
+
+def convert_timezone(
+    dt: datetime,
+    target_tz: Union[str, timezone, ZoneInfo],
+    source_tz: Optional[Union[str, timezone, ZoneInfo]] = None,
+) -> datetime:
+    """
+    Converts a datetime from its source timezone to a target timezone.
+
+    Args:
+        dt: Input datetime.
+        target_tz: Target timezone (e.g. 'Asia/Kolkata', 'America/New_York', 'UTC').
+        source_tz: Source timezone if dt is naive.
+
+    Returns:
+        New timezone-aware datetime object.
+
+    Raises:
+        ValueError: If dt is naive and source_tz is not provided.
+    """
+    if not isinstance(dt, datetime):
+        raise TypeError(f"Expected datetime object, got {type(dt).__name__}")
+
+    tgt_tz = _resolve_tz(target_tz)
+
+    if dt.tzinfo is None:
+        if source_tz is None:
+            raise ValueError("Naive datetime provided without source_tz specification.")
+        src_tz = _resolve_tz(source_tz)
+        dt = dt.replace(tzinfo=src_tz)
+
+    return dt.astimezone(tgt_tz)
+
+
+def to_utc(
+    dt: datetime,
+    source_tz: Optional[Union[str, timezone, ZoneInfo]] = None,
+) -> datetime:
+    """
+    Converts a datetime object to UTC timezone.
+
+    Args:
+        dt: Input datetime object.
+        source_tz: Source timezone if dt is naive.
+
+    Returns:
+        UTC timezone-aware datetime object.
+    """
+    return convert_timezone(dt, target_tz=timezone.utc, source_tz=source_tz)
+
+
+
