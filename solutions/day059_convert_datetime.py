@@ -453,6 +453,71 @@ def count_business_days(
     return count
 
 
+# ─── 7. Calendar & Period Bound Calculators ──────────────────────────────────
+
+
+def get_period_bounds(dt: datetime, period: str = "day") -> Tuple[datetime, datetime]:
+    """
+    Computes the start (00:00:00.000000) and end (23:59:59.999999) datetimes for a given period.
+
+    Args:
+        dt: Input datetime.
+        period: One of 'day', 'week', 'month', 'quarter', 'year'.
+
+    Returns:
+        Tuple of (start_datetime, end_datetime).
+
+    Raises:
+        ValueError: If period is not supported.
+    """
+    if not isinstance(dt, datetime):
+        raise TypeError(f"Expected datetime object, got {type(dt).__name__}")
+
+    clean_period = period.strip().lower()
+
+    if clean_period == "day":
+        start_dt = dt.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_dt = dt.replace(hour=23, minute=59, second=59, microsecond=999999)
+        return start_dt, end_dt
+
+    elif clean_period == "week":
+        # Week starts on Monday (weekday=0)
+        start_date = dt.date() - timedelta(days=dt.weekday())
+        start_dt = datetime.combine(start_date, dt_time.min, tzinfo=dt.tzinfo)
+        end_date = start_date + timedelta(days=6)
+        end_dt = datetime.combine(end_date, dt_time.max, tzinfo=dt.tzinfo)
+        return start_dt, end_dt
+
+    elif clean_period == "month":
+        start_dt = dt.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        # Find next month 1st day minus 1 microsecond
+        if dt.month == 12:
+            next_month = dt.replace(year=dt.year + 1, month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+        else:
+            next_month = dt.replace(month=dt.month + 1, day=1, hour=0, minute=0, second=0, microsecond=0)
+        end_dt = next_month - timedelta(microseconds=1)
+        return start_dt, end_dt
+
+    elif clean_period == "quarter":
+        quarter_start_month = 3 * ((dt.month - 1) // 3) + 1
+        start_dt = dt.replace(month=quarter_start_month, day=1, hour=0, minute=0, second=0, microsecond=0)
+        if quarter_start_month + 3 > 12:
+            next_q = dt.replace(year=dt.year + 1, month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+        else:
+            next_q = dt.replace(month=quarter_start_month + 3, day=1, hour=0, minute=0, second=0, microsecond=0)
+        end_dt = next_q - timedelta(microseconds=1)
+        return start_dt, end_dt
+
+    elif clean_period == "year":
+        start_dt = dt.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+        end_dt = dt.replace(month=12, day=31, hour=23, minute=59, second=59, microsecond=999999)
+        return start_dt, end_dt
+
+    else:
+        raise ValueError(f"Invalid period '{period}'. Choose from 'day', 'week', 'month', 'quarter', 'year'.")
+
+
+
 
 
 
