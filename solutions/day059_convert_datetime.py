@@ -85,3 +85,63 @@ def parse_datetime_string(
             continue
 
     raise ValueError(f"Unable to parse date string '{date_str}' with available formats.")
+
+
+# ─── 2. Datetime to String Formatter ─────────────────────────────────────────
+
+
+def format_datetime(dt: datetime, fmt: str = "%Y-%m-%d %H:%M:%S") -> str:
+    """
+    Formats a datetime object using strftime pattern.
+
+    Args:
+        dt: Input datetime object.
+        fmt: Format specifier pattern.
+
+    Returns:
+        Formatted datetime string.
+
+    Raises:
+        TypeError: If dt is not a datetime object.
+    """
+    if not isinstance(dt, datetime):
+        raise TypeError(f"Expected datetime object, got {type(dt).__name__}")
+    return dt.strftime(fmt)
+
+
+def to_iso8601(dt: datetime, include_microseconds: bool = False) -> str:
+    """
+    Converts datetime to ISO 8601 standard string.
+
+    Args:
+        dt: Input datetime object.
+        include_microseconds: Whether to include fractional seconds.
+
+    Returns:
+        ISO 8601 formatted string.
+    """
+    if not isinstance(dt, datetime):
+        raise TypeError(f"Expected datetime object, got {type(dt).__name__}")
+    
+    if not include_microseconds:
+        dt = dt.replace(microsecond=0)
+    return dt.isoformat()
+
+
+def to_rfc2822(dt: datetime) -> str:
+    """
+    Converts datetime to RFC 2822 compliant format (commonly used in HTTP/Email headers).
+
+    Args:
+        dt: Input datetime object.
+
+    Returns:
+        RFC 2822 formatted string.
+    """
+    if not isinstance(dt, datetime):
+        raise TypeError(f"Expected datetime object, got {type(dt).__name__}")
+    # Default to GMT if naive
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.strftime("%a, %d %b %Y %H:%M:%S %z")
+
