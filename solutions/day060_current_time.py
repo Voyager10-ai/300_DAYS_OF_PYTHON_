@@ -548,6 +548,112 @@ class Stopwatch:
         return list(self._laps)
 
 
+# ─── 8. Unit Test Suite ──────────────────────────────────────────────────────
+
+
+class TestCurrentTimeOperations(unittest.TestCase):
+    """Comprehensive unit test suite for current time and clock utilities."""
+
+    def test_get_current_datetime_and_strings(self) -> None:
+        now_local = get_current_datetime()
+        self.assertIsInstance(now_local, datetime)
+
+        now_utc = get_current_utc()
+        self.assertEqual(now_utc.tzinfo, timezone.utc)
+
+        time_str = get_current_time_str(fmt="%H:%M:%S")
+        self.assertEqual(len(time_str.split(":")), 3)
+
+        utc_str = get_current_utc_str()
+        self.assertIn("UTC", utc_str)
+
+    def test_high_precision_timers(self) -> None:
+        nanos = get_current_nanos()
+        self.assertTrue(nanos > 0)
+
+        mono = get_monotonic_time()
+        self.assertTrue(mono > 0)
+
+        with HighPrecisionTimer() as timer:
+            time.sleep(0.01)
+
+        self.assertGreaterEqual(timer.elapsed_milliseconds, 5.0)
+        self.assertGreaterEqual(timer.elapsed_seconds, 0.005)
+
+    def test_world_clock(self) -> None:
+        wc = get_world_clock(["UTC", "Asia/Kolkata", "America/New_York"])
+        self.assertIn("UTC", wc)
+        self.assertIn("Asia/Kolkata", wc)
+        self.assertIn("America/New_York", wc)
+
+        multi_dt = get_multi_timezone_datetimes(["UTC", "Asia/Tokyo"])
+        self.assertEqual(multi_dt["UTC"].tzinfo, timezone.utc)
+
+    def test_analog_and_digital_clock(self) -> None:
+        fixed_dt = datetime(2026, 9, 8, 3, 30, 0)
+        angles = get_analog_clock_angles(fixed_dt)
+        # At 3:30:00 -> minute hand at 30 min = 180 deg. Hour hand at 3.5 hrs = 105 deg.
+        self.assertAlmostEqual(angles["minute_angle"], 180.0, places=1)
+        self.assertAlmostEqual(angles["hour_angle"], 105.0, places=1)
+        self.assertAlmostEqual(angles["second_angle"], 0.0, places=1)
+
+        fmt_res = format_12h_24h(fixed_dt)
+        self.assertEqual(fmt_res["time_12h"], "03:30:00 AM")
+        self.assertEqual(fmt_res["time_24h"], "03:30:00")
+
+        dig = format_digital_clock(fixed_dt, show_seconds=True, use_12h=False)
+        self.assertEqual(dig, "[03:30:00]")
+
+    def test_utc_offset_and_dst(self) -> None:
+        offset_hours, offset_str = get_current_utc_offset("UTC")
+        self.assertEqual(offset_hours, 0.0)
+        self.assertEqual(offset_str, "+00:00")
+
+        tz_info = get_timezone_info("Asia/Kolkata")
+        self.assertEqual(tz_info["offset_hours"], 5.5)
+        self.assertEqual(tz_info["offset_string"], "+05:30")
+
+    def test_ntp_sync_checker(self) -> None:
+        ref_time = datetime(2026, 9, 8, 12, 0, 0, tzinfo=timezone.utc)
+        local_time = datetime(2026, 9, 8, 12, 0, 0, 100000, tzinfo=timezone.utc)  # 100ms drift
+
+        checker = NTPSyncChecker(max_allowed_drift_ms=500.0)
+        res = checker.evaluate_drift(local_time, ref_time, round_trip_delay_ms=20.0)
+        self.assertEqual(res["sync_status"], "SYNCHRONIZED")
+        self.assertTrue(res["within_tolerance"])
+
+    def test_stopwatch(self) -> None:
+        sw = Stopwatch()
+        self.assertFalse(sw.is_running)
+
+        sw.start()
+        self.assertTrue(sw.is_running)
+        time.sleep(0.01)
+
+        lap1 = sw.lap()
+        self.assertEqual(lap1[0], 1)
+        self.assertGreater(lap1[1], 0.0)
+
+        elapsed = sw.pause()
+        self.assertFalse(sw.is_running)
+        self.assertGreater(elapsed, 0.0)
+
+        sw.reset()
+        self.assertEqual(sw.elapsed_seconds, 0.0)
+        self.assertEqual(len(sw.laps), 0)
+
+    def test_exceptions_and_edge_cases(self) -> None:
+        with self.assertRaises(ValueError):
+            get_current_datetime(tz="NonExistent/Timezone")
+        with self.assertRaises(RuntimeError):
+            timer = HighPrecisionTimer()
+            _ = timer.elapsed_seconds
+        with self.assertRaises(RuntimeError):
+            sw = Stopwatch()
+            sw.lap()
+
+
+
 
 
 
