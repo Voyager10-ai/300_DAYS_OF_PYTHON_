@@ -312,4 +312,86 @@ def format_digital_clock(
     return f"[{target_dt.strftime(fmt)}]"
 
 
+# ─── 5. UTC Offset & Daylight Saving Time (DST) Analyzer ────────────────────
+
+
+def get_current_utc_offset(tz_name: Optional[str] = None) -> Tuple[float, str]:
+    """
+    Calculates current UTC offset hours and formatted string (e.g. +05:30, -04:00) for a timezone.
+
+    Args:
+        tz_name: Optional timezone name (defaults to local system time).
+
+    Returns:
+        Tuple of (offset_hours as float, formatted_offset_str as str).
+    """
+    if tz_name is None:
+        dt = datetime.now().astimezone()
+    elif tz_name.upper() == "UTC":
+        dt = datetime.now(timezone.utc)
+    else:
+        dt = datetime.now(ZoneInfo(tz_name))
+
+    offset = dt.utcoffset()
+    if offset is None:
+        return 0.0, "+00:00"
+
+    total_seconds = int(offset.total_seconds())
+    offset_hours = total_seconds / 3600.0
+
+    sign = "+" if total_seconds >= 0 else "-"
+    abs_seconds = abs(total_seconds)
+    hours, remainder = divmod(abs_seconds, 3600)
+    minutes, _ = divmod(remainder, 60)
+
+    formatted_str = f"{sign}{hours:02d}:{minutes:02d}"
+    return offset_hours, formatted_str
+
+
+def is_dst_active(tz_name: Optional[str] = None, dt: Optional[datetime] = None) -> bool:
+    """
+    Determines if Daylight Saving Time (DST) is active for a given timezone and datetime.
+
+    Args:
+        tz_name: Optional timezone name (defaults to local timezone).
+        dt: Optional datetime (defaults to current time).
+
+    Returns:
+        True if DST is active, False otherwise.
+    """
+    target_dt = dt if dt is not None else datetime.now()
+    if tz_name is not None and tz_name.upper() != "UTC":
+        target_dt = target_dt.astimezone(ZoneInfo(tz_name))
+    elif tz_name is None:
+        target_dt = target_dt.astimezone()
+
+    dst_delta = target_dt.dst()
+    return dst_delta is not None and dst_delta.total_seconds() != 0
+
+
+def get_timezone_info(tz_name: Optional[str] = None) -> Dict[str, Any]:
+    """
+    Returns comprehensive metadata about a timezone.
+
+    Args:
+        tz_name: Timezone string name.
+
+    Returns:
+        Dictionary containing tz_name, current_time, offset_hours, offset_string, and dst_active.
+    """
+    dt = get_current_datetime(tz=tz_name)
+    offset_hours, offset_str = get_current_utc_offset(tz_name)
+    dst_status = is_dst_active(tz_name, dt)
+
+    return {
+        "timezone_name": tz_name or "Local",
+        "current_time": dt.strftime("%Y-%m-%d %H:%M:%S"),
+        "timezone_abbrev": dt.strftime("%Z"),
+        "offset_hours": offset_hours,
+        "offset_string": offset_str,
+        "dst_active": dst_status,
+    }
+
+
+
 
