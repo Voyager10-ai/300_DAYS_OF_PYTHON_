@@ -237,3 +237,79 @@ def get_world_clock(
     return {tz_name: dt.strftime(fmt) for tz_name, dt in dt_map.items()}
 
 
+# ─── 4. Analog & Digital Clock Representations ───────────────────────────────
+
+
+def get_analog_clock_angles(dt: Optional[datetime] = None) -> Dict[str, float]:
+    """
+    Calculates clock hand rotation angles (0 to 360 degrees, 12 o'clock = 0 deg) for a given datetime.
+
+    Args:
+        dt: Input datetime (defaults to current system time).
+
+    Returns:
+        Dictionary with 'hour_angle', 'minute_angle', and 'second_angle' in degrees.
+    """
+    target_dt = dt if dt is not None else datetime.now()
+    hour = target_dt.hour % 12
+    minute = target_dt.minute
+    second = target_dt.second + (target_dt.microsecond / 1_000_000.0)
+
+    # 360 deg / 60 sec = 6 deg/sec
+    second_angle = (second * 6.0) % 360.0
+
+    # 360 deg / 60 min = 6 deg/min + continuous movement from seconds
+    minute_angle = ((minute + second / 60.0) * 6.0) % 360.0
+
+    # 360 deg / 12 hrs = 30 deg/hr + continuous movement from minutes
+    hour_angle = ((hour + (minute + second / 60.0) / 60.0) * 30.0) % 360.0
+
+    return {
+        "hour_angle": round(hour_angle, 4),
+        "minute_angle": round(minute_angle, 4),
+        "second_angle": round(second_angle, 4),
+    }
+
+
+def format_12h_24h(dt: Optional[datetime] = None) -> Dict[str, str]:
+    """
+    Returns 12-hour and 24-hour time strings for a datetime object.
+
+    Args:
+        dt: Input datetime (defaults to current time).
+
+    Returns:
+        Dictionary containing 'time_12h', 'time_24h', 'period' ('AM'/'PM').
+    """
+    target_dt = dt if dt is not None else datetime.now()
+    return {
+        "time_12h": target_dt.strftime("%I:%M:%S %p"),
+        "time_24h": target_dt.strftime("%H:%M:%S"),
+        "period": target_dt.strftime("%p"),
+    }
+
+
+def format_digital_clock(
+    dt: Optional[datetime] = None, show_seconds: bool = True, use_12h: bool = False
+) -> str:
+    """
+    Formats datetime as a digital clock display string.
+
+    Args:
+        dt: Input datetime (defaults to current time).
+        show_seconds: Whether to include seconds.
+        use_12h: Whether to use 12-hour format with AM/PM.
+
+    Returns:
+        Digital clock string e.g. '[14:30:45]' or '[02:30:45 PM]'.
+    """
+    target_dt = dt if dt is not None else datetime.now()
+    if use_12h:
+        fmt = "%I:%M:%S %p" if show_seconds else "%I:%M %p"
+    else:
+        fmt = "%H:%M:%S" if show_seconds else "%H:%M"
+
+    return f"[{target_dt.strftime(fmt)}]"
+
+
+
