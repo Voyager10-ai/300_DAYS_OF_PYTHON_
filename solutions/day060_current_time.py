@@ -465,6 +465,90 @@ def check_clock_drift(
     return checker.evaluate_drift(local_now, simulated_reference_time)
 
 
+# ─── 7. Stopwatch & Lap Timer Engine ─────────────────────────────────────────
+
+
+class Stopwatch:
+    """
+    Multi-lap stopwatch supporting start, pause, resume, reset, and lap split timing.
+    """
+
+    def __init__(self) -> None:
+        self._is_running: bool = False
+        self._accumulated_ns: int = 0
+        self._last_start_ns: Optional[int] = None
+        self._laps: List[Tuple[int, float, float]] = []  # (lap_index, lap_time_sec, total_time_sec)
+        self._last_lap_total_sec: float = 0.0
+
+    def start(self) -> None:
+        """Starts or resumes the stopwatch."""
+        if not self._is_running:
+            self._is_running = True
+            self._last_start_ns = time.perf_counter_ns()
+
+    def pause(self) -> float:
+        """
+        Pauses the stopwatch.
+
+        Returns:
+            Current total elapsed seconds.
+        """
+        if self._is_running and self._last_start_ns is not None:
+            self._accumulated_ns += time.perf_counter_ns() - self._last_start_ns
+            self._is_running = False
+            self._last_start_ns = None
+        return self.elapsed_seconds
+
+    def reset(self) -> None:
+        """Resets the stopwatch to zero and clears laps."""
+        self._is_running = False
+        self._accumulated_ns = 0
+        self._last_start_ns = None
+        self._laps.clear()
+        self._last_lap_total_sec = 0.0
+
+    def lap(self) -> Tuple[int, float, float]:
+        """
+        Records a lap split.
+
+        Returns:
+            Tuple of (lap_number, lap_duration_seconds, total_duration_seconds).
+
+        Raises:
+            RuntimeError: If stopwatch is not running.
+        """
+        if not self._is_running:
+            raise RuntimeError("Cannot record lap while stopwatch is paused or reset.")
+
+        total_sec = self.elapsed_seconds
+        lap_sec = total_sec - self._last_lap_total_sec
+        self._last_lap_total_sec = total_sec
+
+        lap_number = len(self._laps) + 1
+        lap_data = (lap_number, round(lap_sec, 6), round(total_sec, 6))
+        self._laps.append(lap_data)
+        return lap_data
+
+    @property
+    def is_running(self) -> bool:
+        """Returns True if stopwatch is currently running."""
+        return self._is_running
+
+    @property
+    def elapsed_seconds(self) -> float:
+        """Returns total elapsed seconds."""
+        total_ns = self._accumulated_ns
+        if self._is_running and self._last_start_ns is not None:
+            total_ns += time.perf_counter_ns() - self._last_start_ns
+        return total_ns / 1_000_000_000.0
+
+    @property
+    def laps(self) -> List[Tuple[int, float, float]]:
+        """Returns recorded laps."""
+        return list(self._laps)
+
+
+
 
 
 
