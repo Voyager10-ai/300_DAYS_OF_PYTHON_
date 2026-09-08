@@ -171,3 +171,69 @@ class HighPrecisionTimer:
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         self.stop()
 
+
+# ─── 3. World Clock & Multi-Timezone Fetcher ─────────────────────────────────
+
+
+DEFAULT_WORLD_CITIES = [
+    "UTC",
+    "America/New_York",
+    "Europe/London",
+    "Europe/Paris",
+    "Asia/Kolkata",
+    "Asia/Tokyo",
+    "Australia/Sydney",
+]
+
+
+def get_multi_timezone_datetimes(
+    timezones: Optional[List[str]] = None,
+) -> Dict[str, datetime]:
+    """
+    Fetches current datetime for a list of timezone names simultaneously.
+
+    Args:
+        timezones: List of timezone strings (defaults to major world cities).
+
+    Returns:
+        Dictionary mapping timezone name -> timezone-aware datetime object.
+
+    Raises:
+        ValueError: If a timezone string is invalid.
+    """
+    tz_list = timezones if timezones is not None else DEFAULT_WORLD_CITIES
+    results = {}
+    now_utc = datetime.now(timezone.utc)
+
+    for tz_name in tz_list:
+        clean_tz = tz_name.strip()
+        if clean_tz.upper() == "UTC":
+            results[clean_tz] = now_utc
+        else:
+            try:
+                tz_obj = ZoneInfo(clean_tz)
+                results[clean_tz] = now_utc.astimezone(tz_obj)
+            except Exception as e:
+                raise ValueError(f"Failed to resolve timezone '{tz_name}': {e}")
+
+    return results
+
+
+def get_world_clock(
+    timezones: Optional[List[str]] = None,
+    fmt: str = "%Y-%m-%d %H:%M:%S %Z",
+) -> Dict[str, str]:
+    """
+    Returns a formatted world clock dictionary mapping timezone names to current time strings.
+
+    Args:
+        timezones: List of timezone names.
+        fmt: strftime format specifier.
+
+    Returns:
+        Dictionary mapping timezone name -> formatted time string.
+    """
+    dt_map = get_multi_timezone_datetimes(timezones)
+    return {tz_name: dt.strftime(fmt) for tz_name, dt in dt_map.items()}
+
+
