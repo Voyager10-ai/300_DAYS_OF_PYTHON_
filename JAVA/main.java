@@ -1040,7 +1040,21 @@
 //     }
 // }
 
+// class CurrentTimePractice {
+//     public static String getCurrentTimeLocal() {
+//         return java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"));
+//     }
+//     public static String getCurrentTimeUTC() {
+//         return java.time.ZonedDateTime.now(java.time.ZoneOffset.UTC).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z"));
+//     }
+//     public static void main(String[] args) {
+//         System.out.println("Current Local Time: " + getCurrentTimeLocal());
+//         System.out.println("Current UTC Time:   " + getCurrentTimeUTC());
+//     }
+// }
+
 import java.util.*;
+
 
 
 

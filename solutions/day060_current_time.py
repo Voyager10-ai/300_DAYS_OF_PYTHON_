@@ -653,6 +653,62 @@ class TestCurrentTimeOperations(unittest.TestCase):
             sw.lap()
 
 
+# ─── 9. Interactive CLI Runner ───────────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates all current time, high precision timer, and clock capabilities."""
+    print("=" * 70)
+    print(" DAY 60: CURRENT TIME & CLOCK TOOLKIT")
+    print("=" * 70)
+
+    print("\n1. Core Current Time Providers:")
+    print(f"   • Local Datetime: {get_current_datetime().strftime('%Y-%m-%d %H:%M:%S.%f')}")
+    print(f"   • Local Time Str: {get_current_time_str('%I:%M:%S %p')}")
+    print(f"   • UTC Datetime:   {get_current_utc_str()}")
+
+    print("\n2. High-Precision Timers:")
+    print(f"   • Epoch Nanoseconds: {get_current_nanos()}")
+    print(f"   • Monotonic Seconds: {get_monotonic_time():.6f}")
+
+    print("\n3. World Clock (Global Timezones):")
+    world_times = get_world_clock()
+    for tz_name, time_str in world_times.items():
+        print(f"   • {tz_name:<20}: {time_str}")
+
+    print("\n4. Analog & Digital Clock Representations:")
+    now = datetime.now()
+    angles = get_analog_clock_angles(now)
+    print(f"   • Digital Display:   {format_digital_clock(now, show_seconds=True, use_12h=True)}")
+    print(f"   • Analog Hand Angles: Hour: {angles['hour_angle']}°, Minute: {angles['minute_angle']}°, Second: {angles['second_angle']}°")
+
+    print("\n5. UTC Offset & Timezone Metadata (Kolkata vs New York):")
+    for city in ["Asia/Kolkata", "America/New_York", "Europe/London"]:
+        info = get_timezone_info(city)
+        print(f"   • {city:<18}: Offset={info['offset_string']} ({info['offset_hours']:+0.1f}h), DST={'Active' if info['dst_active'] else 'Inactive'}")
+
+    print("\n6. Stopwatch & Lap Split Timing Demo:")
+    sw = Stopwatch()
+    sw.start()
+    time.sleep(0.02)
+    lap1 = sw.lap()
+    time.sleep(0.03)
+    lap2 = sw.lap()
+    sw.pause()
+    print(f"   • Lap 1: {lap1[1]:.4f}s (Total: {lap1[2]:.4f}s)")
+    print(f"   • Lap 2: {lap2[1]:.4f}s (Total: {lap2[2]:.4f}s)")
+    print(f"   • Final Stopwatch Elapsed: {sw.elapsed_seconds:.4f}s")
+
+    print("\n" + "=" * 70)
+
+
+if __name__ == "__main__":
+    unittest.main(exit=False)
+    print()
+    main()
+
+
+
 
 
 
