@@ -393,5 +393,78 @@ def get_timezone_info(tz_name: Optional[str] = None) -> Dict[str, Any]:
     }
 
 
+# ─── 6. NTP Clock Drift & Synchronization Analyzer ───────────────────────────
+
+
+class NTPSyncChecker:
+    """
+    Simulates Network Time Protocol (NTP) synchronization and evaluates clock drift against an authoritative reference server.
+    """
+
+    def __init__(self, server_name: str = "pool.ntp.org", max_allowed_drift_ms: float = 500.0) -> None:
+        self.server_name = server_name
+        self.max_allowed_drift_ms = max_allowed_drift_ms
+
+    def evaluate_drift(
+        self,
+        local_time: datetime,
+        reference_time: datetime,
+        round_trip_delay_ms: float = 20.0,
+    ) -> Dict[str, Any]:
+        """
+        Evaluates clock drift between local system time and reference server time.
+
+        Args:
+            local_time: Local system timestamp.
+            reference_time: Authoritative NTP reference server timestamp.
+            round_trip_delay_ms: Network round trip latency in ms.
+
+        Returns:
+            Dictionary containing drift_ms, within_tolerance, and synchronized status.
+        """
+        # Ensure both are timezone aware or both naive
+        if local_time.tzinfo and not reference_time.tzinfo:
+            reference_time = reference_time.replace(tzinfo=local_time.tzinfo)
+        elif not local_time.tzinfo and reference_time.tzinfo:
+            local_time = local_time.replace(tzinfo=reference_time.tzinfo)
+
+        # Account for network delay (half-trip latency offset)
+        adjusted_reference = reference_time + timedelta(milliseconds=round_trip_delay_ms / 2.0)
+        drift_delta = local_time - adjusted_reference
+        drift_ms = drift_delta.total_seconds() * 1000.0
+
+        within_tolerance = abs(drift_ms) <= self.max_allowed_drift_ms
+
+        return {
+            "ntp_server": self.server_name,
+            "local_time": local_time.isoformat(),
+            "reference_time": reference_time.isoformat(),
+            "round_trip_delay_ms": round_trip_delay_ms,
+            "drift_ms": round(drift_ms, 3),
+            "within_tolerance": within_tolerance,
+            "sync_status": "SYNCHRONIZED" if within_tolerance else "DRIFT_DETECTED",
+        }
+
+
+def check_clock_drift(
+    simulated_reference_time: datetime,
+    max_allowed_drift_ms: float = 500.0,
+) -> Dict[str, Any]:
+    """
+    Convenience wrapper to check local system clock drift against a reference time.
+
+    Args:
+        simulated_reference_time: Authoritative reference time.
+        max_allowed_drift_ms: Max drift threshold in ms.
+
+    Returns:
+        Drift report dictionary.
+    """
+    checker = NTPSyncChecker(max_allowed_drift_ms=max_allowed_drift_ms)
+    local_now = datetime.now(simulated_reference_time.tzinfo)
+    return checker.evaluate_drift(local_now, simulated_reference_time)
+
+
+
 
 
