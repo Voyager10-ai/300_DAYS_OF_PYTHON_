@@ -408,6 +408,93 @@ def pad_time_string(time_str: str, target_length: int = 8, pad_char: str = "0") 
     return ":".join(padded_parts)
 
 
+# ─── 8. Unit Test Suite ──────────────────────────────────────────────────────
+
+
+class TestDateTimeFormatOperations(unittest.TestCase):
+    """Comprehensive unit test suite for date-time formatting utilities."""
+
+    def test_ordinal_day_suffixes(self) -> None:
+        self.assertEqual(get_day_ordinal_suffix(1), "st")
+        self.assertEqual(get_day_ordinal_suffix(2), "nd")
+        self.assertEqual(get_day_ordinal_suffix(3), "rd")
+        self.assertEqual(get_day_ordinal_suffix(4), "th")
+        self.assertEqual(get_day_ordinal_suffix(11), "th")
+        self.assertEqual(get_day_ordinal_suffix(12), "th")
+        self.assertEqual(get_day_ordinal_suffix(13), "th")
+        self.assertEqual(get_day_ordinal_suffix(21), "st")
+        self.assertEqual(get_day_ordinal_suffix(22), "nd")
+        self.assertEqual(get_day_ordinal_suffix(23), "rd")
+        self.assertEqual(get_day_ordinal_suffix(31), "st")
+
+        dt = date(2026, 9, 9)
+        self.assertEqual(format_datetime_ordinal(dt), "September 9th, 2026")
+
+    def test_format_token_template(self) -> None:
+        dt = datetime(2026, 9, 9, 14, 30, 45, 123456)
+        formatted = format_token_template(dt, "YYYY-MM-DD HH:mm:ss SSS A")
+        self.assertEqual(formatted, "2026-09-09 14:30:45 123 PM")
+
+        formatted_12h = format_token_template(dt, "hh:mm A")
+        self.assertEqual(formatted_12h, "02:30 PM")
+
+    def test_culture_presets(self) -> None:
+        dt = datetime(2026, 9, 9, 12, 30, 0, tzinfo=timezone.utc)
+        self.assertEqual(format_culture_preset(dt, "US"), "09/09/2026")
+        self.assertEqual(format_culture_preset(dt, "EU"), "09/09/2026")
+        self.assertEqual(format_culture_preset(dt, "ISO"), "2026-09-09")
+        self.assertIn("Wed, 09 Sep 2026 12:30:00 GMT", format_culture_preset(dt, "HTTP_RFC1123"))
+
+    def test_relative_friendly_format(self) -> None:
+        ref_dt = datetime(2026, 9, 9, 12, 0, 0)
+        today_dt = datetime(2026, 9, 9, 14, 30, 0)
+        yesterday_dt = datetime(2026, 9, 8, 10, 15, 0)
+        tomorrow_dt = datetime(2026, 9, 10, 9, 0, 0)
+
+        self.assertEqual(format_relative_friendly(today_dt, reference_dt=ref_dt), "Today at 2:30 PM")
+        self.assertEqual(format_relative_friendly(yesterday_dt, reference_dt=ref_dt), "Yesterday at 10:15 AM")
+        self.assertEqual(format_relative_friendly(tomorrow_dt, reference_dt=ref_dt), "Tomorrow at 9:00 AM")
+
+    def test_subsecond_precision(self) -> None:
+        dt = datetime(2026, 9, 9, 14, 30, 45, 123456)
+        self.assertEqual(format_subsecond_precision(dt, "ms"), "2026-09-09 14:30:45.123")
+        self.assertEqual(format_subsecond_precision(dt, "us"), "2026-09-09 14:30:45.123456")
+        self.assertEqual(format_subsecond_precision(dt, "ns"), "2026-09-09 14:30:45.123456000")
+
+    def test_validate_strftime_pattern_and_inspector(self) -> None:
+        val = validate_strftime_pattern("%Y-%m-%d %H:%M:%S")
+        self.assertTrue(val["is_valid"])
+        self.assertEqual(len(val["unrecognized_directives"]), 0)
+
+        val_invalid = validate_strftime_pattern("%Y-%m-%d %Q")
+        self.assertFalse(val_invalid["is_valid"])
+
+        tokens = inspect_format_tokens("YYYY-MM-DD HH:mm:ss SSS")
+        self.assertIn("YYYY", tokens)
+        self.assertIn("MM", tokens)
+        self.assertIn("DD", tokens)
+        self.assertIn("SSS", tokens)
+
+    def test_masked_datetime_and_padding(self) -> None:
+        dt = datetime(2026, 9, 9, 14, 30, 45)
+        masked = format_masked_datetime(dt, "####/##/## ##:##:##")
+        self.assertEqual(masked, "2026/09/09 14:30:45")
+
+        padded = pad_time_string("9:5:3 PM")
+        self.assertEqual(padded, "09:05:03 PM")
+
+    def test_exceptions_and_edge_cases(self) -> None:
+        with self.assertRaises(ValueError):
+            get_day_ordinal_suffix(35)
+        with self.assertRaises(ValueError):
+            format_culture_preset(datetime.now(), "UNSUPPORTED_PRESET")
+        with self.assertRaises(TypeError):
+            format_relative_friendly("not-a-datetime")  # type: ignore
+        with self.assertRaises(ValueError):
+            format_subsecond_precision(datetime.now(), precision="invalid")
+
+
+
 
 
 
