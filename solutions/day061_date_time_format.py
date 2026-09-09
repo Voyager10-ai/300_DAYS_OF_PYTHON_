@@ -273,5 +273,73 @@ def format_subsecond_precision(
         raise ValueError(f"Invalid precision '{precision}'. Choose from 'ms' (milliseconds), 'us' (microseconds), 'ns' (nanoseconds).")
 
 
+# ─── 6. Format Pattern Validator & Inspector ─────────────────────────────────
+
+
+KNOWN_STRFTIME_DIRECTIVES = {
+    "%a", "%A", "%b", "%B", "%c", "%d", "%f", "%H", "%I", "%j", "%m", "%M",
+    "%p", "%S", "%U", "%w", "%W", "%x", "%X", "%y", "%Y", "%z", "%Z", "%%"
+}
+
+
+def validate_strftime_pattern(pattern: str) -> Dict[str, Any]:
+    """
+    Validates a strftime format pattern string for correctness and extracts recognized directives.
+
+    Args:
+        pattern: The strftime format pattern to inspect.
+
+    Returns:
+        Dictionary containing is_valid, directives_found, unrecognized_percent, and test_output.
+    """
+    if not isinstance(pattern, str):
+        raise TypeError(f"Expected string pattern, got {type(pattern).__name__}")
+
+    sample_dt = datetime(2026, 9, 9, 14, 30, 45, 123456, tzinfo=timezone.utc)
+    directives_found = re.findall(r"%[a-zA-Z%]", pattern)
+    
+    unrecognized = [d for d in directives_found if d not in KNOWN_STRFTIME_DIRECTIVES]
+
+    try:
+        test_out = sample_dt.strftime(pattern)
+        is_valid = len(unrecognized) == 0
+        err_msg = None
+    except Exception as e:
+        test_out = None
+        is_valid = False
+        err_msg = str(e)
+
+    return {
+        "pattern": pattern,
+        "is_valid": is_valid,
+        "directives_found": list(dict.fromkeys(directives_found)),  # deduplicated preserving order
+        "unrecognized_directives": unrecognized,
+        "sample_output": test_out,
+        "error_message": err_msg,
+    }
+
+
+def inspect_format_tokens(template: str) -> List[str]:
+    """
+    Extracts all supported custom token identifiers (e.g. YYYY, MMMM, DD, HH, SSS) present in a template string.
+
+    Args:
+        template: Tokenized template string.
+
+    Returns:
+        List of recognized tokens present in the template.
+    """
+    known_tokens = [
+        "YYYY", "YY", "MMMM", "MMM", "MM", "M", "DD", "D", "dddd", "ddd",
+        "HH", "hh", "mm", "ss", "SSS", "A", "a"
+    ]
+    found = []
+    for token in known_tokens:
+        if token in template:
+            found.append(token)
+    return found
+
+
+
 
 
