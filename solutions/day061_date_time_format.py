@@ -233,4 +233,45 @@ def format_relative_friendly(
         return dt.strftime(f"%B %d, %Y{time_str}")
 
 
+# ─── 5. Fractional & Sub-Second Precision Formatter ──────────────────────────
+
+
+def format_subsecond_precision(
+    dt: datetime, precision: str = "ms", base_fmt: str = "%Y-%m-%d %H:%M:%S"
+) -> str:
+    """
+    Formats a datetime object with explicitly formatted sub-second precision (milliseconds, microseconds, nanoseconds).
+
+    Args:
+        dt: Input datetime object.
+        precision: Sub-second precision ('ms' for 3 digits, 'us' for 6 digits, 'ns' for 9 digits).
+        base_fmt: Base strftime pattern for year, month, day, time.
+
+    Returns:
+        Formatted datetime string with sub-second fraction appended.
+
+    Raises:
+        ValueError: If precision specifier is unsupported.
+    """
+    if not isinstance(dt, datetime):
+        raise TypeError(f"Expected datetime object, got {type(dt).__name__}")
+
+    clean_prec = precision.strip().lower()
+    base_str = dt.strftime(base_fmt)
+    microsec = dt.microsecond
+
+    if clean_prec == "ms":
+        millisec = microsec // 1000
+        return f"{base_str}.{millisec:03d}"
+    elif clean_prec == "us":
+        return f"{base_str}.{microsec:06d}"
+    elif clean_prec == "ns":
+        # Python datetime microsecond extended with 3 zero digits for nanoseconds representation
+        nanosec = microsec * 1000
+        return f"{base_str}.{nanosec:09d}"
+    else:
+        raise ValueError(f"Invalid precision '{precision}'. Choose from 'ms' (milliseconds), 'us' (microseconds), 'ns' (nanoseconds).")
+
+
+
 
