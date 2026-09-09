@@ -340,6 +340,75 @@ def inspect_format_tokens(template: str) -> List[str]:
     return found
 
 
+# ─── 7. Flexible Mask & Padding Formatter ────────────────────────────────────
+
+
+def format_masked_datetime(dt: datetime, mask: str = "####-##-## ##:##:##") -> str:
+    """
+    Fills digits of datetime into a numerical mask string containing '#' characters.
+    Order of digits: YYYYMMDDHHMMSS.
+
+    Args:
+        dt: Input datetime.
+        mask: Mask string e.g. '####-##-## ##:##:##' or '##/##/####'.
+
+    Returns:
+        Masked datetime string.
+    """
+    if not isinstance(dt, datetime):
+        raise TypeError(f"Expected datetime object, got {type(dt).__name__}")
+
+    digits = dt.strftime("%Y%m%d%H%M%S")
+    digit_idx = 0
+    result_chars = []
+
+    for char in mask:
+        if char == "#":
+            if digit_idx < len(digits):
+                result_chars.append(digits[digit_idx])
+                digit_idx += 1
+            else:
+                result_chars.append("0")
+        else:
+            result_chars.append(char)
+
+    return "".join(result_chars)
+
+
+def pad_time_string(time_str: str, target_length: int = 8, pad_char: str = "0") -> str:
+    """
+    Pads single digit time components in a formatted time string (e.g. '9:5:3' -> '09:05:03').
+
+    Args:
+        time_str: Raw unpadded time string (e.g. '9:5:3' or '1:30 PM').
+        target_length: Desired minimum length.
+        pad_char: Character to pad with.
+
+    Returns:
+        Padded time string.
+    """
+    if not isinstance(time_str, str):
+        raise TypeError(f"Expected string time_str, got {type(time_str).__name__}")
+
+    # Split time components by colon
+    parts = time_str.strip().split(":")
+    padded_parts = []
+
+    for idx, part in enumerate(parts):
+        sub_parts = part.strip().split(" ")
+        num_part = sub_parts[0]
+        if num_part.isdigit() and len(num_part) == 1:
+            num_part = f"{pad_char}{num_part}"
+        
+        if len(sub_parts) > 1:
+            padded_parts.append(f"{num_part} {' '.join(sub_parts[1:])}")
+        else:
+            padded_parts.append(num_part)
+
+    return ":".join(padded_parts)
+
+
+
 
 
 
