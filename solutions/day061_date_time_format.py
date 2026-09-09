@@ -109,32 +109,30 @@ def format_token_template(dt: Union[datetime, date], template: str) -> str:
 
     am_pm = "PM" if hour >= 12 else "AM"
 
-    replacements = [
-        ("YYYY", f"{dt.year:04d}"),
-        ("YY", f"{dt.year % 100:02d}"),
-        ("MMMM", dt.strftime("%B")),
-        ("MMM", dt.strftime("%b")),
-        ("MM", f"{dt.month:02d}"),
-        ("M", str(dt.month)),
-        ("DD", f"{dt.day:02d}"),
-        ("D", str(dt.day)),
-        ("dddd", dt.strftime("%A")),
-        ("ddd", dt.strftime("%a")),
-        ("HH", f"{hour:02d}"),
-        ("hh", f"{hour12:02d}"),
-        ("mm", f"{minute:02d}"),
-        ("ss", f"{second:02d}"),
-        ("SSS", f"{millisec:03d}"),
-        ("A", am_pm),
-        ("a", am_pm.lower()),
-    ]
+    token_map = {
+        "YYYY": f"{dt.year:04d}",
+        "YY": f"{dt.year % 100:02d}",
+        "MMMM": dt.strftime("%B"),
+        "MMM": dt.strftime("%b"),
+        "MM": f"{dt.month:02d}",
+        "M": str(dt.month),
+        "DD": f"{dt.day:02d}",
+        "D": str(dt.day),
+        "dddd": dt.strftime("%A"),
+        "ddd": dt.strftime("%a"),
+        "HH": f"{hour:02d}",
+        "hh": f"{hour12:02d}",
+        "mm": f"{minute:02d}",
+        "ss": f"{second:02d}",
+        "SSS": f"{millisec:03d}",
+        "A": am_pm,
+        "a": am_pm.lower(),
+    }
 
-    result = template
-    # Replace tokens in order of decreasing length to avoid partial token collision
-    for token, value in sorted(replacements, key=lambda x: len(x[0]), reverse=True):
-        result = result.replace(token, value)
+    # Match tokens using regex word boundaries or token list sorted by length descending
+    pattern = r"\b(" + "|".join(sorted(token_map.keys(), key=len, reverse=True)) + r")\b"
+    return re.sub(pattern, lambda m: token_map[m.group(0)], template)
 
-    return result
 
 
 # ─── 3. International Culture Presets & Log Formatters ────────────────────────
@@ -492,6 +490,60 @@ class TestDateTimeFormatOperations(unittest.TestCase):
             format_relative_friendly("not-a-datetime")  # type: ignore
         with self.assertRaises(ValueError):
             format_subsecond_precision(datetime.now(), precision="invalid")
+
+
+# ─── 9. Interactive CLI Runner ───────────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates all date and time formatting capabilities."""
+    print("=" * 70)
+    print(" DAY 61: DATE & TIME FORMATTING TOOLKIT")
+    print("=" * 70)
+
+    sample_dt = datetime(2026, 9, 9, 14, 30, 45, 123456, tzinfo=timezone.utc)
+
+    print(f"\n1. Ordinal Day Suffix Formatting:")
+    print(f"   • Standard: {format_datetime_ordinal(sample_dt, '%B {d}{suffix}, %Y')}")
+    print(f"   • Custom:   {format_datetime_ordinal(sample_dt, '%A the {d}{suffix} of %B in %Y')}")
+
+    print("\n2. Tokenized Template Formatter:")
+    print(f"   • Full Template:  {format_token_template(sample_dt, 'dddd, MMMM DD, YYYY at hh:mm:ss SSS A')}")
+    print(f"   • Short Template: {format_token_template(sample_dt, 'YYYY/MM/DD HH:mm:ss')}")
+
+    print("\n3. International Culture & Log Presets:")
+    for preset_name in ["US", "EU", "ISO_DATETIME", "HTTP_RFC1123", "APACHE_LOG"]:
+        formatted = format_culture_preset(sample_dt, preset_name)
+        print(f"   • {preset_name:<15}: {formatted}")
+
+    print("\n4. Relative Friendly Expressions:")
+    now_ref = datetime(2026, 9, 9, 12, 0, 0)
+    print(f"   • Same Day:   {format_relative_friendly(sample_dt, reference_dt=now_ref)}")
+    print(f"   • Yesterday:  {format_relative_friendly(sample_dt - timedelta(days=1), reference_dt=now_ref)}")
+    print(f"   • Tomorrow:   {format_relative_friendly(sample_dt + timedelta(days=1), reference_dt=now_ref)}")
+
+    print("\n5. Sub-Second Precision Formatter:")
+    print(f"   • Milliseconds (ms): {format_subsecond_precision(sample_dt, 'ms')}")
+    print(f"   • Microseconds (us): {format_subsecond_precision(sample_dt, 'us')}")
+    print(f"   • Nanoseconds (ns):  {format_subsecond_precision(sample_dt, 'ns')}")
+
+    print("\n6. Pattern Validation & Inspector:")
+    valid_res = validate_strftime_pattern("%Y-%m-%d %H:%M:%S")
+    print(f"   • Pattern '%Y-%m-%d %H:%M:%S' Valid: {valid_res['is_valid']}")
+    print(f"   • Directives Found: {valid_res['directives_found']}")
+
+    print("\n7. Digit Masking & Padding:")
+    print(f"   • Masked Digits: {format_masked_datetime(sample_dt, '####-##-## ##:##:##')}")
+    print(f"   • Time Padding:  {pad_time_string('9:5:3 PM')}")
+
+    print("\n" + "=" * 70)
+
+
+if __name__ == "__main__":
+    unittest.main(exit=False)
+    print()
+    main()
+
 
 
 
