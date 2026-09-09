@@ -1053,7 +1053,19 @@
 //     }
 // }
 
+// class DateTimeFormatPractice {
+//     public static String formatCustomPattern(java.time.LocalDateTime dt, String pattern) {
+//         java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern(pattern);
+//         return dt.format(formatter);
+//     }
+//     public static void main(String[] args) {
+//         java.time.LocalDateTime now = java.time.LocalDateTime.now();
+//         System.out.println("Formatted Custom Pattern: " + formatCustomPattern(now, "yyyy-MM-dd HH:mm:ss.SSS"));
+//     }
+// }
+
 import java.util.*;
+
 
 
 
