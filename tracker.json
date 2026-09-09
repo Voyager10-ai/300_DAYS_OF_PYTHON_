@@ -1,6 +1,6 @@
 {
   "total_problems": 282,
-  "current_day": 60,
+  "current_day": 61,
   "problems": [
     {"day": 1, "title": "Print String", "status": "done"},
     {"day": 2, "title": "Input Age", "status": "done"},
@@ -70,8 +70,8 @@
     {"day": 58, "title": "Standard Deviation", "status": "done"},
     {"day": 59, "title": "Convert DateTime", "status": "done"},
     {"day": 60, "title": "Current Time", "status": "done"},
+    {"day": 61, "title": "Date Time Format", "status": "done"},
 
-    {"day": 61, "title": "Date Time Format", "status": "pending"},
     {"day": 62, "title": "Millisecond", "status": "pending"},
     {"day": 63, "title": "Subtract Days", "status": "pending"},
     {"day": 64, "title": "All Words Contain 5 Characters", "status": "pending"},

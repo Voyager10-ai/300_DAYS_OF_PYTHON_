@@ -63,6 +63,8 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 58: Standard Deviation
 - Day 59: Convert DateTime
 - Day 60: Current Time
+- Day 61: Date Time Format
+
 
 
 
