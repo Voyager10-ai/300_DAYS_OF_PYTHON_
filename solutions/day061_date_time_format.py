@@ -65,3 +65,74 @@ def format_datetime_ordinal(dt: Union[datetime, date], fmt: str = "%B {d}{suffix
     # Replace placeholders
     formatted_fmt = fmt.replace("{d}", str(day)).replace("{suffix}", suffix)
     return dt.strftime(formatted_fmt)
+
+
+# ─── 2. Custom Token Template Formatter ──────────────────────────────────────
+
+
+def format_token_template(dt: Union[datetime, date], template: str) -> str:
+    """
+    Formats a datetime using modern tokenized template syntax (e.g. 'YYYY-MM-DD HH:mm:ss SSS').
+
+    Supported Tokens:
+        YYYY: 4-digit year (2026)        YY: 2-digit year (26)
+        MMMM: Full month (September)    MMM: Short month (Sep)
+        MM: 2-digit month (09)           M: 1/2-digit month (9)
+        DD: 2-digit day (09)             D: 1/2-digit day (9)
+        dddd: Full weekday (Wednesday)  ddd: Short weekday (Wed)
+        HH: 24-hour hour (14)           hh: 12-hour hour (02)
+        mm: Minute (30)                 ss: Second (45)
+        SSS: Milliseconds (123)         A: AM/PM (PM)       a: am/pm (pm)
+
+    Args:
+        dt: Input date or datetime object.
+        template: Tokenized template string.
+
+    Returns:
+        Formatted datetime string.
+    """
+    if not isinstance(dt, (datetime, date)):
+        raise TypeError(f"Expected datetime or date object, got {type(dt).__name__}")
+
+    # Microseconds / Milliseconds
+    microsec = getattr(dt, "microsecond", 0)
+    millisec = microsec // 1000
+
+    # Hours / Minutes / Seconds
+    hour = getattr(dt, "hour", 0)
+    minute = getattr(dt, "minute", 0)
+    second = getattr(dt, "second", 0)
+
+    hour12 = hour % 12
+    if hour12 == 0:
+        hour12 = 12
+
+    am_pm = "PM" if hour >= 12 else "AM"
+
+    replacements = [
+        ("YYYY", f"{dt.year:04d}"),
+        ("YY", f"{dt.year % 100:02d}"),
+        ("MMMM", dt.strftime("%B")),
+        ("MMM", dt.strftime("%b")),
+        ("MM", f"{dt.month:02d}"),
+        ("M", str(dt.month)),
+        ("DD", f"{dt.day:02d}"),
+        ("D", str(dt.day)),
+        ("dddd", dt.strftime("%A")),
+        ("ddd", dt.strftime("%a")),
+        ("HH", f"{hour:02d}"),
+        ("hh", f"{hour12:02d}"),
+        ("mm", f"{minute:02d}"),
+        ("ss", f"{second:02d}"),
+        ("SSS", f"{millisec:03d}"),
+        ("A", am_pm),
+        ("a", am_pm.lower()),
+    ]
+
+    result = template
+    # Replace tokens in order of decreasing length to avoid partial token collision
+    for token, value in sorted(replacements, key=lambda x: len(x[0]), reverse=True):
+        result = result.replace(token, value)
+
+    return result
+
