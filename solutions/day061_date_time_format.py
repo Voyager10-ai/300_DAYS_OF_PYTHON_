@@ -136,3 +136,52 @@ def format_token_template(dt: Union[datetime, date], template: str) -> str:
 
     return result
 
+
+# ─── 3. International Culture Presets & Log Formatters ────────────────────────
+
+
+CULTURE_PRESETS = {
+    "US": "%m/%d/%Y",                    # US Standard Date (MM/DD/YYYY)
+    "US_DATETIME": "%m/%d/%Y %I:%M:%S %p",# US Standard DateTime
+    "EU": "%d/%m/%Y",                    # European Standard Date (DD/MM/YYYY)
+    "EU_DATETIME": "%d/%m/%Y %H:%M:%S",   # European Standard DateTime
+    "ISO": "%Y-%m-%d",                   # ISO Date (YYYY-MM-DD)
+    "ISO_DATETIME": "%Y-%m-%dT%H:%M:%S",  # ISO 8601 DateTime
+    "JAPAN": "%Y年%m月%d日",             # Japanese Date
+    "HTTP_RFC1123": "%a, %d %b %Y %H:%M:%S GMT", # RFC 1123 HTTP Header
+    "APACHE_LOG": "[%d/%b/%Y:%H:%M:%S %z]",      # Apache/Nginx Access Log Format
+    "COOKIE_DATE": "%A, %d-%b-%Y %H:%M:%S GMT", # Netscape Cookie Date
+    "RSS_PUB_DATE": "%a, %d %b %Y %H:%M:%S %z", # RSS pubDate
+}
+
+
+def format_culture_preset(dt: datetime, preset: str = "ISO_DATETIME") -> str:
+    """
+    Formats datetime using international culture standards or web server protocols.
+
+    Args:
+        dt: Input datetime object.
+        preset: Preset identifier (e.g., 'US', 'EU', 'ISO', 'HTTP_RFC1123', 'APACHE_LOG', 'COOKIE_DATE').
+
+    Returns:
+        Formatted datetime string.
+
+    Raises:
+        ValueError: If preset is not supported.
+    """
+    if not isinstance(dt, (datetime, date)):
+        raise TypeError(f"Expected datetime or date object, got {type(dt).__name__}")
+
+    clean_preset = preset.strip().upper()
+    if clean_preset not in CULTURE_PRESETS:
+        raise ValueError(f"Unsupported preset '{preset}'. Choose from {list(CULTURE_PRESETS.keys())}.")
+
+    fmt = CULTURE_PRESETS[clean_preset]
+
+    # Ensure naive datetime gets UTC offset representation for log formats if required
+    if ("%z" in fmt or "GMT" in fmt) and isinstance(dt, datetime) and dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+
+    return dt.strftime(fmt)
+
+
