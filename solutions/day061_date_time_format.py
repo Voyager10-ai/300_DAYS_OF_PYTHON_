@@ -185,3 +185,52 @@ def format_culture_preset(dt: datetime, preset: str = "ISO_DATETIME") -> str:
     return dt.strftime(fmt)
 
 
+# ─── 4. Relative Friendly Date Formatter ─────────────────────────────────────
+
+
+def format_relative_friendly(
+    dt: datetime, reference_dt: Optional[datetime] = None, include_time: bool = True
+) -> str:
+    """
+    Formats a datetime relative to today ('Today at 2:30 PM', 'Yesterday at 10:15 AM', 'Tomorrow at 9:00 AM', 'Last Monday').
+
+    Args:
+        dt: Target datetime object.
+        reference_dt: Reference point (defaults to current local/UTC datetime matching dt).
+        include_time: Whether to append the time portion.
+
+    Returns:
+        Friendly formatted relative date string.
+    """
+    if not isinstance(dt, datetime):
+        raise TypeError(f"Expected datetime object, got {type(dt).__name__}")
+
+    if reference_dt is None:
+        reference_dt = datetime.now(dt.tzinfo) if dt.tzinfo else datetime.now()
+    else:
+        if dt.tzinfo and not reference_dt.tzinfo:
+            reference_dt = reference_dt.replace(tzinfo=dt.tzinfo)
+        elif not dt.tzinfo and reference_dt.tzinfo:
+            reference_dt = reference_dt.replace(tzinfo=None)
+
+    target_date = dt.date()
+    ref_date = reference_dt.date()
+    day_diff = (target_date - ref_date).days
+
+    time_str = f" at {dt.strftime('%I:%M %p').lstrip('0')}" if include_time else ""
+
+    if day_diff == 0:
+        return f"Today{time_str}"
+    elif day_diff == -1:
+        return f"Yesterday{time_str}"
+    elif day_diff == 1:
+        return f"Tomorrow{time_str}"
+    elif -7 < day_diff < 0:
+        return f"Last {dt.strftime('%A')}{time_str}"
+    elif 0 < day_diff < 7:
+        return f"Next {dt.strftime('%A')}{time_str}"
+    else:
+        return dt.strftime(f"%B %d, %Y{time_str}")
+
+
+
