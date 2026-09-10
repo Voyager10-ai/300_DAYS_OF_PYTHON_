@@ -336,5 +336,70 @@ class MillisecondTokenBucket:
         return self._capacity
 
 
+# ─── 6. Millisecond Debouncer & Throttler Engines ────────────────────────────
+
+
+class MillisecondThrottle:
+    """
+    Ensures an action executes at most once every N milliseconds.
+    """
+
+    def __init__(self, interval_ms: float) -> None:
+        if interval_ms <= 0:
+            raise ValueError(f"Interval must be > 0 ms, got {interval_ms}")
+        self.interval_ms = interval_ms
+        self._last_execution_ms: Optional[float] = None
+
+    def trigger(self) -> bool:
+        """
+        Attempts to execute the throttled action.
+
+        Returns:
+            True if execution allowed, False if throttled out.
+        """
+        now_ms = time.perf_counter() * 1000.0
+        if self._last_execution_ms is None or (now_ms - self._last_execution_ms) >= self.interval_ms:
+            self._last_execution_ms = now_ms
+            return True
+        return False
+
+    def reset(self) -> None:
+        """Resets the throttle state."""
+        self._last_execution_ms = None
+
+
+class MillisecondDebouncer:
+    """
+    Evaluates whether N milliseconds of quiet time have elapsed since the last activity event.
+    """
+
+    def __init__(self, quiet_period_ms: float) -> None:
+        if quiet_period_ms <= 0:
+            raise ValueError(f"Quiet period must be > 0 ms, got {quiet_period_ms}")
+        self.quiet_period_ms = quiet_period_ms
+        self._last_activity_ms: Optional[float] = None
+
+    def record_activity(self) -> None:
+        """Records an activity occurrence."""
+        self._last_activity_ms = time.perf_counter() * 1000.0
+
+    def is_quiet(self) -> bool:
+        """
+        Checks if required quiet period in milliseconds has passed since last activity.
+
+        Returns:
+            True if quiet period passed (or no activity recorded), False otherwise.
+        """
+        if self._last_activity_ms is None:
+            return True
+        now_ms = time.perf_counter() * 1000.0
+        return (now_ms - self._last_activity_ms) >= self.quiet_period_ms
+
+    def reset(self) -> None:
+        """Resets debouncer activity history."""
+        self._last_activity_ms = None
+
+
+
 
 
