@@ -536,6 +536,61 @@ class TestMillisecondOperations(unittest.TestCase):
             convert_time_units(10, "invalid_unit", "ms")
 
 
+# ─── 9. Interactive CLI Runner ───────────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates all millisecond timing, formatting, rate limiting, and conversion capabilities."""
+    print("=" * 70)
+    print(" DAY 62: MILLISECOND TIME & PRECISION BENCHMARK TOOLKIT")
+    print("=" * 70)
+
+    now_dt = datetime.now(timezone.utc)
+    current_ms = get_current_milliseconds()
+    print(f"\n1. Core Millisecond Time Fetchers:")
+    print(f"   • Current Epoch Milliseconds: {current_ms}")
+    print(f"   • Extracted MS (0-999):       {extract_milliseconds(now_dt)} ms")
+    print(f"   • Formatted Datetime + MS:    {format_datetime_with_ms(now_dt)}")
+
+    print("\n2. Duration Breakdown & Formatting:")
+    sample_ms = 184545120  # 2 days, 3 hours, 15 minutes, 45 seconds, 120 ms
+    print(f"   • Breakdown for {sample_ms} ms: {breakdown_milliseconds(sample_ms)}")
+    print(f"   • Full Words: {format_milliseconds_duration(sample_ms, compact=False)}")
+    print(f"   • Compact:    {format_milliseconds_duration(sample_ms, compact=True)}")
+
+    print("\n3. Timestamp Parsing:")
+    parsed_dt = parse_millisecond_timestamp(current_ms)
+    print(f"   • Parsed Datetime from {current_ms}: {parsed_dt}")
+
+    print("\n4. Precise Sleep & Benchmark Timer:")
+    slept_ms = precise_sleep_ms(25)
+    print(f"   • Requested: 25.0 ms | Actual Slept: {slept_ms:.4f} ms")
+
+    with MillisecondTimer() as timer:
+        time.sleep(0.015)
+    print(f"   • Benchmark Timer Elapsed: {timer.elapsed_milliseconds:.4f} ms ({timer.elapsed_seconds:.6f} s)")
+
+    print("\n5. Millisecond Rate Limiter (Token Bucket):")
+    bucket = MillisecondTokenBucket(capacity=3, refill_rate_per_sec=20)
+    print(f"   • Consuming 1 token: {bucket.consume(1)}")
+    print(f"   • Consuming 2 tokens: {bucket.consume(2)}")
+    print(f"   • Consuming 1 token (bucket empty): {bucket.consume(1)}")
+
+    print("\n6. Universal Time Unit Conversions:")
+    print(f"   • 1,500,000 ns -> ms:  {convert_time_units(1_500_000, 'ns', 'ms'):.4f} ms")
+    print(f"   • 2500 ms -> sec:      {convert_time_units(2500, 'ms', 's'):.4f} sec")
+    print(f"   • 2.5 hours -> ms:     {convert_time_units(2.5, 'hr', 'ms'):,.0f} ms")
+
+    print("\n" + "=" * 70)
+
+
+if __name__ == "__main__":
+    unittest.main(exit=False)
+    print()
+    main()
+
+
+
 
 
 

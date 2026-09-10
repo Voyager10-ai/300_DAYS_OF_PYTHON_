@@ -1064,7 +1064,23 @@
 //     }
 // }
 
+// class MillisecondPractice {
+//     public static long getEpochMillis() {
+//         return System.currentTimeMillis();
+//     }
+//     public static long getDurationMillis(long startMillis) {
+//         return System.currentTimeMillis() - startMillis;
+//     }
+//     public static void main(String[] args) {
+//         long start = getEpochMillis();
+//         try { Thread.sleep(15); } catch (InterruptedException e) {}
+//         long elapsed = getDurationMillis(start);
+//         System.out.println("Elapsed Milliseconds: " + elapsed + " ms");
+//     }
+// }
+
 import java.util.*;
+
 
 
 
