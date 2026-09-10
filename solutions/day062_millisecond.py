@@ -400,6 +400,63 @@ class MillisecondDebouncer:
         self._last_activity_ms = None
 
 
+# ─── 7. Sub-Millisecond & Universal Time Unit Converters ─────────────────────
+
+
+TIME_UNIT_TO_SECONDS = {
+    "ns": 1e-9,
+    "nanoseconds": 1e-9,
+    "us": 1e-6,
+    "microseconds": 1e-6,
+    "ms": 1e-3,
+    "milliseconds": 1e-3,
+    "s": 1.0,
+    "sec": 1.0,
+    "seconds": 1.0,
+    "min": 60.0,
+    "minutes": 60.0,
+    "h": 3600.0,
+    "hr": 3600.0,
+    "hours": 3600.0,
+    "d": 86400.0,
+    "days": 86400.0,
+}
+
+
+def convert_time_units(value: float, from_unit: str, to_unit: str) -> float:
+    """
+    Converts a time quantity between arbitrary time units (nanoseconds to days).
+
+    Args:
+        value: Numerical value to convert.
+        from_unit: Source time unit ('ns', 'us', 'ms', 'sec', 'min', 'hr', 'day').
+        to_unit: Target time unit.
+
+    Returns:
+        Converted float value.
+
+    Raises:
+        ValueError: If an unsupported unit is specified.
+        TypeError: If value is non-numeric.
+    """
+    if not isinstance(value, (int, float)) or isinstance(value, bool):
+        raise TypeError(f"Expected numeric value, got {type(value).__name__}")
+
+    src_unit = from_unit.strip().lower()
+    tgt_unit = to_unit.strip().lower()
+
+    if src_unit not in TIME_UNIT_TO_SECONDS:
+        raise ValueError(f"Unsupported source unit '{from_unit}'. Choose from {list(TIME_UNIT_TO_SECONDS.keys())}.")
+    if tgt_unit not in TIME_UNIT_TO_SECONDS:
+        raise ValueError(f"Unsupported target unit '{to_unit}'. Choose from {list(TIME_UNIT_TO_SECONDS.keys())}.")
+
+    # Convert source unit to base seconds, then to target unit
+    seconds = float(value) * TIME_UNIT_TO_SECONDS[src_unit]
+    result = seconds / TIME_UNIT_TO_SECONDS[tgt_unit]
+    return result
+
+
+
 
 
 
