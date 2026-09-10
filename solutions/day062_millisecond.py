@@ -133,3 +133,49 @@ def format_milliseconds_duration(total_ms: int, compact: bool = False) -> str:
             parts.append(f"{bd['milliseconds']} ms")
         return ", ".join(parts)
 
+
+# ─── 3. Millisecond Timestamp Parsing & Formatting ───────────────────────────
+
+
+def parse_millisecond_timestamp(
+    ms_timestamp: Union[int, float], tz: timezone = timezone.utc
+) -> datetime:
+    """
+    Converts epoch milliseconds into a timezone-aware datetime object.
+
+    Args:
+        ms_timestamp: Epoch timestamp in milliseconds.
+        tz: Target timezone (defaults to UTC).
+
+    Returns:
+        Timezone-aware datetime object.
+
+    Raises:
+        TypeError: If ms_timestamp is not numeric.
+    """
+    if not isinstance(ms_timestamp, (int, float)) or isinstance(ms_timestamp, bool):
+        raise TypeError(f"Expected numeric timestamp, got {type(ms_timestamp).__name__}")
+
+    seconds = float(ms_timestamp) / 1000.0
+    return datetime.fromtimestamp(seconds, tz=tz)
+
+
+def format_datetime_with_ms(
+    dt: Optional[datetime] = None, base_fmt: str = "%Y-%m-%d %H:%M:%S"
+) -> str:
+    """
+    Formats a datetime object with 3-digit millisecond resolution appended (e.g. '2026-09-10 14:30:00.123').
+
+    Args:
+        dt: Optional datetime object (defaults to current time).
+        base_fmt: Base strftime format string.
+
+    Returns:
+        Formatted datetime string with '.fff' milliseconds.
+    """
+    target_dt = dt if dt is not None else datetime.now()
+    ms = target_dt.microsecond // 1000
+    base_str = target_dt.strftime(base_fmt)
+    return f"{base_str}.{ms:03d}"
+
+
