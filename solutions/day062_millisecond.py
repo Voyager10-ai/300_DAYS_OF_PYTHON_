@@ -456,6 +456,87 @@ def convert_time_units(value: float, from_unit: str, to_unit: str) -> float:
     return result
 
 
+# ─── 8. Unit Test Suite ──────────────────────────────────────────────────────
+
+
+class TestMillisecondOperations(unittest.TestCase):
+    """Comprehensive unit test suite for millisecond-level utilities."""
+
+    def test_fetchers_and_extraction(self) -> None:
+        ms = get_current_milliseconds()
+        self.assertTrue(ms > 1_700_000_000_000)
+
+        dt = datetime(2026, 9, 10, 14, 30, 45, 123456, tzinfo=timezone.utc)
+        self.assertEqual(extract_milliseconds(dt), 123)
+        self.assertEqual(get_epoch_milliseconds(dt), int(dt.timestamp() * 1000))
+
+    def test_duration_breakdown_and_formatter(self) -> None:
+        # 2 days, 3 hours, 15 minutes, 45 seconds, 120 ms
+        total_ms = (2 * 86400 + 3 * 3600 + 15 * 60 + 45) * 1000 + 120
+        bd = breakdown_milliseconds(total_ms)
+        self.assertEqual((bd["days"], bd["hours"], bd["minutes"], bd["seconds"], bd["milliseconds"]), (2, 3, 15, 45, 120))
+
+        formatted_full = format_milliseconds_duration(total_ms, compact=False)
+        self.assertIn("2 days, 3 hours, 15 minutes, 45 seconds, 120 ms", formatted_full)
+
+        formatted_compact = format_milliseconds_duration(total_ms, compact=True)
+        self.assertEqual(formatted_compact, "2d 3h 15m 45s 120ms")
+
+    def test_timestamp_parsing_and_formatting(self) -> None:
+        ts_ms = 1788964245123
+        dt = parse_millisecond_timestamp(ts_ms)
+        self.assertEqual(dt.year, 2026)
+
+        formatted = format_datetime_with_ms(dt)
+        self.assertTrue(formatted.endswith(".123"))
+
+    def test_precise_sleep_and_timer(self) -> None:
+        elapsed_sleep = precise_sleep_ms(15)
+        self.assertGreaterEqual(elapsed_sleep, 14.0)
+
+        with MillisecondTimer() as timer:
+            time.sleep(0.01)
+
+        self.assertGreaterEqual(timer.elapsed_milliseconds, 5.0)
+
+    def test_rate_limiter_token_bucket(self) -> None:
+        bucket = MillisecondTokenBucket(capacity=5, refill_rate_per_sec=10)
+        self.assertTrue(bucket.consume(3))
+        self.assertTrue(bucket.consume(2))
+        self.assertFalse(bucket.consume(1))  # Empty
+
+        time.sleep(0.15)  # Refills ~1.5 tokens
+        self.assertTrue(bucket.consume(1))
+
+    def test_debouncer_and_throttler(self) -> None:
+        throttle = MillisecondThrottle(interval_ms=50)
+        self.assertTrue(throttle.trigger())
+        self.assertFalse(throttle.trigger())  # Throttled
+
+        debouncer = MillisecondDebouncer(quiet_period_ms=50)
+        debouncer.record_activity()
+        self.assertFalse(debouncer.is_quiet())
+        time.sleep(0.06)
+        self.assertTrue(debouncer.is_quiet())
+
+    def test_convert_time_units(self) -> None:
+        self.assertEqual(convert_time_units(1000, "ms", "s"), 1.0)
+        self.assertEqual(convert_time_units(1, "sec", "ms"), 1000.0)
+        self.assertEqual(convert_time_units(1000000, "us", "s"), 1.0)
+        self.assertEqual(convert_time_units(1, "hr", "min"), 60.0)
+
+    def test_exceptions_and_edge_cases(self) -> None:
+        with self.assertRaises(ValueError):
+            breakdown_milliseconds(-100)
+        with self.assertRaises(TypeError):
+            parse_millisecond_timestamp("invalid")  # type: ignore
+        with self.assertRaises(ValueError):
+            MillisecondTokenBucket(capacity=-5, refill_rate_per_sec=10)
+        with self.assertRaises(ValueError):
+            convert_time_units(10, "invalid_unit", "ms")
+
+
+
 
 
 
