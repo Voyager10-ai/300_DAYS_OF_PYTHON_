@@ -179,3 +179,91 @@ def format_datetime_with_ms(
     return f"{base_str}.{ms:03d}"
 
 
+
+# ─── 4. High-Precision Delay & Millisecond Timer ──────────────────────────────
+
+
+def precise_sleep_ms(ms: float) -> float:
+    """
+    Suspends execution for a specified duration in milliseconds using hybrid sleep + spin wait
+    to achieve high timing precision.
+
+    Args:
+        ms: Target sleep duration in milliseconds.
+
+    Returns:
+        Actual elapsed duration in milliseconds.
+
+    Raises:
+        ValueError: If ms is negative.
+    """
+    if ms < 0:
+        raise ValueError(f"Sleep duration cannot be negative, got {ms}")
+
+    target_sec = ms / 1000.0
+    start_time = time.perf_counter()
+    end_time = start_time + target_sec
+
+    # Sleep coarse duration if > 3ms to avoid CPU spinning
+    remaining = end_time - time.perf_counter()
+    if remaining > 0.003:
+        time.sleep(remaining - 0.002)
+
+    # Spin-wait remainder for high precision
+    while time.perf_counter() < end_time:
+        pass
+
+    actual_elapsed_ms = (time.perf_counter() - start_time) * 1000.0
+    return round(actual_elapsed_ms, 4)
+
+
+class MillisecondTimer:
+    """
+    Precision timer class for benchmarking operations in milliseconds.
+    """
+
+    def __init__(self) -> None:
+        self._start_perf: Optional[float] = None
+        self._elapsed_ms: Optional[float] = None
+
+    def start(self) -> "MillisecondTimer":
+        """Starts timing."""
+        self._start_perf = time.perf_counter()
+        self._elapsed_ms = None
+        return self
+
+    def stop(self) -> float:
+        """
+        Stops timing and returns elapsed milliseconds.
+
+        Returns:
+            Elapsed time in milliseconds.
+        """
+        if self._start_perf is None:
+            raise RuntimeError("Timer was not started.")
+        self._elapsed_ms = (time.perf_counter() - self._start_perf) * 1000.0
+        return self._elapsed_ms
+
+    @property
+    def elapsed_milliseconds(self) -> float:
+        """Returns elapsed milliseconds."""
+        if self._elapsed_ms is not None:
+            return self._elapsed_ms
+        if self._start_perf is not None:
+            return (time.perf_counter() - self._start_perf) * 1000.0
+        raise RuntimeError("Timer was not started.")
+
+    @property
+    def elapsed_seconds(self) -> float:
+        """Returns elapsed seconds."""
+        return self.elapsed_milliseconds / 1000.0
+
+    def __enter__(self) -> "MillisecondTimer":
+        self.start()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        self.stop()
+
+
+
