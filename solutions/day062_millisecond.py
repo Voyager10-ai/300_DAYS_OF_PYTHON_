@@ -266,4 +266,75 @@ class MillisecondTimer:
         self.stop()
 
 
+# ─── 5. Millisecond Rate Limiter Engine ──────────────────────────────────────
+
+
+class MillisecondTokenBucket:
+    """
+    Token bucket rate limiter algorithm operating with millisecond-level precision.
+    Refills tokens smoothly based on elapsed milliseconds.
+    """
+
+    def __init__(self, capacity: float, refill_rate_per_sec: float) -> None:
+        """
+        Initializes the token bucket.
+
+        Args:
+            capacity: Maximum bucket capacity in tokens.
+            refill_rate_per_sec: Tokens added per second.
+
+        Raises:
+            ValueError: If capacity or refill rate is non-positive.
+        """
+        if capacity <= 0:
+            raise ValueError(f"Capacity must be > 0, got {capacity}")
+        if refill_rate_per_sec <= 0:
+            raise ValueError(f"Refill rate must be > 0, got {refill_rate_per_sec}")
+
+        self._capacity: float = float(capacity)
+        self._tokens: float = float(capacity)
+        self._refill_rate_per_ms: float = float(refill_rate_per_sec) / 1000.0
+        self._last_refill_ms: float = time.perf_counter() * 1000.0
+
+    def _refill(self) -> None:
+        """Refills tokens based on elapsed milliseconds since last check."""
+        now_ms = time.perf_counter() * 1000.0
+        elapsed_ms = now_ms - self._last_refill_ms
+        if elapsed_ms > 0:
+            added = elapsed_ms * self._refill_rate_per_ms
+            self._tokens = min(self._capacity, self._tokens + added)
+            self._last_refill_ms = now_ms
+
+    def consume(self, tokens: float = 1.0) -> bool:
+        """
+        Attempts to consume specified tokens.
+
+        Args:
+            tokens: Number of tokens to consume.
+
+        Returns:
+            True if tokens were available and consumed, False otherwise.
+        """
+        if tokens <= 0:
+            raise ValueError(f"Consumed tokens must be > 0, got {tokens}")
+
+        self._refill()
+        if self._tokens >= tokens:
+            self._tokens -= tokens
+            return True
+        return False
+
+    @property
+    def available_tokens(self) -> float:
+        """Returns current available token count."""
+        self._refill()
+        return self._tokens
+
+    @property
+    def capacity(self) -> float:
+        """Returns total bucket capacity."""
+        return self._capacity
+
+
+
 
