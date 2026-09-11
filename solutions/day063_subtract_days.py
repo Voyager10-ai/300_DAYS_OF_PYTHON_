@@ -171,3 +171,57 @@ def detailed_date_diff(
     }
 
 
+# ─── 4. Past Date Series & Window Generator ──────────────────────────────────
+
+
+def get_past_dates_list(
+    num_days: int,
+    start_from: Optional[Union[datetime, date]] = None,
+    reverse: bool = False,
+) -> List[Union[datetime, date]]:
+    """
+    Generates a list of N consecutive past dates starting from a reference date.
+
+    Args:
+        num_days: Number of past days to generate (must be >= 1).
+        start_from: Starting reference date (defaults to current date/datetime).
+        reverse: If True, orders list chronologically (oldest to newest).
+
+    Returns:
+        List of date or datetime objects.
+
+    Raises:
+        ValueError: If num_days < 1.
+    """
+    if num_days < 1:
+        raise ValueError(f"num_days must be at least 1, got {num_days}")
+
+    ref = start_from if start_from is not None else datetime.now()
+    dates_list = [subtract_days(ref, i) for i in range(num_days)]
+
+    if reverse:
+        dates_list.reverse()
+
+    return dates_list
+
+
+def get_past_date_range(
+    num_days: int,
+    start_from: Optional[Union[datetime, date]] = None,
+) -> Tuple[Union[datetime, date], Union[datetime, date]]:
+    """
+    Returns a tuple of (past_start_date, reference_end_date) representing a lookback window.
+
+    Args:
+        num_days: Size of lookback window in days.
+        start_from: End reference date (defaults to current date/datetime).
+
+    Returns:
+        Tuple of (past_start_date, reference_end_date).
+    """
+    ref = start_from if start_from is not None else datetime.now()
+    past_start = subtract_days(ref, num_days)
+    return past_start, ref
+
+
+
