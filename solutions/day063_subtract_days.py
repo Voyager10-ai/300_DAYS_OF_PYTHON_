@@ -491,3 +491,63 @@ class TestSubtractDaysOperations(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             calculate_age_and_days(target, birth)
+
+
+# ─── 9. Interactive CLI Demonstration ─────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates all Day 63 subtract days utilities."""
+    print("=" * 65)
+    print(" DAY 63: SUBTRACT DAYS & DATE OFFSETS DEMONSTRATION")
+    print("=" * 65)
+
+    today = date.today()
+    now = datetime.now()
+
+    print(f"\n1. Core Days Subtraction:")
+    print(f"   Today's Date           : {today}")
+    print(f"   10 Days Ago            : {subtract_days(today, 10)}")
+    print(f"   30 Days Ago (n_days_ago): {n_days_ago(30, from_date=today)}")
+
+    print(f"\n2. Business Days Subtraction:")
+    print(f"   5 Business Days Ago    : {subtract_business_days(today, 5)}")
+    holidays = {today - timedelta(days=2)}
+    print(f"   5 Business Days (w/ Hol): {subtract_business_days(today, 5, holidays=holidays)}")
+
+    print(f"\n3. Interval & Difference Calculation:")
+    start_date = date(2026, 1, 1)
+    print(f"   Days between 2026-01-01 and today ({today}): {days_between(start_date, today)} days")
+    detailed = detailed_date_diff(start_date, today)
+    print(f"   Detailed Difference    : {detailed['days']}d {detailed['hours']}h {detailed['minutes']}m {detailed['seconds']}s")
+
+    print(f"\n4. Past Date Series Generator:")
+    past_5 = get_past_dates_list(5, start_from=today, reverse=True)
+    print(f"   Past 5 Days (Chronological): {[str(d) for d in past_5]}")
+    p_start, p_end = get_past_date_range(7, start_from=today)
+    print(f"   7-Day Lookback Window     : {p_start} -> {p_end}")
+
+    print(f"\n5. Relative Past String Parser:")
+    expressions = ["yesterday", "3 days ago", "2 weeks ago", "5 hours ago"]
+    for expr in expressions:
+        parsed = parse_past_relative_string(expr, reference_dt=now)
+        print(f"   '{expr:<15}' -> {parsed.strftime('%Y-%m-%d %H:%M:%S')}")
+
+    print(f"\n6. Month & Year Subtraction Engine:")
+    d_march = date(2026, 3, 31)
+    print(f"   {d_march} - 1 Month  : {subtract_months(d_march, 1)}")
+    print(f"   {today} - 5 Years    : {subtract_years(today, 5)}")
+
+    print(f"\n7. Age & Calendar Calculator:")
+    birth = date(1998, 4, 20)
+    age_info = calculate_age_and_days(birth, today)
+    print(f"   Birth Date: {birth} -> Age: {age_info['years']}y {age_info['months']}m {age_info['days']}d (Total: {age_info['total_days']} days)")
+
+    print("\n" + "=" * 65)
+    print(" Running Unit Test Suite...")
+    print("=" * 65)
+    unittest.main(argv=["first-arg-is-ignored"], exit=False)
+
+
+if __name__ == "__main__":
+    main()

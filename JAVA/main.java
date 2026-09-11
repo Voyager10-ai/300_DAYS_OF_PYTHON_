@@ -1079,7 +1079,35 @@
 //     }
 // }
 
+// Java Subtract Days Practice (Day 63)
+// class SubtractDaysPractice {
+//     public static java.time.LocalDate subtractDays(java.time.LocalDate date, long days) {
+//         return date.minusDays(days);
+//     }
+//     public static java.time.LocalDateTime subtractDaysDateTime(java.time.LocalDateTime dt, long days) {
+//         return dt.minusDays(days);
+//     }
+//     public static java.time.LocalDate subtractBusinessDays(java.time.LocalDate start, int businessDays) {
+//         java.time.LocalDate current = start;
+//         int remaining = businessDays;
+//         while (remaining > 0) {
+//             current = current.minusDays(1);
+//             if (current.getDayOfWeek() != java.time.DayOfWeek.SATURDAY && current.getDayOfWeek() != java.time.DayOfWeek.SUNDAY) {
+//                 remaining--;
+//             }
+//         }
+//         return current;
+//     }
+//     public static void main(String[] args) {
+//         java.time.LocalDate today = java.time.LocalDate.now();
+//         System.out.println("Today: " + today);
+//         System.out.println("10 Days Ago: " + subtractDays(today, 10));
+//         System.out.println("5 Business Days Ago: " + subtractBusinessDays(today, 5));
+//     }
+// }
+
 import java.util.*;
+
 
 
 
