@@ -102,3 +102,72 @@ def subtract_business_days(
     else:
         return curr_date
 
+
+# ─── 3. Date Difference & Elapsed Interval Calculator ─────────────────────────
+
+
+def days_between(
+    date1: Union[datetime, date],
+    date2: Union[datetime, date],
+    absolute: bool = True,
+) -> int:
+    """
+    Calculates the number of calendar days between two dates.
+
+    Args:
+        date1: First date or datetime.
+        date2: Second date or datetime.
+        absolute: If True, returns positive integer distance. Else signed difference (date2 - date1).
+
+    Returns:
+        Number of days as integer.
+    """
+    d1 = date1.date() if isinstance(date1, datetime) else date1
+    d2 = date2.date() if isinstance(date2, datetime) else date2
+
+    diff = (d2 - d1).days
+    return abs(diff) if absolute else diff
+
+
+def detailed_date_diff(
+    start: Union[datetime, date],
+    end: Union[datetime, date],
+) -> Dict[str, Any]:
+    """
+    Provides a detailed breakdown of the time elapsed between start and end.
+
+    Args:
+        start: Starting date or datetime.
+        end: Ending date or datetime.
+
+    Returns:
+        Dictionary containing total_days, hours, minutes, seconds, and is_past.
+    """
+    d1 = datetime.combine(start, dt_time.min) if not isinstance(start, datetime) else start
+    d2 = datetime.combine(end, dt_time.min) if not isinstance(end, datetime) else end
+
+    # Align timezone naive/aware if needed
+    if d1.tzinfo and not d2.tzinfo:
+        d2 = d2.replace(tzinfo=d1.tzinfo)
+    elif not d1.tzinfo and d2.tzinfo:
+        d1 = d1.replace(tzinfo=d2.tzinfo)
+
+    delta = d2 - d1
+    total_seconds = delta.total_seconds()
+    is_past = total_seconds < 0
+
+    abs_sec = abs(int(total_seconds))
+    days, remainder = divmod(abs_sec, 86400)
+    hours, remainder = divmod(remainder, 3600)
+    minutes, seconds = divmod(remainder, 60)
+
+    return {
+        "days": days,
+        "hours": hours,
+        "minutes": minutes,
+        "seconds": seconds,
+        "total_days": abs((d2.date() - d1.date()).days),
+        "is_past": is_past,
+    }
+
+
