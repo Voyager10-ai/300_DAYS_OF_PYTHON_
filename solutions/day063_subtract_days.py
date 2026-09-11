@@ -55,3 +55,50 @@ def n_days_ago(days: int, from_date: Optional[Union[datetime, date]] = None) -> 
     """
     ref = from_date if from_date is not None else datetime.now()
     return subtract_days(ref, days)
+
+
+# ─── 2. Business / Working Days Subtraction Engine ───────────────────────────
+
+
+def subtract_business_days(
+    start: Union[datetime, date],
+    business_days: int,
+    holidays: Optional[Set[date]] = None,
+) -> Union[datetime, date]:
+    """
+    Subtracts N business (working) days from a starting date/datetime, skipping weekends and holidays.
+
+    Args:
+        start: Starting date or datetime object.
+        business_days: Number of business days to subtract (must be >= 0).
+        holidays: Optional set of holiday date objects to skip.
+
+    Returns:
+        Date or datetime object offset by -N business days.
+
+    Raises:
+        ValueError: If business_days is negative.
+        TypeError: If start is invalid type.
+    """
+    if not isinstance(start, (datetime, date)):
+        raise TypeError(f"Expected date or datetime instance, got {type(start).__name__}")
+    if business_days < 0:
+        raise ValueError(f"Business days to subtract cannot be negative, got {business_days}")
+
+    is_dt = isinstance(start, datetime)
+    curr_date = start.date() if is_dt else start
+    remaining = business_days
+
+    one_day = timedelta(days=1)
+    
+    while remaining > 0:
+        curr_date -= one_day
+        # Monday = 0, Sunday = 6
+        if curr_date.weekday() < 5 and (holidays is None or curr_date not in holidays):
+            remaining -= 1
+
+    if is_dt:
+        return datetime.combine(curr_date, start.time(), tzinfo=start.tzinfo)
+    else:
+        return curr_date
+
