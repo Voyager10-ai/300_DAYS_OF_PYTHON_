@@ -404,3 +404,90 @@ def calculate_age_and_days(
         "days": days,
         "total_days": total_days,
     }
+
+
+# ─── 8. Unit Test Suite ───────────────────────────────────────────────────────
+
+
+class TestSubtractDaysOperations(unittest.TestCase):
+    """Comprehensive test suite for date subtraction utilities."""
+
+    def test_subtract_days_date_and_datetime(self):
+        d = date(2026, 9, 11)
+        dt = datetime(2026, 9, 11, 14, 30)
+
+        self.assertEqual(subtract_days(d, 5), date(2026, 9, 6))
+        self.assertEqual(subtract_days(dt, 10), datetime(2026, 9, 1, 14, 30))
+
+        with self.assertRaises(ValueError):
+            subtract_days(d, -1)
+
+        with self.assertRaises(TypeError):
+            subtract_days("2026-09-11", 5)
+
+    def test_n_days_ago(self):
+        ref = date(2026, 9, 11)
+        self.assertEqual(n_days_ago(7, from_date=ref), date(2026, 9, 4))
+
+    def test_subtract_business_days(self):
+        friday = date(2026, 9, 11)
+        self.assertEqual(subtract_business_days(friday, 1), date(2026, 9, 10))
+
+        monday = date(2026, 9, 14)
+        self.assertEqual(subtract_business_days(monday, 1), date(2026, 9, 11))
+
+        holidays = {date(2026, 9, 10)}
+        self.assertEqual(subtract_business_days(friday, 1, holidays=holidays), date(2026, 9, 9))
+
+    def test_days_between_and_detailed_diff(self):
+        d1 = date(2026, 9, 1)
+        d2 = date(2026, 9, 11)
+
+        self.assertEqual(days_between(d1, d2), 10)
+        self.assertEqual(days_between(d2, d1, absolute=False), -10)
+
+        dt1 = datetime(2026, 9, 10, 10, 0)
+        dt2 = datetime(2026, 9, 11, 12, 30)
+        diff = detailed_date_diff(dt1, dt2)
+
+        self.assertEqual(diff["days"], 1)
+        self.assertEqual(diff["hours"], 2)
+        self.assertEqual(diff["minutes"], 30)
+
+    def test_past_dates_generators(self):
+        ref = date(2026, 9, 11)
+        past_list = get_past_dates_list(3, start_from=ref, reverse=True)
+        self.assertEqual(past_list, [date(2026, 9, 9), date(2026, 9, 10), date(2026, 9, 11)])
+
+        p_start, p_end = get_past_date_range(5, start_from=ref)
+        self.assertEqual(p_start, date(2026, 9, 6))
+        self.assertEqual(p_end, date(2026, 9, 11))
+
+    def test_parse_past_relative_string(self):
+        ref = datetime(2026, 9, 11, 12, 0)
+        self.assertEqual(parse_past_relative_string("yesterday", reference_dt=ref), datetime(2026, 9, 10, 12, 0))
+        self.assertEqual(parse_past_relative_string("3 days ago", reference_dt=ref), datetime(2026, 9, 8, 12, 0))
+        self.assertEqual(parse_past_relative_string("2 weeks ago", reference_dt=ref), datetime(2026, 8, 28, 12, 0))
+        self.assertEqual(parse_past_relative_string("4 hours ago", reference_dt=ref), datetime(2026, 9, 11, 8, 0))
+
+        with self.assertRaises(ValueError):
+            parse_past_relative_string("invalid string", reference_dt=ref)
+
+    def test_subtract_months_and_years(self):
+        d_march = date(2025, 3, 31)
+        self.assertEqual(subtract_months(d_march, 1), date(2025, 2, 28))
+
+        leap = date(2024, 2, 29)
+        self.assertEqual(subtract_years(leap, 1), date(2023, 2, 28))
+
+    def test_calculate_age_and_days(self):
+        birth = date(2000, 5, 15)
+        target = date(2026, 9, 11)
+        res = calculate_age_and_days(birth, target)
+
+        self.assertEqual(res["years"], 26)
+        self.assertEqual(res["months"], 3)
+        self.assertEqual(res["days"], 27)
+
+        with self.assertRaises(ValueError):
+            calculate_age_and_days(target, birth)
