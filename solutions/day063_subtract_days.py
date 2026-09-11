@@ -275,5 +275,80 @@ def parse_past_relative_string(
         raise ValueError(f"Unsupported unit in string '{text}'.")
 
 
+# ─── 6. Month & Year Subtraction Engine ──────────────────────────────────────
+
+
+def subtract_months(
+    dt: Union[datetime, date], months: int
+) -> Union[datetime, date]:
+    """
+    Subtracts N months from a date or datetime object with month-end clipping.
+    (e.g., March 31 - 1 month = February 28/29).
+
+    Args:
+        dt: Input date or datetime object.
+        months: Number of months to subtract (must be >= 0).
+
+    Returns:
+        Date or datetime object offset by -N months.
+
+    Raises:
+        ValueError: If months is negative.
+        TypeError: If dt is invalid type.
+    """
+    import calendar
+
+    if not isinstance(dt, (datetime, date)):
+        raise TypeError(f"Expected date or datetime instance, got {type(dt).__name__}")
+    if months < 0:
+        raise ValueError(f"Months to subtract cannot be negative, got {months}")
+
+    total_months = dt.year * 12 + (dt.month - 1) - months
+    target_year, target_month_idx = divmod(total_months, 12)
+    target_month = target_month_idx + 1
+
+    _, max_days_in_month = calendar.monthrange(target_year, target_month)
+    target_day = min(dt.day, max_days_in_month)
+
+    if isinstance(dt, datetime):
+        return dt.replace(year=target_year, month=target_month, day=target_day)
+    else:
+        return date(target_year, target_month, target_day)
+
+
+def subtract_years(
+    dt: Union[datetime, date], years: int
+) -> Union[datetime, date]:
+    """
+    Subtracts N years from a date or datetime object, handling Feb 29 leap day clipping.
+
+    Args:
+        dt: Input date or datetime object.
+        years: Number of years to subtract (must be >= 0).
+
+    Returns:
+        Date or datetime object offset by -N years.
+
+    Raises:
+        ValueError: If years is negative.
+    """
+    import calendar
+
+    if not isinstance(dt, (datetime, date)):
+        raise TypeError(f"Expected date or datetime instance, got {type(dt).__name__}")
+    if years < 0:
+        raise ValueError(f"Years to subtract cannot be negative, got {years}")
+
+    target_year = dt.year - years
+    _, max_days_in_month = calendar.monthrange(target_year, dt.month)
+    target_day = min(dt.day, max_days_in_month)
+
+    if isinstance(dt, datetime):
+        return dt.replace(year=target_year, day=target_day)
+    else:
+        return date(target_year, dt.month, target_day)
+
+
+
 
 
