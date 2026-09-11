@@ -349,6 +349,58 @@ def subtract_years(
         return date(target_year, dt.month, target_day)
 
 
+# ─── 7. Calendar Window & Age Calculator ─────────────────────────────────────
 
 
+def calculate_age_and_days(
+    start_date: Union[datetime, date],
+    target_date: Optional[Union[datetime, date]] = None,
+) -> Dict[str, int]:
+    """
+    Calculates exact age/elapsed calendar duration in years, months, days, and total days.
 
+    Args:
+        start_date: Birth date or past reference date.
+        target_date: End reference date (defaults to current date).
+
+    Returns:
+        Dictionary containing 'years', 'months', 'days', and 'total_days'.
+
+    Raises:
+        ValueError: If start_date is in the future relative to target_date.
+    """
+    import calendar
+
+    d1 = start_date.date() if isinstance(start_date, datetime) else start_date
+    d2 = (
+        target_date.date()
+        if isinstance(target_date, datetime)
+        else (target_date if target_date is not None else date.today())
+    )
+
+    if d1 > d2:
+        raise ValueError(f"start_date ({d1}) cannot be after target_date ({d2})")
+
+    years = d2.year - d1.year
+    months = d2.month - d1.month
+    days = d2.day - d1.day
+
+    if days < 0:
+        months -= 1
+        prev_month = d2.month - 1 if d2.month > 1 else 12
+        prev_year = d2.year if d2.month > 1 else d2.year - 1
+        _, days_in_prev_month = calendar.monthrange(prev_year, prev_month)
+        days += days_in_prev_month
+
+    if months < 0:
+        years -= 1
+        months += 12
+
+    total_days = (d2 - d1).days
+
+    return {
+        "years": years,
+        "months": months,
+        "days": days,
+        "total_days": total_days,
+    }
