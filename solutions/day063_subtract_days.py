@@ -224,4 +224,56 @@ def get_past_date_range(
     return past_start, ref
 
 
+# ─── 5. Relative Past Time String Parser ──────────────────────────────────────
+
+
+def parse_past_relative_string(
+    text: str, reference_dt: Optional[datetime] = None
+) -> datetime:
+    """
+    Parses human-readable relative past expressions like '5 days ago', '2 weeks ago',
+    '3 hours ago', 'yesterday' into a datetime object.
+
+    Args:
+        text: Input relative expression (case-insensitive).
+        reference_dt: Reference datetime (defaults to current time).
+
+    Returns:
+        Calculated datetime object.
+
+    Raises:
+        ValueError: If expression string cannot be parsed.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected string text, got {type(text).__name__}")
+
+    clean = text.strip().lower()
+    ref = reference_dt if reference_dt is not None else datetime.now()
+
+    if clean == "today":
+        return ref
+    elif clean == "yesterday":
+        return ref - timedelta(days=1)
+
+    # Match patterns like "5 days ago", "1 day ago", "3 weeks ago", "12 hours ago", "45 minutes ago"
+    match = re.match(r"^(\d+)\s+(day|days|week|weeks|hour|hours|minute|minutes)\s+ago$", clean)
+    if not match:
+        raise ValueError(f"Unable to parse relative past string '{text}'.")
+
+    amount = int(match.group(1))
+    unit = match.group(2)
+
+    if "day" in unit:
+        return ref - timedelta(days=amount)
+    elif "week" in unit:
+        return ref - timedelta(weeks=amount)
+    elif "hour" in unit:
+        return ref - timedelta(hours=amount)
+    elif "minute" in unit:
+        return ref - timedelta(minutes=amount)
+    else:
+        raise ValueError(f"Unsupported unit in string '{text}'.")
+
+
+
 
