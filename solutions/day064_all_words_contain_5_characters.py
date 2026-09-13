@@ -87,3 +87,51 @@ def all_words_have_length(
             return False
 
     return True
+
+
+# ─── 2. Word Filtering by Length Utility ─────────────────────────────────────
+
+
+def filter_words_by_length(
+    text_or_list: Union[str, List[str]],
+    target_length: int = 5,
+    clean_punctuation: bool = True,
+) -> List[str]:
+    """
+    Filters and returns all words from text or list that have exact target_length characters.
+
+    Args:
+        text_or_list: Input string sentence or list of word strings.
+        target_length: Required character length (default: 5).
+        clean_punctuation: If True, strips surrounding punctuation.
+
+    Returns:
+        List of matching words of length target_length.
+
+    Raises:
+        TypeError: If input types are invalid.
+        ValueError: If target_length < 1.
+    """
+    if not isinstance(target_length, int) or isinstance(target_length, bool):
+        raise TypeError(f"target_length must be an integer, got {type(target_length).__name__}")
+    if target_length < 1:
+        raise ValueError(f"target_length must be positive, got {target_length}")
+
+    if isinstance(text_or_list, str):
+        words = tokenize_words(text_or_list, remove_punct=clean_punctuation)
+    elif isinstance(text_or_list, list):
+        words = text_or_list
+    else:
+        raise TypeError(f"Expected str or list of str, got {type(text_or_list).__name__}")
+
+    matching = []
+    for word in words:
+        if not isinstance(word, str):
+            raise TypeError(f"All list elements must be strings, got {type(word).__name__}")
+        w = word.strip()
+        if clean_punctuation and isinstance(text_or_list, list):
+            w = re.sub(r"^\W+|\W+$", "", w)
+        if len(w) == target_length:
+            matching.append(w)
+
+    return matching
