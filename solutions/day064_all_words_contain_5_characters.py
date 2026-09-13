@@ -286,3 +286,52 @@ def check_words_length_constraint(
         "violating_words": violating_words,
         "compliance_rate": round(compliance_rate, 2),
     }
+
+
+# ─── 6. String Transformation & Masking Helpers ───────────────────────────────
+
+
+def mask_non_five_letter_words(text: str, mask_char: str = "*") -> str:
+    """
+    Replaces words in text that do not have 5 characters with mask_char repeated.
+
+    Args:
+        text: Input string paragraph.
+        mask_char: Single character to replace non-5-letter word characters (default '*').
+
+    Returns:
+        Transformed string.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected string, got {type(text).__name__}")
+
+    def replace_word(match: re.Match) -> str:
+        word = match.group(0)
+        if len(word) == 5:
+            return word
+        return mask_char * len(word)
+
+    return re.sub(r"\b\w+\b", replace_word, text)
+
+
+def highlight_five_letter_words(text: str, tag: str = "FIVE") -> str:
+    """
+    Wraps all 5-letter words in text with a tag like [FIVE:apple].
+
+    Args:
+        text: Input text.
+        tag: Tag label to prefix word with.
+
+    Returns:
+        Tagged string.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected string, got {type(text).__name__}")
+
+    def tag_word(match: re.Match) -> str:
+        word = match.group(0)
+        if len(word) == 5:
+            return f"[{tag}:{word}]"
+        return word
+
+    return re.sub(r"\b\w+\b", tag_word, text)
