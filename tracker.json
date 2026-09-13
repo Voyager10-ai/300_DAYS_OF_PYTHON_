@@ -1,6 +1,6 @@
 {
   "total_problems": 282,
-  "current_day": 63,
+  "current_day": 64,
   "problems": [
     {"day": 1, "title": "Print String", "status": "done"},
     {"day": 2, "title": "Input Age", "status": "done"},
@@ -74,7 +74,7 @@
     {"day": 62, "title": "Millisecond", "status": "done"},
 
     {"day": 63, "title": "Subtract Days", "status": "done"},
-    {"day": 64, "title": "All Words Contain 5 Characters", "status": "pending"},
+    {"day": 64, "title": "All Words Contain 5 Characters", "status": "done"},
     {"day": 65, "title": "Check String", "status": "pending"},
     {"day": 66, "title": "Find Substring", "status": "pending"},
     {"day": 67, "title": "Find URL", "status": "pending"},
