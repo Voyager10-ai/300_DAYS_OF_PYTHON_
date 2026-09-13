@@ -411,3 +411,64 @@ class TestFiveCharacterWords(unittest.TestCase):
 
         tagged = highlight_five_letter_words(text)
         self.assertIn("[FIVE:apple]", tagged)
+
+
+# ─── 8. Interactive CLI Demonstration ─────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates all Day 64 5-character word detection utilities."""
+    print("=" * 65)
+    print(" DAY 64: ALL WORDS CONTAIN 5 CHARACTERS DEMONSTRATION")
+    print("=" * 65)
+
+    sample1 = ["apple", "grape", "peach", "lemon", "berry"]
+    sample2 = "The quick brown fox jumps over the lazy dog"
+    sample3 = "train plane truck clock chair"
+
+    print("\n1. All Words Have 5 Characters Check:")
+    print(f"   Sample 1 (List): {sample1}")
+    print(f"   -> Result: {all_words_have_length(sample1, 5)}")
+
+    print(f"\n   Sample 2 (Sentence): '{sample2}'")
+    print(f"   -> Result: {all_words_have_length(sample2, 5)}")
+
+    print(f"\n   Sample 3 (Sentence): '{sample3}'")
+    print(f"   -> Result: {all_words_have_length(sample3, 5)}")
+
+    print("\n2. Filter 5-Letter Words:")
+    print(f"   Input text: '{sample2}'")
+    fives = filter_words_by_length(sample2, 5)
+    print(f"   -> 5-letter words found: {fives}")
+
+    print("\n3. Comprehensive Length Analysis:")
+    analysis = analyze_word_lengths("An apple a day keeps the doctor away from house", target_length=5)
+    print(f"   Total Words       : {analysis['total_words']}")
+    print(f"   5-Letter Count    : {analysis['target_length_count']}")
+    print(f"   5-Letter Words    : {analysis['target_length_words']}")
+    print(f"   All Match 5       : {analysis['all_match_target']}")
+    print(f"   Length Frequency  : {[(l, len(words)) for l, words in sorted(analysis['length_distribution'].items())]}")
+
+    print("\n4. 5-Letter Word Validation:")
+    all_val, val_w, inval_w = validate_five_letter_words(sample3)
+    print(f"   Sample 3 -> Valid: {all_val}, 5-Letter Words: {val_w}, Invalid: {inval_w}")
+
+    print("\n5. Custom Length Constraint Check (min=4, max=6):")
+    constraint = check_words_length_constraint(sample2, min_length=4, max_length=6)
+    print(f"   Is Valid (4-6 chars): {constraint['is_valid']}")
+    print(f"   Compliance Rate     : {constraint['compliance_rate']}%")
+
+    print("\n6. Masking & Tagging Transformations:")
+    text_demo = "an apple a day keeps the doctor away from house"
+    print(f"   Original Text: '{text_demo}'")
+    print(f"   Masked Text  : '{mask_non_five_letter_words(text_demo)}'")
+    print(f"   Tagged Text  : '{highlight_five_letter_words(text_demo)}'")
+
+    print("\n" + "=" * 65)
+    print(" Running Unit Test Suite...")
+    print("=" * 65)
+    unittest.main(argv=["first-arg-is-ignored"], exit=False)
+
+
+if __name__ == "__main__":
+    main()
