@@ -335,3 +335,79 @@ def highlight_five_letter_words(text: str, tag: str = "FIVE") -> str:
         return word
 
     return re.sub(r"\b\w+\b", tag_word, text)
+
+
+# ─── 7. Unit Test Suite ───────────────────────────────────────────────────────
+
+
+class TestFiveCharacterWords(unittest.TestCase):
+    """Test suite for 5-character word detection and analysis functions."""
+
+    def test_tokenize_words(self):
+        text = "Hello, world! Python is cool."
+        words = tokenize_words(text, remove_punct=True)
+        self.assertEqual(words, ["Hello", "world", "Python", "is", "cool"])
+
+        with self.assertRaises(TypeError):
+            tokenize_words(12345)
+
+    def test_all_words_have_length_true(self):
+        # All 5-letter words
+        words_list = ["apple", "grape", "peach", "lemon", "berry"]
+        self.assertTrue(all_words_have_length(words_list, target_length=5))
+
+        sentence = "apple grape peach lemon berry"
+        self.assertTrue(all_words_have_length(sentence, target_length=5))
+
+    def test_all_words_have_length_false(self):
+        sentence = "The quick brown fox jumps"
+        self.assertFalse(all_words_have_length(sentence, target_length=5))
+
+        with self.assertRaises(ValueError):
+            all_words_have_length("apple", target_length=0)
+
+    def test_filter_words_by_length(self):
+        text = "apple pie, fresh grape and lemon juice!"
+        fives = filter_words_by_length(text, target_length=5)
+        self.assertEqual(fives, ["apple", "fresh", "grape", "lemon", "juice"])
+
+    def test_analyze_word_lengths(self):
+        words = ["apple", "banana", "peach", "pear"]
+        analysis = analyze_word_lengths(words, target_length=5)
+
+        self.assertEqual(analysis["total_words"], 4)
+        self.assertEqual(analysis["target_length_count"], 2)
+        self.assertEqual(analysis["target_length_words"], ["apple", "peach"])
+        self.assertFalse(analysis["all_match_target"])
+        self.assertIn(6, analysis["length_distribution"])
+
+    def test_validate_five_letter_words(self):
+        valid_sentence = "train plane truck"
+        all_val, valid, invalid = validate_five_letter_words(valid_sentence)
+        self.assertTrue(all_val)
+        self.assertEqual(valid, ["train", "plane", "truck"])
+        self.assertEqual(invalid, [])
+
+        mixed = "car train bicycle truck"
+        all_val, valid, invalid = validate_five_letter_words(mixed)
+        self.assertFalse(all_val)
+        self.assertEqual(valid, ["train", "truck"])
+        self.assertEqual(invalid, ["car", "bicycle"])
+
+    def test_check_words_length_constraint(self):
+        words = ["apple", "peach", "grape"]
+        res = check_words_length_constraint(words, min_length=5, max_length=5)
+        self.assertTrue(res["is_valid"])
+        self.assertEqual(res["compliance_rate"], 100.0)
+
+        with self.assertRaises(ValueError):
+            check_words_length_constraint(words, min_length=6, max_length=5)
+
+    def test_mask_and_highlight(self):
+        text = "an apple a day keeps doctors away"
+        masked = mask_non_five_letter_words(text, mask_char="*")
+        self.assertIn("apple", masked)
+        self.assertIn("**", masked)
+
+        tagged = highlight_five_letter_words(text)
+        self.assertIn("[FIVE:apple]", tagged)
