@@ -1106,7 +1106,39 @@
 //     }
 // }
 
+// Java All Words Contain 5 Characters Practice (Day 64)
+// class FiveLetterWordsPractice {
+//     public static boolean allWordsContain5Chars(String[] words) {
+//         if (words == null || words.length == 0) return false;
+//         for (String w : words) {
+//             if (w == null || w.trim().replaceAll("^\\W+|\\W+$", "").length() != 5) {
+//                 return false;
+//             }
+//         }
+//         return true;
+//     }
+//     public static java.util.List<String> filter5LetterWords(String sentence) {
+//         java.util.List<String> result = new java.util.ArrayList<>();
+//         if (sentence == null) return result;
+//         String[] words = sentence.split("\\s+");
+//         for (String w : words) {
+//             String clean = w.replaceAll("^\\W+|\\W+$", "");
+//             if (clean.length() == 5) {
+//                 result.add(clean);
+//             }
+//         }
+//         return result;
+//     }
+//     public static void main(String[] args) {
+//         String[] sample1 = {"apple", "grape", "peach", "lemon"};
+//         System.out.println("All 5 chars: " + allWordsContain5Chars(sample1));
+//         String text = "The quick brown fox jumps over the lazy dog";
+//         System.out.println("Filtered 5-letter words: " + filter5LetterWords(text));
+//     }
+// }
+
 import java.util.*;
+
 
 
 
