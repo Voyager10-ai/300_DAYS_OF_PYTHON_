@@ -201,3 +201,26 @@ def analyze_word_lengths(
         "length_distribution": length_dist,
         "non_matching_words": non_matching,
     }
+
+
+# ─── 4. 5-Letter Word Validator with Mismatch Breakdown ───────────────────────
+
+
+def validate_five_letter_words(
+    text_or_list: Union[str, List[str]]
+) -> Tuple[bool, List[str], List[str]]:
+    """
+    Validates whether input contains exclusively 5-letter words.
+
+    Args:
+        text_or_list: String sentence or list of word strings.
+
+    Returns:
+        Tuple of (all_valid, valid_5_letter_words, invalid_words).
+    """
+    analysis = analyze_word_lengths(text_or_list, target_length=5)
+    valid_words = analysis["target_length_words"]
+    invalid_words = [w for w, _ in analysis["non_matching_words"]]
+    all_valid = analysis["all_match_target"]
+
+    return all_valid, valid_words, invalid_words
