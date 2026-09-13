@@ -135,3 +135,69 @@ def filter_words_by_length(
             matching.append(w)
 
     return matching
+
+
+# ─── 3. Detailed Word Length Analysis Engine ─────────────────────────────────
+
+
+def analyze_word_lengths(
+    text_or_list: Union[str, List[str]],
+    target_length: int = 5,
+    clean_punctuation: bool = True,
+) -> Dict[str, Any]:
+    """
+    Analyzes word lengths in an input text or list, returning comprehensive metrics.
+
+    Args:
+        text_or_list: Input text or list of word strings.
+        target_length: Target word length to analyze against (default: 5).
+        clean_punctuation: If True, strips surrounding punctuation.
+
+    Returns:
+        Dictionary containing:
+          - total_words: Total word count.
+          - target_length_count: Number of words with length == target_length.
+          - target_length_words: List of words with length == target_length.
+          - all_match_target: Boolean, True if all words match target_length.
+          - length_distribution: Dict mapping word_length -> list of words.
+          - non_matching_words: List of (word, length) tuples for non-matching words.
+    """
+    if isinstance(text_or_list, str):
+        words = tokenize_words(text_or_list, remove_punct=clean_punctuation)
+    elif isinstance(text_or_list, list):
+        words = text_or_list
+    else:
+        raise TypeError(f"Expected str or list of str, got {type(text_or_list).__name__}")
+
+    cleaned_words = []
+    for word in words:
+        if not isinstance(word, str):
+            raise TypeError(f"All elements must be strings, got {type(word).__name__}")
+        w = word.strip()
+        if clean_punctuation and isinstance(text_or_list, list):
+            w = re.sub(r"^\W+|\W+$", "", w)
+        if w:
+            cleaned_words.append(w)
+
+    total_words = len(cleaned_words)
+    target_words = [w for w in cleaned_words if len(w) == target_length]
+    target_count = len(target_words)
+    all_match = total_words > 0 and total_words == target_count
+
+    length_dist: Dict[int, List[str]] = {}
+    non_matching = []
+
+    for w in cleaned_words:
+        l = len(w)
+        length_dist.setdefault(l, []).append(w)
+        if l != target_length:
+            non_matching.append((w, l))
+
+    return {
+        "total_words": total_words,
+        "target_length_count": target_count,
+        "target_length_words": target_words,
+        "all_match_target": all_match,
+        "length_distribution": length_dist,
+        "non_matching_words": non_matching,
+    }
