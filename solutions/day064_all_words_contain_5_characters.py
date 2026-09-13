@@ -224,3 +224,65 @@ def validate_five_letter_words(
     all_valid = analysis["all_match_target"]
 
     return all_valid, valid_words, invalid_words
+
+
+# ─── 5. Custom Length Range Constraint Checker ───────────────────────────────
+
+
+def check_words_length_constraint(
+    text_or_list: Union[str, List[str]],
+    min_length: int = 5,
+    max_length: int = 5,
+    clean_punctuation: bool = True,
+) -> Dict[str, Any]:
+    """
+    Checks if all words satisfy a min_length to max_length constraint.
+
+    Args:
+        text_or_list: Input string sentence or list of word strings.
+        min_length: Minimum allowed word length.
+        max_length: Maximum allowed word length.
+        clean_punctuation: If True, strips surrounding punctuation.
+
+    Returns:
+        Dict with 'is_valid', 'violating_words', 'valid_words', and 'compliance_rate'.
+
+    Raises:
+        ValueError: If min_length > max_length or min_length < 1.
+    """
+    if min_length < 1 or max_length < 1:
+        raise ValueError("min_length and max_length must be positive integers.")
+    if min_length > max_length:
+        raise ValueError(f"min_length ({min_length}) cannot exceed max_length ({max_length}).")
+
+    if isinstance(text_or_list, str):
+        words = tokenize_words(text_or_list, remove_punct=clean_punctuation)
+    elif isinstance(text_or_list, list):
+        words = text_or_list
+    else:
+        raise TypeError(f"Expected str or list of str, got {type(text_or_list).__name__}")
+
+    valid_words = []
+    violating_words = []
+
+    for word in words:
+        if not isinstance(word, str):
+            raise TypeError(f"All elements must be strings, got {type(word).__name__}")
+        w = word.strip()
+        if clean_punctuation and isinstance(text_or_list, list):
+            w = re.sub(r"^\W+|\W+$", "", w)
+        if w:
+            if min_length <= len(w) <= max_length:
+                valid_words.append(w)
+            else:
+                violating_words.append((w, len(w)))
+
+    total = len(valid_words) + len(violating_words)
+    compliance_rate = (len(valid_words) / total * 100.0) if total > 0 else 0.0
+
+    return {
+        "is_valid": total > 0 and len(violating_words) == 0,
+        "valid_words": valid_words,
+        "violating_words": violating_words,
+        "compliance_rate": round(compliance_rate, 2),
+    }
