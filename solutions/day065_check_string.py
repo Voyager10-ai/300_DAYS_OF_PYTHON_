@@ -561,6 +561,95 @@ def extract_matching_tokens(text: str, pattern_type: str = "alpha") -> List[str]
         )
 
 
+# ─── 7. Unit Test Suite ───────────────────────────────────────────────────────
+
+
+class TestCheckString(unittest.TestCase):
+    """Unit test suite for string classification, validation, and analysis helpers."""
+
+    def test_core_checkers(self):
+        self.assertTrue(is_alphanumeric_str("Python300"))
+        self.assertFalse(is_alphanumeric_str("Hello World!"))
+        self.assertFalse(is_alphanumeric_str(""))
+
+        self.assertTrue(is_numeric_str("12345"))
+        self.assertTrue(is_numeric_str("-45.67", allow_negative=True, allow_decimal=True))
+        self.assertFalse(is_numeric_str("-45.67", allow_negative=False))
+
+        self.assertTrue(is_alpha_str("Python"))
+        self.assertTrue(is_alpha_str("Hello World", allow_spaces=True))
+        self.assertFalse(is_alpha_str("Hello World", allow_spaces=False))
+
+        self.assertTrue(contains_only_chars("10101", "01"))
+        self.assertFalse(contains_only_chars("10201", "01"))
+
+        with self.assertRaises(TypeError):
+            is_alphanumeric_str(12345)
+
+    def test_substring_and_matching(self):
+        self.assertTrue(check_substring("Hello World", "world", case_sensitive=False))
+        self.assertFalse(check_substring("Hello World", "world", case_sensitive=True))
+        self.assertTrue(check_prefix_suffix("https://example.com", prefix="https://", suffix=".com"))
+        self.assertFalse(check_prefix_suffix("http://example.org", prefix="https://"))
+
+        self.assertEqual(count_substring_occurrences("aaaa", "aa", allow_overlap=False), 2)
+        self.assertEqual(count_substring_occurrences("aaaa", "aa", allow_overlap=True), 3)
+
+    def test_pattern_validations(self):
+        self.assertTrue(is_valid_identifier("my_var123"))
+        self.assertFalse(is_valid_identifier("123var"))
+
+        self.assertTrue(is_hex_color("#FFF"))
+        self.assertTrue(is_hex_color("#1A2B3C"))
+        self.assertFalse(is_hex_color("1A2B3C"))
+        self.assertFalse(is_hex_color("#12345"))
+
+        self.assertTrue(is_valid_email_basic("user@example.com"))
+        self.assertFalse(is_valid_email_basic("invalid-email"))
+
+        self.assertTrue(is_valid_ipv4("192.168.1.1"))
+        self.assertFalse(is_valid_ipv4("256.0.0.1"))
+        self.assertFalse(is_valid_ipv4("192.168.01.1"))
+
+    def test_analyze_string_properties(self):
+        res = analyze_string_properties("A man a plan a canal Panama 123!")
+        self.assertEqual(res["digits_count"], 3)
+        self.assertEqual(res["casing_format"], "mixedcase")
+        self.assertTrue(res["is_palindrome"])
+        self.assertTrue(res["is_ascii"])
+        self.assertIn("A", res["char_frequencies"])
+
+    def test_validate_string_rules(self):
+        res = validate_string_rules(
+            "SecretPass123!",
+            min_len=8,
+            max_len=20,
+            require_upper=True,
+            require_lower=True,
+            require_digit=True,
+            require_special=True,
+            forbidden_chars=" ",
+        )
+        self.assertTrue(res["is_valid"])
+        self.assertEqual(res["score_percentage"], 100.0)
+
+        fail_res = validate_string_rules("simple", min_len=10, require_digit=True)
+        self.assertFalse(fail_res["is_valid"])
+        self.assertEqual(len(fail_res["failed_rules"]), 2)
+
+    def test_sanitization_and_token_extraction(self):
+        cleaned = sanitize_string("Py123th!on", remove_digits=True, remove_special=True, to_case="upper")
+        self.assertEqual(cleaned, "PYTHON")
+
+        text = "Contact info@example.com or support@test.org for 100% help."
+        emails = extract_matching_tokens(text, pattern_type="email")
+        self.assertEqual(emails, ["info@example.com", "support@test.org"])
+
+        nums = extract_matching_tokens(text, pattern_type="numeric")
+        self.assertEqual(nums, ["100"])
+
+
+
 
 
 
