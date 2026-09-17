@@ -212,3 +212,96 @@ def count_substring_occurrences(text: str, sub: str, allow_overlap: bool = False
         start = pos + 1
     return count
 
+
+# ─── 3. Pattern Validation Engine ────────────────────────────────────────────
+
+
+def is_valid_identifier(s: str) -> bool:
+    """
+    Checks if string is a valid Python/Java variable identifier.
+
+    Args:
+        s: Input string to check.
+
+    Returns:
+        True if s is a valid identifier name, else False.
+
+    Raises:
+        TypeError: If s is not a string.
+    """
+    if not isinstance(s, str):
+        raise TypeError(f"Expected string, got {type(s).__name__}")
+    return s.isidentifier()
+
+
+def is_hex_color(s: str) -> bool:
+    """
+    Checks if string is a valid 3-digit or 6-digit hex color code (e.g., '#FFF', '#1a2b3c').
+
+    Args:
+        s: Input color string.
+
+    Returns:
+        True if s is a valid hex color string, else False.
+
+    Raises:
+        TypeError: If s is not a string.
+    """
+    if not isinstance(s, str):
+        raise TypeError(f"Expected string, got {type(s).__name__}")
+    pattern = r"^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+    return bool(re.match(pattern, s.strip()))
+
+
+def is_valid_email_basic(s: str) -> bool:
+    """
+    Performs basic email format validation.
+
+    Args:
+        s: Input email string to test.
+
+    Returns:
+        True if s matches standard email format, else False.
+
+    Raises:
+        TypeError: If s is not a string.
+    """
+    if not isinstance(s, str):
+        raise TypeError(f"Expected string, got {type(s).__name__}")
+    pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+    return bool(re.match(pattern, s.strip()))
+
+
+def is_valid_ipv4(s: str) -> bool:
+    """
+    Validates if string represents a correct IPv4 address (4 octets, 0 to 255).
+
+    Args:
+        s: IP address string.
+
+    Returns:
+        True if s is a valid IPv4 address, else False.
+
+    Raises:
+        TypeError: If s is not a string.
+    """
+    if not isinstance(s, str):
+        raise TypeError(f"Expected string, got {type(s).__name__}")
+
+    parts = s.strip().split(".")
+    if len(parts) != 4:
+        return False
+
+    for part in parts:
+        if not part.isdigit():
+            return False
+        # Disallow leading zeroes unless single zero
+        if len(part) > 1 and part.startswith("0"):
+            return False
+        val = int(part)
+        if val < 0 or val > 255:
+            return False
+
+    return True
+
+
