@@ -1162,6 +1162,38 @@ import java.util.*;
 
 
 
+// Java Check String Practice (Day 65)
+// class CheckStringPractice {
+//     public static boolean isAlphanumeric(String s) {
+//         if (s == null || s.isEmpty()) return false;
+//         return s.matches("^[a-zA-Z0-9]+$");
+//     }
+//     public static boolean isNumeric(String s) {
+//         if (s == null || s.isEmpty()) return false;
+//         return s.matches("^-?\\d+(\\.\\d+)?$");
+//     }
+//     public static boolean isValidIPv4(String s) {
+//         if (s == null) return false;
+//         String[] parts = s.split("\\.");
+//         if (parts.length != 4) return false;
+//         for (String p : parts) {
+//             try {
+//                 int val = Integer.parseInt(p);
+//                 if (val < 0 || val > 255) return false;
+//                 if (p.length() > 1 && p.startsWith("0")) return false;
+//             } catch (NumberFormatException e) {
+//                 return false;
+//             }
+//         }
+//         return true;
+//     }
+//     public static void main(String[] args) {
+//         System.out.println("Is Alphanumeric: " + isAlphanumeric("Java2026"));
+//         System.out.println("Is Numeric: " + isNumeric("-123.45"));
+//         System.out.println("Is Valid IPv4: " + isValidIPv4("192.168.1.1"));
+//     }
+// }
+
 public class main{
   public static void main(String[] args){
     Scanner sc = new Scanner(System.in);
