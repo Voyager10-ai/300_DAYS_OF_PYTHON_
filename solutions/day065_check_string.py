@@ -478,5 +478,89 @@ def validate_string_rules(
     }
 
 
+# ─── 6. String Sanitization & Token Extraction Helpers ───────────────────────
+
+
+def sanitize_string(
+    s: str,
+    remove_digits: bool = False,
+    remove_special: bool = False,
+    to_case: Optional[str] = None,
+) -> str:
+    """
+    Sanitizes string according to specified cleaning operations.
+
+    Args:
+        s: Input string to sanitize.
+        remove_digits: If True, strips numeric digits 0-9.
+        remove_special: If True, strips punctuation/special characters.
+        to_case: Target case transformation ('upper', 'lower', 'title', or None).
+
+    Returns:
+        Sanitized output string.
+
+    Raises:
+        TypeError: If s is not a string.
+        ValueError: If invalid to_case option provided.
+    """
+    if not isinstance(s, str):
+        raise TypeError(f"Expected string, got {type(s).__name__}")
+
+    res = s
+    if remove_digits:
+        res = re.sub(r"\d+", "", res)
+    if remove_special:
+        res = re.sub(r"[^\w\s]", "", res)
+
+    if to_case is not None:
+        c = to_case.lower()
+        if c == "upper":
+            res = res.upper()
+        elif c == "lower":
+            res = res.lower()
+        elif c == "title":
+            res = res.title()
+        else:
+            raise ValueError(f"Invalid to_case option '{to_case}'. Choose 'upper', 'lower', or 'title'.")
+
+    return res
+
+
+def extract_matching_tokens(text: str, pattern_type: str = "alpha") -> List[str]:
+    """
+    Extracts tokens matching a predefined category from text.
+
+    Args:
+        text: Source text string.
+        pattern_type: Token type to extract ('alpha', 'numeric', 'alphanumeric', 'email', 'word').
+
+    Returns:
+        List of matching token strings.
+
+    Raises:
+        TypeError: If text is not a string.
+        ValueError: If pattern_type is unrecognised.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected string for text, got {type(text).__name__}")
+
+    p = pattern_type.lower()
+    if p == "alpha":
+        return re.findall(r"\b[a-zA-Z]+\b", text)
+    elif p == "numeric":
+        return re.findall(r"\b\d+\b", text)
+    elif p == "alphanumeric":
+        return re.findall(r"\b[a-zA-Z0-9]+\b", text)
+    elif p == "email":
+        return re.findall(r"\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b", text)
+    elif p == "word":
+        return re.findall(r"\b\w+\b", text)
+    else:
+        raise ValueError(
+            f"Unknown pattern_type '{pattern_type}'. Valid options: 'alpha', 'numeric', 'alphanumeric', 'email', 'word'."
+        )
+
+
+
 
 
