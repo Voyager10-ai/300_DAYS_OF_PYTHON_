@@ -371,4 +371,112 @@ def analyze_string_properties(s: str) -> Dict[str, Any]:
     }
 
 
+# ─── 5. Custom Rule-Based Multi-Condition Validator ──────────────────────────
+
+
+def validate_string_rules(
+    s: str,
+    min_len: Optional[int] = None,
+    max_len: Optional[int] = None,
+    require_upper: bool = False,
+    require_lower: bool = False,
+    require_digit: bool = False,
+    require_special: bool = False,
+    forbidden_chars: Optional[str] = None,
+) -> Dict[str, Any]:
+    """
+    Validates string against custom configurable criteria (length, character classes, forbidden chars).
+
+    Args:
+        s: Target string to validate.
+        min_len: Minimum allowed length (or None).
+        max_len: Maximum allowed length (or None).
+        require_upper: If True, must contain at least 1 uppercase letter.
+        require_lower: If True, must contain at least 1 lowercase letter.
+        require_digit: If True, must contain at least 1 numeric digit.
+        require_special: If True, must contain at least 1 punctuation/special char.
+        forbidden_chars: String of disallowed characters.
+
+    Returns:
+        Dict with 'is_valid', 'passed_rules', 'failed_rules', and 'score_percentage'.
+
+    Raises:
+        TypeError: If s is not a string.
+        ValueError: If min_len > max_len or negative limits provided.
+    """
+    if not isinstance(s, str):
+        raise TypeError(f"Expected string, got {type(s).__name__}")
+
+    if min_len is not None and min_len < 0:
+        raise ValueError("min_len cannot be negative.")
+    if max_len is not None and max_len < 0:
+        raise ValueError("max_len cannot be negative.")
+    if min_len is not None and max_len is not None and min_len > max_len:
+        raise ValueError(f"min_len ({min_len}) cannot be greater than max_len ({max_len}).")
+
+    passed_rules = []
+    failed_rules = []
+
+    # Rule 1: min_len
+    if min_len is not None:
+        if len(s) >= min_len:
+            passed_rules.append(f"min_length_satisfied ({len(s)} >= {min_len})")
+        else:
+            failed_rules.append(f"min_length_failed ({len(s)} < {min_len})")
+
+    # Rule 2: max_len
+    if max_len is not None:
+        if len(s) <= max_len:
+            passed_rules.append(f"max_length_satisfied ({len(s)} <= {max_len})")
+        else:
+            failed_rules.append(f"max_length_failed ({len(s)} > {max_len})")
+
+    # Rule 3: require_upper
+    if require_upper:
+        if any(c.isupper() for c in s):
+            passed_rules.append("require_uppercase_satisfied")
+        else:
+            failed_rules.append("require_uppercase_failed")
+
+    # Rule 4: require_lower
+    if require_lower:
+        if any(c.islower() for c in s):
+            passed_rules.append("require_lowercase_satisfied")
+        else:
+            failed_rules.append("require_lowercase_failed")
+
+    # Rule 5: require_digit
+    if require_digit:
+        if any(c.isdigit() for c in s):
+            passed_rules.append("require_digit_satisfied")
+        else:
+            failed_rules.append("require_digit_failed")
+
+    # Rule 6: require_special
+    if require_special:
+        if any(c in string.punctuation for c in s):
+            passed_rules.append("require_special_satisfied")
+        else:
+            failed_rules.append("require_special_failed")
+
+    # Rule 7: forbidden_chars
+    if forbidden_chars:
+        found_forbidden = [c for c in s if c in forbidden_chars]
+        if not found_forbidden:
+            passed_rules.append("forbidden_chars_satisfied")
+        else:
+            failed_rules.append(f"forbidden_chars_failed (found: {''.join(set(found_forbidden))})")
+
+    total_rules = len(passed_rules) + len(failed_rules)
+    score = (len(passed_rules) / total_rules * 100.0) if total_rules > 0 else 100.0
+
+    return {
+        "is_valid": len(failed_rules) == 0,
+        "passed_rules": passed_rules,
+        "failed_rules": failed_rules,
+        "score_percentage": round(score, 2),
+    }
+
+
+
 
