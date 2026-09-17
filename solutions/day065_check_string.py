@@ -109,3 +109,106 @@ def contains_only_chars(s: str, allowed_chars: Union[str, Set[str], List[str]]) 
 
     allowed_set = set(allowed_chars)
     return all(char in allowed_set for char in s)
+
+
+# ─── 2. Substring, Prefix & Suffix Matching Utilities ─────────────────────────
+
+
+def check_substring(text: str, sub: str, case_sensitive: bool = True) -> bool:
+    """
+    Checks whether substring sub is present in text.
+
+    Args:
+        text: Main text string to search within.
+        sub: Substring to search for.
+        case_sensitive: If False, performs case-insensitive matching.
+
+    Returns:
+        True if sub is found in text, else False.
+
+    Raises:
+        TypeError: If text or sub is not a string.
+    """
+    if not isinstance(text, str) or not isinstance(sub, str):
+        raise TypeError("Both text and sub must be strings.")
+    if not sub:
+        return True
+
+    if not case_sensitive:
+        return sub.lower() in text.lower()
+    return sub in text
+
+
+def check_prefix_suffix(
+    text: str,
+    prefix: Optional[str] = None,
+    suffix: Optional[str] = None,
+    case_sensitive: bool = True,
+) -> bool:
+    """
+    Checks if text starts with prefix and/or ends with suffix.
+
+    Args:
+        text: Main string to check.
+        prefix: Required starting substring (or None to skip).
+        suffix: Required ending substring (or None to skip).
+        case_sensitive: If False, ignores letter case.
+
+    Returns:
+        True if text satisfies both prefix and suffix constraints (if provided), else False.
+
+    Raises:
+        TypeError: If text is not a string.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected string for text, got {type(text).__name__}")
+
+    t = text if case_sensitive else text.lower()
+
+    if prefix is not None:
+        p = prefix if case_sensitive else prefix.lower()
+        if not t.startswith(p):
+            return False
+
+    if suffix is not None:
+        s = suffix if case_sensitive else suffix.lower()
+        if not t.endswith(s):
+            return False
+
+    return True
+
+
+def count_substring_occurrences(text: str, sub: str, allow_overlap: bool = False) -> int:
+    """
+    Counts occurrences of sub within text.
+
+    Args:
+        text: Source string to search.
+        sub: Pattern substring to count.
+        allow_overlap: If True, counts overlapping occurrences.
+
+    Returns:
+        Number of matching occurrences.
+
+    Raises:
+        TypeError: If inputs are not strings.
+        ValueError: If sub is an empty string.
+    """
+    if not isinstance(text, str) or not isinstance(sub, str):
+        raise TypeError("Both text and sub must be strings.")
+    if not sub:
+        raise ValueError("Search substring 'sub' cannot be empty.")
+
+    if not allow_overlap:
+        return text.count(sub)
+
+    count = 0
+    start = 0
+    while True:
+        pos = text.find(sub, start)
+        if pos == -1:
+            break
+        count += 1
+        start = pos + 1
+    return count
+
