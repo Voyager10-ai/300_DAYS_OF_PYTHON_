@@ -612,12 +612,15 @@ class TestCheckString(unittest.TestCase):
         self.assertFalse(is_valid_ipv4("192.168.01.1"))
 
     def test_analyze_string_properties(self):
-        res = analyze_string_properties("A man a plan a canal Panama 123!")
+        res = analyze_string_properties("A man a plan a canal Panama! 123")
         self.assertEqual(res["digits_count"], 3)
         self.assertEqual(res["casing_format"], "mixedcase")
-        self.assertTrue(res["is_palindrome"])
         self.assertTrue(res["is_ascii"])
         self.assertIn("A", res["char_frequencies"])
+
+        pal_res = analyze_string_properties("A man a plan a canal Panama!")
+        self.assertTrue(pal_res["is_palindrome"])
+
 
     def test_validate_string_rules(self):
         res = validate_string_rules(
@@ -647,6 +650,78 @@ class TestCheckString(unittest.TestCase):
 
         nums = extract_matching_tokens(text, pattern_type="numeric")
         self.assertEqual(nums, ["100"])
+
+
+# ─── 8. Interactive CLI Demonstration ─────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates all Day 65 string checking and validation utilities."""
+    print("=" * 65)
+    print(" DAY 65: CHECK STRING UTILITIES DEMONSTRATION")
+    print("=" * 65)
+
+    s1 = "Python300"
+    s2 = "-123.456"
+    s3 = "https://developer.mozilla.org"
+
+    print("\n1. Core String Classification:")
+    print(f"   is_alphanumeric_str('{s1}')        : {is_alphanumeric_str(s1)}")
+    print(f"   is_numeric_str('{s2}', allow_negative=True, allow_decimal=True) : {is_numeric_str(s2, True, True)}")
+    print(f"   contains_only_chars('10101', '01')  : {contains_only_chars('10101', '01')}")
+
+    print("\n2. Substring & Prefix/Suffix Checks:")
+    print(f"   check_substring('{s3}', 'mozilla') : {check_substring(s3, 'mozilla')}")
+    print(f"   check_prefix_suffix('{s3}', prefix='https://') : {check_prefix_suffix(s3, prefix='https://')}")
+    print(f"   count_substring_occurrences('abababa', 'aba', allow_overlap=True) : {count_substring_occurrences('abababa', 'aba', True)}")
+
+    print("\n3. Pattern Validation Engine:")
+    print(f"   is_valid_identifier('var_123')     : {is_valid_identifier('var_123')}")
+    print(f"   is_hex_color('#FF5733')            : {is_hex_color('#FF5733')}")
+    print(f"   is_valid_email_basic('test@domain.com') : {is_valid_email_basic('test@domain.com')}")
+    print(f"   is_valid_ipv4('192.168.1.254')    : {is_valid_ipv4('192.168.1.254')}")
+
+    print("\n4. Comprehensive String Property Analysis:")
+    analysis = analyze_string_properties("A man a plan a canal Panama 2026!")
+    print(f"   Total Length     : {analysis['total_length']}")
+    print(f"   Digits Count     : {analysis['digits_count']}")
+    print(f"   Letters Count    : {analysis['letters_count']}")
+    print(f"   Casing Format    : {analysis['casing_format']}")
+    print(f"   Is Palindrome    : {analysis['is_palindrome']}")
+    print(f"   Is ASCII         : {analysis['is_ascii']}")
+
+    print("\n5. Multi-Condition Custom Rule Validation:")
+    rule_res = validate_string_rules(
+        "SecureP@ss2026",
+        min_len=8,
+        max_len=20,
+        require_upper=True,
+        require_lower=True,
+        require_digit=True,
+        require_special=True,
+        forbidden_chars=" ",
+    )
+    print(f"   Target String     : 'SecureP@ss2026'")
+    print(f"   Is Valid Password : {rule_res['is_valid']}")
+    print(f"   Compliance Score  : {rule_res['score_percentage']}%")
+    print(f"   Passed Rules      : {rule_res['passed_rules']}")
+
+    print("\n6. Sanitization & Token Extraction:")
+    raw_text = "Reach out to info@company.com or dev@company.org! Order #99182."
+    print(f"   Original Text : '{raw_text}'")
+    print(f"   Sanitized     : '{sanitize_string(raw_text, remove_digits=True, remove_special=True, to_case='lower')}'")
+    print(f"   Extracted Emails : {extract_matching_tokens(raw_text, 'email')}")
+    print(f"   Extracted Digits : {extract_matching_tokens(raw_text, 'numeric')}")
+
+    print("\n" + "=" * 65)
+    print(" Running Unit Test Suite...")
+    print("=" * 65)
+    unittest.main(argv=["first-arg-is-ignored"], exit=False)
+
+
+if __name__ == "__main__":
+    main()
+
 
 
 
