@@ -305,3 +305,70 @@ def is_valid_ipv4(s: str) -> bool:
     return True
 
 
+# ─── 4. Detailed String Analysis Engine ──────────────────────────────────────
+
+
+def analyze_string_properties(s: str) -> Dict[str, Any]:
+    """
+    Analyzes character breakdown, casing, palindrome status, and metrics of a string.
+
+    Args:
+        s: Input string to analyze.
+
+    Returns:
+        Dict containing total_length, char_counts (digits, letters, uppercase, lowercase,
+        whitespace, punctuation/special), casing_format, is_palindrome, is_ascii,
+        and char_frequencies.
+
+    Raises:
+        TypeError: If s is not a string.
+    """
+    if not isinstance(s, str):
+        raise TypeError(f"Expected string, got {type(s).__name__}")
+
+    total_len = len(s)
+    digit_cnt = sum(1 for c in s if c.isdigit())
+    alpha_cnt = sum(1 for c in s if c.isalpha())
+    upper_cnt = sum(1 for c in s if c.isupper())
+    lower_cnt = sum(1 for c in s if c.islower())
+    space_cnt = sum(1 for c in s if c.isspace())
+    punct_cnt = sum(1 for c in s if c in string.punctuation)
+    other_cnt = total_len - (digit_cnt + alpha_cnt + space_cnt + punct_cnt)
+
+    casing = "empty"
+    if s:
+        if s.isupper():
+            casing = "uppercase"
+        elif s.islower():
+            casing = "lowercase"
+        elif s.istitle():
+            casing = "titlecase"
+        else:
+            casing = "mixedcase"
+
+    # Palindrome check (ignoring case and non-alphanumeric chars)
+    clean_chars = [c.lower() for c in s if c.isalnum()]
+    is_pal = len(clean_chars) > 0 and clean_chars == clean_chars[::-1]
+
+    # Frequency breakdown
+    freq: Dict[str, int] = {}
+    for char in s:
+        freq[char] = freq.get(char, 0) + 1
+
+    return {
+        "total_length": total_len,
+        "digits_count": digit_cnt,
+        "letters_count": alpha_cnt,
+        "uppercase_count": upper_cnt,
+        "lowercase_count": lower_cnt,
+        "whitespace_count": space_cnt,
+        "punctuation_count": punct_cnt,
+        "other_count": max(0, other_cnt),
+        "casing_format": casing,
+        "is_palindrome": is_pal,
+        "is_ascii": s.isascii(),
+        "char_frequencies": freq,
+    }
+
+
+
