@@ -430,5 +430,89 @@ def extract_substring_context(
     return snippets
 
 
+# ─── 6. Substring Replacement & Highlight Helpers ─────────────────────────────
+
+
+def replace_substring_occurrences(
+    text: str,
+    sub: str,
+    replacement: str,
+    count: Optional[int] = None,
+    case_sensitive: bool = True,
+) -> str:
+    """
+    Replaces occurrences of sub with replacement string (with optional case insensitivity).
+
+    Args:
+        text: Source text string.
+        sub: Substring to be replaced.
+        replacement: Replacement text.
+        count: Max replacements to make (or None for all).
+        case_sensitive: If False, performs case-insensitive replacement.
+
+    Returns:
+        Transformed output string.
+
+    Raises:
+        TypeError: If inputs are invalid types.
+        ValueError: If sub is empty string.
+    """
+    if not isinstance(text, str) or not isinstance(sub, str) or not isinstance(replacement, str):
+        raise TypeError("text, sub, and replacement must all be strings.")
+    if not sub:
+        raise ValueError("Substring 'sub' cannot be empty.")
+
+    if case_sensitive:
+        if count is None:
+            return text.replace(sub, replacement)
+        return text.replace(sub, replacement, count)
+
+    # Case-insensitive replacement using regex
+    pattern = re.escape(sub)
+    c = 0 if count is None else count
+    return re.sub(pattern, replacement, text, count=c, flags=re.IGNORECASE)
+
+
+def highlight_substring_occurrences(
+    text: str,
+    sub: str,
+    left_tag: str = "<<",
+    right_tag: str = ">>",
+    case_sensitive: bool = True,
+) -> str:
+    """
+    Wraps all occurrences of sub in text with custom tags like <<substr>>.
+
+    Args:
+        text: Source text.
+        sub: Substring to highlight.
+        left_tag: Prefix tag label (default '<<').
+        right_tag: Suffix tag label (default '>>').
+        case_sensitive: If False, ignores letter case while preserving original text.
+
+    Returns:
+        Highlighted text string.
+
+    Raises:
+        TypeError: If inputs are not strings.
+        ValueError: If sub is empty.
+    """
+    if not isinstance(text, str) or not isinstance(sub, str):
+        raise TypeError("text and sub must be strings.")
+    if not sub:
+        raise ValueError("Substring 'sub' cannot be empty.")
+
+    if case_sensitive:
+        return text.replace(sub, f"{left_tag}{sub}{right_tag}")
+
+    pattern = re.escape(sub)
+
+    def replacer(match: re.Match) -> str:
+        return f"{left_tag}{match.group(0)}{right_tag}"
+
+    return re.sub(pattern, replacer, text, flags=re.IGNORECASE)
+
+
+
 
 
