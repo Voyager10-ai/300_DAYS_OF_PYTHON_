@@ -339,4 +339,96 @@ def find_longest_repeated_substring(text: str) -> str:
     return lrs
 
 
+# ─── 5. Regex Pattern Locator & Context Extractor ────────────────────────────
+
+
+def find_substring_regex(
+    text: str,
+    pattern: str,
+    case_sensitive: bool = True,
+) -> List[Dict[str, Any]]:
+    """
+    Finds matches of regex pattern in text returning match detail dicts.
+
+    Args:
+        text: Source text string.
+        pattern: Regex pattern string.
+        case_sensitive: If False, uses re.IGNORECASE.
+
+    Returns:
+        List of dicts containing 'match', 'start', 'end', and 'span'.
+
+    Raises:
+        TypeError: If text or pattern is not a string.
+        re.error: If regex pattern is invalid.
+    """
+    if not isinstance(text, str) or not isinstance(pattern, str):
+        raise TypeError("Both text and pattern must be strings.")
+
+    flags = 0 if case_sensitive else re.IGNORECASE
+    matches = []
+
+    for match in re.finditer(pattern, text, flags):
+        matches.append(
+            {
+                "match": match.group(0),
+                "start": match.start(),
+                "end": match.end(),
+                "span": match.span(),
+            }
+        )
+
+    return matches
+
+
+def extract_substring_context(
+    text: str,
+    sub: str,
+    window: int = 15,
+    case_sensitive: bool = True,
+) -> List[str]:
+    """
+    Extracts text snippets surrounding every occurrence of sub with a context window.
+
+    Args:
+        text: Source text string.
+        sub: Substring to locate.
+        window: Number of context characters before and after match (default 15).
+        case_sensitive: If False, ignores letter case.
+
+    Returns:
+        List of snippet strings formatted like '...context [sub] context...'.
+
+    Raises:
+        TypeError: If inputs are invalid types.
+        ValueError: If window is negative or sub is empty.
+    """
+    if not isinstance(text, str) or not isinstance(sub, str):
+        raise TypeError("Both text and sub must be strings.")
+    if window < 0:
+        raise ValueError(f"window size cannot be negative, got {window}")
+    if not sub:
+        raise ValueError("Substring 'sub' cannot be empty.")
+
+    indices = find_all_substring_indices(text, sub, allow_overlap=False, case_sensitive=case_sensitive)
+    snippets = []
+    sub_len = len(sub)
+
+    for idx in indices:
+        start = max(0, idx - window)
+        end = min(len(text), idx + sub_len + window)
+
+        prefix = "..." if start > 0 else ""
+        suffix = "..." if end < len(text) else ""
+
+        match_str = text[idx : idx + sub_len]
+        left_ctx = text[start:idx]
+        right_ctx = text[idx + sub_len : end]
+
+        snippets.append(f"{prefix}{left_ctx}[{match_str}]{right_ctx}{suffix}")
+
+    return snippets
+
+
+
 
