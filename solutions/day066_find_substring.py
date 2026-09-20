@@ -92,3 +92,91 @@ def find_all_substring_indices(
         start = pos + step
 
     return indices
+
+
+# ─── 2. Knuth-Morris-Pratt (KMP) Pattern Search ───────────────────────────────
+
+
+def compute_lps_array(pattern: str) -> List[int]:
+    """
+    Computes the Longest Prefix Suffix (LPS) array for KMP algorithm.
+
+    lps[i] stores the length of the longest proper prefix of pattern[0..i]
+    that is also a suffix of pattern[0..i].
+
+    Args:
+        pattern: The search pattern string.
+
+    Returns:
+        List of integers representing the LPS lookup table.
+    """
+    m = len(pattern)
+    lps = [0] * m
+    length = 0
+    i = 1
+
+    while i < m:
+        if pattern[i] == pattern[length]:
+            length += 1
+            lps[i] = length
+            i += 1
+        else:
+            if length != 0:
+                length = lps[length - 1]
+            else:
+                lps[i] = 0
+                i += 1
+
+    return lps
+
+
+def kmp_search(text: str, pattern: str, case_sensitive: bool = True) -> List[int]:
+    """
+    Performs Knuth-Morris-Pratt (KMP) string matching algorithm in O(N + M) time complexity.
+
+    Args:
+        text: Target text string to search within.
+        pattern: Pattern substring to find.
+        case_sensitive: If False, performs case-insensitive KMP search.
+
+    Returns:
+        List of starting indices where pattern matches text.
+
+    Raises:
+        TypeError: If inputs are not strings.
+        ValueError: If pattern is empty.
+    """
+    if not isinstance(text, str) or not isinstance(pattern, str):
+        raise TypeError("Both text and pattern must be strings.")
+    if not pattern:
+        raise ValueError("Search pattern cannot be empty.")
+
+    t = text if case_sensitive else text.lower()
+    p = pattern if case_sensitive else pattern.lower()
+
+    n = len(t)
+    m = len(p)
+    if m > n:
+        return []
+
+    lps = compute_lps_array(p)
+    indices = []
+    i = 0  # index for t
+    j = 0  # index for p
+
+    while i < n:
+        if p[j] == t[i]:
+            i += 1
+            j += 1
+
+        if j == m:
+            indices.append(i - j)
+            j = lps[j - 1]
+        elif i < n and p[j] != t[i]:
+            if j != 0:
+                j = lps[j - 1]
+            else:
+                i += 1
+
+    return indices
+
