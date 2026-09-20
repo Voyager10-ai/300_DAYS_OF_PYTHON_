@@ -249,3 +249,94 @@ def rabin_karp_search(
     return indices
 
 
+# ─── 4. Longest Common & Repeated Substring Finders ───────────────────────────
+
+
+def find_longest_common_substring(
+    s1: str,
+    s2: str,
+    case_sensitive: bool = True,
+) -> str:
+    """
+    Finds the longest contiguous common substring between two strings s1 and s2 using DP matrix.
+
+    Args:
+        s1: First string.
+        s2: Second string.
+        case_sensitive: If False, ignores casing.
+
+    Returns:
+        The longest common substring (from s1 original casing).
+
+    Raises:
+        TypeError: If s1 or s2 is not a string.
+    """
+    if not isinstance(s1, str) or not isinstance(s2, str):
+        raise TypeError("Both s1 and s2 must be strings.")
+    if not s1 or not s2:
+        return ""
+
+    str1 = s1 if case_sensitive else s1.lower()
+    str2 = s2 if case_sensitive else s2.lower()
+
+    m, n = len(str1), len(str2)
+    dp = [[0] * (n + 1) for _ in range(m + 1)]
+
+    max_len = 0
+    end_pos_s1 = 0
+
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            if str1[i - 1] == str2[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1] + 1
+                if dp[i][j] > max_len:
+                    max_len = dp[i][j]
+                    end_pos_s1 = i
+
+    if max_len == 0:
+        return ""
+
+    start_pos_s1 = end_pos_s1 - max_len
+    return s1[start_pos_s1:end_pos_s1]
+
+
+def find_longest_repeated_substring(text: str) -> str:
+    """
+    Finds the longest substring that appears at least twice in text.
+
+    Args:
+        text: Source string to analyze.
+
+    Returns:
+        Longest repeated substring string.
+
+    Raises:
+        TypeError: If text is not a string.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected string, got {type(text).__name__}")
+    if len(text) < 2:
+        return ""
+
+    n = len(text)
+    # Generate Suffix Array
+    suffixes = sorted([(text[i:], i) for i in range(n)])
+
+    lrs = ""
+    for i in range(n - 1):
+        s1, idx1 = suffixes[i]
+        s2, idx2 = suffixes[i + 1]
+
+        # Calculate Longest Common Prefix (LCP) between adjacent suffixes
+        j = 0
+        min_l = min(len(s1), len(s2))
+        while j < min_l and s1[j] == s2[j]:
+            j += 1
+
+        if j > len(lrs):
+            lrs = s1[:j]
+
+    return lrs
+
+
+
