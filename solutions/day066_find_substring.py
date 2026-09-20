@@ -180,3 +180,72 @@ def kmp_search(text: str, pattern: str, case_sensitive: bool = True) -> List[int
 
     return indices
 
+
+# ─── 3. Rabin-Karp Rolling Hash Search Algorithm ─────────────────────────────
+
+
+def rabin_karp_search(
+    text: str,
+    pattern: str,
+    prime: int = 101,
+    case_sensitive: bool = True,
+) -> List[int]:
+    """
+    Performs Rabin-Karp pattern search algorithm using rolling hash functions.
+
+    Args:
+        text: Source text string to search within.
+        pattern: Pattern substring to match.
+        prime: Prime number modulus for hash collision avoidance (default 101).
+        case_sensitive: If False, ignores casing.
+
+    Returns:
+        List of 0-indexed starting positions where pattern occurs in text.
+
+    Raises:
+        TypeError: If text or pattern is not a string.
+        ValueError: If pattern is empty.
+    """
+    if not isinstance(text, str) or not isinstance(pattern, str):
+        raise TypeError("Both text and pattern must be strings.")
+    if not pattern:
+        raise ValueError("Pattern string cannot be empty.")
+
+    t = text if case_sensitive else text.lower()
+    p = pattern if case_sensitive else pattern.lower()
+
+    n = len(t)
+    m = len(p)
+    if m > n:
+        return []
+
+    d = 256  # Number of characters in alphabet
+    p_hash = 0
+    t_hash = 0
+    h = 1
+
+    # h = pow(d, m-1) % prime
+    for i in range(m - 1):
+        h = (h * d) % prime
+
+    # Calculate initial hash values
+    for i in range(m):
+        p_hash = (d * p_hash + ord(p[i])) % prime
+        t_hash = (d * t_hash + ord(t[i])) % prime
+
+    indices = []
+
+    for i in range(n - m + 1):
+        if p_hash == t_hash:
+            # Check characters one by one on hash collision
+            if t[i : i + m] == p:
+                indices.append(i)
+
+        if i < n - m:
+            t_hash = (d * (t_hash - ord(t[i]) * h) + ord(t[i + m])) % prime
+            if t_hash < 0:
+                t_hash += prime
+
+    return indices
+
+
