@@ -513,6 +513,67 @@ def highlight_substring_occurrences(
     return re.sub(pattern, replacer, text, flags=re.IGNORECASE)
 
 
+# ─── 7. Unit Test Suite ───────────────────────────────────────────────────────
+
+
+class TestFindSubstring(unittest.TestCase):
+    """Test suite for substring find, match, KMP, Rabin-Karp, and analysis utilities."""
+
+    def test_core_substring_index(self):
+        self.assertEqual(find_substring_index("hello world", "world"), 6)
+        self.assertEqual(find_substring_index("hello world", "WORLD", case_sensitive=False), 6)
+        self.assertEqual(find_substring_index("hello world", "python"), -1)
+        self.assertEqual(find_all_substring_indices("abababa", "aba", allow_overlap=False), [0, 4])
+        self.assertEqual(find_all_substring_indices("abababa", "aba", allow_overlap=True), [0, 2, 4])
+
+        with self.assertRaises(TypeError):
+            find_substring_index(12345, "1")
+
+    def test_kmp_search(self):
+        text = "ABABDABACDABABCABAB"
+        pattern = "ABABCABAB"
+        indices = kmp_search(text, pattern)
+        self.assertEqual(indices, [10])
+
+        self.assertEqual(kmp_search("aaaaa", "aa"), [0, 1, 2, 3])
+
+        with self.assertRaises(ValueError):
+            kmp_search("hello", "")
+
+    def test_rabin_karp_search(self):
+        text = "GEEKS FOR GEEKS"
+        pattern = "GEEK"
+        self.assertEqual(rabin_karp_search(text, pattern), [0, 10])
+        self.assertEqual(rabin_karp_search("python code", "CODE", case_sensitive=False), [7])
+
+    def test_lcs_and_lrs(self):
+        self.assertEqual(find_longest_common_substring("abcdef", "zbcdf"), "bcd")
+        self.assertEqual(find_longest_common_substring("Hello World", "world", case_sensitive=False), "World")
+
+        self.assertEqual(find_longest_repeated_substring("banana"), "ana")
+        self.assertEqual(find_longest_repeated_substring("abcdef"), "")
+
+    def test_regex_and_context(self):
+        text = "Python 3.9 and Python 3.10 and Python 3.11"
+        matches = find_substring_regex(text, r"Python \d+\.\d+")
+        self.assertEqual(len(matches), 3)
+        self.assertEqual(matches[0]["match"], "Python 3.9")
+
+        text_ctx = "The fast brown fox jumped over the lazy sleeping dog"
+        snippets = extract_substring_context(text_ctx, "fox", window=10)
+        self.assertEqual(len(snippets), 1)
+        self.assertIn("[fox]", snippets[0])
+
+    def test_replace_and_highlight(self):
+        text = "Apple, apple, APPLE"
+        replaced = replace_substring_occurrences(text, "apple", "fruit", case_sensitive=False)
+        self.assertEqual(replaced, "fruit, fruit, fruit")
+
+        highlighted = highlight_substring_occurrences("Hello Python!", "Python", left_tag="[", right_tag="]")
+        self.assertEqual(highlighted, "Hello [Python]!")
+
+
+
 
 
 
