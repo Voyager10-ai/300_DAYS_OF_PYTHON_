@@ -1194,6 +1194,42 @@ import java.util.*;
 //     }
 // }
 
+// Java Find Substring & KMP Practice (Day 66)
+// class FindSubstringPractice {
+//     public static int findSubstringIndex(String text, String sub) {
+//         if (text == null || sub == null) return -1;
+//         return text.indexOf(sub);
+//     }
+//     public static java.util.List<Integer> kmpSearch(String text, String pattern) {
+//         java.util.List<Integer> matches = new java.util.ArrayList<>();
+//         if (text == null || pattern == null || pattern.isEmpty()) return matches;
+//         int n = text.length(), m = pattern.length();
+//         int[] lps = new int[m];
+//         for (int i = 1, len = 0; i < m; ) {
+//             if (pattern.charAt(i) == pattern.charAt(len)) {
+//                 lps[i++] = ++len;
+//             } else if (len != 0) {
+//                 len = lps[len - 1];
+//             } else {
+//                 lps[i++] = 0;
+//             }
+//         }
+//         for (int i = 0, j = 0; i < n; ) {
+//             if (pattern.charAt(j) == text.charAt(i)) { i++; j++; }
+//             if (j == m) { matches.add(i - j); j = lps[j - 1]; }
+//             else if (i < n && pattern.charAt(j) != text.charAt(i)) {
+//                 if (j != 0) j = lps[j - 1]; else i++;
+//             }
+//         }
+//         return matches;
+//     }
+//     public static void main(String[] args) {
+//         String text = "AABAACAADAABAABA", pattern = "AABA";
+//         System.out.println("Index of 'AABA': " + findSubstringIndex(text, pattern));
+//         System.out.println("KMP Matches: " + kmpSearch(text, pattern));
+//     }
+// }
+
 public class main{
   public static void main(String[] args){
     Scanner sc = new Scanner(System.in);
