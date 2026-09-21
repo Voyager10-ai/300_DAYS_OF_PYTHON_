@@ -573,6 +573,56 @@ class TestFindSubstring(unittest.TestCase):
         self.assertEqual(highlighted, "Hello [Python]!")
 
 
+# ─── 8. Interactive CLI Demonstration ─────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates all Day 66 substring search utilities and algorithms."""
+    print("=" * 65)
+    print(" DAY 66: FIND SUBSTRING UTILITIES & ALGORITHMS DEMONSTRATION")
+    print("=" * 65)
+
+    sample_text = "The quick brown fox jumps over the lazy dog. The fox is clever."
+
+    print("\n1. Core Index Search:")
+    print(f"   First occurrence of 'fox': {find_substring_index(sample_text, 'fox')}")
+    print(f"   All occurrences of 'the' (case-insensitive): {find_all_substring_indices(sample_text, 'the', case_sensitive=False)}")
+
+    print("\n2. Knuth-Morris-Pratt (KMP) Search:")
+    kmp_text = "AABAACAADAABAABA"
+    kmp_pattern = "AABA"
+    print(f"   Text: '{kmp_text}', Pattern: '{kmp_pattern}'")
+    print(f"   KMP Match Indices: {kmp_search(kmp_text, kmp_pattern)}")
+
+    print("\n3. Rabin-Karp Rolling Hash Search:")
+    print(f"   Rabin-Karp Match Indices: {rabin_karp_search(kmp_text, kmp_pattern)}")
+
+    print("\n4. Longest Common & Repeated Substrings:")
+    s1, s2 = "Global Positioning System", "Positioning Sensor Array"
+    print(f"   s1: '{s1}', s2: '{s2}'")
+    print(f"   Longest Common Substring: '{find_longest_common_substring(s1, s2)}'")
+    print(f"   Longest Repeated Substring in 'banana': '{find_longest_repeated_substring('banana')}'")
+
+    print("\n5. Regex Locator & Context Extractor:")
+    print(f"   Extracted Context Snippets for 'fox' (window=12):")
+    for snippet in extract_substring_context(sample_text, "fox", window=12):
+        print(f"     -> {snippet}")
+
+    print("\n6. Substring Replacement & Highlighting:")
+    print(f"   Case-insensitive Replace 'fox' -> 'cat': '{replace_substring_occurrences(sample_text, 'FOX', 'cat', case_sensitive=False)}'")
+    print(f"   Highlighted Text: '{highlight_substring_occurrences(sample_text, 'fox', left_tag='[', right_tag=']')}'")
+
+    print("\n" + "=" * 65)
+    print(" Running Unit Test Suite...")
+    print("=" * 65)
+    unittest.main(argv=["first-arg-is-ignored"], exit=False)
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 
