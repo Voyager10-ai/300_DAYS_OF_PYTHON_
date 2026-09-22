@@ -69,6 +69,7 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 64: All Words Contain 5 Characters
 - Day 65: Check String
 - Day 66: Find Substring
+- Day 67: Find URL
 
 
 
