@@ -132,3 +132,116 @@ def parse_url_components(url: str) -> Dict[str, Any]:
         "is_secure": parsed.scheme.lower() == "https",
     }
 
+
+# ─── 3. URL Validation & Security Health Checker ─────────────────────────────
+
+
+def is_valid_url(
+    url: str,
+    require_protocol: bool = True,
+    allowed_schemes: Optional[Set[str]] = None,
+) -> bool:
+    """
+    Validates whether a given string is a syntactically correct URL.
+
+    Args:
+        url: URL string to check.
+        require_protocol: If True, requires explicit scheme (e.g. http:// or https://).
+        allowed_schemes: Set of allowed schemes e.g. {'http', 'https'}.
+
+    Returns:
+        True if valid URL matching criteria, else False.
+
+    Raises:
+        TypeError: If url is not a string.
+    """
+    if not isinstance(url, str):
+        raise TypeError(f"Expected string, got {type(url).__name__}")
+    if not url.strip():
+        return False
+
+    if allowed_schemes is None:
+        allowed_schemes = {"http", "https", "ftp", "ftps"}
+
+    if require_protocol:
+        if "://" not in url:
+            return False
+        scheme = url.split("://")[0].lower()
+        if scheme not in allowed_schemes:
+            return False
+
+    target = url if "://" in url else f"http://{url}"
+    parsed = urlparse(target)
+
+    # Validate hostname domain format
+    hostname = parsed.hostname
+    if not hostname:
+        return False
+
+    # Check IPv4 or domain syntax
+    domain_pattern = r"^([a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}$|^localhost$|^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$"
+    return bool(re.match(domain_pattern, hostname))
+
+
+def validate_url_security(url: str) -> Dict[str, Any]:
+    """
+    Performs security risk assessment on a URL string.
+
+    Args:
+        url: URL string to inspect.
+
+    Returns:
+        Dict containing is_secure_protocol, is_ip_host, contains_credentials,
+        has_suspicious_tld, potential_path_traversal, and security_score (0 to 100).
+
+    Raises:
+        TypeError: If url is not a string.
+    """
+    if not isinstance(url, str):
+        raise TypeError(f"Expected string, got {type(url).__name__}")
+
+    components = parse_url_components(url)
+    hostname = components["hostname"]
+    scheme = components["scheme"].lower()
+
+    is_https = scheme == "https"
+    is_ip = bool(re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", hostname))
+    has_userinfo = components["userinfo"] is not None
+
+    suspicious_tlds = {".zip", ".mov", ".top", ".xyz", ".work", ".click", ".country"}
+    has_suspicious = any(hostname.lower().endswith(tld) for tld in suspicious_tlds)
+
+    path = components["path"]
+    has_traversal = "../" in path or "..\\" in path
+
+    warnings = []
+    score = 100
+
+    if not is_https:
+        warnings.append("Insecure protocol (HTTP/FTP)")
+        score -= 20
+    if is_ip:
+        warnings.append("Raw IP address used instead of domain name")
+        score -= 25
+    if has_userinfo:
+        warnings.append("Credentials embedded in URL userinfo")
+        score -= 30
+    if has_suspicious:
+        warnings.append("Suspicious or high-risk TLD extension")
+        score -= 15
+    if has_traversal:
+        warnings.append("Potential directory traversal pattern in path")
+        score -= 40
+
+    return {
+        "url": url,
+        "is_https": is_https,
+        "is_ip_host": is_ip,
+        "contains_credentials": has_userinfo,
+        "has_suspicious_tld": has_suspicious,
+        "potential_path_traversal": has_traversal,
+        "warnings": warnings,
+        "security_score": max(0, score),
+    }
+
+
