@@ -368,4 +368,96 @@ def normalize_url(
     )
 
 
+# ─── 5. Domain & TLD Analysis Utilities ───────────────────────────────────────
+
+
+def extract_domain_info(url: str) -> Dict[str, str]:
+    """
+    Deconstructs a URL's hostname into subdomain, root domain, and TLD extension.
+
+    Args:
+        url: Input URL string.
+
+    Returns:
+        Dict containing full_hostname, subdomain, root_domain, and tld.
+
+    Raises:
+        TypeError: If url is not a string.
+    """
+    if not isinstance(url, str):
+        raise TypeError(f"Expected string, got {type(url).__name__}")
+
+    components = parse_url_components(url)
+    hostname = components["hostname"].lower()
+
+    if not hostname:
+        return {"full_hostname": "", "subdomain": "", "root_domain": "", "tld": ""}
+
+    parts = hostname.split(".")
+    if len(parts) == 1:
+        return {"full_hostname": hostname, "subdomain": "", "root_domain": hostname, "tld": ""}
+
+    # Common multi-part TLD extensions e.g., .co.uk, .com.au
+    multi_tlds = {"co.uk", "com.au", "gov.uk", "edu.au", "co.in", "net.au"}
+
+    if len(parts) >= 3 and f"{parts[-2]}.{parts[-1]}" in multi_tlds:
+        tld = f"{parts[-2]}.{parts[-1]}"
+        root_domain = f"{parts[-3]}.{tld}"
+        subdomain = ".".join(parts[:-3])
+    else:
+        tld = parts[-1]
+        root_domain = f"{parts[-2]}.{tld}"
+        subdomain = ".".join(parts[:-2])
+
+    return {
+        "full_hostname": hostname,
+        "subdomain": subdomain,
+        "root_domain": root_domain,
+        "tld": tld,
+    }
+
+
+def filter_urls_by_domain(
+    urls: List[str],
+    target_domain: str,
+    include_subdomains: bool = True,
+) -> List[str]:
+    """
+    Filters a list of URLs to keep only those belonging to target_domain.
+
+    Args:
+        urls: List of URL strings.
+        target_domain: Target domain e.g. 'example.com'.
+        include_subdomains: If True, matches subdomains like 'blog.example.com'.
+
+    Returns:
+        Filtered list of URL strings.
+
+    Raises:
+        TypeError: If inputs are invalid types.
+    """
+    if not isinstance(urls, list) or not isinstance(target_domain, str):
+        raise TypeError("urls must be a list and target_domain must be a string.")
+
+    target = target_domain.lower().strip()
+    matching = []
+
+    for u in urls:
+        if not isinstance(u, str):
+            continue
+        info = extract_domain_info(u)
+        host = info["full_hostname"]
+        root = info["root_domain"]
+
+        if include_subdomains:
+            if host == target or host.endswith(f".{target}") or root == target:
+                matching.append(u)
+        else:
+            if host == target or root == target:
+                matching.append(u)
+
+    return matching
+
+
+
 
