@@ -245,3 +245,127 @@ def validate_url_security(url: str) -> Dict[str, Any]:
     }
 
 
+# ─── 4. Query String Builder & URL Normalizer ─────────────────────────────────
+
+
+def add_query_params(url: str, params: Dict[str, Any]) -> str:
+    """
+    Appends or updates query parameters in a URL string.
+
+    Args:
+        url: Target URL string.
+        params: Dictionary of parameters to add/update.
+
+    Returns:
+        Updated URL string with newly encoded query parameters.
+
+    Raises:
+        TypeError: If inputs are invalid types.
+    """
+    if not isinstance(url, str):
+        raise TypeError(f"Expected string for url, got {type(url).__name__}")
+    if not isinstance(params, dict):
+        raise TypeError(f"Expected dict for params, got {type(params).__name__}")
+    if not params:
+        return url
+
+    parsed = urlparse(url)
+    current_qs = parse_qs(parsed.query)
+
+    for k, v in params.items():
+        current_qs[k] = [str(v)]
+
+    new_query = urlencode(current_qs, doseq=True)
+    return urlunparse(
+        (
+            parsed.scheme,
+            parsed.netloc,
+            parsed.path,
+            parsed.params,
+            new_query,
+            parsed.fragment,
+        )
+    )
+
+
+def remove_query_params(url: str, param_names: List[str]) -> str:
+    """
+    Removes specified query parameters from a URL string.
+
+    Args:
+        url: Target URL string.
+        param_names: List of parameter keys to remove.
+
+    Returns:
+        Cleaned URL string without specified query keys.
+
+    Raises:
+        TypeError: If inputs are invalid types.
+    """
+    if not isinstance(url, str):
+        raise TypeError(f"Expected string for url, got {type(url).__name__}")
+    if not isinstance(param_names, list):
+        raise TypeError(f"Expected list for param_names, got {type(param_names).__name__}")
+
+    parsed = urlparse(url)
+    current_qs = parse_qs(parsed.query)
+
+    for name in param_names:
+        current_qs.pop(name, None)
+
+    new_query = urlencode(current_qs, doseq=True)
+    return urlunparse(
+        (
+            parsed.scheme,
+            parsed.netloc,
+            parsed.path,
+            parsed.params,
+            new_query,
+            parsed.fragment,
+        )
+    )
+
+
+def normalize_url(
+    url: str,
+    strip_trailing_slash: bool = True,
+    lowercase_domain: bool = True,
+) -> str:
+    """
+    Normalizes a URL to a canonical standard form.
+
+    Args:
+        url: Input URL string.
+        strip_trailing_slash: If True, strips trailing '/' from path.
+        lowercase_domain: If True, converts scheme and domain to lowercase.
+
+    Returns:
+        Normalized URL string.
+
+    Raises:
+        TypeError: If url is not a string.
+    """
+    if not isinstance(url, str):
+        raise TypeError(f"Expected string, got {type(url).__name__}")
+
+    parsed = urlparse(url.strip())
+    scheme = parsed.scheme.lower() if lowercase_domain else parsed.scheme
+    netloc = parsed.netloc.lower() if lowercase_domain else parsed.netloc
+
+    path = parsed.path
+    if strip_trailing_slash and path != "/" and path.endswith("/"):
+        path = path.rstrip("/")
+
+    return urlunparse(
+        (
+            scheme,
+            netloc,
+            path,
+            parsed.params,
+            parsed.query,
+            parsed.fragment,
+        )
+    )
+
+
+
