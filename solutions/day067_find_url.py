@@ -533,6 +533,83 @@ def mask_urls_in_text(text: str, mask_str: str = "[URL REDACTED]") -> str:
     return redacted
 
 
+# ─── 7. Unit Test Suite ───────────────────────────────────────────────────────
+
+
+class TestFindURL(unittest.TestCase):
+    """Test suite for URL extraction, component parsing, validation, and domain analysis."""
+
+    def test_extract_urls(self):
+        text = "Visit https://google.com or http://github.com/repo for details."
+        urls = extract_urls(text)
+        self.assertEqual(urls, ["https://google.com", "http://github.com/repo"])
+        self.assertTrue(has_url(text))
+        self.assertFalse(has_url("No link here."))
+
+        with self.assertRaises(TypeError):
+            extract_urls(12345)
+
+    def test_parse_url_components(self):
+        url = "https://admin:pass@api.example.com:8080/v1/users?role=admin&active=true#section2"
+        comp = parse_url_components(url)
+        self.assertEqual(comp["scheme"], "https")
+        self.assertEqual(comp["hostname"], "api.example.com")
+        self.assertEqual(comp["port"], 8080)
+        self.assertEqual(comp["path"], "/v1/users")
+        self.assertEqual(comp["query_params"], {"role": "admin", "active": "true"})
+        self.assertEqual(comp["fragment"], "section2")
+        self.assertEqual(comp["userinfo"], {"username": "admin", "password": "pass"})
+        self.assertTrue(comp["is_secure"])
+
+    def test_is_valid_url_and_security(self):
+        self.assertTrue(is_valid_url("https://example.com/test"))
+        self.assertFalse(is_valid_url("invalid-url-string"))
+
+        sec = validate_url_security("http://192.168.1.1/admin/../secret.txt")
+        self.assertFalse(sec["is_https"])
+        self.assertTrue(sec["is_ip_host"])
+        self.assertTrue(sec["potential_path_traversal"])
+        self.assertLess(sec["security_score"], 50)
+
+    def test_query_params_and_normalization(self):
+        url = "https://example.com/search?q=python"
+        updated = add_query_params(url, {"page": 2, "sort": "asc"})
+        self.assertIn("page=2", updated)
+        self.assertIn("sort=asc", updated)
+
+        cleaned = remove_query_params(updated, ["page"])
+        self.assertNotIn("page=2", cleaned)
+        self.assertIn("q=python", cleaned)
+
+        norm = normalize_url("HTTPS://Example.com:80/path/to/page/")
+        self.assertEqual(norm, "https://example.com:80/path/to/page")
+
+    def test_domain_info_and_filtering(self):
+        info = extract_domain_info("https://blog.sub.example.co.uk/post/1")
+        self.assertEqual(info["full_hostname"], "blog.sub.example.co.uk")
+        self.assertEqual(info["root_domain"], "example.co.uk")
+        self.assertEqual(info["tld"], "co.uk")
+
+        urls = [
+            "https://example.com/p1",
+            "https://blog.example.com/p2",
+            "https://otherdomain.com/p3",
+        ]
+        filtered = filter_urls_by_domain(urls, "example.com", include_subdomains=True)
+        self.assertEqual(filtered, ["https://example.com/p1", "https://blog.example.com/p2"])
+
+    def test_html_parsing_and_masking(self):
+        html = '<a href="/about">About</a><img src="https://cdn.site.com/logo.png">'
+        links = extract_urls_from_html(html, base_url="https://site.com")
+        self.assertEqual(len(links), 2)
+        self.assertEqual(links[0]["absolute_url"], "https://site.com/about")
+
+        text = "Contact us at https://support.site.com now."
+        masked = mask_urls_in_text(text, mask_str="[REDACTED]")
+        self.assertEqual(masked, "Contact us at [REDACTED] now.")
+
+
+
 
 
 
