@@ -459,5 +459,80 @@ def filter_urls_by_domain(
     return matching
 
 
+# ─── 6. HTML Link Tag Parser & URL Masker ─────────────────────────────────────
+
+
+def extract_urls_from_html(
+    html_content: str,
+    base_url: Optional[str] = None,
+) -> List[Dict[str, str]]:
+    """
+    Parses HTML content to extract all link (href) and media (src) URLs.
+
+    Args:
+        html_content: String HTML document markup.
+        base_url: Optional base URL to resolve relative link paths (e.g. '/about' -> 'https://site.com/about').
+
+    Returns:
+        List of dicts containing 'tag', 'attribute', 'raw_value', and 'absolute_url'.
+
+    Raises:
+        TypeError: If html_content is not a string.
+    """
+    if not isinstance(html_content, str):
+        raise TypeError(f"Expected string for html_content, got {type(html_content).__name__}")
+
+    tag_pattern = r'<(a|img|script|link|iframe|source)\s+[^>]*?(href|src)\s*=\s*["\']([^"\']+)["\'][^>]*>'
+    matches = re.findall(tag_pattern, html_content, flags=re.IGNORECASE)
+
+    extracted = []
+    for tag, attr, raw_val in matches:
+        val = raw_val.strip()
+        if not val or val.startswith("javascript:") or val.startswith("mailto:"):
+            continue
+
+        abs_url = val
+        if base_url:
+            abs_url = urljoin(base_url, val)
+
+        extracted.append(
+            {
+                "tag": tag.lower(),
+                "attribute": attr.lower(),
+                "raw_value": val,
+                "absolute_url": abs_url,
+            }
+        )
+
+    return extracted
+
+
+def mask_urls_in_text(text: str, mask_str: str = "[URL REDACTED]") -> str:
+    """
+    Replaces all URLs in a text paragraph with a redaction mask.
+
+    Args:
+        text: Target text string.
+        mask_str: Redaction label replacement string (default '[URL REDACTED]').
+
+    Returns:
+        Redacted text string.
+
+    Raises:
+        TypeError: If text is not a string.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected string, got {type(text).__name__}")
+
+    urls = extract_urls(text)
+    redacted = text
+
+    for u in urls:
+        redacted = redacted.replace(u, mask_str)
+
+    return redacted
+
+
+
 
 
