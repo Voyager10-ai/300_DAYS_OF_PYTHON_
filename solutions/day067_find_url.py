@@ -70,3 +70,65 @@ def has_url(text: str) -> bool:
     if not isinstance(text, str):
         raise TypeError(f"Expected string, got {type(text).__name__}")
     return bool(extract_urls(text))
+
+
+# ─── 2. Detailed URL Parser & Component Decomposition Engine ─────────────────
+
+
+def parse_url_components(url: str) -> Dict[str, Any]:
+    """
+    Decomposes a URL string into detailed constituent components.
+
+    Args:
+        url: Target URL string to parse.
+
+    Returns:
+        Dict containing scheme, netloc, domain, port, path, query_string,
+        query_params (dict), fragment, and userinfo.
+
+    Raises:
+        TypeError: If url is not a string.
+        ValueError: If url is empty.
+    """
+    if not isinstance(url, str):
+        raise TypeError(f"Expected string for url, got {type(url).__name__}")
+    if not url.strip():
+        raise ValueError("URL string cannot be empty.")
+
+    # Ensure URL has protocol for urllib parsing if omitted
+    parse_target = url if "://" in url else f"http://{url}"
+    parsed = urlparse(parse_target)
+
+    # Extract userinfo if present
+    userinfo = None
+    if parsed.username or parsed.password:
+        userinfo = {
+            "username": parsed.username,
+            "password": parsed.password,
+        }
+
+    # Extract query parameters into dict
+    raw_query = parse_qs(parsed.query)
+    # Simplify query values list if single value
+    query_params: Dict[str, Any] = {}
+    for k, v in raw_query.items():
+        query_params[k] = v[0] if len(v) == 1 else v
+
+    # Extract port
+    port = parsed.port
+    hostname = parsed.hostname or ""
+
+    return {
+        "raw_url": url,
+        "scheme": parsed.scheme,
+        "netloc": parsed.netloc,
+        "hostname": hostname,
+        "port": port,
+        "path": parsed.path or "/",
+        "query_string": parsed.query,
+        "query_params": query_params,
+        "fragment": parsed.fragment,
+        "userinfo": userinfo,
+        "is_secure": parsed.scheme.lower() == "https",
+    }
+
