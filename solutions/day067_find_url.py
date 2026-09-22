@@ -13,8 +13,9 @@ from urllib.parse import urlparse, parse_qs, urlencode, urlunparse, urljoin
 
 # ─── 1. Core Regex URL Extractors & Link Finders ─────────────────────────────
 
-# Robust URL matching pattern supporting http, https, ftp, ftps, with ports, paths, query, and fragments
-URL_REGEX_PATTERN = r"(?i)\b(?:https?|ftp)://(?:[a-zA-Z0-9.\-]+(?::[a-zA-Z0-9.&%$-]+)*@)?(?:[a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,}(?::\d+)?(?:/[^\s<>'\"`{}]*)?"
+# Robust URL matching pattern supporting http, https, ftp, ftps, with ports, paths, query, IP addresses, and fragments
+URL_REGEX_PATTERN = r"(?i)\b(?:https?|ftp)://(?:[a-zA-Z0-9.\-]+(?::[a-zA-Z0-9.&%$-]+)*@)?(?:(?:\d{1,3}\.){3}\d{1,3}|localhost|(?:[a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,})(?::\d+)?(?:/[^\s<>'\"`{}]*)?"
+
 
 
 def extract_urls(
@@ -607,6 +608,74 @@ class TestFindURL(unittest.TestCase):
         text = "Contact us at https://support.site.com now."
         masked = mask_urls_in_text(text, mask_str="[REDACTED]")
         self.assertEqual(masked, "Contact us at [REDACTED] now.")
+
+
+# ─── 8. Interactive CLI Demonstration ─────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates all Day 67 URL extraction, parsing, and manipulation utilities."""
+    print("=" * 65)
+    print(" DAY 67: FIND URL & PARSER UTILITIES DEMONSTRATION")
+    print("=" * 65)
+
+    sample_paragraph = (
+        "Check documentation at https://docs.python.org/3/library/urllib.parse.html "
+        "or visit http://admin:secret@192.168.1.100:8080/dashboard?user=root#overview for dev stats."
+    )
+
+    print("\n1. Extracted URLs:")
+    extracted = extract_urls(sample_paragraph)
+    for u in extracted:
+        print(f"   -> {u}")
+
+    print("\n2. URL Component Breakdown (Complex URL):")
+    target_url = "https://admin:secret@api.service.co.uk:9000/v2/items?category=tech&page=1#results"
+    comp = parse_url_components(target_url)
+    print(f"   Raw URL      : {comp['raw_url']}")
+    print(f"   Scheme       : {comp['scheme']} (HTTPS: {comp['is_secure']})")
+    print(f"   Hostname     : {comp['hostname']} (Port: {comp['port']})")
+    print(f"   Path         : {comp['path']}")
+    print(f"   Query Params : {comp['query_params']}")
+    print(f"   Fragment     : {comp['fragment']}")
+    print(f"   User Info    : {comp['userinfo']}")
+
+    print("\n3. URL Security Health Assessment:")
+    insecure_url = "http://192.168.1.1/admin/../etc/passwd"
+    sec = validate_url_security(insecure_url)
+    print(f"   Target URL     : {insecure_url}")
+    print(f"   Security Score : {sec['security_score']}/100")
+    print(f"   Warnings       : {sec['warnings']}")
+
+    print("\n4. Query Parameter Manipulator & Normalizer:")
+    base_link = "https://example.com/products?category=shoes"
+    updated_link = add_query_params(base_link, {"discount": "20%", "sort": "price"})
+    print(f"   Original Link : {base_link}")
+    print(f"   Updated Link  : {updated_link}")
+    print(f"   Normalized    : {normalize_url('HTTPS://EXAMPLE.COM:443/products/')}")
+
+    print("\n5. Domain & TLD Deconstruction:")
+    domain_info = extract_domain_info("https://sub.blog.example.co.uk/article")
+    print(f"   Hostname    : {domain_info['full_hostname']}")
+    print(f"   Subdomain   : {domain_info['subdomain']}")
+    print(f"   Root Domain : {domain_info['root_domain']}")
+    print(f"   TLD         : {domain_info['tld']}")
+
+    print("\n6. HTML Link Extraction & Redaction Masking:")
+    html_markup = '<a href="/login">Login</a> <img src="https://cdn.example.com/banner.png">'
+    html_links = extract_urls_from_html(html_markup, base_url="https://example.com")
+    print(f"   Extracted HTML Links: {html_links}")
+    print(f"   Redacted Paragraph  : '{mask_urls_in_text(sample_paragraph)}'")
+
+    print("\n" + "=" * 65)
+    print(" Running Unit Test Suite...")
+    print("=" * 65)
+    unittest.main(argv=["first-arg-is-ignored"], exit=False)
+
+
+if __name__ == "__main__":
+    main()
+
 
 
 
