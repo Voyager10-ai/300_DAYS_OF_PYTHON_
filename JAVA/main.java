@@ -1230,6 +1230,34 @@ import java.util.*;
 //     }
 // }
 
+// Java Find URL & Parser Practice (Day 67)
+// class FindURLPractice {
+//     public static java.util.List<String> extractURLs(String text) {
+//         java.util.List<String> urls = new java.util.ArrayList<>();
+//         if (text == null) return urls;
+//         java.util.regex.Pattern p = java.util.regex.Pattern.compile("https?://[\\w\\.\\-]+(:\\d+)?(/[^\\s]*)?");
+//         java.util.regex.Matcher m = p.matcher(text);
+//         while (m.find()) {
+//             urls.add(m.group());
+//         }
+//         return urls;
+//     }
+//     public static boolean isValidURL(String url) {
+//         if (url == null) return false;
+//         try {
+//             new java.net.URL(url).toURI();
+//             return true;
+//         } catch (Exception e) {
+//             return false;
+//         }
+//     }
+//     public static void main(String[] args) {
+//         String paragraph = "Check https://github.com and http://example.com:8080/path for details.";
+//         System.out.println("Extracted URLs: " + extractURLs(paragraph));
+//         System.out.println("Is Valid URL: " + isValidURL("https://google.com"));
+//     }
+// }
+
 public class main{
   public static void main(String[] args){
     Scanner sc = new Scanner(System.in);
