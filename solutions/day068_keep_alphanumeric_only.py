@@ -350,6 +350,55 @@ def slugify_alphanumeric(text: str, separator: str = "-") -> str:
     return separator.join(w.lower() for w in words)
 
 
+# ─── 7. Unit Test Suite ───────────────────────────────────────────────────────
+
+
+class TestKeepAlphanumericOnly(unittest.TestCase):
+    """Test suite for alphanumeric filtering, custom retention, analysis, and batch operations."""
+
+    def test_keep_alphanumeric_only(self):
+        self.assertEqual(keep_alphanumeric_only("Hello, World! 123"), "HelloWorld123")
+        self.assertEqual(keep_alphanumeric_only("Hello, World! 123", keep_spaces=True), "Hello World 123")
+        self.assertEqual(keep_alphanumeric_only(""), "")
+        self.assertTrue(is_pure_alphanumeric("Python300"))
+        self.assertFalse(is_pure_alphanumeric("Python 300!"))
+
+        with self.assertRaises(TypeError):
+            keep_alphanumeric_only(12345)
+
+    def test_sanitize_custom_and_word_extraction(self):
+        self.assertEqual(sanitize_alphanumeric_custom("User@Domain.com!", preserve_case=True, allowed_extra_chars="@."), "User@Domain.com")
+        self.assertEqual(sanitize_alphanumeric_custom("User@Domain.com!", preserve_case=False, allowed_extra_chars="@."), "user@domain.com")
+        self.assertEqual(extract_alphanumeric_words("The quick, brown-fox!"), ["The", "quick", "brownfox"])
+
+    def test_ascii_and_unicode_modes(self):
+        self.assertEqual(keep_ascii_alphanumeric("Café#123!"), "Caf123")
+        self.assertEqual(keep_unicode_alphanumeric("Café#123!"), "Café123")
+
+    def test_analyze_alphanumeric_filtration(self):
+        res = analyze_alphanumeric_filtration("Py#300!")
+        self.assertEqual(res["total_length"], 7)
+        self.assertEqual(res["retained_alphanumeric_count"], 5)
+        self.assertEqual(res["removed_special_count"], 2)
+        self.assertEqual(res["retained_text"], "Py300")
+        self.assertEqual(res["category_breakdown"]["letters"], 2)
+        self.assertEqual(res["category_breakdown"]["digits"], 3)
+
+    def test_batch_sanitizers(self):
+        lst = ["Item #1!", "User @Home!"]
+        self.assertEqual(sanitize_string_list(lst), ["Item1", "UserHome"])
+
+        d = {"user_name!": "John Doe#1", "age": 30}
+        san_d = sanitize_dictionary_keys_values(d)
+        self.assertIn("username", san_d)
+        self.assertEqual(san_d["username"], "JohnDoe1")
+
+    def test_replace_and_slugify(self):
+        self.assertEqual(replace_non_alphanumeric("Hello World!", "_"), "Hello_World_")
+        self.assertEqual(slugify_alphanumeric("300 Days of Python! Day #68"), "300-days-of-python-day-68")
+
+
+
 
 
 
