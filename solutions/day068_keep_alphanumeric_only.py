@@ -304,5 +304,52 @@ def sanitize_dictionary_keys_values(
     return new_dict
 
 
+# ─── 6. Text Masking & URL Slugification Helpers ──────────────────────────────
+
+
+def replace_non_alphanumeric(text: str, replacement_char: str = "_") -> str:
+    """
+    Replaces all non-alphanumeric characters with a designated replacement character.
+
+    Args:
+        text: Source text string.
+        replacement_char: Character to substitute for special symbols/whitespace (default '_').
+
+    Returns:
+        Transformed output string.
+
+    Raises:
+        TypeError: If inputs are invalid types.
+    """
+    if not isinstance(text, str) or not isinstance(replacement_char, str):
+        raise TypeError("text and replacement_char must be strings.")
+
+    return re.sub(r"[^\w]", replacement_char, text, flags=re.UNICODE)
+
+
+def slugify_alphanumeric(text: str, separator: str = "-") -> str:
+    """
+    Generates a clean, URL-friendly slug by retaining alphanumeric words separated by separator.
+
+    Args:
+        text: Source title or headline string.
+        separator: Delimiter string connecting words (default '-').
+
+    Returns:
+        URL slug string.
+
+    Raises:
+        TypeError: If inputs are not strings.
+    """
+    if not isinstance(text, str) or not isinstance(separator, str):
+        raise TypeError("text and separator must be strings.")
+    if not text.strip():
+        return ""
+
+    words = extract_alphanumeric_words(text)
+    return separator.join(w.lower() for w in words)
+
+
+
 
 
