@@ -237,4 +237,72 @@ def analyze_alphanumeric_filtration(text: str) -> Dict[str, Any]:
     }
 
 
+# ─── 5. Collection Batch Sanitizers ───────────────────────────────────────────
+
+
+def sanitize_string_list(
+    text_list: List[str],
+    keep_spaces: bool = False,
+) -> List[str]:
+    """
+    Sanitizes a list of strings, keeping only alphanumeric characters in each item.
+
+    Args:
+        text_list: List of input string items.
+        keep_spaces: If True, preserves whitespace characters.
+
+    Returns:
+        New list of sanitized strings.
+
+    Raises:
+        TypeError: If text_list is not a list.
+    """
+    if not isinstance(text_list, list):
+        raise TypeError(f"Expected list for text_list, got {type(text_list).__name__}")
+
+    sanitized = []
+    for item in text_list:
+        if not isinstance(item, str):
+            raise TypeError(f"All list items must be strings, got {type(item).__name__}")
+        sanitized.append(keep_alphanumeric_only(item, keep_spaces=keep_spaces))
+
+    return sanitized
+
+
+def sanitize_dictionary_keys_values(
+    data: Dict[str, Any],
+    sanitize_keys: bool = True,
+    sanitize_values: bool = True,
+) -> Dict[str, Any]:
+    """
+    Sanitizes dictionary keys and/or string values to contain only alphanumeric characters.
+
+    Args:
+        data: Target dictionary.
+        sanitize_keys: If True, strips non-alphanumeric chars from string keys.
+        sanitize_values: If True, strips non-alphanumeric chars from string values.
+
+    Returns:
+        New dictionary with sanitized keys/values.
+
+    Raises:
+        TypeError: If data is not a dict.
+    """
+    if not isinstance(data, dict):
+        raise TypeError(f"Expected dict for data, got {type(data).__name__}")
+
+    new_dict: Dict[str, Any] = {}
+
+    for k, v in data.items():
+        new_key = keep_alphanumeric_only(str(k)) if sanitize_keys else k
+        new_val = v
+        if sanitize_values and isinstance(v, str):
+            new_val = keep_alphanumeric_only(v)
+
+        new_dict[new_key] = new_val
+
+    return new_dict
+
+
+
 
