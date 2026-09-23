@@ -119,3 +119,58 @@ def extract_alphanumeric_words(text: str) -> List[str]:
 
     return words
 
+
+# ─── 3. ASCII vs Unicode Alphanumeric Filtering Modes ─────────────────────────
+
+
+def keep_ascii_alphanumeric(text: str, keep_spaces: bool = False) -> str:
+    """
+    Filters text strictly to ASCII alphanumeric characters (A-Z, a-z, 0-9).
+
+    Args:
+        text: Target text string.
+        keep_spaces: If True, preserves space characters.
+
+    Returns:
+        Filtered ASCII string.
+
+    Raises:
+        TypeError: If text is not a string.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected string, got {type(text).__name__}")
+
+    if keep_spaces:
+        return re.sub(r"[^a-zA-Z0-9\s]", "", text)
+    return re.sub(r"[^a-zA-Z0-9]", "", text)
+
+
+def keep_unicode_alphanumeric(text: str, keep_spaces: bool = False) -> str:
+    """
+    Filters text using Unicode character category inspection (retains letters and numbers across all languages).
+
+    Args:
+        text: Target text string.
+        keep_spaces: If True, preserves space characters.
+
+    Returns:
+        Filtered Unicode string.
+
+    Raises:
+        TypeError: If text is not a string.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected string, got {type(text).__name__}")
+
+    retained = []
+    for char in text:
+        # Category check: 'L' (Letter), 'N' (Number)
+        cat = unicodedata.category(char)
+        if cat.startswith("L") or cat.startswith("N"):
+            retained.append(char)
+        elif keep_spaces and char.isspace():
+            retained.append(char)
+
+    return "".join(retained)
+
+
