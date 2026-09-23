@@ -56,3 +56,66 @@ def is_pure_alphanumeric(text: str) -> bool:
     if not isinstance(text, str):
         raise TypeError(f"Expected string, got {type(text).__name__}")
     return len(text) > 0 and text.isalnum()
+
+
+# ─── 2. Custom Character Retention & Word Extraction ──────────────────────────
+
+
+def sanitize_alphanumeric_custom(
+    text: str,
+    preserve_case: bool = True,
+    allowed_extra_chars: Optional[str] = None,
+) -> str:
+    """
+    Filters text to alphanumeric characters while permitting specified custom extra characters.
+
+    Args:
+        text: Target text string.
+        preserve_case: If False, converts output to lowercase.
+        allowed_extra_chars: String of extra allowed non-alphanumeric chars e.g. " -_@".
+
+    Returns:
+        Filtered string containing alphanumeric plus allowed extra characters.
+
+    Raises:
+        TypeError: If inputs are invalid types.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected string for text, got {type(text).__name__}")
+
+    extra = allowed_extra_chars or ""
+    escaped_extra = re.escape(extra)
+    pattern = f"[^a-zA-Z0-9{escaped_extra}]"
+
+    res = re.sub(pattern, "", text)
+    return res if preserve_case else res.lower()
+
+
+def extract_alphanumeric_words(text: str) -> List[str]:
+    """
+    Extracts words containing strictly alphanumeric characters from a body of text.
+
+    Args:
+        text: Source text paragraph.
+
+    Returns:
+        List of alphanumeric word strings.
+
+    Raises:
+        TypeError: If text is not a string.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected string, got {type(text).__name__}")
+    if not text.strip():
+        return []
+
+    tokens = text.split()
+    words = []
+
+    for token in tokens:
+        cleaned = re.sub(r"[^\w]", "", token).replace("_", "")
+        if cleaned:
+            words.append(cleaned)
+
+    return words
+
