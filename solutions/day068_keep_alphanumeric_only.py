@@ -174,3 +174,67 @@ def keep_unicode_alphanumeric(text: str, keep_spaces: bool = False) -> str:
     return "".join(retained)
 
 
+# ─── 4. Character Removal Breakdown & Analysis Engine ─────────────────────────
+
+
+def analyze_alphanumeric_filtration(text: str) -> Dict[str, Any]:
+    """
+    Analyzes character composition and calculates filtration metrics for a text.
+
+    Args:
+        text: Input string to analyze.
+
+    Returns:
+        Dict containing total_chars, retained_alphanumeric_count, removed_special_count,
+        removed_characters_list, retention_ratio_percentage, and category_breakdown.
+
+    Raises:
+        TypeError: If text is not a string.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected string, got {type(text).__name__}")
+
+    total_len = len(text)
+    retained_chars = []
+    removed_chars = []
+
+    cat_breakdown = {
+        "letters": 0,
+        "digits": 0,
+        "punctuation": 0,
+        "whitespace": 0,
+        "symbols_other": 0,
+    }
+
+    for c in text:
+        if c.isalnum():
+            retained_chars.append(c)
+            if c.isalpha():
+                cat_breakdown["letters"] += 1
+            else:
+                cat_breakdown["digits"] += 1
+        else:
+            removed_chars.append(c)
+            if c in string.punctuation:
+                cat_breakdown["punctuation"] += 1
+            elif c.isspace():
+                cat_breakdown["whitespace"] += 1
+            else:
+                cat_breakdown["symbols_other"] += 1
+
+    ret_count = len(retained_chars)
+    rem_count = len(removed_chars)
+    ratio = (ret_count / total_len * 100.0) if total_len > 0 else 0.0
+
+    return {
+        "total_length": total_len,
+        "retained_alphanumeric_count": ret_count,
+        "removed_special_count": rem_count,
+        "retained_text": "".join(retained_chars),
+        "removed_characters": removed_chars,
+        "retention_ratio_percentage": round(ratio, 2),
+        "category_breakdown": cat_breakdown,
+    }
+
+
+
