@@ -398,6 +398,64 @@ class TestKeepAlphanumericOnly(unittest.TestCase):
         self.assertEqual(slugify_alphanumeric("300 Days of Python! Day #68"), "300-days-of-python-day-68")
 
 
+# ─── 8. Interactive CLI Demonstration ─────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates all Day 68 alphanumeric filtering utilities."""
+    print("=" * 65)
+    print(" DAY 68: KEEP ALPHANUMERIC ONLY UTILITIES DEMONSTRATION")
+    print("=" * 65)
+
+    raw_sample = "Hello, World! Welcome to Python #300 (Day 68) — 100% Awesome!"
+
+    print("\n1. Core Alphanumeric Filtering:")
+    print(f"   Original Raw Text     : '{raw_sample}'")
+    print(f"   Strict Alphanumeric   : '{keep_alphanumeric_only(raw_sample)}'")
+    print(f"   Preserve Whitespace   : '{keep_alphanumeric_only(raw_sample, keep_spaces=True)}'")
+    print(f"   Is Pure Alphanumeric  : {is_pure_alphanumeric(keep_alphanumeric_only(raw_sample))}")
+
+    print("\n2. Custom Extra Character Retention:")
+    print(f"   Keep @ . -            : '{sanitize_alphanumeric_custom('Contact: info@domain-site.com!', allowed_extra_chars='@.-')}'")
+    print(f"   Extracted Words List  : {extract_alphanumeric_words(raw_sample)}")
+
+    print("\n3. ASCII vs Unicode Modes:")
+    unicode_sample = "Café & Naïve #123 — 🌟 Python!"
+    print(f"   Original Unicode Text : '{unicode_sample}'")
+    print(f"   ASCII Strict Mode     : '{keep_ascii_alphanumeric(unicode_sample, keep_spaces=True)}'")
+    print(f"   Unicode Mode          : '{keep_unicode_alphanumeric(unicode_sample, keep_spaces=True)}'")
+
+    print("\n4. Filtration Breakdown & Analysis:")
+    analysis = analyze_alphanumeric_filtration(raw_sample)
+    print(f"   Total Length         : {analysis['total_length']}")
+    print(f"   Retained Alphanumeric: {analysis['retained_alphanumeric_count']} chars")
+    print(f"   Removed Special      : {analysis['removed_special_count']} chars")
+    print(f"   Retention Ratio      : {analysis['retention_ratio_percentage']}%")
+    print(f"   Category Breakdown   : {analysis['category_breakdown']}")
+
+    print("\n5. Collection Batch Sanitization:")
+    raw_list = ["User_Name#1", "Order-ID #99!", "Price: $49.99"]
+    print(f"   Raw List             : {raw_list}")
+    print(f"   Sanitized List       : {sanitize_string_list(raw_list)}")
+
+    raw_dict = {"user_id!": "usr#101", "role_type": "admin@root"}
+    print(f"   Sanitized Dict       : {sanitize_dictionary_keys_values(raw_dict)}")
+
+    print("\n6. Masking & URL Slugification:")
+    print(f"   Masked Non-Alnum     : '{replace_non_alphanumeric(raw_sample, '_')}'")
+    print(f"   Generated URL Slug   : '{slugify_alphanumeric('300 Days of Python: Day 68 Keep Alphanumeric Only')}'")
+
+    print("\n" + "=" * 65)
+    print(" Running Unit Test Suite...")
+    print("=" * 65)
+    unittest.main(argv=["first-arg-is-ignored"], exit=False)
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 
