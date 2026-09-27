@@ -1258,6 +1258,27 @@ import java.util.*;
 //     }
 // }
 
+// Java Keep Alphanumeric Only Practice (Day 68)
+// class KeepAlphanumericPractice {
+//     public static String keepAlphanumericOnly(String text, boolean keepSpaces) {
+//         if (text == null) return "";
+//         if (keepSpaces) {
+//             return text.replaceAll("[^a-zA-Z0-9\\s]", "");
+//         }
+//         return text.replaceAll("[^a-zA-Z0-9]", "");
+//     }
+//     public static boolean isPureAlphanumeric(String text) {
+//         if (text == null || text.isEmpty()) return false;
+//         return text.matches("^[a-zA-Z0-9]+$");
+//     }
+//     public static void main(String[] args) {
+//         String raw = "Hello, World! #300 (Day 68)";
+//         System.out.println("Strict Alphanumeric: " + keepAlphanumericOnly(raw, false));
+//         System.out.println("Keep Spaces: " + keepAlphanumericOnly(raw, true));
+//         System.out.println("Is Pure: " + isPureAlphanumeric("Java2026"));
+//     }
+// }
+
 public class main{
   public static void main(String[] args){
     Scanner sc = new Scanner(System.in);
