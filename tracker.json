@@ -1,6 +1,6 @@
 {
   "total_problems": 282,
-  "current_day": 67,
+  "current_day": 68,
   "problems": [
     {"day": 1, "title": "Print String", "status": "done"},
     {"day": 2, "title": "Input Age", "status": "done"},
@@ -78,7 +78,7 @@
     {"day": 65, "title": "Check String", "status": "done"},
     {"day": 66, "title": "Find Substring", "status": "done"},
     {"day": 67, "title": "Find URL", "status": "done"},
-    {"day": 68, "title": "Keep Alphanumeric Only", "status": "pending"},
+    {"day": 68, "title": "Keep Alphanumeric Only", "status": "done"},
     {"day": 69, "title": "Remove Parenthesis", "status": "pending"},
     {"day": 70, "title": "Remove White Space", "status": "pending"},
     {"day": 71, "title": "Remove Zero", "status": "pending"},
