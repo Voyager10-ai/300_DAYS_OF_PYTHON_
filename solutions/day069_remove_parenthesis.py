@@ -61,3 +61,79 @@ def has_parentheses(text: str) -> bool:
     if not isinstance(text, str):
         raise TypeError(f"Expected string, got {type(text).__name__}")
     return "(" in text or ")" in text
+
+
+# ─── 2. Multi-Bracket Remover & Content Extractor ────────────────────────────
+
+BRACKET_PAIRS = {
+    "()": (r"\(", r"\)"),
+    "[]": (r"\[", r"\]"),
+    "{}": (r"\{", r"\}"),
+    "<>": (r"<", r">"),
+}
+
+
+def remove_custom_brackets(
+    text: str,
+    brackets: Optional[List[str]] = None,
+    remove_contents: bool = True,
+) -> str:
+    """
+    Strips specified bracket types e.g. '()', '[]', '{}', '<>' and optionally their contents.
+
+    Args:
+        text: Input string.
+        brackets: List of bracket pair strings e.g. ['()', '[]']. Defaults to all.
+        remove_contents: If True, removes text enclosed inside brackets.
+
+    Returns:
+        Cleaned output string.
+
+    Raises:
+        TypeError: If inputs are invalid types.
+        ValueError: If invalid bracket type provided.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected string for text, got {type(text).__name__}")
+    if not text:
+        return ""
+
+    target_brackets = brackets or ["()", "[]", "{}", "<>"]
+    result = text
+
+    for b in target_brackets:
+        if b not in BRACKET_PAIRS:
+            raise ValueError(f"Unsupported bracket pair '{b}'. Choose from '()', '[]', '{{}}', '<>'.")
+        open_b, close_b = BRACKET_PAIRS[b]
+
+        if remove_contents:
+            pattern = f"{open_b}[^{open_b}{close_b}]*{close_b}"
+            while re.search(pattern, result):
+                result = re.sub(pattern, "", result)
+        else:
+            raw_open, raw_close = b[0], b[1]
+            result = result.replace(raw_open, "").replace(raw_close, "")
+
+    return re.sub(r" +", " ", result).strip()
+
+
+def extract_parenthetical_contents(text: str) -> List[str]:
+    """
+    Extracts all substrings enclosed inside parentheses.
+
+    Args:
+        text: Source text string.
+
+    Returns:
+        List of extracted string contents.
+
+    Raises:
+        TypeError: If text is not a string.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected string, got {type(text).__name__}")
+    if not text:
+        return []
+
+    return re.findall(r"\(([^()]*)\)", text)
+
