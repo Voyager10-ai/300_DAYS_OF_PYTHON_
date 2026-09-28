@@ -1279,6 +1279,38 @@ import java.util.*;
 //     }
 // }
 
+// Java Remove Parenthesis & Stack Practice (Day 69)
+// class RemoveParenthesisPractice {
+//     public static String removeParentheses(String text, boolean removeContents) {
+//         if (text == null) return "";
+//         if (removeContents) {
+//             String res = text;
+//             while (res.contains("(") && res.contains(")")) {
+//                 res = res.replaceAll("\\([^()]*\\)", "");
+//             }
+//             return res.replaceAll(" +", " ").trim();
+//         }
+//         return text.replace("(", "").replace(")", "");
+//     }
+//     public static boolean isBalancedParentheses(String text) {
+//         if (text == null) return true;
+//         int depth = 0;
+//         for (char c : text.toCharArray()) {
+//             if (c == '(') depth++;
+//             else if (c == ')') {
+//                 if (depth == 0) return false;
+//                 depth--;
+//             }
+//         }
+//         return depth == 0;
+//     }
+//     public static void main(String[] args) {
+//         String sample = "Python (programming language) 3.10";
+//         System.out.println("Remove Parentheses: " + removeParentheses(sample, true));
+//         System.out.println("Is Balanced: " + isBalancedParentheses("((a + b))"));
+//     }
+// }
+
 public class main{
   public static void main(String[] args){
     Scanner sc = new Scanner(System.in);
