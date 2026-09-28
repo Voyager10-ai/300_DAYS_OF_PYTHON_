@@ -221,3 +221,73 @@ def check_balanced_parentheses(text: str) -> Tuple[bool, int, List[int]]:
     return is_balanced, max_depth, unbalanced_indices
 
 
+# ─── 4. Expression Simplifier & Structure Analysis Engine ────────────────────
+
+
+def simplify_expression_parentheses(expr: str) -> str:
+    """
+    Removes redundant nested parentheses enclosing a mathematical or logical expression.
+    e.g. "((a + b))" -> "(a + b)"
+
+    Args:
+        expr: Expression string to simplify.
+
+    Returns:
+        Simplified expression string.
+
+    Raises:
+        TypeError: If expr is not a string.
+    """
+    if not isinstance(expr, str):
+        raise TypeError(f"Expected string, got {type(expr).__name__}")
+    if not expr.strip():
+        return ""
+
+    res = expr.strip()
+    while res.startswith("(") and res.endswith(")"):
+        is_bal, _, _ = check_balanced_parentheses(res[1:-1])
+        if is_bal:
+            res = res[1:-1].strip()
+        else:
+            break
+
+    return res
+
+
+def analyze_parenthesis_structure(text: str) -> Dict[str, Any]:
+    """
+    Computes statistical and structural metrics for parentheses in a text.
+
+    Args:
+        text: Target text string.
+
+    Returns:
+        Dict containing open_count, close_count, is_balanced, max_depth,
+        unbalanced_indices, total_enclosed_chars, and parenthetical_pairs_count.
+
+    Raises:
+        TypeError: If text is not a string.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected string, got {type(text).__name__}")
+
+    open_cnt = text.count("(")
+    close_cnt = text.count(")")
+    is_bal, max_depth, unbal_idx = check_balanced_parentheses(text)
+
+    contents = extract_parenthetical_contents(text)
+    total_enclosed = sum(len(c) for c in contents)
+
+    return {
+        "open_count": open_cnt,
+        "close_count": close_cnt,
+        "is_balanced": is_bal,
+        "max_nesting_depth": max_depth,
+        "unbalanced_indices": unbal_idx,
+        "parenthetical_pairs_count": len(contents),
+        "total_enclosed_chars": total_enclosed,
+        "extracted_contents": contents,
+    }
+
+
+
