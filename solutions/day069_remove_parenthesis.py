@@ -464,6 +464,66 @@ class TestRemoveParenthesis(unittest.TestCase):
         self.assertEqual(transform_parentheses_tags("Func(x, y)", "[", "]"), "Func[x, y]")
 
 
+# ─── 8. Interactive CLI Demonstration ─────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates all Day 69 parenthesis removal and parsing utilities."""
+    print("=" * 65)
+    print(" DAY 69: REMOVE PARENTHESIS UTILITIES DEMONSTRATION")
+    print("=" * 65)
+
+    sample_text = "Python (programming language) 3.10 [latest release] {active} <stable>"
+
+    print("\n1. Core Parenthesis Removal:")
+    print(f"   Original Raw Text     : '{sample_text}'")
+    print(f"   Remove () with content: '{remove_parentheses(sample_text, remove_contents=True)}'")
+    print(f"   Remove () keep content: '{remove_parentheses(sample_text, remove_contents=False)}'")
+    print(f"   Has Parentheses       : {has_parentheses(sample_text)}")
+
+    print("\n2. Multi-Bracket Type Stripping:")
+    print(f"   Strip All Brackets    : '{remove_custom_brackets(sample_text)}'")
+    print(f"   Strip () and [] only  : '{remove_custom_brackets(sample_text, brackets=['()', '[]'])}'")
+    print(f"   Extracted () Contents : {extract_parenthetical_contents(sample_text)}")
+
+    print("\n3. Nested Parenthesis Stack Parsing:")
+    nested_expr = "A (B (C) D) E (F)"
+    print(f"   Nested Sample Text    : '{nested_expr}'")
+    print(f"   Strip All Nested      : '{remove_nested_parentheses(nested_expr)}'")
+    print(f"   Max Depth Limit = 1   : '{remove_nested_parentheses(nested_expr, max_depth=1)}'")
+
+    print("\n4. Expression Simplifier & Structure Analysis:")
+    math_expr = "((x + y) * (z - 1))"
+    print(f"   Math Expression       : '{math_expr}'")
+    print(f"   Simplified Expression : '{simplify_expression_parentheses(math_expr)}'")
+    analysis = analyze_parenthesis_structure(sample_text)
+    print(f"   Max Nesting Depth     : {analysis['max_nesting_depth']}")
+    print(f"   Is Balanced           : {analysis['is_balanced']}")
+    print(f"   Total Enclosed Chars  : {analysis['total_enclosed_chars']}")
+
+    print("\n5. Collection Batch Sanitization:")
+    raw_list = ["Title (Draft)", "User (Admin)", "Setting (Default)"]
+    print(f"   Raw List              : {raw_list}")
+    print(f"   Sanitized List        : {remove_parentheses_from_list(raw_list)}")
+
+    raw_dict = {"key(1)": "val(10)", "name(str)": "Alice"}
+    print(f"   Sanitized Dict        : {remove_parentheses_from_dict(raw_dict)}")
+
+    print("\n6. Masking & Tag Transformation:")
+    print(f"   Redacted Mask         : '{mask_parentheses_contents('Secret (password123) data')}'")
+    print(f"   Transformed to []     : '{transform_parentheses_tags('Func(x, y)', '[', ']')}'")
+
+    print("\n" + "=" * 65)
+    print(" Running Unit Test Suite...")
+    print("=" * 65)
+    unittest.main(argv=["first-arg-is-ignored"], exit=False)
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 
