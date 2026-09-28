@@ -356,5 +356,56 @@ def remove_parentheses_from_dict(
     return new_dict
 
 
+# ─── 6. Parenthesis Redaction Masker & Tag Transformer ────────────────────────
+
+
+def mask_parentheses_contents(text: str, mask_str: str = "[REDACTED]") -> str:
+    """
+    Replaces all text inside parentheses with a redaction mask label.
+
+    Args:
+        text: Source text string.
+        mask_str: Redaction label string (default '[REDACTED]').
+
+    Returns:
+        Redacted text string.
+
+    Raises:
+        TypeError: If inputs are invalid types.
+    """
+    if not isinstance(text, str) or not isinstance(mask_str, str):
+        raise TypeError("text and mask_str must be strings.")
+    if not text:
+        return ""
+
+    return re.sub(r"\([^()]*\)", f"({mask_str})", text)
+
+
+def transform_parentheses_tags(
+    text: str,
+    new_open: str = "[",
+    new_close: str = "]",
+) -> str:
+    """
+    Replaces parenthesis characters '()' with alternative open/close brackets e.g. '[]' or '{}'.
+
+    Args:
+        text: Target string.
+        new_open: New opening character/string (default '[').
+        new_close: New closing character/string (default ']').
+
+    Returns:
+        Transformed string.
+
+    Raises:
+        TypeError: If inputs are not strings.
+    """
+    if not isinstance(text, str) or not isinstance(new_open, str) or not isinstance(new_close, str):
+        raise TypeError("Inputs must be strings.")
+
+    return text.replace("(", new_open).replace(")", new_close)
+
+
+
 
 
