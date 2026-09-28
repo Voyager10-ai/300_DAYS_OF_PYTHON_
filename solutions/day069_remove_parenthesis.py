@@ -137,3 +137,87 @@ def extract_parenthetical_contents(text: str) -> List[str]:
 
     return re.findall(r"\(([^()]*)\)", text)
 
+
+# ─── 3. Nested Parenthesis Stack Parser & Balance Checker ────────────────────
+
+
+def remove_nested_parentheses(text: str, max_depth: Optional[int] = None) -> str:
+    """
+    Parses and strips nested parentheses up to a specified depth using a character stack.
+
+    Args:
+        text: Source string containing nested parentheses e.g. "a (b (c) d) e".
+        max_depth: Maximum nesting depth to remove (None to remove all nested levels).
+
+    Returns:
+        Stripped output string.
+
+    Raises:
+        TypeError: If text is not a string.
+        ValueError: If max_depth is negative.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected string, got {type(text).__name__}")
+    if max_depth is not None and max_depth < 1:
+        raise ValueError("max_depth must be positive integer >= 1")
+
+    res = []
+    current_depth = 0
+
+    for char in text:
+        if char == "(":
+            current_depth += 1
+            if max_depth is not None and current_depth > max_depth:
+                res.append(char)
+        elif char == ")":
+            if max_depth is not None and current_depth > max_depth:
+                res.append(char)
+            if current_depth > 0:
+                current_depth -= 1
+        else:
+            if current_depth == 0 or (max_depth is not None and current_depth > max_depth):
+                res.append(char)
+
+    return re.sub(r" +", " ", "".join(res)).strip()
+
+
+def check_balanced_parentheses(text: str) -> Tuple[bool, int, List[int]]:
+    """
+    Validates if parentheses in text are properly balanced.
+
+    Args:
+        text: Target text string.
+
+    Returns:
+        Tuple of (is_balanced, max_depth, unbalanced_indices_list).
+
+    Raises:
+        TypeError: If text is not a string.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected string, got {type(text).__name__}")
+
+    stack = []  # stores (index, char)
+    max_depth = 0
+    unbalanced_indices = []
+
+    for idx, char in enumerate(text):
+        if char == "(":
+            stack.append((idx, char))
+            if len(stack) > max_depth:
+                max_depth = len(stack)
+        elif char == ")":
+            if stack:
+                stack.pop()
+            else:
+                unbalanced_indices.append(idx)
+
+    for idx, char in stack:
+        unbalanced_indices.append(idx)
+
+    unbalanced_indices.sort()
+    is_balanced = len(unbalanced_indices) == 0
+
+    return is_balanced, max_depth, unbalanced_indices
+
+
