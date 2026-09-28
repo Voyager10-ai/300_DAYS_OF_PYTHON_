@@ -290,4 +290,71 @@ def analyze_parenthesis_structure(text: str) -> Dict[str, Any]:
     }
 
 
+# ─── 5. Collection Batch Sanitizer & List Cleaner ─────────────────────────────
+
+
+def remove_parentheses_from_list(
+    text_list: List[str],
+    remove_contents: bool = True,
+) -> List[str]:
+    """
+    Sanitizes a list of strings by stripping parentheses and optionally their contents.
+
+    Args:
+        text_list: List of input string items.
+        remove_contents: If True, removes text inside parentheses.
+
+    Returns:
+        List of sanitized strings.
+
+    Raises:
+        TypeError: If text_list is not a list.
+    """
+    if not isinstance(text_list, list):
+        raise TypeError(f"Expected list for text_list, got {type(text_list).__name__}")
+
+    sanitized = []
+    for item in text_list:
+        if not isinstance(item, str):
+            raise TypeError(f"All list elements must be strings, got {type(item).__name__}")
+        sanitized.append(remove_parentheses(item, remove_contents=remove_contents))
+
+    return sanitized
+
+
+def remove_parentheses_from_dict(
+    data: Dict[str, Any],
+    sanitize_keys: bool = True,
+    sanitize_values: bool = True,
+) -> Dict[str, Any]:
+    """
+    Sanitizes dictionary keys and/or string values by stripping parentheses.
+
+    Args:
+        data: Target dictionary.
+        sanitize_keys: If True, strips parentheses from string keys.
+        sanitize_values: If True, strips parentheses from string values.
+
+    Returns:
+        New dictionary with sanitized keys and values.
+
+    Raises:
+        TypeError: If data is not a dict.
+    """
+    if not isinstance(data, dict):
+        raise TypeError(f"Expected dict for data, got {type(data).__name__}")
+
+    new_dict: Dict[str, Any] = {}
+
+    for k, v in data.items():
+        new_k = remove_parentheses(str(k)) if sanitize_keys else k
+        new_v = v
+        if sanitize_values and isinstance(v, str):
+            new_v = remove_parentheses(v)
+        new_dict[new_k] = new_v
+
+    return new_dict
+
+
+
 
