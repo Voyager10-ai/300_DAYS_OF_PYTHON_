@@ -406,6 +406,65 @@ def transform_parentheses_tags(
     return text.replace("(", new_open).replace(")", new_close)
 
 
+# ─── 7. Unit Test Suite ───────────────────────────────────────────────────────
+
+
+class TestRemoveParenthesis(unittest.TestCase):
+    """Test suite for parenthesis removal, content stripping, nested stack parsing, and structure analysis."""
+
+    def test_core_remove_parentheses(self):
+        self.assertEqual(remove_parentheses("Hello (world) Python"), "Hello Python")
+        self.assertEqual(remove_parentheses("Hello (world) Python", remove_contents=False), "Hello world Python")
+        self.assertEqual(remove_parentheses(""), "")
+        self.assertTrue(has_parentheses("Text (note)"))
+        self.assertFalse(has_parentheses("Text note"))
+
+        with self.assertRaises(TypeError):
+            remove_parentheses(12345)
+
+    def test_remove_custom_brackets_and_contents(self):
+        text = "Alpha (one) [two] {three} <four>"
+        self.assertEqual(remove_custom_brackets(text, brackets=["()", "[]"]), "Alpha {three} <four>")
+        self.assertEqual(extract_parenthetical_contents("Py (first) and (second)"), ["first", "second"])
+
+    def test_nested_stack_parser_and_balance(self):
+        nested = "A (B (C) D) E"
+        self.assertEqual(remove_nested_parentheses(nested), "A E")
+        self.assertEqual(remove_nested_parentheses(nested, max_depth=1), "A (C) E")
+
+        is_bal, max_d, unbal = check_balanced_parentheses("((a + b))")
+        self.assertTrue(is_bal)
+        self.assertEqual(max_d, 2)
+        self.assertEqual(unbal, [])
+
+        is_bal_fail, _, unbal_fail = check_balanced_parentheses("((a + b)")
+        self.assertFalse(is_bal_fail)
+        self.assertEqual(unbal_fail, [0])
+
+    def test_expression_simplifier_and_structure(self):
+        self.assertEqual(simplify_expression_parentheses("((x + y))"), "x + y")
+        self.assertEqual(simplify_expression_parentheses("(a + b) * (c + d)"), "(a + b) * (c + d)")
+
+        struct = analyze_parenthesis_structure("Val (1) + (2)")
+        self.assertEqual(struct["open_count"], 2)
+        self.assertEqual(struct["parenthetical_pairs_count"], 2)
+        self.assertEqual(struct["extracted_contents"], ["1", "2"])
+
+    def test_collection_sanitizers(self):
+        lst = ["Alpha (v1)", "Beta (v2)"]
+        self.assertEqual(remove_parentheses_from_list(lst), ["Alpha", "Beta"])
+
+        d = {"key(1)": "val(2)", "num": 100}
+        san_d = remove_parentheses_from_dict(d)
+        self.assertIn("key", san_d)
+        self.assertEqual(san_d["key"], "val")
+
+    def test_masking_and_tag_transformation(self):
+        self.assertEqual(mask_parentheses_contents("User (secret) data"), "User ([REDACTED]) data")
+        self.assertEqual(transform_parentheses_tags("Func(x, y)", "[", "]"), "Func[x, y]")
+
+
+
 
 
 
