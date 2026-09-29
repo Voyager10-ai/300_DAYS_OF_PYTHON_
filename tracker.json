@@ -1,6 +1,6 @@
 {
   "total_problems": 282,
-  "current_day": 69,
+  "current_day": 70,
   "problems": [
     {"day": 1, "title": "Print String", "status": "done"},
     {"day": 2, "title": "Input Age", "status": "done"},
@@ -80,7 +80,7 @@
     {"day": 67, "title": "Find URL", "status": "done"},
     {"day": 68, "title": "Keep Alphanumeric Only", "status": "done"},
     {"day": 69, "title": "Remove Parenthesis", "status": "done"},
-    {"day": 70, "title": "Remove White Space", "status": "pending"},
+    {"day": 70, "title": "Remove White Space", "status": "done"},
     {"day": 71, "title": "Remove Zero", "status": "pending"},
     {"day": 72, "title": "Array Longest Non Repeat", "status": "pending"},
     {"day": 73, "title": "Array Merge Intervals", "status": "pending"},
