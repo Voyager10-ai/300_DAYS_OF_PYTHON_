@@ -194,3 +194,48 @@ def has_excess_whitespace(text: str) -> bool:
     return bool(re.search(r" {2,}|\t|\n", text))
 
 
+# ─── 4. Whitespace Analysis & Distribution Metrics Engine ────────────────────
+
+
+def analyze_whitespace_distribution(text: str) -> Dict[str, Any]:
+    """
+    Computes comprehensive statistics on whitespace distribution within a text string.
+
+    Args:
+        text: Target input string.
+
+    Returns:
+        Dict containing total_length, non_whitespace_count, total_whitespace_count,
+        spaces_count, tabs_count, newlines_count, whitespace_ratio_percentage,
+        and consecutive_space_blocks_count.
+
+    Raises:
+        TypeError: If text is not a string.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected string, got {type(text).__name__}")
+
+    total_len = len(text)
+    spaces_cnt = text.count(" ")
+    tabs_cnt = text.count("\t")
+    newlines_cnt = text.count("\n") + text.count("\r")
+    total_ws = sum(1 for c in text if c.isspace())
+    non_ws = total_len - total_ws
+
+    ratio = (total_ws / total_len * 100.0) if total_len > 0 else 0.0
+    consecutive_blocks = len(re.findall(r"\s+", text))
+
+    return {
+        "total_length": total_len,
+        "non_whitespace_count": non_ws,
+        "total_whitespace_count": total_ws,
+        "spaces_count": spaces_cnt,
+        "tabs_count": tabs_cnt,
+        "newlines_count": newlines_cnt,
+        "whitespace_ratio_percentage": round(ratio, 2),
+        "consecutive_space_blocks_count": consecutive_blocks,
+        "has_excess_whitespace": has_excess_whitespace(text),
+    }
+
+
+
