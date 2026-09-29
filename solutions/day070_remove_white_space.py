@@ -238,4 +238,89 @@ def analyze_whitespace_distribution(text: str) -> Dict[str, Any]:
     }
 
 
+# ─── 5. Collection Batch Whitespace Sanitizers ───────────────────────────────
+
+
+def remove_whitespace_from_list(
+    text_list: List[str],
+    mode: str = "all",
+) -> List[str]:
+    """
+    Sanitizes a list of strings by removing or trimming whitespace based on mode.
+
+    Args:
+        text_list: Input list of strings.
+        mode: Sanitization mode ('all', 'trim', 'normalize').
+              - 'all': strips all whitespace completely.
+              - 'trim': strips leading and trailing whitespace.
+              - 'normalize': collapses multiple spaces into single space.
+
+    Returns:
+        List of sanitized strings.
+
+    Raises:
+        TypeError: If text_list is not a list.
+    """
+    if not isinstance(text_list, list):
+        raise TypeError(f"Expected list for text_list, got {type(text_list).__name__}")
+
+    sanitized = []
+    m = mode.lower().strip()
+
+    for item in text_list:
+        if not isinstance(item, str):
+            raise TypeError(f"All list elements must be strings, got {type(item).__name__}")
+
+        if m == "all":
+            sanitized.append(remove_all_whitespace(item))
+        elif m == "trim":
+            sanitized.append(item.strip())
+        elif m == "normalize":
+            sanitized.append(normalize_whitespace(item))
+        else:
+            raise ValueError(f"Invalid mode '{mode}'. Choose from 'all', 'trim', 'normalize'.")
+
+    return sanitized
+
+
+def remove_whitespace_from_dict(
+    data: Dict[str, Any],
+    sanitize_keys: bool = True,
+    sanitize_values: bool = True,
+    mode: str = "all",
+) -> Dict[str, Any]:
+    """
+    Sanitizes dictionary keys and/or string values by cleaning whitespace.
+
+    Args:
+        data: Target dictionary.
+        sanitize_keys: If True, cleans whitespace in string keys.
+        sanitize_values: If True, cleans whitespace in string values.
+        mode: Sanitization mode ('all', 'trim', 'normalize').
+
+    Returns:
+        New dictionary with sanitized keys/values.
+
+    Raises:
+        TypeError: If data is not a dict.
+    """
+    if not isinstance(data, dict):
+        raise TypeError(f"Expected dict for data, got {type(data).__name__}")
+
+    new_dict: Dict[str, Any] = {}
+
+    for k, v in data.items():
+        key_str = str(k)
+        new_k = remove_whitespace_from_list([key_str], mode=mode)[0] if sanitize_keys else k
+
+        new_v = v
+        if sanitize_values and isinstance(v, str):
+            new_v = remove_whitespace_from_list([v], mode=mode)[0]
+
+        new_dict[new_k] = new_v
+
+    return new_dict
+
+
+
 
