@@ -1311,6 +1311,23 @@ import java.util.*;
 //     }
 // }
 
+// Java Remove White Space Practice (Day 70)
+// class RemoveWhiteSpacePractice {
+//     public static String removeAllWhiteSpace(String text) {
+//         if (text == null) return "";
+//         return text.replaceAll("\\s+", "");
+//     }
+//     public static String normalizeWhiteSpace(String text) {
+//         if (text == null) return "";
+//         return text.replaceAll("\\s+", " ").trim();
+//     }
+//     public static void main(String[] args) {
+//         String raw = "  Java   Language   Practice  \t\n ";
+//         System.out.println("Remove All: '" + removeAllWhiteSpace(raw) + "'");
+//         System.out.println("Normalized: '" + normalizeWhiteSpace(raw) + "'");
+//     }
+// }
+
 public class main{
   public static void main(String[] args){
     Scanner sc = new Scanner(System.in);
