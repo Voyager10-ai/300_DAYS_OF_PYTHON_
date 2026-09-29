@@ -383,6 +383,62 @@ def normalize_indentation(code_text: str, indent_spaces: int = 4) -> str:
     return "\n".join(normalized)
 
 
+# ─── 7. Unit Test Suite ───────────────────────────────────────────────────────
+
+
+class TestRemoveWhiteSpace(unittest.TestCase):
+    """Test suite for whitespace removal, trimming, normalization, and metrics analysis."""
+
+    def test_core_remove_and_trim(self):
+        self.assertEqual(remove_all_whitespace("  Hello \t World \n "), "HelloWorld")
+        self.assertEqual(trim_whitespace("  Python  ", mode="both"), "Python")
+        self.assertEqual(trim_whitespace("  Python  ", mode="leading"), "Python  ")
+        self.assertEqual(trim_whitespace("  Python  ", mode="trailing"), "  Python")
+        self.assertEqual(trim_whitespace("The   quick   brown", mode="extra_spaces"), "The quick brown")
+
+        with self.assertRaises(TypeError):
+            remove_all_whitespace(12345)
+
+    def test_normalization_and_multiline_cleaner(self):
+        self.assertEqual(normalize_whitespace("Line 1  \n\n  Line 2", single_space=True), "Line 1 Line 2")
+        self.assertEqual(normalize_whitespace("Line 1   \n   Line 2", single_space=False), "Line 1\nLine 2")
+
+        multiline = "  Line 1  \n\n  Line 2  \n  "
+        self.assertEqual(clean_line_whitespace(multiline, remove_empty_lines=True), "Line 1\nLine 2")
+        self.assertEqual(clean_line_whitespace(multiline, remove_empty_lines=False), "Line 1\n\nLine 2\n")
+
+    def test_selective_stripper_and_excess(self):
+        text = "Hello\tWorld\n300"
+        self.assertEqual(strip_whitespace_categories(text, remove_spaces=False, remove_tabs=True, remove_newlines=True), "HelloWorld300")
+        self.assertTrue(has_excess_whitespace("  Hello"))
+        self.assertTrue(has_excess_whitespace("Hello  World"))
+        self.assertFalse(has_excess_whitespace("Hello World"))
+
+    def test_analyze_whitespace_distribution(self):
+        stats = analyze_whitespace_distribution("Py 300\t\n")
+        self.assertEqual(stats["total_length"], 8)
+        self.assertEqual(stats["non_whitespace_count"], 5)
+        self.assertEqual(stats["total_whitespace_count"], 3)
+        self.assertEqual(stats["spaces_count"], 1)
+        self.assertEqual(stats["tabs_count"], 1)
+
+    def test_batch_sanitizers(self):
+        lst = ["  item1 ", "item2  "]
+        self.assertEqual(remove_whitespace_from_list(lst, mode="all"), ["item1", "item2"])
+        self.assertEqual(remove_whitespace_from_list(lst, mode="trim"), ["item1", "item2"])
+
+        d = {" key 1 ": " val 1 ", "num": 10}
+        san_d = remove_whitespace_from_dict(d, mode="all")
+        self.assertIn("key1", san_d)
+        self.assertEqual(san_d["key1"], "val1")
+
+    def test_replace_and_indentation(self):
+        self.assertEqual(replace_whitespace("Hello World \n", "_"), "Hello_World__")
+        code = "\tdef foo():\n\t\treturn 1"
+        self.assertEqual(normalize_indentation(code, indent_spaces=4), "    def foo():\n        return 1")
+
+
+
 
 
 
