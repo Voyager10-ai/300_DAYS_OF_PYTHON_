@@ -322,5 +322,67 @@ def remove_whitespace_from_dict(
     return new_dict
 
 
+# ─── 6. Whitespace Replacement Masker & Code Indentation Normalizer ─────────
+
+
+def replace_whitespace(text: str, replacement_char: str = "_") -> str:
+    """
+    Replaces all whitespace characters in a text with a replacement character.
+
+    Args:
+        text: Source text string.
+        replacement_char: Character to substitute for whitespace (default '_').
+
+    Returns:
+        Transformed string.
+
+    Raises:
+        TypeError: If inputs are not strings.
+    """
+    if not isinstance(text, str) or not isinstance(replacement_char, str):
+        raise TypeError("text and replacement_char must be strings.")
+
+    return re.sub(r"\s", replacement_char, text)
+
+
+def normalize_indentation(code_text: str, indent_spaces: int = 4) -> str:
+    """
+    Converts tab characters in indented code text to uniform space indentation.
+
+    Args:
+        code_text: Multiline code snippet string.
+        indent_spaces: Number of spaces per tab level (default 4).
+
+    Returns:
+        Code string with normalized space indentation.
+
+    Raises:
+        TypeError: If code_text is not a string.
+        ValueError: If indent_spaces is not positive.
+    """
+    if not isinstance(code_text, str):
+        raise TypeError(f"Expected string for code_text, got {type(code_text).__name__}")
+    if indent_spaces < 1:
+        raise ValueError(f"indent_spaces must be positive, got {indent_spaces}")
+
+    spaces = " " * indent_spaces
+    lines = code_text.splitlines()
+    normalized = []
+
+    for line in lines:
+        # Convert leading tabs to space indentation
+        match = re.match(r"^[\t ]+", line)
+        if match:
+            leading = match.group(0)
+            converted_leading = leading.replace("\t", spaces)
+            rest = line[len(leading) :]
+            normalized.append(converted_leading + rest)
+        else:
+            normalized.append(line)
+
+    return "\n".join(normalized)
+
+
+
 
 
