@@ -131,3 +131,66 @@ def clean_line_whitespace(multiline_text: str, remove_empty_lines: bool = True) 
 
     return "\n".join(cleaned)
 
+
+# ─── 3. Selective Category Stripper & Excess Whitespace Detector ───────────────
+
+
+def strip_whitespace_categories(
+    text: str,
+    remove_spaces: bool = True,
+    remove_tabs: bool = True,
+    remove_newlines: bool = True,
+) -> str:
+    """
+    Selectively removes specific categories of whitespace (spaces, tabs, newlines).
+
+    Args:
+        text: Target text string.
+        remove_spaces: If True, strips space characters ' '.
+        remove_tabs: If True, strips tab characters '\t'.
+        remove_newlines: If True, strips line break characters '\n' and '\r'.
+
+    Returns:
+        Filtered string.
+
+    Raises:
+        TypeError: If text is not a string.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected string, got {type(text).__name__}")
+
+    res = text
+    if remove_tabs:
+        res = res.replace("\t", "")
+    if remove_newlines:
+        res = res.replace("\n", "").replace("\r", "")
+    if remove_spaces:
+        res = res.replace(" ", "")
+
+    return res
+
+
+def has_excess_whitespace(text: str) -> bool:
+    """
+    Detects if a string contains excess whitespace (leading, trailing, or multiple consecutive spaces).
+
+    Args:
+        text: Target text string.
+
+    Returns:
+        True if text has leading/trailing whitespace or multiple spaces, else False.
+
+    Raises:
+        TypeError: If text is not a string.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected string, got {type(text).__name__}")
+    if not text:
+        return False
+
+    if text != text.strip():
+        return True
+
+    return bool(re.search(r" {2,}|\t|\n", text))
+
+
