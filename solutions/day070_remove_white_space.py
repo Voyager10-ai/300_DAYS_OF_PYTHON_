@@ -67,3 +67,67 @@ def trim_whitespace(text: str, mode: str = "both") -> str:
         return re.sub(r"\s+", " ", text).strip()
     else:
         raise ValueError(f"Invalid mode '{mode}'. Choose from 'both', 'leading', 'trailing', 'extra_spaces'.")
+
+
+# ─── 2. Whitespace Normalizer & Multiline Text Cleaner ────────────────────────
+
+
+def normalize_whitespace(text: str, single_space: bool = True) -> str:
+    """
+    Normalizes consecutive whitespace characters into a single space or standard newlines.
+
+    Args:
+        text: Source text string.
+        single_space: If True, converts all consecutive whitespace (including newlines) into a single space.
+                      If False, collapses consecutive spaces per line while preserving single line breaks.
+
+    Returns:
+        Normalized string.
+
+    Raises:
+        TypeError: If text is not a string.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected string, got {type(text).__name__}")
+    if not text:
+        return ""
+
+    if single_space:
+        return re.sub(r"\s+", " ", text).strip()
+
+    # Preserve line breaks but collapse horizontal spaces on each line
+    lines = text.splitlines()
+    normalized_lines = [re.sub(r"[ \t]+", " ", line).strip() for line in lines]
+    return "\n".join(normalized_lines)
+
+
+def clean_line_whitespace(multiline_text: str, remove_empty_lines: bool = True) -> str:
+    """
+    Trims leading and trailing whitespace from each line of a multiline text block.
+
+    Args:
+        multiline_text: Paragraph or multiline string.
+        remove_empty_lines: If True, completely filters out blank or empty lines.
+
+    Returns:
+        Cleaned multiline string.
+
+    Raises:
+        TypeError: If multiline_text is not a string.
+    """
+    if not isinstance(multiline_text, str):
+        raise TypeError(f"Expected string for multiline_text, got {type(multiline_text).__name__}")
+
+    lines = multiline_text.splitlines()
+    cleaned = []
+
+    for line in lines:
+        stripped = line.strip()
+        if remove_empty_lines:
+            if stripped:
+                cleaned.append(stripped)
+        else:
+            cleaned.append(stripped)
+
+    return "\n".join(cleaned)
+
