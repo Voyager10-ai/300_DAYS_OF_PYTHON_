@@ -438,6 +438,62 @@ class TestRemoveWhiteSpace(unittest.TestCase):
         self.assertEqual(normalize_indentation(code, indent_spaces=4), "    def foo():\n        return 1")
 
 
+# ─── 8. Interactive CLI Demonstration ─────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates all Day 70 whitespace removal and cleaning utilities."""
+    print("=" * 65)
+    print(" DAY 70: REMOVE WHITE SPACE UTILITIES DEMONSTRATION")
+    print("=" * 65)
+
+    sample_text = "   Python   300   \t\n  Day 70   Remove   Whitespace   "
+
+    print("\n1. Core Whitespace Removal & Trimming:")
+    print(f"   Original Raw Text     : '{sample_text!r}'")
+    print(f"   Remove All Whitespace : '{remove_all_whitespace(sample_text)}'")
+    print(f"   Trim Both Ends        : '{trim_whitespace(sample_text, mode='both')}'")
+    print(f"   Trim Extra Spaces     : '{trim_whitespace(sample_text, mode='extra_spaces')}'")
+
+    print("\n2. Whitespace Normalization & Line Cleaner:")
+    multiline_sample = "   Line 1:  Python   \n\n   Line 2:   Data Science   \n  "
+    print(f"   Single Space Normal   : '{normalize_whitespace(multiline_sample, single_space=True)}'")
+    print(f"   Cleaned Multiline     :\n{clean_line_whitespace(multiline_sample, remove_empty_lines=True)}")
+
+    print("\n3. Selective Category Stripping & Excess Detection:")
+    tab_nl_sample = "Hello\tWorld!\nPython 300"
+    print(f"   Remove Tabs & Newlines: '{strip_whitespace_categories(tab_nl_sample, remove_spaces=False, remove_tabs=True, remove_newlines=True)}'")
+    print(f"   Has Excess Whitespace : {has_excess_whitespace(sample_text)}")
+
+    print("\n4. Whitespace Analysis & Metrics Distribution:")
+    stats = analyze_whitespace_distribution(sample_text)
+    print(f"   Total Length          : {stats['total_length']}")
+    print(f"   Non-Whitespace Chars  : {stats['non_whitespace_count']}")
+    print(f"   Total Whitespace      : {stats['total_whitespace_count']} (Spaces: {stats['spaces_count']}, Tabs: {stats['tabs_count']}, Newlines: {stats['newlines_count']})")
+    print(f"   Whitespace Ratio      : {stats['whitespace_ratio_percentage']}%")
+
+    print("\n5. Collection Batch Sanitization:")
+    raw_list = ["  item1  ", "item2\t\n", "   item3   "]
+    print(f"   Raw List              : {raw_list}")
+    print(f"   Sanitized List (all)  : {remove_whitespace_from_list(raw_list, mode='all')}")
+    print(f"   Sanitized List (trim) : {remove_whitespace_from_list(raw_list, mode='trim')}")
+
+    print("\n6. Replacement Masker & Code Indentation Normalizer:")
+    print(f"   Masked Whitespace     : '{replace_whitespace('Hello World Python', '_')}'")
+    tab_code = "\tdef greet():\n\t\tprint('Hello World')"
+    print(f"   Normalized Indent Code:\n{normalize_indentation(tab_code, indent_spaces=4)}")
+
+    print("\n" + "=" * 65)
+    print(" Running Unit Test Suite...")
+    print("=" * 65)
+    unittest.main(argv=["first-arg-is-ignored"], exit=False)
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 
