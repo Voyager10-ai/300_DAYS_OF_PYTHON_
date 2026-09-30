@@ -286,4 +286,86 @@ def analyze_zero_distribution(text: str) -> Dict[str, Any]:
     }
 
 
+# ─── 5. Collection Zero Sanitizers ───────────────────────────────────────────
+
+
+def sanitize_zeros_from_collection(data: Any, mode: str = "all") -> Any:
+    """
+    Recursively strips or removes zeros from data collections (lists, tuples, dicts, sets, strings).
+
+    Args:
+        data: Collection or item to sanitize.
+        mode: Trimming mode applied to string elements ('all', 'leading', 'trailing').
+
+    Returns:
+        Sanitized collection of the same structure.
+
+    Raises:
+        ValueError: If mode is invalid.
+    """
+    m = mode.lower().strip()
+    if m not in ("all", "leading", "trailing"):
+        raise ValueError(f"Invalid mode '{mode}'. Choose from 'all', 'leading', 'trailing'.")
+
+    if isinstance(data, str):
+        if m == "all":
+            return data.replace("0", "")
+        elif m == "leading":
+            return data.lstrip("0")
+        elif m == "trailing":
+            return data.rstrip("0")
+    elif isinstance(data, (int, float)):
+        if data == 0:
+            return None
+        return data
+    elif isinstance(data, list):
+        cleaned = [sanitize_zeros_from_collection(item, mode=mode) for item in data]
+        return [item for item in cleaned if item is not None and item != ""]
+    elif isinstance(data, tuple):
+        cleaned = [sanitize_zeros_from_collection(item, mode=mode) for item in data]
+        return tuple(item for item in cleaned if item is not None and item != "")
+    elif isinstance(data, set):
+        cleaned = {sanitize_zeros_from_collection(item, mode=mode) for item in data}
+        return {item for item in cleaned if item is not None and item != ""}
+    elif isinstance(data, dict):
+        res = {}
+        for k, v in data.items():
+            cleaned_val = sanitize_zeros_from_collection(v, mode=mode)
+            if cleaned_val is not None and cleaned_val != "":
+                res[k] = cleaned_val
+        return res
+
+    return data
+
+
+def filter_zero_values_dict(d: Dict[Any, Any], remove_zero_strings: bool = True) -> Dict[Any, Any]:
+    """
+    Filters out key-value pairs from a dictionary where the value is zero (0, 0.0, or string zeros).
+
+    Args:
+        d: Input dictionary.
+        remove_zero_strings: If True, treats strings like "0", "0.0", "00" as zero values to filter out.
+
+    Returns:
+        Filtered dictionary without zero entries.
+
+    Raises:
+        TypeError: If d is not a dictionary.
+    """
+    if not isinstance(d, dict):
+        raise TypeError(f"Expected dict for d, got {type(d).__name__}")
+
+    result = {}
+    for k, v in d.items():
+        if v == 0 or v == 0.0:
+            continue
+        if remove_zero_strings and isinstance(v, str):
+            stripped = v.strip()
+            if stripped and re.match(r"^0+(\.0+)?$", stripped):
+                continue
+        result[k] = v
+    return result
+
+
+
 
