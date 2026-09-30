@@ -1326,9 +1326,25 @@ import java.util.*;
 //         System.out.println("Remove All: '" + removeAllWhiteSpace(raw) + "'");
 //         System.out.println("Normalized: '" + normalizeWhiteSpace(raw) + "'");
 //     }
+// Java Remove Zero Practice (Day 71)
+// class RemoveZeroPractice {
+//     public static String removeAllZeros(String text) {
+//         if (text == null) return "";
+//         return text.replace("0", "");
+//     }
+//     public static String removeLeadingZeros(String text) {
+//         if (text == null) return "";
+//         return text.replaceFirst("^0+", "");
+//     }
+//     public static void main(String[] args) {
+//         String sample = "000102030040.500";
+//         System.out.println("Remove All Zeros: " + removeAllZeros(sample));
+//         System.out.println("Remove Leading Zeros: " + removeLeadingZeros(sample));
+//     }
 // }
 
 public class main{
+
   public static void main(String[] args){
     Scanner sc = new Scanner(System.in);
 
