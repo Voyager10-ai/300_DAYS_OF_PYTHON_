@@ -470,11 +470,12 @@ class TestRemoveZero(unittest.TestCase):
     def test_analyze_zero_distribution(self):
         stats = analyze_zero_distribution("001020300")
         self.assertEqual(stats["total_chars"], 9)
-        self.assertEqual(stats["zero_count"], 5)
+        self.assertEqual(stats["zero_count"], 6)
         self.assertEqual(stats["leading_zero_count"], 2)
         self.assertEqual(stats["trailing_zero_count"], 2)
-        self.assertEqual(stats["interior_zero_count"], 1)
+        self.assertEqual(stats["interior_zero_count"], 2)
         self.assertEqual(stats["cleaned_text"], "123")
+
 
     def test_sanitize_zeros_from_collection(self):
         data = ["0012", "00", {"a": "004500", "b": 0, "c": "hello"}]
@@ -500,6 +501,42 @@ class TestRemoveZero(unittest.TestCase):
             remove_leading_zeros(123)
         with self.assertRaises(ValueError):
             normalize_numeric_zeros("abc")
+
+
+# ─── 8. Interactive CLI Demo Runner ──────────────────────────────────────────
+
+
+def main():
+    """Runs interactive demonstration and executes test suite."""
+    print("=" * 65)
+    print(" Day 71: Remove Zero - Demonstration & Execution Engine")
+    print("=" * 65)
+
+    sample = "000102030040.500"
+    print(f"Sample Input Text        : '{sample}'")
+    print(f"Remove All Zeros         : '{remove_all_zeros(sample)}'")
+    print(f"Remove Leading Zeros     : '{remove_leading_zeros(sample)}'")
+    print(f"Remove Trailing Zeros    : '{remove_trailing_zeros(sample)}'")
+    print(f"Normalize Numeric Zeros  : '{normalize_numeric_zeros('-00042.500')}'")
+    print(f"Pad Non-Zeros (8, '#')   : '{pad_non_zeros('000789', 8, '#')}'")
+    print(f"Align Numeric (min=4)    : '{align_numeric_string('05', 4)}'")
+    print(f"Replace Zeros with 'X'   : '{replace_zeros('102030', 'X')}'")
+    print(f"Mask Leading Zeros '*'   : '{mask_zeros(sample, '*', leading_only=True)}'")
+
+    print("\n--- Zero Distribution Metrics Analysis ---")
+    stats = analyze_zero_distribution(sample)
+    for k, v in stats.items():
+        print(f"  {k:<20}: {v}")
+
+    print("\n--- Running Unit Test Suite ---")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestRemoveZero)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    main()
+
 
 
 
