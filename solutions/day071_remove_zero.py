@@ -367,5 +367,63 @@ def filter_zero_values_dict(d: Dict[Any, Any], remove_zero_strings: bool = True)
     return result
 
 
+# ─── 6. Zero Masking & Replacement Helpers ────────────────────────────────────
+
+
+def replace_zeros(text: str, replacement: str = "X") -> str:
+    """
+    Replaces all '0' characters in a string with a designated replacement token.
+
+    Args:
+        text: Input string.
+        replacement: String token to replace zeros with (default "X").
+
+    Returns:
+        String with zeros substituted.
+
+    Raises:
+        TypeError: If text or replacement is not a string.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected str for text, got {type(text).__name__}")
+    if not isinstance(replacement, str):
+        raise TypeError(f"Expected str for replacement, got {type(replacement).__name__}")
+
+    return text.replace("0", replacement)
+
+
+def mask_zeros(text: str, mask_char: str = "*", leading_only: bool = False) -> str:
+    """
+    Masks zeros with a specified character.
+
+    Args:
+        text: Input string.
+        mask_char: Masking character (default "*").
+        leading_only: If True, masks only leading zeros.
+
+    Returns:
+        Masked string.
+
+    Raises:
+        TypeError: If text is not a string or mask_char is invalid.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected str for text, got {type(text).__name__}")
+    if not isinstance(mask_char, str) or len(mask_char) != 1:
+        raise TypeError("mask_char must be a single character string.")
+
+    if leading_only:
+        leading_count = 0
+        for char in text:
+            if char == "0":
+                leading_count += 1
+            else:
+                break
+        return (mask_char * leading_count) + text[leading_count:]
+
+    return text.replace("0", mask_char)
+
+
+
 
 
