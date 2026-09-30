@@ -424,6 +424,85 @@ def mask_zeros(text: str, mask_char: str = "*", leading_only: bool = False) -> s
     return text.replace("0", mask_char)
 
 
+# ─── 7. Unit Test Suite ───────────────────────────────────────────────────────
+
+
+class TestRemoveZero(unittest.TestCase):
+    """Unit test suite for Zero removal and formatting utilities."""
+
+    def test_remove_all_zeros(self):
+        self.assertEqual(remove_all_zeros("001020300"), "123")
+        self.assertEqual(remove_all_zeros("12345"), "12345")
+        self.assertEqual(remove_all_zeros(102030), "123")
+        self.assertEqual(remove_all_zeros("000"), "")
+
+    def test_remove_leading_zeros(self):
+        self.assertEqual(remove_leading_zeros("000123"), "123")
+        self.assertEqual(remove_leading_zeros("000"), "")
+        self.assertEqual(remove_leading_zeros("000", keep_single_zero=True), "0")
+        self.assertEqual(remove_leading_zeros("12300"), "12300")
+
+    def test_remove_trailing_zeros(self):
+        self.assertEqual(remove_trailing_zeros("123000"), "123")
+        self.assertEqual(remove_trailing_zeros("000123"), "000123")
+        self.assertEqual(remove_trailing_zeros("000"), "")
+
+    def test_strip_decimal_zeros(self):
+        self.assertEqual(strip_decimal_zeros("12.34000"), "12.34")
+        self.assertEqual(strip_decimal_zeros("100.00"), "100")
+        self.assertEqual(strip_decimal_zeros(5.000), "5")
+        self.assertEqual(strip_decimal_zeros("0.050"), "0.05")
+
+    def test_normalize_numeric_zeros(self):
+        self.assertEqual(normalize_numeric_zeros("-00042.500"), "-42.5")
+        self.assertEqual(normalize_numeric_zeros("+000.050"), "0.05")
+        self.assertEqual(normalize_numeric_zeros("0000"), "0")
+        self.assertEqual(normalize_numeric_zeros("0007.80"), "7.8")
+
+    def test_pad_non_zeros(self):
+        self.assertEqual(pad_non_zeros("000456", 8, fillchar=" "), "     456")
+        self.assertEqual(pad_non_zeros("000789", 6, fillchar="#"), "###789")
+
+    def test_align_numeric_string(self):
+        self.assertEqual(align_numeric_string("005", min_digits=4), "0005")
+        self.assertEqual(align_numeric_string("-007.5", min_digits=3), "-007.5")
+
+    def test_analyze_zero_distribution(self):
+        stats = analyze_zero_distribution("001020300")
+        self.assertEqual(stats["total_chars"], 9)
+        self.assertEqual(stats["zero_count"], 5)
+        self.assertEqual(stats["leading_zero_count"], 2)
+        self.assertEqual(stats["trailing_zero_count"], 2)
+        self.assertEqual(stats["interior_zero_count"], 1)
+        self.assertEqual(stats["cleaned_text"], "123")
+
+    def test_sanitize_zeros_from_collection(self):
+        data = ["0012", "00", {"a": "004500", "b": 0, "c": "hello"}]
+        result = sanitize_zeros_from_collection(data, mode="all")
+        self.assertEqual(result, ["12", {"a": "45", "c": "hello"}])
+
+    def test_filter_zero_values_dict(self):
+        d = {"x": 10, "y": 0, "z": "0.0", "w": "00", "v": "active"}
+        filtered = filter_zero_values_dict(d, remove_zero_strings=True)
+        self.assertEqual(filtered, {"x": 10, "v": "active"})
+
+    def test_replace_zeros(self):
+        self.assertEqual(replace_zeros("102030", "X"), "1X2X3X")
+
+    def test_mask_zeros(self):
+        self.assertEqual(mask_zeros("00102", mask_char="*"), "**1*2")
+        self.assertEqual(mask_zeros("00102", mask_char="#", leading_only=True), "##102")
+
+    def test_error_handling(self):
+        with self.assertRaises(TypeError):
+            remove_all_zeros(None)
+        with self.assertRaises(TypeError):
+            remove_leading_zeros(123)
+        with self.assertRaises(ValueError):
+            normalize_numeric_zeros("abc")
+
+
+
 
 
 
