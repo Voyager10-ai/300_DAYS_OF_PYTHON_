@@ -218,3 +218,72 @@ def align_numeric_string(val: str, min_digits: int = 1) -> str:
     return padded_int
 
 
+# ─── 4. Zero Occurrence Analyzer & Distribution Metrics Engine ───────────────
+
+
+def analyze_zero_distribution(text: str) -> Dict[str, Any]:
+    """
+    Analyzes zero frequency, positioning (leading, trailing, interior), and percentages in text.
+
+    Args:
+        text: Input target string.
+
+    Returns:
+        Dictionary containing metric counts and distribution figures.
+
+    Raises:
+        TypeError: If text is not a string.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected str for text, got {type(text).__name__}")
+
+    total_chars = len(text)
+    if total_chars == 0:
+        return {
+            "total_chars": 0,
+            "zero_count": 0,
+            "zero_percentage": 0.0,
+            "leading_zero_count": 0,
+            "trailing_zero_count": 0,
+            "interior_zero_count": 0,
+            "cleaned_text": "",
+        }
+
+    zero_count = text.count("0")
+    zero_percentage = round((zero_count / total_chars) * 100, 2)
+
+    # Calculate leading zeros
+    leading_zero_count = 0
+    for char in text:
+        if char == "0":
+            leading_zero_count += 1
+        else:
+            break
+
+    # Calculate trailing zeros
+    trailing_zero_count = 0
+    for char in reversed(text):
+        if char == "0":
+            trailing_zero_count += 1
+        else:
+            break
+
+    # Handle edge case where entire string is zeros
+    if leading_zero_count == total_chars:
+        interior_zero_count = 0
+        trailing_zero_count = 0
+    else:
+        interior_zero_count = max(0, zero_count - leading_zero_count - trailing_zero_count)
+
+    return {
+        "total_chars": total_chars,
+        "zero_count": zero_count,
+        "zero_percentage": zero_percentage,
+        "leading_zero_count": leading_zero_count,
+        "trailing_zero_count": trailing_zero_count,
+        "interior_zero_count": interior_zero_count,
+        "cleaned_text": text.replace("0", ""),
+    }
+
+
+
