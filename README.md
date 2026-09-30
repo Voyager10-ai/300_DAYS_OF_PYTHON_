@@ -73,6 +73,8 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 68: Keep Alphanumeric Only
 - Day 69: Remove Parenthesis
 - Day 70: Remove White Space
+- Day 71: Remove Zero
+
 
 
 
