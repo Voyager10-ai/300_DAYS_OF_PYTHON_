@@ -75,3 +75,80 @@ def remove_trailing_zeros(val: str) -> str:
     if not isinstance(val, str):
         raise TypeError(f"Expected str for val, got {type(val).__name__}")
     return val.rstrip("0")
+
+
+# ─── 2. Numeric Zero Stripping & Float Format Normalizers ────────────────────
+
+
+def strip_decimal_zeros(val: Union[str, float, int]) -> str:
+    """
+    Strips redundant trailing zeros after a decimal point, converting numbers like '12.3400' to '12.34' and '5.00' to '5'.
+
+    Args:
+        val: Input string, float, or integer.
+
+    Returns:
+        Cleaned numeric string without trailing fractional zeros.
+
+    Raises:
+        TypeError: If input is None.
+    """
+    if val is None:
+        raise TypeError("Input value cannot be None.")
+
+    text = str(val).strip()
+    if "." in text:
+        text = text.rstrip("0").rstrip(".")
+    return text
+
+
+def normalize_numeric_zeros(val: str) -> str:
+    """
+    Normalizes a numeric string by removing excess leading/trailing zeros, preserving sign (+/-).
+
+    Examples:
+        "-00042.500" -> "-42.5"
+        "+000.050"   -> "0.05"
+        "0000"       -> "0"
+
+    Args:
+        val: Numeric string input.
+
+    Returns:
+        Normalized numeric string.
+
+    Raises:
+        TypeError: If val is not a string.
+        ValueError: If val is not a valid representation of a number.
+    """
+    if not isinstance(val, str):
+        raise TypeError(f"Expected str for val, got {type(val).__name__}")
+
+    s = val.strip()
+    if not s:
+        raise ValueError("Input numeric string cannot be empty.")
+
+    sign = ""
+    if s[0] in ("+", "-"):
+        sign = "-" if s[0] == "-" else ""
+        s = s[1:]
+
+    if not s or not re.match(r"^\d*\.?\d*$", s) or s == ".":
+        raise ValueError(f"Invalid numeric string format: '{val}'")
+
+    if "." in s:
+        integer_part, decimal_part = s.split(".", 1)
+        integer_part = integer_part.lstrip("0") or "0"
+        decimal_part = decimal_part.rstrip("0")
+        if decimal_part:
+            res = f"{integer_part}.{decimal_part}"
+        else:
+            res = integer_part
+    else:
+        res = s.lstrip("0") or "0"
+
+    if res == "0":
+        return "0"
+
+    return f"{sign}{res}"
+
