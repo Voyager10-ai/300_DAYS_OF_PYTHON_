@@ -152,3 +152,69 @@ def normalize_numeric_zeros(val: str) -> str:
 
     return f"{sign}{res}"
 
+
+# ─── 3. Non-Zero Padding & Alignment Helpers ─────────────────────────────────
+
+
+def pad_non_zeros(text: str, length: int, fillchar: str = " ") -> str:
+    """
+    Removes leading zeros from a string and pads the result on the left with fillchar.
+
+    Args:
+        text: Input string.
+        length: Target total width.
+        fillchar: Character used for padding (default is space).
+
+    Returns:
+        Padded string after stripping leading zeros.
+
+    Raises:
+        TypeError: If text is not a string or fillchar length != 1.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected str for text, got {type(text).__name__}")
+    if not isinstance(fillchar, str) or len(fillchar) != 1:
+        raise TypeError("fillchar must be a single character string.")
+
+    unpadded = text.lstrip("0")
+    return unpadded.rjust(length, fillchar)
+
+
+def align_numeric_string(val: str, min_digits: int = 1) -> str:
+    """
+    Ensures a numeric string has leading zeros removed, but guarantees at least min_digits.
+
+    Args:
+        val: Numeric input string.
+        min_digits: Minimum required integer digits (default 1).
+
+    Returns:
+        Formatted numeric string with exact minimum leading zero padding.
+
+    Raises:
+        TypeError: If input is not a string.
+        ValueError: If min_digits < 1.
+    """
+    if not isinstance(val, str):
+        raise TypeError(f"Expected str for val, got {type(val).__name__}")
+    if min_digits < 1:
+        raise ValueError("min_digits must be at least 1.")
+
+    normalized = normalize_numeric_zeros(val)
+    parts = normalized.split(".", 1)
+    integer_part = parts[0]
+    
+    # Handle negative sign if present
+    is_neg = integer_part.startswith("-")
+    if is_neg:
+        integer_part = integer_part[1:]
+        
+    padded_int = integer_part.zfill(min_digits)
+    if is_neg:
+        padded_int = f"-{padded_int}"
+
+    if len(parts) > 1:
+        return f"{padded_int}.{parts[1]}"
+    return padded_int
+
+
