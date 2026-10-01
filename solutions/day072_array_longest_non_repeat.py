@@ -362,5 +362,68 @@ def filter_sequences_by_non_repeat_threshold(
     return result
 
 
+# ─── 6. Sequence Transformation & Formatting Helpers ───────────────────────
+
+
+def collapse_repeats_in_sequence(sequence: Union[str, List[Any]]) -> Union[str, List[Any]]:
+    """
+    Removes duplicate elements while preserving original order of first occurrence.
+
+    Args:
+        sequence: Input string or list.
+
+    Returns:
+        Deduplicated string or list of same type.
+
+    Raises:
+        TypeError: If sequence is not str/list/tuple.
+    """
+    if not isinstance(sequence, (str, list, tuple)):
+        raise TypeError(f"Expected str, list, or tuple, got {type(sequence).__name__}")
+
+    seen: Set[Any] = set()
+    deduped = []
+    for item in sequence:
+        if item not in seen:
+            seen.add(item)
+            deduped.append(item)
+
+    if isinstance(sequence, str):
+        return "".join(deduped)
+    return deduped
+
+
+def highlight_longest_non_repeat(text: str, marker: str = "***") -> str:
+    """
+    Highlights the longest non-repeating substring by enclosing it with marker tokens.
+
+    Args:
+        text: Input string.
+        marker: Surrounding marker string (default '***').
+
+    Returns:
+        String with highlighted non-repeating segment.
+
+    Raises:
+        TypeError: If text or marker is not a string.
+    """
+    if not isinstance(text, str):
+        raise TypeError(f"Expected str for text, got {type(text).__name__}")
+    if not isinstance(marker, str):
+        raise TypeError(f"Expected str for marker, got {type(marker).__name__}")
+    if not text:
+        return ""
+
+    start, end, max_len = get_non_repeat_subsegment_indices(text)
+    if max_len == 0:
+        return text
+
+    prefix = text[:start]
+    target = text[start : end + 1]
+    suffix = text[end + 1 :]
+    return f"{prefix}{marker}{target}{marker}{suffix}"
+
+
+
 
 
