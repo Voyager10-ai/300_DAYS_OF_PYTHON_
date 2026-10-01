@@ -1341,9 +1341,30 @@ import java.util.*;
 //         System.out.println("Remove All Zeros: " + removeAllZeros(sample));
 //         System.out.println("Remove Leading Zeros: " + removeLeadingZeros(sample));
 //     }
+// Java Longest Non-Repeating Substring Practice (Day 72)
+// class LongestNonRepeatPractice {
+//     public static int lengthOfLongestSubstring(String s) {
+//         if (s == null || s.isEmpty()) return 0;
+//         java.util.Map<Character, Integer> map = new java.util.HashMap<>();
+//         int maxLen = 0, left = 0;
+//         for (int right = 0; right < s.length(); right++) {
+//             char c = s.charAt(right);
+//             if (map.containsKey(c) && map.get(c) >= left) {
+//                 left = map.get(c) + 1;
+//             }
+//             map.put(c, right);
+//             maxLen = Math.max(maxLen, right - left + 1);
+//         }
+//         return maxLen;
+//     }
+//     public static void main(String[] args) {
+//         String s = "abcabcbb";
+//         System.out.println("Longest Non-Repeating Substring Length: " + lengthOfLongestSubstring(s));
+//     }
 // }
 
 public class main{
+
 
   public static void main(String[] args){
     Scanner sc = new Scanner(System.in);
