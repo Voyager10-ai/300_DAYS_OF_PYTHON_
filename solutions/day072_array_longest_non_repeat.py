@@ -165,3 +165,88 @@ def longest_k_unique_subsegment(sequence: Union[str, List[Any]], k: int) -> Tupl
 
     return (max_len, sequence[best_start : best_start + max_len])
 
+
+# ─── 3. Subsegment Slice Extractors & Indexing Utilities ────────────────────
+
+
+def get_non_repeat_subsegment_indices(sequence: Union[str, List[Any]]) -> Tuple[int, int, int]:
+    """
+    Returns start index, end index (inclusive), and length of the longest non-repeating subsegment.
+
+    Args:
+        sequence: Input string or list.
+
+    Returns:
+        Tuple of (start_index, end_index, max_length). If empty, returns (-1, -1, 0).
+
+    Raises:
+        TypeError: If sequence is not str/list/tuple.
+    """
+    if not isinstance(sequence, (str, list, tuple)):
+        raise TypeError(f"Expected str, list, or tuple, got {type(sequence).__name__}")
+    if not sequence:
+        return (-1, -1, 0)
+
+    items = list(sequence)
+    seen_map: Dict[Any, int] = {}
+    left = 0
+    max_len = 0
+    best_start = 0
+    best_end = 0
+
+    for right, item in enumerate(items):
+        if item in seen_map and seen_map[item] >= left:
+            left = seen_map[item] + 1
+
+        seen_map[item] = right
+        current_len = right - left + 1
+        if current_len > max_len:
+            max_len = current_len
+            best_start = left
+            best_end = right
+
+    return (best_start, best_end, max_len)
+
+
+def slice_non_repeat_windows(
+    sequence: Union[str, List[Any]], min_length: int = 1
+) -> List[Tuple[int, int, Union[str, List[Any]]]]:
+    """
+    Extracts all maximal non-repeating contiguous windows of length >= min_length.
+
+    Args:
+        sequence: Input string or list.
+        min_length: Minimum window length to include.
+
+    Returns:
+        List of tuples (start_idx, end_idx_inclusive, subsegment).
+
+    Raises:
+        TypeError: If sequence is not str/list/tuple.
+        ValueError: If min_length < 1.
+    """
+    if not isinstance(sequence, (str, list, tuple)):
+        raise TypeError(f"Expected str, list, or tuple, got {type(sequence).__name__}")
+    if min_length < 1:
+        raise ValueError("min_length must be at least 1.")
+
+    if not sequence:
+        return []
+
+    items = list(sequence)
+    n = len(items)
+    windows: List[Tuple[int, int, Union[str, List[Any]]]] = []
+
+    for start in range(n):
+        seen: Set[Any] = set()
+        for end in range(start, n):
+            if items[end] in seen:
+                break
+            seen.add(items[end])
+            win_len = end - start + 1
+            if win_len >= min_length:
+                windows.append((start, end, sequence[start : end + 1]))
+
+    return windows
+
+
