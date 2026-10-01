@@ -424,6 +424,85 @@ def highlight_longest_non_repeat(text: str, marker: str = "***") -> str:
     return f"{prefix}{marker}{target}{marker}{suffix}"
 
 
+# ─── 7. Unit Test Suite ───────────────────────────────────────────────────────
+
+
+class TestArrayLongestNonRepeat(unittest.TestCase):
+    """Unit test suite for Longest Non-Repeating Subarray & Substring algorithms."""
+
+    def test_longest_non_repeat_subarray(self):
+        arr = [1, 2, 3, 1, 4, 5, 2, 3, 6]
+        length, sub = longest_non_repeat_subarray(arr)
+        self.assertEqual(length, 5)
+        self.assertEqual(sub, [3, 1, 4, 5, 2])
+
+    def test_longest_non_repeat_substring(self):
+        text = "abcabcbb"
+        length, sub = longest_non_repeat_substring(text)
+        self.assertEqual(length, 3)
+        self.assertEqual(sub, "abc")
+
+        length_b, sub_b = longest_non_repeat_substring("bbbbb")
+        self.assertEqual(length_b, 1)
+        self.assertEqual(sub_b, "b")
+
+    def test_all_longest_non_repeat_subsegments(self):
+        text = "abcabc"
+        subs = all_longest_non_repeat_subsegments(text)
+        self.assertEqual(subs, ["abc", "bca", "cab"])
+
+    def test_longest_k_unique_subsegment(self):
+        text = "eceba"
+        length, sub = longest_k_unique_subsegment(text, 2)
+        self.assertEqual(length, 3)
+        self.assertEqual(sub, "ece")
+
+    def test_get_non_repeat_subsegment_indices(self):
+        text = "pwwkew"
+        start, end, max_len = get_non_repeat_subsegment_indices(text)
+        self.assertEqual(max_len, 3)
+        self.assertEqual(text[start : end + 1], "wke")
+
+    def test_slice_non_repeat_windows(self):
+        text = "abc"
+        windows = slice_non_repeat_windows(text, min_length=2)
+        self.assertEqual(len(windows), 3)  # "ab", "abc", "bc"
+
+    def test_analyze_non_repeat_sequence(self):
+        stats = analyze_non_repeat_sequence("abcabcbb")
+        self.assertEqual(stats["total_length"], 8)
+        self.assertEqual(stats["unique_element_count"], 3)
+        self.assertEqual(stats["longest_non_repeat_length"], 3)
+
+    def test_batch_longest_non_repeat(self):
+        seqs = ["abc", "bbbb"]
+        results = batch_longest_non_repeat(seqs)
+        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0]["longest_non_repeat_length"], 3)
+        self.assertEqual(results[1]["longest_non_repeat_length"], 1)
+
+    def test_filter_sequences_by_non_repeat_threshold(self):
+        seqs = ["abcde", "bb", "123456"]
+        filtered = filter_sequences_by_non_repeat_threshold(seqs, 4)
+        self.assertEqual(filtered, ["abcde", "123456"])
+
+    def test_collapse_repeats_in_sequence(self):
+        self.assertEqual(collapse_repeats_in_sequence("abacaba"), "abc")
+        self.assertEqual(collapse_repeats_in_sequence([1, 2, 1, 3, 2]), [1, 2, 3])
+
+    def test_highlight_longest_non_repeat(self):
+        self.assertEqual(highlight_longest_non_repeat("pwwkew", "***"), "pw***wke***w")
+
+    def test_error_handling(self):
+        with self.assertRaises(TypeError):
+            longest_non_repeat_subarray(123)
+        with self.assertRaises(TypeError):
+            longest_non_repeat_substring(None)
+        with self.assertRaises(ValueError):
+            longest_k_unique_subsegment("abc", 0)
+
+
+
 
 
 
