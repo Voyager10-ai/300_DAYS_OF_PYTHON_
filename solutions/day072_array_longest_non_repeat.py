@@ -250,3 +250,61 @@ def slice_non_repeat_windows(
     return windows
 
 
+# ─── 4. Sequence Metrics & Complexity Analysis Engine ───────────────────────
+
+
+def analyze_non_repeat_sequence(sequence: Union[str, List[Any]]) -> Dict[str, Any]:
+    """
+    Analyzes sequence composition, unique elements, max non-repeat window metrics, and ratios.
+
+    Args:
+        sequence: Input string or list.
+
+    Returns:
+        Dictionary containing detailed composition metrics and ratios.
+
+    Raises:
+        TypeError: If sequence is not str/list/tuple.
+    """
+    if not isinstance(sequence, (str, list, tuple)):
+        raise TypeError(f"Expected str, list, or tuple, got {type(sequence).__name__}")
+
+    total_len = len(sequence)
+    if total_len == 0:
+        empty_sub = "" if isinstance(sequence, str) else []
+        return {
+            "total_length": 0,
+            "unique_element_count": 0,
+            "duplicate_element_count": 0,
+            "longest_non_repeat_length": 0,
+            "non_repeat_ratio": 0.0,
+            "unique_ratio": 0.0,
+            "longest_subsegment": empty_sub,
+            "all_longest_subsegments": [],
+        }
+
+    items = list(sequence)
+    unique_set = set(items)
+    unique_count = len(unique_set)
+    duplicate_count = total_len - unique_count
+
+    all_longest = all_longest_non_repeat_subsegments(sequence)
+    longest_sub = all_longest[0] if all_longest else sequence[0:0]
+    longest_len = len(longest_sub)
+
+    non_repeat_ratio = round((longest_len / total_len) * 100, 2)
+    unique_ratio = round((unique_count / total_len) * 100, 2)
+
+    return {
+        "total_length": total_len,
+        "unique_element_count": unique_count,
+        "duplicate_element_count": duplicate_count,
+        "longest_non_repeat_length": longest_len,
+        "non_repeat_ratio": non_repeat_ratio,
+        "unique_ratio": unique_ratio,
+        "longest_subsegment": longest_sub,
+        "all_longest_subsegments": all_longest,
+    }
+
+
+
