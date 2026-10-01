@@ -307,4 +307,60 @@ def analyze_non_repeat_sequence(sequence: Union[str, List[Any]]) -> Dict[str, An
     }
 
 
+# ─── 5. Batch Collection Processors ──────────────────────────────────────────
+
+
+def batch_longest_non_repeat(sequences: List[Union[str, List[Any]]]) -> List[Dict[str, Any]]:
+    """
+    Processes a collection of sequences and generates analytical summaries for each.
+
+    Args:
+        sequences: List of input strings or lists.
+
+    Returns:
+        List of analytical summary dictionaries for each sequence.
+
+    Raises:
+        TypeError: If sequences is not a list/tuple.
+    """
+    if not isinstance(sequences, (list, tuple)):
+        raise TypeError(f"Expected list or tuple of sequences, got {type(sequences).__name__}")
+
+    return [analyze_non_repeat_sequence(seq) for seq in sequences]
+
+
+def filter_sequences_by_non_repeat_threshold(
+    sequences: List[Union[str, List[Any]]], min_non_repeat_len: int
+) -> List[Union[str, List[Any]]]:
+    """
+    Filters sequences that have a longest non-repeating subsegment length >= min_non_repeat_len.
+
+    Args:
+        sequences: List of input sequences (strings or lists).
+        min_non_repeat_len: Minimum required non-repeating length threshold.
+
+    Returns:
+        Filtered list of qualifying sequences.
+
+    Raises:
+        TypeError: If sequences is not a list or min_non_repeat_len is not an int.
+        ValueError: If min_non_repeat_len < 0.
+    """
+    if not isinstance(sequences, (list, tuple)):
+        raise TypeError(f"Expected list or tuple for sequences, got {type(sequences).__name__}")
+    if not isinstance(min_non_repeat_len, int):
+        raise TypeError(f"Expected int for min_non_repeat_len, got {type(min_non_repeat_len).__name__}")
+    if min_non_repeat_len < 0:
+        raise ValueError("min_non_repeat_len must be >= 0.")
+
+    result = []
+    for seq in sequences:
+        if isinstance(seq, (str, list, tuple)):
+            stats = analyze_non_repeat_sequence(seq)
+            if stats["longest_non_repeat_length"] >= min_non_repeat_len:
+                result.append(seq)
+    return result
+
+
+
 
