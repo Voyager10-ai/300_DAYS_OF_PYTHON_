@@ -433,8 +433,9 @@ class TestArrayLongestNonRepeat(unittest.TestCase):
     def test_longest_non_repeat_subarray(self):
         arr = [1, 2, 3, 1, 4, 5, 2, 3, 6]
         length, sub = longest_non_repeat_subarray(arr)
-        self.assertEqual(length, 5)
-        self.assertEqual(sub, [3, 1, 4, 5, 2])
+        self.assertEqual(length, 6)
+        self.assertEqual(sub, [1, 4, 5, 2, 3, 6])
+
 
     def test_longest_non_repeat_substring(self):
         text = "abcabcbb"
@@ -500,6 +501,49 @@ class TestArrayLongestNonRepeat(unittest.TestCase):
             longest_non_repeat_substring(None)
         with self.assertRaises(ValueError):
             longest_k_unique_subsegment("abc", 0)
+
+
+# ─── 8. Interactive CLI Demo Runner ──────────────────────────────────────────
+
+
+def main():
+    """Runs interactive demonstration and executes test suite."""
+    print("=" * 65)
+    print(" Day 72: Array Longest Non Repeat - Demonstration Engine")
+    print("=" * 65)
+
+    sample_arr = [1, 2, 3, 1, 4, 5, 2, 3, 6]
+    sample_text = "abcabcbb"
+    print(f"Sample Array             : {sample_arr}")
+    max_len, sub_arr = longest_non_repeat_subarray(sample_arr)
+    print(f"Longest Non-Repeat Subarray (len={max_len}): {sub_arr}")
+
+    print(f"\nSample String            : '{sample_text}'")
+    max_len_str, sub_str = longest_non_repeat_substring(sample_text)
+    print(f"Longest Non-Repeat Substring (len={max_len_str}): '{sub_str}'")
+
+    print("\n--- All Tied Longest Subsegments ---")
+    print(f"All max subsegments for 'abcabc': {all_longest_non_repeat_subsegments('abcabc')}")
+
+    print("\n--- Longest Subsegment with at most k=2 unique elements ---")
+    print(f"k=2 unique for 'eceba': {longest_k_unique_subsegment('eceba', 2)}")
+
+    print("\n--- Sequence Analysis Metrics ---")
+    stats = analyze_non_repeat_sequence(sample_text)
+    for k, v in stats.items():
+        print(f"  {k:<26}: {v}")
+
+    print(f"\nHighlighted Text         : {highlight_longest_non_repeat('pwwkew', '***')}")
+
+    print("\n--- Running Unit Test Suite ---")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestArrayLongestNonRepeat)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    main()
+
 
 
 
