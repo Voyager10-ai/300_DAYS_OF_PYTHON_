@@ -551,6 +551,43 @@ class TestArrayMergeIntervals(unittest.TestCase):
             insert_interval([[1, 3]], [5, 2])
 
 
+# ─── 8. Interactive CLI Demo Runner ──────────────────────────────────────────
+
+
+def main():
+    """Runs interactive demonstration and executes test suite."""
+    print("=" * 65)
+    print(" Day 73: Array Merge Intervals - Demonstration Engine")
+    print("=" * 65)
+
+    sample_intervals = [[1, 3], [2, 6], [8, 10], [15, 18], [17, 20]]
+    print(f"Sample Input Intervals   : {sample_intervals}")
+    merged = merge_intervals(sample_intervals)
+    print(f"Merged Intervals         : {merged}")
+    print(f"Formatted String         : '{format_intervals_string(merged)}'")
+
+    inserted = insert_interval(merged, [7, 12])
+    print(f"After Inserting [7, 12]  : {inserted}")
+
+    print("\n--- Interval Set Coverage Metrics ---")
+    stats = analyze_interval_set(sample_intervals)
+    for k, v in stats.items():
+        print(f"  {k:<24}: {v}")
+
+    print("\n--- ASCII Timeline Visualization ---")
+    print(visualize_intervals_ascii(sample_intervals, width=30))
+
+    print("\n--- Running Unit Test Suite ---")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestArrayMergeIntervals)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 
