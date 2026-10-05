@@ -101,3 +101,66 @@ def merge_intervals(
                 merged.append(curr)
 
     return merged
+
+
+# ─── 2. Interval Insertion & Point Query Search ──────────────────────────────
+
+
+def insert_interval(
+    intervals: List[Union[List[int], Tuple[int, int]]], new_interval: Union[List[int], Tuple[int, int]]
+) -> List[List[int]]:
+    """
+    Inserts a new interval into a list of sorted non-overlapping intervals and merges if necessary.
+
+    Args:
+        intervals: List of sorted, non-overlapping intervals.
+        new_interval: New interval [start, end] to insert.
+
+    Returns:
+        Updated list of merged non-overlapping intervals.
+
+    Raises:
+        TypeError: If inputs are invalid types.
+        ValueError: If interval start > end.
+    """
+    if not (isinstance(new_interval, (list, tuple)) and len(new_interval) == 2):
+        raise TypeError(f"Expected 2-element sequence for new_interval, got {type(new_interval).__name__}")
+
+    s_new, e_new = new_interval[0], new_interval[1]
+    if s_new > e_new:
+        raise ValueError(f"Invalid new_interval: start {s_new} > end {e_new}")
+
+    all_intervals = list(intervals) + [[s_new, e_new]]
+    return merge_intervals(all_intervals, merge_adjacent=True)
+
+
+def find_intervals_containing_point(
+    intervals: List[Union[List[int], Tuple[int, int]]], point: Union[int, float]
+) -> List[List[int]]:
+    """
+    Finds all intervals in a collection that contain a specific point (inclusive).
+
+    Args:
+        intervals: Collection of intervals.
+        point: Numeric point value.
+
+    Returns:
+        List of matching intervals [start, end] containing point.
+
+    Raises:
+        TypeError: If point is not int or float, or intervals format is invalid.
+    """
+    if not isinstance(point, (int, float)):
+        raise TypeError(f"Expected int or float for point, got {type(point).__name__}")
+    if not isinstance(intervals, (list, tuple)):
+        raise TypeError(f"Expected list or tuple of intervals, got {type(intervals).__name__}")
+
+    result: List[List[int]] = []
+    for item in intervals:
+        if not (isinstance(item, (list, tuple)) and len(item) == 2):
+            raise TypeError(f"Each interval must be a 2-element sequence, got {item}")
+        start, end = item[0], item[1]
+        if start <= point <= end:
+            result.append([start, end])
+    return result
+
