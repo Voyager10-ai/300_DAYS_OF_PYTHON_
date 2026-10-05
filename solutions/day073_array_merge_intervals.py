@@ -470,6 +470,88 @@ def visualize_intervals_ascii(
     return "\n".join(lines)
 
 
+# ─── 7. Unit Test Suite ───────────────────────────────────────────────────────
+
+
+class TestArrayMergeIntervals(unittest.TestCase):
+    """Unit test suite for Array Merge Intervals utilities and algorithms."""
+
+    def test_is_overlapping(self):
+        self.assertTrue(is_overlapping([1, 4], [2, 6]))
+        self.assertFalse(is_overlapping([1, 3], [5, 7]))
+        self.assertTrue(is_overlapping([1, 3], [3, 5], allow_adjacent=True))
+        self.assertFalse(is_overlapping([1, 3], [3, 5], allow_adjacent=False))
+
+    def test_merge_intervals(self):
+        intervals = [[1, 3], [2, 6], [8, 10], [15, 18]]
+        self.assertEqual(merge_intervals(intervals), [[1, 6], [8, 10], [15, 18]])
+
+        intervals_adjacent = [[1, 4], [4, 5]]
+        self.assertEqual(merge_intervals(intervals_adjacent, merge_adjacent=True), [[1, 5]])
+        self.assertEqual(merge_intervals(intervals_adjacent, merge_adjacent=False), [[1, 4], [4, 5]])
+
+        self.assertEqual(merge_intervals([]), [])
+
+    def test_insert_interval(self):
+        intervals = [[1, 3], [6, 9]]
+        new_int = [2, 5]
+        self.assertEqual(insert_interval(intervals, new_int), [[1, 5], [6, 9]])
+
+    def test_find_intervals_containing_point(self):
+        intervals = [[1, 5], [3, 8], [10, 15]]
+        self.assertEqual(find_intervals_containing_point(intervals, 4), [[1, 5], [3, 8]])
+        self.assertEqual(find_intervals_containing_point(intervals, 20), [])
+
+    def test_interval_intersection(self):
+        i1 = [[0, 2], [5, 10], [13, 23], [24, 25]]
+        i2 = [[1, 5], [8, 12], [15, 24], [25, 26]]
+        expected = [[1, 2], [5, 5], [8, 10], [15, 23], [24, 24], [25, 25]]
+        self.assertEqual(interval_intersection(i1, i2), expected)
+
+    def test_find_interval_gaps(self):
+        intervals = [[1, 3], [6, 9]]
+        gaps = find_interval_gaps(intervals, bounds=(0, 10))
+        self.assertEqual(gaps, [[0, 1], [3, 6], [9, 10]])
+
+    def test_analyze_interval_set(self):
+        intervals = [[1, 4], [2, 6], [8, 10]]
+        stats = analyze_interval_set(intervals)
+        self.assertEqual(stats["total_input_intervals"], 3)
+        self.assertEqual(stats["merged_interval_count"], 2)
+        self.assertEqual(stats["total_coverage_length"], 7)
+        self.assertEqual(stats["overall_span_length"], 9)
+        self.assertEqual(stats["total_gap_length"], 2)
+
+    def test_batch_merge_intervals(self):
+        dataset = [[[1, 3], [2, 4]], [[5, 7], [6, 8]]]
+        results = batch_merge_intervals(dataset)
+        self.assertEqual(results, [[[1, 4]], [[5, 8]]])
+
+    def test_filter_intervals_by_min_length(self):
+        intervals = [[1, 2], [3, 8], [10, 15]]
+        filtered = filter_intervals_by_min_length(intervals, 4)
+        self.assertEqual(filtered, [[3, 8], [10, 15]])
+
+    def test_format_intervals_string(self):
+        intervals = [[1, 3], [2, 6]]
+        self.assertEqual(format_intervals_string(intervals), "[1, 3], [2, 6]")
+
+    def test_visualize_intervals_ascii(self):
+        intervals = [[1, 5], [6, 10]]
+        output = visualize_intervals_ascii(intervals, width=20)
+        self.assertIn("Timeline Bounds", output)
+        self.assertIn("Int #1", output)
+
+    def test_error_handling(self):
+        with self.assertRaises(TypeError):
+            merge_intervals("invalid")
+        with self.assertRaises(ValueError):
+            merge_intervals([[5, 2]])
+        with self.assertRaises(ValueError):
+            insert_interval([[1, 3]], [5, 2])
+
+
+
 
 
 
