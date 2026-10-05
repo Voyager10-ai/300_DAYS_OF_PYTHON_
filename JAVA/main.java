@@ -1361,9 +1361,33 @@ import java.util.*;
 //         String s = "abcabcbb";
 //         System.out.println("Longest Non-Repeating Substring Length: " + lengthOfLongestSubstring(s));
 //     }
+// Java Array Merge Intervals Practice (Day 73)
+// class MergeIntervalsPractice {
+//     public static int[][] merge(int[][] intervals) {
+//         if (intervals.length <= 1) return intervals;
+//         java.util.Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
+//         java.util.List<int[]> result = new java.util.ArrayList<>();
+//         int[] current = intervals[0];
+//         result.add(current);
+//         for (int[] interval : intervals) {
+//             if (interval[0] <= current[1]) {
+//                 current[1] = Math.max(current[1], interval[1]);
+//             } else {
+//                 current = interval;
+//                 result.add(current);
+//             }
+//         }
+//         return result.toArray(new int[result.size()][]);
+//     }
+//     public static void main(String[] args) {
+//         int[][] intervals = {{1, 3}, {2, 6}, {8, 10}, {15, 18}};
+//         int[][] merged = merge(intervals);
+//         System.out.println("Merged Intervals count: " + merged.length);
+//     }
 // }
 
 public class main{
+
 
 
   public static void main(String[] args){
