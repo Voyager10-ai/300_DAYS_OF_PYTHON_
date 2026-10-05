@@ -271,3 +271,58 @@ def find_interval_gaps(
     return gaps
 
 
+# ─── 4. Interval Metrics & Coverage Analysis Engine ─────────────────────────
+
+
+def analyze_interval_set(intervals: List[Union[List[int], Tuple[int, int]]]) -> Dict[str, Any]:
+    """
+    Analyzes coverage, total length, merge reduction ratio, and gap metrics for an interval set.
+
+    Args:
+        intervals: List of intervals.
+
+    Returns:
+        Dictionary of coverage metrics and statistics.
+
+    Raises:
+        TypeError: If intervals is not list/tuple.
+    """
+    if not isinstance(intervals, (list, tuple)):
+        raise TypeError(f"Expected list or tuple of intervals, got {type(intervals).__name__}")
+
+    total_input = len(intervals)
+    if total_input == 0:
+        return {
+            "total_input_intervals": 0,
+            "merged_interval_count": 0,
+            "reduction_percentage": 0.0,
+            "total_coverage_length": 0,
+            "overall_span_length": 0,
+            "total_gap_length": 0,
+            "coverage_ratio": 0.0,
+            "merged_intervals": [],
+        }
+
+    merged = merge_intervals(intervals, merge_adjacent=True)
+    merged_count = len(merged)
+
+    reduction_pct = round(((total_input - merged_count) / total_input) * 100, 2)
+    total_coverage = sum(end - start for start, end in merged)
+
+    overall_span = merged[-1][1] - merged[0][0]
+    total_gap = max(0, overall_span - total_coverage)
+    coverage_ratio = round((total_coverage / overall_span) * 100, 2) if overall_span > 0 else 100.0
+
+    return {
+        "total_input_intervals": total_input,
+        "merged_interval_count": merged_count,
+        "reduction_percentage": reduction_pct,
+        "total_coverage_length": total_coverage,
+        "overall_span_length": overall_span,
+        "total_gap_length": total_gap,
+        "coverage_ratio": coverage_ratio,
+        "merged_intervals": merged,
+    }
+
+
+
