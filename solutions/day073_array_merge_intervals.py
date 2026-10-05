@@ -383,5 +383,93 @@ def filter_intervals_by_min_length(
     return filtered
 
 
+# ─── 6. Interval Formatters & ASCII Visualizer ──────────────────────────────
+
+
+def format_intervals_string(
+    intervals: List[Union[List[int], Tuple[int, int]]], delimiter: str = ", "
+) -> str:
+    """
+    Formats a list of intervals as a formatted string representation.
+
+    Args:
+        intervals: List of intervals.
+        delimiter: Delimiter string between interval pairs.
+
+    Returns:
+        Formatted string representation e.g. "[1, 3], [2, 6], [8, 10]".
+
+    Raises:
+        TypeError: If inputs are invalid.
+    """
+    if not isinstance(intervals, (list, tuple)):
+        raise TypeError(f"Expected list or tuple of intervals, got {type(intervals).__name__}")
+    if not isinstance(delimiter, str):
+        raise TypeError(f"Expected str for delimiter, got {type(delimiter).__name__}")
+
+    formatted_pairs = []
+    for item in intervals:
+        if not (isinstance(item, (list, tuple)) and len(item) == 2):
+            raise TypeError(f"Each interval must be a 2-element sequence, got {item}")
+        formatted_pairs.append(f"[{item[0]}, {item[1]}]")
+
+    return delimiter.join(formatted_pairs)
+
+
+def visualize_intervals_ascii(
+    intervals: List[Union[List[int], Tuple[int, int]]], width: int = 40
+) -> str:
+    """
+    Renders an ASCII timeline visualization of intervals across a fixed timeline width.
+
+    Args:
+        intervals: List of intervals.
+        width: Character width for rendering.
+
+    Returns:
+        Multi-line string representation of the timeline.
+
+    Raises:
+        TypeError: If inputs are invalid.
+        ValueError: If width < 10.
+    """
+    if not isinstance(width, int):
+        raise TypeError(f"Expected int for width, got {type(width).__name__}")
+    if width < 10:
+        raise ValueError("width must be at least 10.")
+    if not isinstance(intervals, (list, tuple)):
+        raise TypeError(f"Expected list or tuple of intervals, got {type(intervals).__name__}")
+
+    if not intervals:
+        return "No intervals to visualize."
+
+    merged = merge_intervals(intervals, merge_adjacent=True)
+    min_val = min(item[0] for item in intervals)
+    max_val = max(item[1] for item in intervals)
+
+    span = max_val - min_val
+    if span == 0:
+        span = 1
+
+    lines = []
+    lines.append(f"Timeline Bounds: [{min_val} ... {max_val}]")
+    lines.append("-" * (width + 12))
+
+    for idx, (s, e) in enumerate(intervals):
+        rel_s = int(round(((s - min_val) / span) * width))
+        rel_e = int(round(((e - min_val) / span) * width))
+        rel_e = max(rel_s + 1, rel_e)
+
+        row = ["."] * (width + 1)
+        for i in range(rel_s, min(rel_e + 1, width + 1)):
+            row[i] = "="
+        
+        row_str = "".join(row)
+        lines.append(f"Int #{idx+1:<2} [{s:>3}, {e:>3}] | {row_str}")
+
+    return "\n".join(lines)
+
+
+
 
 
