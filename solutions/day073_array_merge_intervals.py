@@ -164,3 +164,110 @@ def find_intervals_containing_point(
             result.append([start, end])
     return result
 
+
+# ─── 3. Interval Intersection & Gap Utilities ───────────────────────────────
+
+
+def interval_intersection(
+    intervals1: List[Union[List[int], Tuple[int, int]]], intervals2: List[Union[List[int], Tuple[int, int]]]
+) -> List[List[int]]:
+    """
+    Finds the intersection of two lists of sorted non-overlapping intervals.
+
+    Args:
+        intervals1: First list of non-overlapping intervals.
+        intervals2: Second list of non-overlapping intervals.
+
+    Returns:
+        List of intersected intervals [start, end].
+
+    Raises:
+        TypeError: If inputs are invalid.
+    """
+    m1 = merge_intervals(intervals1, merge_adjacent=False)
+    m2 = merge_intervals(intervals2, merge_adjacent=False)
+
+    i, j = 0, 0
+    intersections: List[List[int]] = []
+
+    while i < len(m1) and j < len(m2):
+        s1, e1 = m1[i][0], m1[i][1]
+        s2, e2 = m2[j][0], m2[j][1]
+
+        start_max = max(s1, s2)
+        end_min = min(e1, e2)
+
+        if start_max <= end_min:
+            intersections.append([start_max, end_min])
+
+        if e1 < e2:
+            i += 1
+        else:
+            j += 1
+
+    return intersections
+
+
+def find_interval_gaps(
+    intervals: List[Union[List[int], Tuple[int, int]]], bounds: Optional[Tuple[int, int]] = None
+) -> List[List[int]]:
+    """
+    Finds uncovered gap intervals between merged intervals within optional bounds [min_b, max_b].
+
+    Args:
+        intervals: List of intervals.
+        bounds: Optional tuple (start_bound, end_bound) specifying outer search range.
+
+    Returns:
+        List of gap intervals [gap_start, gap_end].
+
+    Raises:
+        TypeError: If bounds is provided but invalid.
+        ValueError: If bounds start > end.
+    """
+    merged = merge_intervals(intervals, merge_adjacent=True)
+    if not merged:
+        if bounds is not None:
+            if bounds[0] > bounds[1]:
+                raise ValueError(f"Invalid bounds: {bounds}")
+            return [[bounds[0], bounds[1]]]
+        return []
+
+    gaps: List[List[int]] = []
+
+    # Check gap before first interval if bounds provided
+    curr_min = merged[0][0]
+    curr_max = merged[-1][1]
+
+    if bounds is not None:
+        if not (isinstance(bounds, (list, tuple)) and len(bounds) == 2):
+            raise TypeError("bounds must be a 2-element sequence (min_b, max_b).")
+        b_start, b_end = bounds[0], bounds[1]
+        if b_start > b_end:
+            raise ValueError(f"Invalid bounds: {b_start} > {b_end}")
+
+        if b_start < curr_min:
+            gaps.append([b_start, min(b_end, curr_min)])
+
+    # Gaps between adjacent merged intervals
+    for idx in range(len(merged) - 1):
+        gap_start = merged[idx][1]
+        gap_end = merged[idx + 1][0]
+        if gap_start < gap_end:
+            if bounds is not None:
+                g_s = max(bounds[0], gap_start)
+                g_e = min(bounds[1], gap_end)
+                if g_s < g_e:
+                    gaps.append([g_s, g_e])
+            else:
+                gaps.append([gap_start, gap_end])
+
+    # Check gap after last interval if bounds provided
+    if bounds is not None:
+        b_start, b_end = bounds[0], bounds[1]
+        if b_end > curr_max:
+            gaps.append([max(b_start, curr_max), b_end])
+
+    return gaps
+
+
