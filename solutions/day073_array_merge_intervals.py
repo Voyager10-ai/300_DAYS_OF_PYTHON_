@@ -325,4 +325,63 @@ def analyze_interval_set(intervals: List[Union[List[int], Tuple[int, int]]]) -> 
     }
 
 
+# ─── 5. Batch Collection Processors & Threshold Filters ──────────────────────
+
+
+def batch_merge_intervals(
+    dataset: List[List[Union[List[int], Tuple[int, int]]]]
+) -> List[List[List[int]]]:
+    """
+    Processes multiple sets of intervals and merges each.
+
+    Args:
+        dataset: List of interval sets.
+
+    Returns:
+        List of merged interval sets.
+
+    Raises:
+        TypeError: If dataset is not a list or tuple.
+    """
+    if not isinstance(dataset, (list, tuple)):
+        raise TypeError(f"Expected list or tuple of interval sets, got {type(dataset).__name__}")
+
+    return [merge_intervals(interval_set) for interval_set in dataset]
+
+
+def filter_intervals_by_min_length(
+    intervals: List[Union[List[int], Tuple[int, int]]], min_length: Union[int, float]
+) -> List[List[int]]:
+    """
+    Filters intervals keeping only those with duration/length (end - start) >= min_length.
+
+    Args:
+        intervals: List of intervals.
+        min_length: Minimum required interval length.
+
+    Returns:
+        Filtered list of intervals [start, end].
+
+    Raises:
+        TypeError: If min_length is not numeric or intervals is invalid.
+        ValueError: If min_length < 0.
+    """
+    if not isinstance(min_length, (int, float)):
+        raise TypeError(f"Expected int or float for min_length, got {type(min_length).__name__}")
+    if min_length < 0:
+        raise ValueError("min_length must be >= 0.")
+    if not isinstance(intervals, (list, tuple)):
+        raise TypeError(f"Expected list or tuple of intervals, got {type(intervals).__name__}")
+
+    filtered: List[List[int]] = []
+    for item in intervals:
+        if not (isinstance(item, (list, tuple)) and len(item) == 2):
+            raise TypeError(f"Each interval must be a 2-element sequence, got {item}")
+        start, end = item[0], item[1]
+        if (end - start) >= min_length:
+            filtered.append([start, end])
+    return filtered
+
+
+
 
