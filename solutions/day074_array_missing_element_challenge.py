@@ -255,3 +255,79 @@ def find_first_missing_positive(arr: List[int]) -> int:
     return n + 1
 
 
+# ─── 4. Array Completeness Metrics & Missingness Analysis Engine ───────────
+
+
+def analyze_missing_element_array(
+    arr: List[int], expected_range: Optional[Tuple[int, int]] = None
+) -> Dict[str, Any]:
+    """
+    Analyzes completeness, missing elements, duplicates, and range statistics of an integer array.
+
+    Args:
+        arr: Target integer array.
+        expected_range: Optional tuple (start, end) specifying overall expected bounds.
+
+    Returns:
+        Dictionary of missingness analysis metrics.
+
+    Raises:
+        TypeError: If inputs are invalid.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple for arr, got {type(arr).__name__}")
+    for x in arr:
+        if not isinstance(x, int):
+            raise TypeError(f"All elements in arr must be integers, got {type(x).__name__}")
+
+    if not arr:
+        return {
+            "array_length": 0,
+            "min_val": 0,
+            "max_val": 0,
+            "expected_count": 0,
+            "missing_count": 0,
+            "completeness_ratio": 0.0,
+            "missing_elements": [],
+            "duplicate_elements": [],
+            "first_missing_positive": 1,
+        }
+
+    if expected_range is not None:
+        if not (isinstance(expected_range, (list, tuple)) and len(expected_range) == 2):
+            raise TypeError("expected_range must be a 2-element sequence (start, end).")
+        start, end = expected_range[0], expected_range[1]
+    else:
+        start = min(arr)
+        end = max(arr)
+
+    seen = set()
+    duplicates = set()
+    for x in arr:
+        if x in seen:
+            duplicates.add(x)
+        seen.add(x)
+
+    missing = [x for x in range(start, end + 1) if x not in seen]
+    expected_count = (end - start + 1) if end >= start else 0
+    unique_present_in_range = len([x for x in range(start, end + 1) if x in seen])
+    completeness_ratio = (
+        round((unique_present_in_range / expected_count) * 100, 2) if expected_count > 0 else 100.0
+    )
+
+    first_missing_pos = find_first_missing_positive(arr)
+
+    return {
+        "array_length": len(arr),
+        "min_val": min(arr),
+        "max_val": max(arr),
+        "expected_count": expected_count,
+        "missing_count": len(missing),
+        "completeness_ratio": completeness_ratio,
+        "missing_elements": missing,
+        "duplicate_elements": sorted(list(duplicates)),
+        "first_missing_positive": first_missing_pos,
+    }
+
+
+
