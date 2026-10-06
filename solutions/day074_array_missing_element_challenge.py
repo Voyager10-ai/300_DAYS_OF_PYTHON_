@@ -513,6 +513,51 @@ class TestArrayMissingElement(unittest.TestCase):
             find_missing_element_shuffled([1, 2], [1, 2, 3])
 
 
+# ─── 8. Interactive CLI Demo Runner ──────────────────────────────────────────
+
+
+def main():
+    """Runs interactive demonstration and executes test suite."""
+    print("=" * 65)
+    print(" Day 74: Array Missing Element Challenge - Demonstration Engine")
+    print("=" * 65)
+
+    sample_arr = [1, 2, 4, 5, 6, 7]
+    print(f"Sample Input Array       : {sample_arr}")
+    print(f"Missing (Sum Method)     : {find_missing_element_sum(sample_arr)}")
+    print(f"Missing (XOR Method)     : {find_missing_element_xor(sample_arr)}")
+
+    sample_shuffled_orig = [10, 20, 30, 40, 50]
+    sample_shuffled_sub = [30, 10, 50, 20]
+    print(f"\nOriginal Shuffled Array  : {sample_shuffled_orig}")
+    print(f"Sub-Array (Missing 1)    : {sample_shuffled_sub}")
+    print(f"Missing in Shuffled      : {find_missing_element_shuffled(sample_shuffled_orig, sample_shuffled_sub)}")
+
+    dup_arr = [3, 1, 2, 5, 3]
+    dup, miss = find_duplicate_and_missing(dup_arr)
+    print(f"\nDuplicate & Missing in {dup_arr} -> Duplicate: {dup}, Missing: {miss}")
+
+    pos_arr = [3, 4, -1, 1]
+    print(f"First Missing Positive in {pos_arr}: {find_first_missing_positive(pos_arr)}")
+
+    print("\n--- Array Completeness Metrics ---")
+    stats = analyze_missing_element_array(sample_arr, expected_range=(1, 7))
+    for k, v in stats.items():
+        print(f"  {k:<24}: {v}")
+
+    print(f"\nFormatted Summary String : '{format_missing_summary_string(sample_arr, (1, 7))}'")
+
+    print("\n--- Running Unit Test Suite ---")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestArrayMissingElement)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 
