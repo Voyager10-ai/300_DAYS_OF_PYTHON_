@@ -330,4 +330,68 @@ def analyze_missing_element_array(
     }
 
 
+# ─── 5. Batch Dataset Solvers & Range Sanity Checkers ───────────────────────
+
+
+def batch_find_missing(
+    datasets: List[List[int]], start: int = 1
+) -> List[Dict[str, Any]]:
+    """
+    Processes multiple array datasets and returns analysis metrics for each.
+
+    Args:
+        datasets: List of integer array datasets.
+        start: Starting range bound for completeness calculation.
+
+    Returns:
+        List of missingness analysis dictionaries.
+
+    Raises:
+        TypeError: If datasets is not list or tuple.
+    """
+    if not isinstance(datasets, (list, tuple)):
+        raise TypeError(f"Expected list or tuple of datasets, got {type(datasets).__name__}")
+
+    results = []
+    for arr in datasets:
+        stats = analyze_missing_element_array(arr, expected_range=(start, max(arr) if arr else start))
+        results.append(stats)
+    return results
+
+
+def filter_arrays_by_missing_count(
+    datasets: List[List[int]], max_missing: int, start: int = 1
+) -> List[List[int]]:
+    """
+    Filters datasets retaining only those with missing element count <= max_missing.
+
+    Args:
+        datasets: List of array datasets.
+        max_missing: Maximum allowed missing count threshold.
+        start: Starting range bound.
+
+    Returns:
+        Filtered list of array datasets.
+
+    Raises:
+        TypeError: If inputs are invalid.
+        ValueError: If max_missing < 0.
+    """
+    if not isinstance(datasets, (list, tuple)):
+        raise TypeError(f"Expected list or tuple for datasets, got {type(datasets).__name__}")
+    if not isinstance(max_missing, int):
+        raise TypeError(f"Expected int for max_missing, got {type(max_missing).__name__}")
+    if max_missing < 0:
+        raise ValueError("max_missing must be >= 0.")
+
+    qualifying: List[List[int]] = []
+    for arr in datasets:
+        if isinstance(arr, (list, tuple)):
+            stats = analyze_missing_element_array(arr, expected_range=(start, max(arr) if arr else start))
+            if stats["missing_count"] <= max_missing:
+                qualifying.append(list(arr))
+    return qualifying
+
+
+
 
