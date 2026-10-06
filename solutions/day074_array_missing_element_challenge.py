@@ -446,6 +446,74 @@ def format_missing_summary_string(
     )
 
 
+# ─── 7. Unit Test Suite ───────────────────────────────────────────────────────
+
+
+class TestArrayMissingElement(unittest.TestCase):
+    """Unit test suite for Array Missing Element Challenge algorithms."""
+
+    def test_find_missing_element_sum(self):
+        self.assertEqual(find_missing_element_sum([1, 2, 4, 5, 6]), 3)
+        self.assertEqual(find_missing_element_sum([2, 3, 4, 5], n=5), 1)
+
+    def test_find_missing_element_xor(self):
+        self.assertEqual(find_missing_element_xor([1, 2, 4, 5, 6]), 3)
+        self.assertEqual(find_missing_element_xor([1, 2, 3, 5]), 4)
+
+    def test_find_all_missing_elements(self):
+        self.assertEqual(find_all_missing_elements([1, 3, 5, 8], start=1, end=8), [2, 4, 6, 7])
+
+    def test_find_missing_element_shuffled(self):
+        arr1 = [1, 2, 3, 4, 5, 3]
+        arr2 = [5, 1, 3, 2, 4]
+        self.assertEqual(find_missing_element_shuffled(arr1, arr2), 3)
+
+    def test_find_duplicate_and_missing(self):
+        dup, miss = find_duplicate_and_missing([3, 1, 2, 5, 3])
+        self.assertEqual(dup, 3)
+        self.assertEqual(miss, 4)
+
+    def test_find_first_missing_positive(self):
+        self.assertEqual(find_first_missing_positive([3, 4, -1, 1]), 2)
+        self.assertEqual(find_first_missing_positive([1, 2, 0]), 3)
+        self.assertEqual(find_first_missing_positive([7, 8, 9, 11, 12]), 1)
+
+    def test_analyze_missing_element_array(self):
+        stats = analyze_missing_element_array([1, 2, 4, 5])
+        self.assertEqual(stats["array_length"], 4)
+        self.assertEqual(stats["missing_count"], 1)
+        self.assertEqual(stats["missing_elements"], [3])
+
+    def test_batch_find_missing(self):
+        ds = [[1, 3], [1, 2, 4, 5]]
+        res = batch_find_missing(ds, start=1)
+        self.assertEqual(len(res), 2)
+        self.assertEqual(res[0]["missing_elements"], [2])
+        self.assertEqual(res[1]["missing_elements"], [3])
+
+    def test_filter_arrays_by_missing_count(self):
+        ds = [[1, 2, 3, 4], [1, 5], [1, 2, 4]]
+        filtered = filter_arrays_by_missing_count(ds, max_missing=1, start=1)
+        self.assertEqual(filtered, [[1, 2, 3, 4], [1, 2, 4]])
+
+    def test_fill_missing_elements(self):
+        self.assertEqual(fill_missing_elements([1, 3, 5], start=1, end=5), [1, 2, 3, 4, 5])
+
+    def test_format_missing_summary_string(self):
+        summary = format_missing_summary_string([1, 2, 4, 5])
+        self.assertIn("Missing 1 element(s)", summary)
+        self.assertIn("[3]", summary)
+
+    def test_error_handling(self):
+        with self.assertRaises(TypeError):
+            find_missing_element_sum("invalid")
+        with self.assertRaises(ValueError):
+            find_missing_element_sum([1, 2, 3], n=0)
+        with self.assertRaises(ValueError):
+            find_missing_element_shuffled([1, 2], [1, 2, 3])
+
+
+
 
 
 
