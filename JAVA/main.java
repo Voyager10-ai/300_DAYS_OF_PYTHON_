@@ -1384,9 +1384,29 @@ import java.util.*;
 //         int[][] merged = merge(intervals);
 //         System.out.println("Merged Intervals count: " + merged.length);
 //     }
+// Java Array Missing Element Practice (Day 74)
+// class MissingElementPractice {
+//     public static int findMissingElement(int[] nums, int n) {
+//         int expectedSum = (n * (n + 1)) / 2;
+//         int actualSum = 0;
+//         for (int num : nums) actualSum += num;
+//         return expectedSum - actualSum;
+//     }
+//     public static int findMissingXOR(int[] nums, int n) {
+//         int xorAll = 0;
+//         for (int i = 1; i <= n; i++) xorAll ^= i;
+//         for (int num : nums) xorAll ^= num;
+//         return xorAll;
+//     }
+//     public static void main(String[] args) {
+//         int[] arr = {1, 2, 4, 5, 6};
+//         System.out.println("Missing (Sum): " + findMissingElement(arr, 6));
+//         System.out.println("Missing (XOR): " + findMissingXOR(arr, 6));
+//     }
 // }
 
 public class main{
+
 
 
 
