@@ -393,5 +393,59 @@ def filter_arrays_by_missing_count(
     return qualifying
 
 
+# ─── 6. Array Reconstruction & Missing Element Patch Helpers ───────────────
+
+
+def fill_missing_elements(
+    arr: List[int], start: int = 1, end: Optional[int] = None
+) -> List[int]:
+    """
+    Reconstructs the full sequence from start to end by filling in missing values.
+
+    Args:
+        arr: Target input array.
+        start: Start bound (default 1).
+        end: Optional end bound (defaults to max(arr) or start).
+
+    Returns:
+        Sorted list containing all numbers in range [start, end].
+
+    Raises:
+        TypeError: If input is invalid.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple for arr, got {type(arr).__name__}")
+    if end is None:
+        end = max(arr) if arr else start
+
+    return list(range(start, end + 1))
+
+
+def format_missing_summary_string(
+    arr: List[int], expected_range: Optional[Tuple[int, int]] = None
+) -> str:
+    """
+    Formats a concise human-readable summary of missing values in an array.
+
+    Args:
+        arr: Integer array.
+        expected_range: Optional range bounds.
+
+    Returns:
+        Summary string e.g. "Array len=5 | Missing 2 element(s): [3, 7] | Complete: 71.43%".
+
+    Raises:
+        TypeError: If inputs are invalid.
+    """
+    stats = analyze_missing_element_array(arr, expected_range=expected_range)
+    missing_str = ", ".join(map(str, stats["missing_elements"])) if stats["missing_elements"] else "None"
+    return (
+        f"Array len={stats['array_length']} | "
+        f"Missing {stats['missing_count']} element(s): [{missing_str}] | "
+        f"Completeness: {stats['completeness_ratio']}%"
+    )
+
+
+
 
 
