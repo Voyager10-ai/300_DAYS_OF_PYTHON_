@@ -170,3 +170,88 @@ def find_missing_element_shuffled(arr1: List[Any], arr2: List[Any]) -> Any:
 
     raise ValueError("Failed to find unique missing element between arrays.")
 
+
+# ─── 3. Range Anomaly Detection & Special Solvers ───────────────────────────
+
+
+def find_duplicate_and_missing(arr: List[int]) -> Tuple[int, int]:
+    """
+    Finds the duplicate and missing numbers in an array of size N containing values 1..N.
+
+    Args:
+        arr: List of N integers where one number is repeated and one is missing.
+
+    Returns:
+        Tuple of (duplicate_number, missing_number).
+
+    Raises:
+        TypeError: If input is not a list of ints.
+        ValueError: If array format does not match duplicate/missing pattern.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple for arr, got {type(arr).__name__}")
+
+    n = len(arr)
+    if n < 2:
+        raise ValueError("Array length must be at least 2.")
+
+    for x in arr:
+        if not isinstance(x, int):
+            raise TypeError(f"All elements in arr must be integers, got {type(x).__name__}")
+
+    seen = set()
+    duplicate = -1
+    for num in arr:
+        if num in seen:
+            duplicate = num
+        seen.add(num)
+
+    if duplicate == -1:
+        raise ValueError("No duplicate element found in input array.")
+
+    expected_sum = (n * (n + 1)) // 2
+    actual_sum = sum(arr)
+    missing = expected_sum - (actual_sum - duplicate)
+
+    return (duplicate, missing)
+
+
+def find_first_missing_positive(arr: List[int]) -> int:
+    """
+    Finds the smallest missing positive integer from an unsorted integer array.
+
+    Example:
+        [3, 4, -1, 1] -> 2
+        [1, 2, 0]     -> 3
+
+    Args:
+        arr: Unsorted integer array.
+
+    Returns:
+        Smallest missing positive integer >= 1.
+
+    Raises:
+        TypeError: If arr is not a list or elements are not ints.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple for arr, got {type(arr).__name__}")
+    for x in arr:
+        if not isinstance(x, int):
+            raise TypeError(f"All elements in arr must be integers, got {type(x).__name__}")
+
+    nums = list(arr)
+    n = len(nums)
+
+    # Place each number in its right place: nums[i] should equal i + 1
+    for i in range(n):
+        while 1 <= nums[i] <= n and nums[nums[i] - 1] != nums[i]:
+            target_idx = nums[i] - 1
+            nums[i], nums[target_idx] = nums[target_idx], nums[i]
+
+    for i in range(n):
+        if nums[i] != i + 1:
+            return i + 1
+
+    return n + 1
+
+
