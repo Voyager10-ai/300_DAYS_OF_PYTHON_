@@ -203,3 +203,82 @@ def rotate_array_block_swap(arr: List[Any], k: int) -> List[Any]:
     _swap_blocks(res, d - i, d, i)
     return res
 
+
+# ─── 3. 2D Matrix Rotation & Multidimensional Transform Helpers ─────────────
+
+
+def rotate_matrix_90(matrix: List[List[Any]], direction: str = "clockwise") -> List[List[Any]]:
+    """
+    Rotates a 2D matrix (M x N) by 90 degrees clockwise or counterclockwise.
+
+    Args:
+        matrix: 2D list of lists.
+        direction: 'clockwise' or 'counterclockwise' / 'anti-clockwise'.
+
+    Returns:
+        New rotated 2D matrix.
+
+    Raises:
+        TypeError: If matrix format is invalid.
+        ValueError: If direction is invalid.
+    """
+    if not isinstance(matrix, (list, tuple)):
+        raise TypeError(f"Expected list or tuple for matrix, got {type(matrix).__name__}")
+    if not matrix:
+        return []
+
+    for row in matrix:
+        if not isinstance(row, (list, tuple)):
+            raise TypeError(f"Each row must be a list or tuple, got {type(row).__name__}")
+
+    d = direction.lower().strip()
+    if d in ("clockwise", "cw"):
+        # Transpose then reverse rows
+        return [list(col[::-1]) for col in zip(*matrix)]
+    elif d in ("counterclockwise", "anti-clockwise", "ccw"):
+        # Transpose then reverse cols (reverse overall rows)
+        return [list(col) for col in zip(*matrix)][::-1]
+    else:
+        raise ValueError(f"Invalid direction '{direction}'. Choose 'clockwise' or 'counterclockwise'.")
+
+
+def rotate_matrix_inplace(matrix: List[List[Any]], direction: str = "clockwise") -> None:
+    """
+    Rotates an N x N square matrix in-place by 90 degrees.
+
+    Args:
+        matrix: Square 2D list of lists to mutate.
+        direction: 'clockwise' or 'counterclockwise'.
+
+    Raises:
+        TypeError: If matrix is invalid.
+        ValueError: If matrix is not square (N x N) or direction is invalid.
+    """
+    if not isinstance(matrix, list):
+        raise TypeError(f"Expected list for matrix, got {type(matrix).__name__}")
+
+    n = len(matrix)
+    if n == 0:
+        return
+
+    for row in matrix:
+        if not isinstance(row, list) or len(row) != n:
+            raise ValueError("In-place rotation requires a square matrix (N x N).")
+
+    d = direction.lower().strip()
+    if d not in ("clockwise", "cw", "counterclockwise", "ccw"):
+        raise ValueError(f"Invalid direction '{direction}'.")
+
+    # Step 1: Transpose
+    for i in range(n):
+        for j in range(i + 1, n):
+            matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
+
+    # Step 2: Reverse rows or columns based on direction
+    if d in ("clockwise", "cw"):
+        for i in range(n):
+            matrix[i].reverse()
+    else:
+        matrix.reverse()
+
+
