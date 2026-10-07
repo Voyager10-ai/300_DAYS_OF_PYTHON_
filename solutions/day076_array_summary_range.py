@@ -235,3 +235,120 @@ def summary_ranges_with_max_gap(nums: List[int], max_gap: int = 1) -> List[Tuple
     intervals.append((start, nums[-1]))
     return intervals
 
+
+# ─── 3. Range Parser & Reverse Array Reconstruction Helpers ──────────────────
+
+
+def parse_range_string(range_str: str) -> Tuple[int, int]:
+    """
+    Parses a range string ("a->b" or "a") into an integer tuple (start, end).
+
+    Args:
+        range_str: Range string formatted as "a->b" or "a".
+
+    Returns:
+        Tuple of (start, end) integers inclusive.
+
+    Raises:
+        TypeError: If range_str is not a string.
+        ValueError: If range_str format is invalid or start > end.
+    """
+    if not isinstance(range_str, str):
+        raise TypeError(f"Expected str for range_str, got {type(range_str).__name__}")
+
+    s = range_str.strip()
+    if not s:
+        raise ValueError("Range string cannot be empty")
+
+    if "->" in s:
+        parts = s.split("->")
+        if len(parts) != 2:
+            raise ValueError(f"Malformed range string '{range_str}' (expected single '->')")
+        try:
+            start = int(parts[0].strip())
+            end = int(parts[1].strip())
+        except ValueError as err:
+            raise ValueError(f"Invalid integer in range string '{range_str}': {err}") from err
+
+        if start > end:
+            raise ValueError(f"Invalid range in '{range_str}': start ({start}) > end ({end})")
+        return (start, end)
+    else:
+        try:
+            val = int(s)
+            return (val, val)
+        except ValueError as err:
+            raise ValueError(f"Invalid integer in range string '{range_str}': {err}") from err
+
+
+def ranges_to_array(ranges: List[str]) -> List[int]:
+    """
+    Reconstructs the original sorted integer array from a list of summary range strings.
+
+    For example, ["0->2", "4->5", "7"] -> [0, 1, 2, 4, 5, 7].
+
+    Args:
+        ranges: List of summary range strings.
+
+    Returns:
+        Reconstructed list of integers in increasing order.
+
+    Raises:
+        TypeError: If ranges is not a list/tuple of strings.
+        ValueError: If ranges overlap or are not in strictly increasing order.
+    """
+    if not isinstance(ranges, (list, tuple)):
+        raise TypeError(f"Expected list or tuple of strings, got {type(ranges).__name__}")
+
+    result: List[int] = []
+    prev_end: Optional[int] = None
+
+    for i, r_str in enumerate(ranges):
+        start, end = parse_range_string(r_str)
+        if prev_end is not None and start <= prev_end:
+            raise ValueError(
+                f"Range at index {i} ('{r_str}') overlaps or is not strictly after previous range ending at {prev_end}"
+            )
+        result.extend(range(start, end + 1))
+        prev_end = end
+
+    return result
+
+
+def intervals_to_array(intervals: List[Tuple[int, int]]) -> List[int]:
+    """
+    Reconstructs an integer array from a list of (start, end) intervals.
+
+    Args:
+        intervals: List of (start, end) inclusive tuples.
+
+    Returns:
+        Flattened list of integers covering all intervals.
+
+    Raises:
+        TypeError: If intervals is not a list of pairs.
+        ValueError: If intervals overlap or are invalid.
+    """
+    if not isinstance(intervals, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(intervals).__name__}")
+
+    result: List[int] = []
+    prev_end: Optional[int] = None
+
+    for i, item in enumerate(intervals):
+        if not isinstance(item, (list, tuple)) or len(item) != 2:
+            raise TypeError(f"Interval at index {i} must be a 2-tuple (start, end), got {item!r}")
+        start, end = item
+        if not isinstance(start, int) or isinstance(start, bool) or not isinstance(end, int) or isinstance(end, bool):
+            raise TypeError(f"Interval bounds at index {i} must be integers: ({start!r}, {end!r})")
+        if start > end:
+            raise ValueError(f"Interval at index {i} has start ({start}) > end ({end})")
+        if prev_end is not None and start <= prev_end:
+            raise ValueError(f"Interval at index {i} overlaps or is not strictly after previous end {prev_end}")
+
+        result.extend(range(start, end + 1))
+        prev_end = end
+
+    return result
+
+
