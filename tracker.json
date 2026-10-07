@@ -1,7 +1,8 @@
 {
   "total_problems": 282,
-  "current_day": 74,
+  "current_day": 75,
   "problems": [
+
 
 
 
@@ -89,7 +90,7 @@
     {"day": 72, "title": "Array Longest Non Repeat", "status": "done"},
     {"day": 73, "title": "Array Merge Intervals", "status": "done"},
     {"day": 74, "title": "Array Missing Element Challenge", "status": "done"},
-    {"day": 75, "title": "Array Rotate", "status": "pending"},
+    {"day": 75, "title": "Array Rotate", "status": "done"},
     {"day": 76, "title": "Array Summary Range", "status": "pending"},
     {"day": 77, "title": "Array Two Sum", "status": "pending"},
     {"day": 78, "title": "Bubble Sort Implement", "status": "pending"},

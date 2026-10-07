@@ -77,6 +77,8 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 72: Array Longest Non Repeat
 - Day 73: Array Merge Intervals
 - Day 74: Array Missing Element Challenge
+- Day 75: Array Rotate
+
 
 
 
