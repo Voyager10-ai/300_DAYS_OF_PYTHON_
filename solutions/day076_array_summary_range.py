@@ -431,4 +431,81 @@ def find_missing_intervals(nums: List[int], lower: int, upper: int) -> List[Tupl
     return [parse_range_string(s) for s in missing_strs]
 
 
+# ─── 5. Range Analytics & Coverage Metrics Engine ────────────────────────────
+
+
+def analyze_range_density(nums: List[int]) -> Dict[str, Any]:
+    """
+    Computes structural density and compression statistics for an integer array.
+
+    Args:
+        nums: Sorted list of unique integers.
+
+    Returns:
+        Dictionary containing:
+            - total_elements: Total count of integers.
+            - total_ranges: Number of summarized ranges.
+            - singleton_count: Number of 1-element ranges.
+            - multi_count: Number of multi-element ranges.
+            - longest_span: Length of the longest contiguous sequence.
+            - total_span: (max_val - min_val + 1) if not empty.
+            - compression_ratio: elements compressed per range (total_elements / total_ranges).
+            - coverage_percentage: percentage of total span covered by nums.
+
+    Raises:
+        TypeError: If nums is invalid.
+    """
+    if not isinstance(nums, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(nums).__name__}")
+
+    n = len(nums)
+    if n == 0:
+        return {
+            "total_elements": 0,
+            "total_ranges": 0,
+            "singleton_count": 0,
+            "multi_count": 0,
+            "longest_span": 0,
+            "total_span": 0,
+            "compression_ratio": 1.0,
+            "coverage_percentage": 0.0,
+        }
+
+    intervals = summary_ranges_intervals(list(nums))
+    singleton_count = sum(1 for s, e in intervals if s == e)
+    multi_count = sum(1 for s, e in intervals if s != e)
+    longest_span = max((e - s + 1) for s, e in intervals)
+    total_span = nums[-1] - nums[0] + 1
+    compression_ratio = round(n / len(intervals), 2)
+    coverage_percentage = round((n / total_span) * 100.0, 2) if total_span > 0 else 100.0
+
+    return {
+        "total_elements": n,
+        "total_ranges": len(intervals),
+        "singleton_count": singleton_count,
+        "multi_count": multi_count,
+        "longest_span": longest_span,
+        "total_span": total_span,
+        "compression_ratio": compression_ratio,
+        "coverage_percentage": coverage_percentage,
+    }
+
+
+def find_isolated_elements(nums: List[int]) -> List[int]:
+    """
+    Finds all elements that do not have immediate adjacent neighbors in the array.
+
+    These are elements that form singletons (e.g. "x" rather than "a->b") in summary_ranges.
+
+    Args:
+        nums: Sorted list of unique integers.
+
+    Returns:
+        List of isolated integer elements.
+    """
+    intervals = summary_ranges_intervals(list(nums))
+    return [s for s, e in intervals if s == e]
+
+
+
 
