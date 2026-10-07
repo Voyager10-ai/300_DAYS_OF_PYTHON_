@@ -106,3 +106,100 @@ def rotate_array_inplace(arr: List[Any], k: int, direction: str = "right") -> No
         _reverse_slice(arr, shift, n - 1)
         # 3. Reverse entire array
         _reverse_slice(arr, 0, n - 1)
+
+
+# ─── 2. Advanced Rotation Algorithms (Block Swap & Juggling) ─────────────────
+
+
+def rotate_array_juggling(arr: List[Any], k: int) -> List[Any]:
+    """
+    Rotates an array left by k positions using the Juggling Algorithm (GCD cycles).
+
+    Args:
+        arr: Input list.
+        k: Number of left rotation steps.
+
+    Returns:
+        New rotated list.
+
+    Raises:
+        TypeError: If inputs are invalid.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple for arr, got {type(arr).__name__}")
+    if not isinstance(k, int):
+        raise TypeError(f"Expected int for k, got {type(k).__name__}")
+
+    n = len(arr)
+    if n <= 1:
+        return list(arr)
+
+    shift = k % n
+    if shift == 0:
+        return list(arr)
+
+    res = list(arr)
+    num_cycles = math.gcd(shift, n)
+
+    for i in range(num_cycles):
+        temp = res[i]
+        j = i
+        while True:
+            d = (j + shift) % n
+            if d == i:
+                break
+            res[j] = res[d]
+            j = d
+        res[j] = temp
+
+    return res
+
+
+def _swap_blocks(arr: List[Any], fi: int, si: int, d: int) -> None:
+    """Swaps d elements starting at index fi with d elements starting at index si."""
+    for i in range(d):
+        arr[fi + i], arr[si + i] = arr[si + i], arr[fi + i]
+
+
+def rotate_array_block_swap(arr: List[Any], k: int) -> List[Any]:
+    """
+    Rotates an array left by k positions using the Block Swap Algorithm.
+
+    Args:
+        arr: Input list.
+        k: Left rotation count.
+
+    Returns:
+        New rotated list.
+
+    Raises:
+        TypeError: If inputs are invalid.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple for arr, got {type(arr).__name__}")
+    if not isinstance(k, int):
+        raise TypeError(f"Expected int for k, got {type(k).__name__}")
+
+    n = len(arr)
+    if n <= 1:
+        return list(arr)
+
+    d = k % n
+    if d == 0:
+        return list(arr)
+
+    res = list(arr)
+    i = d
+    j = n - d
+
+    while i != j:
+        if i < j:
+            _swap_blocks(res, d - i, d + j - i, i)
+            j -= i
+        else:
+            _swap_blocks(res, d - i, d, j)
+            i -= j
+
+    _swap_blocks(res, d - i, d, i)
+    return res
+
