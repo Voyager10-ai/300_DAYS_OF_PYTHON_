@@ -6,6 +6,7 @@
 #   reverse array reconstruction, missing range solvers (LeetCode 163), range analytics engine,
 #   batch/categorized sequence processors, overlapping range mergers, unit test suite, and Java practice.
 
+import unittest
 from typing import List, Dict, Tuple, Set, Any, Optional, Union
 
 
@@ -629,6 +630,123 @@ def format_interval_tuples(intervals: List[Tuple[int, int]], arrow: str = "->") 
         else:
             output.append(f"{s}{arrow}{e}")
     return output
+
+
+# ─── 8. Unit Test Suite ───────────────────────────────────────────────────────
+
+
+class TestArraySummaryRange(unittest.TestCase):
+    """Comprehensive test suite covering all array summary range algorithms and helpers."""
+
+    def test_summary_ranges_standard(self):
+        self.assertEqual(summary_ranges([0, 1, 2, 4, 5, 7]), ["0->2", "4->5", "7"])
+        self.assertEqual(summary_ranges([0, 2, 3, 4, 6, 8, 9]), ["0", "2->4", "6", "8->9"])
+
+    def test_summary_ranges_edge_cases(self):
+        self.assertEqual(summary_ranges([]), [])
+        self.assertEqual(summary_ranges([1]), ["1"])
+        self.assertEqual(summary_ranges([-1]), ["-1"])
+        self.assertEqual(summary_ranges([-3, -2, -1, 0, 1]), ["-3->1"])
+        self.assertEqual(summary_ranges([-10, -8, -7, 0, 5, 6]), ["-10", "-8->-7", "0", "5->6"])
+
+    def test_summary_ranges_intervals(self):
+        self.assertEqual(summary_ranges_intervals([]), [])
+        self.assertEqual(summary_ranges_intervals([5]), [(5, 5)])
+        self.assertEqual(summary_ranges_intervals([1, 2, 3, 10, 11]), [(1, 3), (10, 11)])
+
+    def test_summary_ranges_unsorted(self):
+        self.assertEqual(summary_ranges_unsorted([7, 1, 0, 2, 5, 4, 2, 1]), ["0->2", "4->5", "7"])
+        self.assertEqual(summary_ranges_unsorted([]), [])
+        self.assertEqual(summary_ranges_unsorted([3, 3, 3]), ["3"])
+
+    def test_summary_ranges_with_step(self):
+        self.assertEqual(summary_ranges_with_step([1, 3, 5, 10, 12], step=2), ["1->5", "10->12"])
+        self.assertEqual(summary_ranges_with_step([0, 5, 10, 20], step=5), ["0->10", "20"])
+        self.assertEqual(summary_ranges_with_step([], step=2), [])
+
+    def test_summary_ranges_with_max_gap(self):
+        self.assertEqual(summary_ranges_with_max_gap([1, 2, 4, 8, 9, 12], max_gap=2), [(1, 4), (8, 9), (12, 12)])
+        self.assertEqual(summary_ranges_with_max_gap([1, 5, 10], max_gap=1), [(1, 1), (5, 5), (10, 10)])
+
+    def test_range_parsing_and_reconstruction(self):
+        self.assertEqual(parse_range_string("0->2"), (0, 2))
+        self.assertEqual(parse_range_string("7"), (7, 7))
+        self.assertEqual(parse_range_string("-5->-2"), (-5, -2))
+
+        original = [0, 1, 2, 4, 5, 7]
+        ranges = summary_ranges(original)
+        reconstructed = ranges_to_array(ranges)
+        self.assertEqual(original, reconstructed)
+
+        intervals = summary_ranges_intervals(original)
+        self.assertEqual(intervals_to_array(intervals), original)
+
+    def test_find_missing_ranges(self):
+        nums = [0, 1, 3, 50, 75]
+        expected = ["2", "4->49", "51->74", "76->99"]
+        self.assertEqual(find_missing_ranges(nums, 0, 99), expected)
+
+        # Boundary edge cases
+        self.assertEqual(find_missing_ranges([], 1, 1), ["1"])
+        self.assertEqual(find_missing_ranges([], 1, 3), ["1->3"])
+        self.assertEqual(find_missing_ranges([1], 1, 1), [])
+        self.assertEqual(find_missing_ranges([1, 2, 3], 1, 3), [])
+
+        intervals = find_missing_intervals([0, 1, 3, 50, 75], 0, 99)
+        self.assertEqual(intervals, [(2, 2), (4, 49), (51, 74), (76, 99)])
+
+    def test_range_density_and_isolated_elements(self):
+        nums = [0, 1, 2, 4, 6, 7, 9]
+        metrics = analyze_range_density(nums)
+        self.assertEqual(metrics["total_elements"], 7)
+        self.assertEqual(metrics["total_ranges"], 4)
+        self.assertEqual(metrics["singleton_count"], 2)  # 4 and 9
+        self.assertEqual(metrics["multi_count"], 2)      # 0->2 and 6->7
+        self.assertEqual(metrics["longest_span"], 3)     # 0..2
+        self.assertEqual(metrics["total_span"], 10)      # 0..9 = 10
+        self.assertEqual(find_isolated_elements(nums), [4, 9])
+
+        empty_metrics = analyze_range_density([])
+        self.assertEqual(empty_metrics["total_elements"], 0)
+
+    def test_batch_and_categorized(self):
+        batch = [[0, 1, 2], [4, 5], [7]]
+        self.assertEqual(batch_summary_ranges(batch), [["0->2"], ["4->5"], ["7"]])
+
+        cat_data = {"auth": [80, 81, 82, 443], "ssh": [22, 2222]}
+        res = summary_ranges_by_category(cat_data)
+        self.assertEqual(res["auth"], ["80->82", "443"])
+        self.assertEqual(res["ssh"], ["22", "2222"])
+
+    def test_overlapping_ranges(self):
+        ranges = [(1, 3), (2, 6), (8, 10), (15, 18)]
+        merged = merge_overlapping_ranges(ranges, merge_adjacent=False)
+        self.assertEqual(merged, [(1, 6), (8, 10), (15, 18)])
+
+        # Touching intervals merge with merge_adjacent=True
+        touching = [(1, 3), (4, 6), (8, 10)]
+        self.assertEqual(merge_overlapping_ranges(touching, merge_adjacent=True), [(1, 6), (8, 10)])
+
+        self.assertEqual(format_interval_tuples([(1, 6), (8, 8)]), ["1->6", "8"])
+
+    def test_error_handling(self):
+        with self.assertRaises(TypeError):
+            summary_ranges(None)
+        with self.assertRaises(TypeError):
+            summary_ranges([1, "two", 3])
+        with self.assertRaises(ValueError):
+            summary_ranges([3, 2, 1])  # Unsorted
+        with self.assertRaises(ValueError):
+            summary_ranges([1, 2, 2, 3])  # Duplicate
+        with self.assertRaises(ValueError):
+            summary_ranges_with_step([1, 2, 3], step=-1)
+        with self.assertRaises(ValueError):
+            parse_range_string("5->2")  # start > end
+        with self.assertRaises(ValueError):
+            parse_range_string("abc")
+        with self.assertRaises(ValueError):
+            find_missing_ranges([1, 2], lower=10, upper=5)
+
 
 
 
