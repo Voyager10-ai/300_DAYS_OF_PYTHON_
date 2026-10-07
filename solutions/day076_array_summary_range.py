@@ -352,3 +352,83 @@ def intervals_to_array(intervals: List[Tuple[int, int]]) -> List[int]:
     return result
 
 
+# ─── 4. Missing Range Solver for Bounded Integer Arrays ──────────────────────
+
+
+def find_missing_ranges(nums: List[int], lower: int, upper: int) -> List[str]:
+    """
+    Finds all missing ranges in a sorted array that fall within [lower, upper] (LeetCode 163).
+
+    For example, nums=[0, 1, 3, 50, 75], lower=0, upper=99
+    yields ["2", "4->49", "51->74", "76->99"].
+
+    Args:
+        nums: Sorted list of unique integers within or near [lower, upper].
+        lower: Lower bound of the target range.
+        upper: Upper bound of the target range.
+
+    Returns:
+        List of missing range strings formatted as "a->b" or "a".
+
+    Raises:
+        TypeError: If inputs are invalid types.
+        ValueError: If lower > upper or nums is not sorted.
+    """
+    if not isinstance(nums, (list, tuple)):
+        raise TypeError(f"Expected list or tuple for nums, got {type(nums).__name__}")
+    if not isinstance(lower, int) or isinstance(lower, bool):
+        raise TypeError(f"Expected int for lower, got {type(lower).__name__}")
+    if not isinstance(upper, int) or isinstance(upper, bool):
+        raise TypeError(f"Expected int for upper, got {type(upper).__name__}")
+    if lower > upper:
+        raise ValueError(f"lower ({lower}) cannot be greater than upper ({upper})")
+
+    # Filter nums strictly inside [lower, upper] and ensure sorted
+    curr = lower
+    result: List[str] = []
+
+    for i, x in enumerate(nums):
+        if not isinstance(x, int) or isinstance(x, bool):
+            raise TypeError(f"Element at index {i} is not an integer: {x!r}")
+        if i > 0 and x < nums[i - 1]:
+            raise ValueError(f"nums must be sorted: {nums[i-1]} > {x}")
+
+        if x < curr:
+            continue
+        if x > upper:
+            break
+
+        if x > curr:
+            if x - 1 == curr:
+                result.append(str(curr))
+            else:
+                result.append(f"{curr}->{x - 1}")
+
+        curr = x + 1
+
+    if curr <= upper:
+        if curr == upper:
+            result.append(str(curr))
+        else:
+            result.append(f"{curr}->{upper}")
+
+    return result
+
+
+def find_missing_intervals(nums: List[int], lower: int, upper: int) -> List[Tuple[int, int]]:
+    """
+    Finds all missing intervals in [lower, upper] as (start, end) tuples.
+
+    Args:
+        nums: Sorted list of unique integers.
+        lower: Lower bound.
+        upper: Upper bound.
+
+    Returns:
+        List of (start, end) inclusive missing intervals.
+    """
+    missing_strs = find_missing_ranges(nums, lower, upper)
+    return [parse_range_string(s) for s in missing_strs]
+
+
+
