@@ -1426,6 +1426,35 @@ import java.util.*;
 //         System.out.println("Rotated Right (k=3): " + java.util.Arrays.toString(arr));
 //     }
 // }
+// Java Array Summary Range Practice (Day 76)
+// class ArraySummaryRangePractice {
+//     public static java.util.List<String> summaryRanges(int[] nums) {
+//         java.util.List<String> result = new java.util.ArrayList<>();
+//         if (nums == null || nums.length == 0) return result;
+//         int n = nums.length;
+//         int start = nums[0];
+//         for (int i = 1; i < n; i++) {
+//             if (nums[i] != nums[i - 1] + 1) {
+//                 if (start == nums[i - 1]) {
+//                     result.add(String.valueOf(start));
+//                 } else {
+//                     result.add(start + "->" + nums[i - 1]);
+//                 }
+//                 start = nums[i];
+//             }
+//         }
+//         if (start == nums[n - 1]) {
+//             result.add(String.valueOf(start));
+//         } else {
+//             result.add(start + "->" + nums[n - 1]);
+//         }
+//         return result;
+//     }
+//     public static void main(String[] args) {
+//         int[] arr = {0, 1, 2, 4, 5, 7};
+//         System.out.println("Summary Ranges: " + summaryRanges(arr));
+//     }
+// }
 
 public class main{
 

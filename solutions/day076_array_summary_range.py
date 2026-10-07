@@ -748,6 +748,65 @@ class TestArraySummaryRange(unittest.TestCase):
             find_missing_ranges([1, 2], lower=10, upper=5)
 
 
+# ─── 9. Interactive CLI Demo Runner ──────────────────────────────────────────
+
+
+def main() -> None:
+    print("=" * 68)
+    print(" Day 76: Array Summary Range - Demonstration Engine")
+    print("=" * 68)
+
+    sample1 = [0, 1, 2, 4, 5, 7]
+    sample2 = [0, 2, 3, 4, 6, 8, 9]
+
+    print(f"\n[1] Classic Summary Ranges (LeetCode 228):")
+    print(f"  Input Array 1 : {sample1}")
+    print(f"  Summary Ranges: {summary_ranges(sample1)}")
+    print(f"  Interval Tuples: {summary_ranges_intervals(sample1)}")
+
+    print(f"\n  Input Array 2 : {sample2}")
+    print(f"  Summary Ranges: {summary_ranges(sample2)}")
+    print(f"  Isolated Pts  : {find_isolated_elements(sample2)}")
+
+    print(f"\n[2] Custom Step Summary (step=2):")
+    step_sample = [1, 3, 5, 10, 12, 14, 20]
+    print(f"  Input Array   : {step_sample}")
+    print(f"  Ranges (k=2)  : {summary_ranges_with_step(step_sample, step=2)}")
+
+    print(f"\n[3] Reverse Reconstruction (Ranges -> Array):")
+    range_input = ["0->2", "4->5", "7"]
+    reconstructed = ranges_to_array(range_input)
+    print(f"  Input Ranges  : {range_input}")
+    print(f"  Reconstructed : {reconstructed}")
+
+    print(f"\n[4] Missing Ranges (LeetCode 163):")
+    miss_nums = [0, 1, 3, 50, 75]
+    lower, upper = 0, 99
+    print(f"  Input Array   : {miss_nums} within [{lower}, {upper}]")
+    print(f"  Missing Ranges: {find_missing_ranges(miss_nums, lower, upper)}")
+
+    print(f"\n[5] Range Analytics & Density Engine:")
+    density = analyze_range_density(sample1)
+    for k, v in density.items():
+        print(f"  {k:<22}: {v}")
+
+    print(f"\n[6] Overlapping Range Merger:")
+    raw_intervals = [(1, 3), (2, 6), (8, 10), (15, 18)]
+    merged = merge_overlapping_ranges(raw_intervals, merge_adjacent=False)
+    print(f"  Raw Intervals : {raw_intervals}")
+    print(f"  Merged Output : {merged} -> {format_interval_tuples(merged)}")
+
+    print("\n--- Running Unit Test Suite ---")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestArraySummaryRange)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 
