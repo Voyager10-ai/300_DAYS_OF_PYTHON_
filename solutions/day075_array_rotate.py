@@ -545,6 +545,46 @@ class TestArrayRotate(unittest.TestCase):
             rotate_matrix_inplace([[1, 2, 3], [4, 5]])
 
 
+# ─── 8. Interactive CLI Demo Runner ──────────────────────────────────────────
+
+
+def main():
+    """Runs interactive demonstration and executes test suite."""
+    print("=" * 65)
+    print(" Day 75: Array Rotate - Demonstration Engine")
+    print("=" * 65)
+
+    sample_arr = [1, 2, 3, 4, 5, 6, 7]
+    print(f"Sample Input Array       : {sample_arr}")
+    print(f"Right Rotate (k=2)       : {rotate_array(sample_arr, 2, 'right')}")
+    print(f"Left Rotate (k=2)        : {rotate_array(sample_arr, 2, 'left')}")
+    print(f"Block Swap Left (k=3)    : {rotate_array_block_swap(sample_arr, 3)}")
+    print(f"Juggling Left (k=3)      : {rotate_array_juggling(sample_arr, 3)}")
+
+    sample_mat = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+    print(f"\nOriginal 3x3 Matrix      : {sample_mat}")
+    print(f"90° Clockwise Matrix     : {rotate_matrix_90(sample_mat, 'clockwise')}")
+
+    sorted_rot = [15, 18, 2, 3, 6, 12]
+    shift_count = find_rotation_count_sorted(sorted_rot)
+    print(f"\nRotated Sorted Array {sorted_rot} -> Rotated right {shift_count} times.")
+
+    print("\n--- Array Rotation Metrics ---")
+    stats = analyze_array_rotation(sample_arr, 2, "right")
+    for k, v in stats.items():
+        print(f"  {k:<30}: {v}")
+
+    print("\n--- Running Unit Test Suite ---")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestArrayRotate)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 
