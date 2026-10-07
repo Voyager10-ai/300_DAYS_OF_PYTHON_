@@ -337,4 +337,144 @@ def analyze_array_rotation(arr: List[Any], k: int, direction: str = "right") -> 
     }
 
 
+# ─── 5. Batch Collection Processors & Rotation Filters ──────────────────────
+
+
+def batch_rotate_arrays(
+    datasets: List[List[Any]], k: int, direction: str = "right"
+) -> List[List[Any]]:
+    """
+    Applies rotation to a collection of array datasets.
+
+    Args:
+        datasets: List of lists.
+        k: Shift positions.
+        direction: 'right' or 'left'.
+
+    Returns:
+        List of rotated lists.
+
+    Raises:
+        TypeError: If datasets is not a list or tuple.
+    """
+    if not isinstance(datasets, (list, tuple)):
+        raise TypeError(f"Expected list or tuple of datasets, got {type(datasets).__name__}")
+
+    return [rotate_array(arr, k, direction=direction) for arr in datasets]
+
+
+def filter_arrays_by_rotation_equivalence(
+    datasets: List[List[Any]], target: List[Any]
+) -> List[List[Any]]:
+    """
+    Filters datasets returning only those arrays that are cyclic rotations of target.
+
+    Args:
+        datasets: List of candidate arrays.
+        target: Reference target array.
+
+    Returns:
+        List of qualifying arrays that match target under rotation.
+
+    Raises:
+        TypeError: If inputs are invalid.
+    """
+    if not isinstance(datasets, (list, tuple)):
+        raise TypeError(f"Expected list or tuple for datasets, got {type(datasets).__name__}")
+    if not isinstance(target, (list, tuple)):
+        raise TypeError(f"Expected list or tuple for target, got {type(target).__name__}")
+
+    qualifying: List[List[Any]] = []
+    for candidate in datasets:
+        if isinstance(candidate, (list, tuple)):
+            is_rot, _ = is_rotation_of(candidate, target)
+            if is_rot:
+                qualifying.append(list(candidate))
+    return qualifying
+
+
+# ─── 6. Rotation Search & Array Equivalence Checkers ─────────────────────────
+
+
+def is_rotation_of(arr1: List[Any], arr2: List[Any]) -> Tuple[bool, int]:
+    """
+    Checks whether arr2 is a rotated version of arr1 and returns the shift count.
+
+    Args:
+        arr1: Original reference list.
+        arr2: Candidate rotated list.
+
+    Returns:
+        Tuple of (is_rotation: bool, shift_count: int). If False, shift_count is -1.
+
+    Raises:
+        TypeError: If inputs are not lists or tuples.
+    """
+    if not isinstance(arr1, (list, tuple)):
+        raise TypeError(f"Expected list or tuple for arr1, got {type(arr1).__name__}")
+    if not isinstance(arr2, (list, tuple)):
+        raise TypeError(f"Expected list or tuple for arr2, got {type(arr2).__name__}")
+
+    n1, n2 = len(arr1), len(arr2)
+    if n1 != n2:
+        return (False, -1)
+    if n1 == 0:
+        return (True, 0)
+
+    l1 = list(arr1)
+    l2 = list(arr2)
+
+    for shift in range(n1):
+        if rotate_array(l1, shift, direction="right") == l2:
+            return (True, shift)
+
+    return (False, -1)
+
+
+def find_rotation_count_sorted(arr: List[int]) -> int:
+    """
+    Finds how many times a sorted distinct array has been rotated right (Binary Search O(log N)).
+
+    Args:
+        arr: Rotated sorted array of distinct integers.
+
+    Returns:
+        Number of right rotations (index of minimum element).
+
+    Raises:
+        TypeError: If arr is not list or elements are not ints.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple for arr, got {type(arr).__name__}")
+    for x in arr:
+        if not isinstance(x, int):
+            raise TypeError(f"All elements in arr must be integers, got {type(x).__name__}")
+
+    n = len(arr)
+    if n <= 1:
+        return 0
+
+    low, high = 0, n - 1
+
+    while low <= high:
+        if arr[low] <= arr[high]:
+            return low
+
+        mid = (low + high) // 2
+        next_idx = (mid + 1) % n
+        prev_idx = (mid - 1 + n) % n
+
+        if arr[mid] <= arr[next_idx] and arr[mid] <= arr[prev_idx]:
+            return mid
+
+        if arr[mid] >= arr[low]:
+            low = mid + 1
+        else:
+            high = mid - 1
+
+    return 0
+
+
+
+
 
