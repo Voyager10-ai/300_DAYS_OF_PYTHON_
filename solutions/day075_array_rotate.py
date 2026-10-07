@@ -475,6 +475,77 @@ def find_rotation_count_sorted(arr: List[int]) -> int:
     return 0
 
 
+# ─── 7. Unit Test Suite ───────────────────────────────────────────────────────
+
+
+class TestArrayRotate(unittest.TestCase):
+    """Unit test suite for Array Rotate algorithms."""
+
+    def test_rotate_array(self):
+        self.assertEqual(rotate_array([1, 2, 3, 4, 5], 2, direction="right"), [4, 5, 1, 2, 3])
+        self.assertEqual(rotate_array([1, 2, 3, 4, 5], 2, direction="left"), [3, 4, 5, 1, 2])
+        self.assertEqual(rotate_array([1, 2, 3], 0), [1, 2, 3])
+
+    def test_rotate_array_inplace(self):
+        arr = [1, 2, 3, 4, 5]
+        rotate_array_inplace(arr, 2, direction="right")
+        self.assertEqual(arr, [4, 5, 1, 2, 3])
+
+        arr_l = [1, 2, 3, 4, 5]
+        rotate_array_inplace(arr_l, 2, direction="left")
+        self.assertEqual(arr_l, [3, 4, 5, 1, 2])
+
+    def test_rotate_array_juggling(self):
+        self.assertEqual(rotate_array_juggling([1, 2, 3, 4, 5, 6], 2), [3, 4, 5, 6, 1, 2])
+
+    def test_rotate_array_block_swap(self):
+        self.assertEqual(rotate_array_block_swap([1, 2, 3, 4, 5, 6, 7], 3), [4, 5, 6, 7, 1, 2, 3])
+
+    def test_rotate_matrix_90(self):
+        mat = [[1, 2], [3, 4]]
+        cw = rotate_matrix_90(mat, direction="clockwise")
+        self.assertEqual(cw, [[3, 1], [4, 2]])
+
+    def test_rotate_matrix_inplace(self):
+        mat = [[1, 2], [3, 4]]
+        rotate_matrix_inplace(mat, direction="clockwise")
+        self.assertEqual(mat, [[3, 1], [4, 2]])
+
+    def test_analyze_array_rotation(self):
+        stats = analyze_array_rotation([1, 2, 3, 4, 5], 2, direction="right")
+        self.assertEqual(stats["effective_shift"], 2)
+        self.assertEqual(stats["rotated_array"], [4, 5, 1, 2, 3])
+
+    def test_batch_rotate_arrays(self):
+        ds = [[1, 2, 3], [4, 5, 6]]
+        res = batch_rotate_arrays(ds, 1, direction="right")
+        self.assertEqual(res, [[3, 1, 2], [6, 4, 5]])
+
+    def test_filter_arrays_by_rotation_equivalence(self):
+        ds = [[2, 3, 1], [3, 2, 1], [1, 2, 3]]
+        target = [1, 2, 3]
+        filtered = filter_arrays_by_rotation_equivalence(ds, target)
+        self.assertEqual(filtered, [[2, 3, 1], [1, 2, 3]])
+
+    def test_is_rotation_of(self):
+        is_rot, shift = is_rotation_of([1, 2, 3, 4], [3, 4, 1, 2])
+        self.assertTrue(is_rot)
+        self.assertEqual(shift, 2)
+
+    def test_find_rotation_count_sorted(self):
+        self.assertEqual(find_rotation_count_sorted([15, 18, 2, 3, 6, 12]), 2)
+        self.assertEqual(find_rotation_count_sorted([1, 2, 3, 4, 5]), 0)
+
+    def test_error_handling(self):
+        with self.assertRaises(TypeError):
+            rotate_array("invalid", 2)
+        with self.assertRaises(ValueError):
+            rotate_array([1, 2], 1, direction="diagonal")
+        with self.assertRaises(ValueError):
+            rotate_matrix_inplace([[1, 2, 3], [4, 5]])
+
+
+
 
 
 
