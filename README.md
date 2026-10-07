@@ -78,6 +78,7 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 73: Array Merge Intervals
 - Day 74: Array Missing Element Challenge
 - Day 75: Array Rotate
+- Day 76: Array Summary Range
 
 
 
