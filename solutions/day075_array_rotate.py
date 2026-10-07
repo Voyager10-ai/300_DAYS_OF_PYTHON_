@@ -282,3 +282,59 @@ def rotate_matrix_inplace(matrix: List[List[Any]], direction: str = "clockwise")
         matrix.reverse()
 
 
+# ─── 4. Array Rotation Metrics & Cycle Analysis Engine ───────────────────────
+
+
+def analyze_array_rotation(arr: List[Any], k: int, direction: str = "right") -> Dict[str, Any]:
+    """
+    Analyzes displacement, effective shift, full cycles, and rotational symmetry of an array.
+
+    Args:
+        arr: Target input array.
+        k: Shift steps.
+        direction: Rotation direction ('right' or 'left').
+
+    Returns:
+        Dictionary of rotation metrics.
+
+    Raises:
+        TypeError: If inputs are invalid.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple for arr, got {type(arr).__name__}")
+    if not isinstance(k, int):
+        raise TypeError(f"Expected int for k, got {type(k).__name__}")
+
+    n = len(arr)
+    if n == 0:
+        return {
+            "array_length": 0,
+            "requested_shift": k,
+            "effective_shift": 0,
+            "direction": direction,
+            "is_full_cycle": True,
+            "full_rotations_completed": 0,
+            "element_displacement_distance": 0,
+            "rotated_array": [],
+            "is_symmetric_under_rotation": True,
+        }
+
+    effective_shift = k % n
+    full_cycles = abs(k) // n
+    rotated = rotate_array(arr, k, direction=direction)
+    is_symmetric = (rotated == list(arr))
+
+    return {
+        "array_length": n,
+        "requested_shift": k,
+        "effective_shift": effective_shift,
+        "direction": direction,
+        "is_full_cycle": (effective_shift == 0),
+        "full_rotations_completed": full_cycles,
+        "element_displacement_distance": effective_shift,
+        "rotated_array": rotated,
+        "is_symmetric_under_rotation": is_symmetric,
+    }
+
+
+
