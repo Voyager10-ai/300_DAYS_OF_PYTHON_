@@ -54,6 +54,23 @@ def rotate_array(arr: List[Any], k: int, direction: str = "right") -> List[Any]:
         return list(arr[shift:] + arr[:shift])
 
 
+def rotate_cyclic_shift(arr: List[Any], shift: int) -> List[Any]:
+    """
+    Performs a cyclic right (positive shift) or left (negative shift) rotation.
+
+    Args:
+        arr: Input list.
+        shift: Shift magnitude (positive for right, negative for left).
+
+    Returns:
+        New cyclically shifted list.
+    """
+    if shift >= 0:
+        return rotate_array(arr, shift, direction="right")
+    return rotate_array(arr, abs(shift), direction="left")
+
+
+
 def _reverse_slice(arr: List[Any], start: int, end: int) -> None:
     """Helper to reverse elements in arr[start:end+1] in-place."""
     while start < end:
