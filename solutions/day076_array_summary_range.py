@@ -554,6 +554,84 @@ def summary_ranges_by_category(data: Dict[str, List[int]]) -> Dict[str, List[str
     return result
 
 
+# ─── 7. Overlapping Range Merger & Interval Formatter ────────────────────────
+
+
+def merge_overlapping_ranges(
+    ranges: List[Tuple[int, int]], merge_adjacent: bool = True
+) -> List[Tuple[int, int]]:
+    """
+    Merges overlapping and optionally adjacent integer ranges.
+
+    Args:
+        ranges: List of (start, end) inclusive integer intervals.
+        merge_adjacent: If True, merges touching intervals like (1, 3) and (4, 6) into (1, 6).
+
+    Returns:
+        Sorted, non-overlapping list of merged (start, end) intervals.
+
+    Raises:
+        TypeError: If ranges is not a list of pairs.
+        ValueError: If any interval has start > end.
+    """
+    if not isinstance(ranges, (list, tuple)):
+        raise TypeError(f"Expected list or tuple of intervals, got {type(ranges).__name__}")
+
+    cleaned: List[Tuple[int, int]] = []
+    for i, item in enumerate(ranges):
+        if not isinstance(item, (list, tuple)) or len(item) != 2:
+            raise TypeError(f"Item at index {i} must be a 2-tuple (start, end), got {item!r}")
+        start, end = item
+        if not isinstance(start, int) or isinstance(start, bool) or not isinstance(end, int) or isinstance(end, bool):
+            raise TypeError(f"Interval bounds must be integers: ({start!r}, {end!r})")
+        if start > end:
+            raise ValueError(f"Interval has start ({start}) > end ({end})")
+        cleaned.append((start, end))
+
+    if not cleaned:
+        return []
+
+    cleaned.sort(key=lambda x: (x[0], x[1]))
+    merged: List[Tuple[int, int]] = [cleaned[0]]
+
+    threshold = 1 if merge_adjacent else 0
+
+    for current in cleaned[1:]:
+        prev_start, prev_end = merged[-1]
+        curr_start, curr_end = current
+
+        if curr_start <= prev_end + threshold:
+            merged[-1] = (prev_start, max(prev_end, curr_end))
+        else:
+            merged.append(current)
+
+    return merged
+
+
+def format_interval_tuples(intervals: List[Tuple[int, int]], arrow: str = "->") -> List[str]:
+    """
+    Formats a list of (start, end) integer intervals into formatted strings.
+
+    Args:
+        intervals: List of (start, end) tuples.
+        arrow: Separator symbol (default '->').
+
+    Returns:
+        List of formatted string representations.
+    """
+    if not isinstance(intervals, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(intervals).__name__}")
+
+    output: List[str] = []
+    for s, e in intervals:
+        if s == e:
+            output.append(str(s))
+        else:
+            output.append(f"{s}{arrow}{e}")
+    return output
+
+
+
 
 
 
