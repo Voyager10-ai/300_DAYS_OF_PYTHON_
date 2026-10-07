@@ -1403,9 +1403,32 @@ import java.util.*;
 //         System.out.println("Missing (Sum): " + findMissingElement(arr, 6));
 //         System.out.println("Missing (XOR): " + findMissingXOR(arr, 6));
 //     }
+// Java Array Rotate Practice (Day 75)
+// class ArrayRotatePractice {
+//     public static void rotateRight(int[] nums, int k) {
+//         if (nums == null || nums.length <= 1) return;
+//         int n = nums.length;
+//         k %= n;
+//         reverse(nums, 0, n - 1);
+//         reverse(nums, 0, k - 1);
+//         reverse(nums, k, n - 1);
+//     }
+//     private static void reverse(int[] nums, int start, int end) {
+//         while (start < end) {
+//             int temp = nums[start];
+//             nums[start++] = nums[end];
+//             nums[end--] = temp;
+//         }
+//     }
+//     public static void main(String[] args) {
+//         int[] arr = {1, 2, 3, 4, 5, 6, 7};
+//         rotateRight(arr, 3);
+//         System.out.println("Rotated Right (k=3): " + java.util.Arrays.toString(arr));
+//     }
 // }
 
 public class main{
+
 
 
 
