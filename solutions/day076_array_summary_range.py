@@ -507,5 +507,53 @@ def find_isolated_elements(nums: List[int]) -> List[int]:
     return [s for s, e in intervals if s == e]
 
 
+# ─── 6. Batch & Categorized Multi-Sequence Range Summarizers ─────────────────
+
+
+def batch_summary_ranges(arrays: List[List[int]]) -> List[List[str]]:
+    """
+    Executes summary ranges across a batch of integer lists.
+
+    Args:
+        arrays: List of integer arrays.
+
+    Returns:
+        List of summary range string lists.
+
+    Raises:
+        TypeError: If arrays is not a list/tuple.
+    """
+    if not isinstance(arrays, (list, tuple)):
+        raise TypeError(f"Expected list or tuple of arrays, got {type(arrays).__name__}")
+
+    return [summary_ranges(arr) for arr in arrays]
+
+
+def summary_ranges_by_category(data: Dict[str, List[int]]) -> Dict[str, List[str]]:
+    """
+    Computes summary ranges for multiple categorized series (e.g., timestamps, port lists).
+
+    Args:
+        data: Mapping from category name to integer array.
+
+    Returns:
+        Mapping from category name to summary range strings.
+
+    Raises:
+        TypeError: If data is not a dictionary.
+    """
+    if not isinstance(data, dict):
+        raise TypeError(f"Expected dict for data, got {type(data).__name__}")
+
+    result: Dict[str, List[str]] = {}
+    for key, arr in data.items():
+        if not isinstance(key, str):
+            raise TypeError(f"Category keys must be strings, got {type(key).__name__}")
+        result[key] = summary_ranges_unsorted(arr)
+
+    return result
+
+
+
 
 
