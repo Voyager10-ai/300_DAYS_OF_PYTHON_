@@ -422,4 +422,79 @@ class TwoSum:
         return sum(self._counts.values())
 
 
+# ─── 5. Two Sum Multiplicity & Unique Pair Solvers ───────────────────────────
+
+
+def two_sum_count_pairs(nums: List[int], target: int) -> int:
+    """
+    Counts the total number of index pairs (i < j) such that nums[i] + nums[j] == target.
+    Runs in optimal O(n) time using frequency counts.
+
+    Args:
+        nums: List of integers.
+        target: Target sum.
+
+    Returns:
+        Integer count of matching index pairs.
+
+    Raises:
+        TypeError: If inputs are invalid.
+    """
+    if not isinstance(nums, (list, tuple)):
+        raise TypeError(f"Expected list or tuple for nums, got {type(nums).__name__}")
+    if not isinstance(target, int) or isinstance(target, bool):
+        raise TypeError(f"Expected int for target, got {type(target).__name__}")
+
+    counts: Dict[int, int] = {}
+    pair_count = 0
+
+    for i, x in enumerate(nums):
+        if not isinstance(x, int) or isinstance(x, bool):
+            raise TypeError(f"Element at index {i} is not an integer: {x!r}")
+        complement = target - x
+        if complement in counts:
+            pair_count += counts[complement]
+        counts[x] = counts.get(x, 0) + 1
+
+    return pair_count
+
+
+def two_sum_unique_value_pairs(nums: List[int], target: int) -> List[Tuple[int, int]]:
+    """
+    Finds all unique (value1, value2) pairs (val1 <= val2) such that val1 + val2 == target.
+    Prevents duplicate reporting when duplicate numbers exist in the array.
+
+    Args:
+        nums: List of integers.
+        target: Target sum.
+
+    Returns:
+        Sorted list of unique (val1, val2) pairs.
+
+    Raises:
+        TypeError: If inputs are invalid.
+    """
+    if not isinstance(nums, (list, tuple)):
+        raise TypeError(f"Expected list or tuple for nums, got {type(nums).__name__}")
+    if not isinstance(target, int) or isinstance(target, bool):
+        raise TypeError(f"Expected int for target, got {type(target).__name__}")
+
+    for i, x in enumerate(nums):
+        if not isinstance(x, int) or isinstance(x, bool):
+            raise TypeError(f"Element at index {i} is not an integer: {x!r}")
+
+    seen: Set[int] = set()
+    unique_pairs: Set[Tuple[int, int]] = set()
+
+    for x in nums:
+        complement = target - x
+        if complement in seen:
+            pair = (min(x, complement), max(x, complement))
+            unique_pairs.add(pair)
+        seen.add(x)
+
+    return sorted(list(unique_pairs))
+
+
+
 
