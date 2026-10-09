@@ -1455,6 +1455,25 @@ import java.util.*;
 //         System.out.println("Summary Ranges: " + summaryRanges(arr));
 //     }
 // }
+// Java Array Two Sum Practice (Day 77)
+// class ArrayTwoSumPractice {
+//     public static int[] twoSum(int[] nums, int target) {
+//         java.util.Map<Integer, Integer> map = new java.util.HashMap<>();
+//         for (int i = 0; i < nums.length; i++) {
+//             int complement = target - nums[i];
+//             if (map.containsKey(complement)) {
+//                 return new int[] { map.get(complement), i };
+//             }
+//             map.put(nums[i], i);
+//         }
+//         return new int[] {};
+//     }
+//     public static void main(String[] args) {
+//         int[] arr = {2, 7, 11, 15};
+//         int[] res = twoSum(arr, 9);
+//         System.out.println("Two Sum Indices: " + java.util.Arrays.toString(res));
+//     }
+// }
 
 public class main{
 

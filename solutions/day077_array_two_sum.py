@@ -776,6 +776,73 @@ class TestArrayTwoSum(unittest.TestCase):
             two_sum_closest([1], 5)  # len < 2
 
 
+# ─── 9. Interactive CLI Demo Runner ──────────────────────────────────────────
+
+
+def main() -> None:
+    print("=" * 68)
+    print(" Day 77: Array Two Sum - Algorithmic Demonstration Engine")
+    print("=" * 68)
+
+    sample1 = [2, 7, 11, 15]
+    target1 = 9
+    print(f"\n[1] Classic Two Sum (LeetCode 1):")
+    print(f"  Input Array  : {sample1}, Target: {target1}")
+    print(f"  Hash Map     : indices {two_sum_hash_map(sample1, target1)}")
+    print(f"  Brute Force  : indices {two_sum_brute_force(sample1, target1)}")
+
+    sample_sorted = [1, 2, 4, 6, 8, 11, 15]
+    target2 = 10
+    print(f"\n[2] Two Sum II - Sorted Array (LeetCode 167):")
+    print(f"  Sorted Array : {sample_sorted}, Target: {target2}")
+    print(f"  Two Pointers : 0-indexed {two_sum_two_pointers(sample_sorted, target2)}")
+    print(f"  Two Pointers : 1-indexed {two_sum_two_pointers(sample_sorted, target2, one_indexed=True)}")
+    print(f"  Binary Search: 0-indexed {two_sum_binary_search(sample_sorted, target2)}")
+
+    print(f"\n[3] Two Sum Closest & Less Than K (LeetCode 1099):")
+    close_sample = [10, 22, 28, 29, 30, 40]
+    print(f"  Array        : {close_sample}")
+    print(f"  Closest to 54: {two_sum_closest(close_sample, 54)} (val1, val2, sum)")
+    print(f"  Less Than 54 : {two_sum_less_than_k(close_sample, 54)} (val1, val2, sum)")
+
+    print(f"\n[4] Dynamic TwoSum Data Structure (LeetCode 170):")
+    ts = TwoSum()
+    for val in [1, 3, 5, 1, 9]:
+        ts.add(val)
+    print(f"  Elements Stored: {ts.get_all_elements()}")
+    print(f"  Find 4 (1+3)   : {ts.find(4)}")
+    print(f"  Find 2 (1+1)   : {ts.find(2)}")
+    print(f"  Find 7         : {ts.find(7)}")
+
+    print(f"\n[5] Multiplicity & Unique Pairs:")
+    dup_sample = [1, 1, 2, 4, 4, 5]
+    print(f"  Array        : {dup_sample}, Target: 6")
+    print(f"  Total Pairs  : {two_sum_count_pairs(dup_sample, 6)} index pairs")
+    print(f"  Unique Values: {two_sum_unique_value_pairs(dup_sample, 6)}")
+
+    print(f"\n[6] Pedagogical Step-by-Step Trace:")
+    trace = explain_two_sum_step_by_step([2, 11, 7, 15], 9)
+    for step in trace:
+        print(f"  Step {step['step']}: Current Val={step['current_value']} (idx {step['current_index']}), "
+              f"Need={step['complement_needed']}, Seen={step['hash_map_state']}, Match={step['match_found']}")
+
+    print(f"\n[7] Algorithmic Benchmark:")
+    bench_data = list(range(1, 1500))
+    bm = benchmark_two_sum_algorithms(bench_data, 2997)
+    for alg, data in bm.items():
+        print(f"  {alg:<20}: result={data['result']}, time={data['time_ms']:.4f} ms ({data['complexity']})")
+
+    print("\n--- Running Unit Test Suite ---")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestArrayTwoSum)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 
