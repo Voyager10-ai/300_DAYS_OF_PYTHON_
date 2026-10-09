@@ -652,6 +652,131 @@ def benchmark_two_sum_algorithms(nums: List[int], target: int) -> Dict[str, Any]
     return results
 
 
+# ─── 8. Comprehensive Unit Test Suite ────────────────────────────────────────
+
+
+class TestArrayTwoSum(unittest.TestCase):
+    """Test suite covering all Two Sum algorithms, variants, and data structures."""
+
+    def test_two_sum_hash_map_standard(self):
+        self.assertEqual(two_sum_hash_map([2, 7, 11, 15], 9), (0, 1))
+        self.assertEqual(two_sum_hash_map([3, 2, 4], 6), (1, 2))
+        self.assertEqual(two_sum_hash_map([3, 3], 6), (0, 1))
+        self.assertIsNone(two_sum_hash_map([1, 2, 3], 10))
+
+    def test_two_sum_hash_map_negatives_and_zeros(self):
+        self.assertEqual(two_sum_hash_map([-1, -2, -3, -4, -5], -8), (2, 4))
+        self.assertEqual(two_sum_hash_map([0, 4, 3, 0], 0), (0, 3))
+        self.assertEqual(two_sum_hash_map([-5, 10, 2], 5), (0, 1))
+
+    def test_two_sum_brute_force(self):
+        nums = [2, 7, 11, 15]
+        self.assertEqual(two_sum_brute_force(nums, 9), (0, 1))
+        self.assertEqual(two_sum_brute_force([3, 2, 4], 6), (1, 2))
+        self.assertIsNone(two_sum_brute_force([1, 2], 5))
+
+    def test_two_sum_all_pairs(self):
+        nums = [1, 2, 3, 2, 1]
+        # target = 4: (1 at 0, 3 at 2), (2 at 1, 2 at 3), (3 at 2, 1 at 4)
+        pairs = two_sum_all_pairs(nums, 4)
+        self.assertEqual(len(pairs), 3)
+
+        unique_vals = two_sum_all_pairs(nums, 4, unique_values_only=True)
+        self.assertEqual(unique_vals, [(1, 3), (2, 2)])
+
+    def test_two_sum_two_pointers(self):
+        sorted_nums = [2, 7, 11, 15]
+        self.assertEqual(two_sum_two_pointers(sorted_nums, 9), (0, 1))
+        self.assertEqual(two_sum_two_pointers(sorted_nums, 9, one_indexed=True), (1, 2))
+        self.assertEqual(two_sum_two_pointers([2, 3, 4], 6), (0, 2))
+        self.assertIsNone(two_sum_two_pointers([1, 2, 3], 100))
+
+    def test_two_sum_binary_search(self):
+        sorted_nums = [1, 2, 3, 4, 4, 9, 56, 90]
+        self.assertEqual(two_sum_binary_search(sorted_nums, 8), (3, 4))
+        self.assertEqual(two_sum_binary_search(sorted_nums, 8, one_indexed=True), (4, 5))
+        self.assertIsNone(two_sum_binary_search(sorted_nums, 1000))
+
+    def test_two_sum_closest(self):
+        self.assertEqual(two_sum_closest([10, 22, 28, 29, 30, 40], 54), (22, 30, 52))
+        self.assertEqual(two_sum_closest([1, 2, 3, 4], 7), (3, 4, 7))
+        self.assertEqual(two_sum_closest([-5, -2, 1, 9], 0), (-2, 1, -1))
+
+    def test_two_sum_less_than_k(self):
+        nums = [34, 23, 1, 24, 75, 33, 54, 8]
+        self.assertEqual(two_sum_less_than_k(nums, 60), (24, 34, 58))
+        self.assertIsNone(two_sum_less_than_k([10, 20, 30], 15))
+
+    def test_two_sum_data_structure(self):
+        ts = TwoSum()
+        ts.add(1)
+        ts.add(3)
+        ts.add(5)
+        self.assertTrue(ts.find(4))   # 1 + 3
+        self.assertTrue(ts.find(6))   # 1 + 5
+        self.assertFalse(ts.find(7))
+        self.assertFalse(ts.find(2))  # only one 1
+
+        ts.add(1)
+        self.assertTrue(ts.find(2))   # two 1s
+        self.assertEqual(ts.get_count(1), 2)
+        self.assertEqual(len(ts), 4)
+
+        self.assertTrue(ts.remove(1))
+        self.assertEqual(ts.get_count(1), 1)
+        self.assertFalse(ts.find(2))
+
+        self.assertEqual(ts.get_all_elements(), [1, 3, 5])
+        ts.clear()
+        self.assertEqual(len(ts), 0)
+
+    def test_two_sum_count_pairs(self):
+        nums = [1, 1, 1, 1]
+        self.assertEqual(two_sum_count_pairs(nums, 2), 6)  # 4C2 = 6
+        self.assertEqual(two_sum_count_pairs([1, 2, 3, 4, 3], 6), 2)  # (2, 4) and (3, 3)
+
+    def test_two_sum_unique_value_pairs(self):
+        nums = [1, 1, 2, 4, 4, 5]
+        self.assertEqual(two_sum_unique_value_pairs(nums, 6), [(1, 5), (2, 4)])
+
+    def test_batch_and_matrix(self):
+        queries = [([2, 7, 11, 15], 9), ([3, 2, 4], 6), ([1, 2], 10)]
+        results = batch_two_sum(queries)
+        self.assertEqual(results, [(0, 1), (1, 2), None])
+
+        matrix = [
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9]
+        ]
+        self.assertEqual(two_sum_matrix(matrix, 17), ((3 - 1, 3 - 2), (3 - 1, 3 - 1)))  # (2, 1)=8 and (2, 2)=9
+        self.assertIsNone(two_sum_matrix(matrix, 100))
+
+    def test_trace_and_benchmark(self):
+        trace = explain_two_sum_step_by_step([2, 7, 11], 9)
+        self.assertEqual(len(trace), 2)
+        self.assertTrue(trace[1]["match_found"])
+        self.assertEqual(trace[1]["solution"], (0, 1))
+
+        bm = benchmark_two_sum_algorithms([1, 5, 3, 7, 9], 10)
+        self.assertIn("hash_map", bm)
+        self.assertIn("brute_force", bm)
+        self.assertIn("two_pointers_sorted", bm)
+
+    def test_error_handling(self):
+        with self.assertRaises(TypeError):
+            two_sum_hash_map(None, 5)
+        with self.assertRaises(TypeError):
+            two_sum_hash_map([1, "two"], 3)
+        with self.assertRaises(TypeError):
+            two_sum_hash_map([1, 2], "3")
+        with self.assertRaises(ValueError):
+            two_sum_two_pointers([3, 2, 1], 5)  # unsorted
+        with self.assertRaises(ValueError):
+            two_sum_closest([1], 5)  # len < 2
+
+
+
 
 
 
