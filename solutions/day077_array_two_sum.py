@@ -561,6 +561,98 @@ def two_sum_matrix(
     return None
 
 
+# ─── 7. Step-by-Step Trace & Algorithm Benchmark Engine ──────────────────────
+
+
+def explain_two_sum_step_by_step(nums: List[int], target: int) -> List[Dict[str, Any]]:
+    """
+    Produces a pedagogical trace of the hash map Two Sum algorithm.
+
+    Args:
+        nums: List of integers.
+        target: Target sum.
+
+    Returns:
+        List of trace step dictionaries containing step details.
+    """
+    if not isinstance(nums, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(nums).__name__}")
+    if not isinstance(target, int) or isinstance(target, bool):
+        raise TypeError(f"Expected int for target, got {type(target).__name__}")
+
+    steps: List[Dict[str, Any]] = []
+    seen: Dict[int, int] = {}
+
+    for i, num in enumerate(nums):
+        if not isinstance(num, int) or isinstance(num, bool):
+            raise TypeError(f"Element at index {i} is not an integer: {num!r}")
+
+        complement = target - num
+        match_found = complement in seen
+        step_info = {
+            "step": i + 1,
+            "current_index": i,
+            "current_value": num,
+            "complement_needed": complement,
+            "hash_map_state": dict(seen),
+            "match_found": match_found,
+            "solution": (seen[complement], i) if match_found else None,
+        }
+        steps.append(step_info)
+
+        if match_found:
+            break
+        seen[num] = i
+
+    return steps
+
+
+def benchmark_two_sum_algorithms(nums: List[int], target: int) -> Dict[str, Any]:
+    """
+    Compares runtime performance between hash map, brute force, and two-pointer approaches.
+
+    Args:
+        nums: List of integers.
+        target: Target sum.
+
+    Returns:
+        Dictionary mapping algorithm names to their execution metrics.
+    """
+    results: Dict[str, Any] = {}
+
+    # 1. Hash Map
+    t0 = time.perf_counter()
+    res_hm = two_sum_hash_map(nums, target)
+    t_hm = (time.perf_counter() - t0) * 1000.0
+    results["hash_map"] = {"result": res_hm, "time_ms": round(t_hm, 4), "complexity": "O(n)"}
+
+    # 2. Brute Force
+    t0 = time.perf_counter()
+    res_bf = two_sum_brute_force(nums, target)
+    t_bf = (time.perf_counter() - t0) * 1000.0
+    results["brute_force"] = {"result": res_bf, "time_ms": round(t_bf, 4), "complexity": "O(n^2)"}
+
+    # 3. Two Pointers (includes sorting overhead)
+    t0 = time.perf_counter()
+    indexed = sorted([(val, idx) for idx, val in enumerate(nums)], key=lambda x: x[0])
+    l, r = 0, len(indexed) - 1
+    res_tp = None
+    while l < r:
+        s = indexed[l][0] + indexed[r][0]
+        if s == target:
+            res_tp = (min(indexed[l][1], indexed[r][1]), max(indexed[l][1], indexed[r][1]))
+            break
+        elif s < target:
+            l += 1
+        else:
+            r -= 1
+    t_tp = (time.perf_counter() - t0) * 1000.0
+    results["two_pointers_sorted"] = {"result": res_tp, "time_ms": round(t_tp, 4), "complexity": "O(n log n)"}
+
+    return results
+
+
+
 
 
 
