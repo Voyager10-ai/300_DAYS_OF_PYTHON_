@@ -79,6 +79,7 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 74: Array Missing Element Challenge
 - Day 75: Array Rotate
 - Day 76: Array Summary Range
+- Day 77: Array Two Sum
 
 
 
