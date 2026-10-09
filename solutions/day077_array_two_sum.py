@@ -228,3 +228,102 @@ def two_sum_binary_search(
 
     return None
 
+
+# ─── 3. Two Sum Closest & Inequality Variants ────────────────────────────────
+
+
+def two_sum_closest(nums: List[int], target: int) -> Tuple[int, int, int]:
+    """
+    Finds two elements whose sum is closest to the given target.
+
+    Args:
+        nums: List of integers (length >= 2).
+        target: Target integer.
+
+    Returns:
+        Tuple of (val1, val2, closest_sum) where val1 <= val2.
+
+    Raises:
+        TypeError: If inputs are invalid.
+        ValueError: If nums has fewer than 2 elements.
+    """
+    if not isinstance(nums, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(nums).__name__}")
+    if not isinstance(target, int) or isinstance(target, bool):
+        raise TypeError(f"Expected int for target, got {type(target).__name__}")
+    if len(nums) < 2:
+        raise ValueError("nums must have at least 2 elements")
+
+    for i, x in enumerate(nums):
+        if not isinstance(x, int) or isinstance(x, bool):
+            raise TypeError(f"Element at index {i} is not an integer: {x!r}")
+
+    sorted_nums = sorted(nums)
+    left, right = 0, len(sorted_nums) - 1
+    best_pair = (sorted_nums[left], sorted_nums[right])
+    best_diff = abs(sorted_nums[left] + sorted_nums[right] - target)
+
+    while left < right:
+        curr_sum = sorted_nums[left] + sorted_nums[right]
+        diff = abs(curr_sum - target)
+
+        if diff < best_diff:
+            best_diff = diff
+            best_pair = (sorted_nums[left], sorted_nums[right])
+
+        if curr_sum == target:
+            return (sorted_nums[left], sorted_nums[right], target)
+        elif curr_sum < target:
+            left += 1
+        else:
+            right -= 1
+
+    return (best_pair[0], best_pair[1], best_pair[0] + best_pair[1])
+
+
+def two_sum_less_than_k(nums: List[int], k: int) -> Optional[Tuple[int, int, int]]:
+    """
+    Finds two elements whose sum is strictly less than k, but as close to k as possible (LeetCode 1099).
+
+    Args:
+        nums: List of integers.
+        k: Upper limit bound (sum < k).
+
+    Returns:
+        Tuple of (val1, val2, max_sum) with val1 <= val2, or None if no pair sums to < k.
+
+    Raises:
+        TypeError: If inputs are invalid.
+    """
+    if not isinstance(nums, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(nums).__name__}")
+    if not isinstance(k, int) or isinstance(k, bool):
+        raise TypeError(f"Expected int for k, got {type(k).__name__}")
+
+    if len(nums) < 2:
+        return None
+
+    for i, x in enumerate(nums):
+        if not isinstance(x, int) or isinstance(x, bool):
+            raise TypeError(f"Element at index {i} is not an integer: {x!r}")
+
+    sorted_nums = sorted(nums)
+    left, right = 0, len(sorted_nums) - 1
+    best_sum: Optional[int] = None
+    best_pair: Optional[Tuple[int, int]] = None
+
+    while left < right:
+        curr_sum = sorted_nums[left] + sorted_nums[right]
+        if curr_sum < k:
+            if best_sum is None or curr_sum > best_sum:
+                best_sum = curr_sum
+                best_pair = (sorted_nums[left], sorted_nums[right])
+            left += 1
+        else:
+            right -= 1
+
+    if best_pair is not None and best_sum is not None:
+        return (best_pair[0], best_pair[1], best_sum)
+    return None
+
+
