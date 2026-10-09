@@ -496,5 +496,71 @@ def two_sum_unique_value_pairs(nums: List[int], target: int) -> List[Tuple[int, 
     return sorted(list(unique_pairs))
 
 
+# ─── 6. Batch Two Sum & 2D Matrix Sum Coordinators ───────────────────────────
+
+
+def batch_two_sum(queries: List[Tuple[List[int], int]]) -> List[Optional[Tuple[int, int]]]:
+    """
+    Executes Two Sum queries in batch.
+
+    Args:
+        queries: List of (nums, target) tuples.
+
+    Returns:
+        List of results corresponding to each query.
+
+    Raises:
+        TypeError: If queries format is invalid.
+    """
+    if not isinstance(queries, (list, tuple)):
+        raise TypeError(f"Expected list or tuple of queries, got {type(queries).__name__}")
+
+    results: List[Optional[Tuple[int, int]]] = []
+    for idx, item in enumerate(queries):
+        if not isinstance(item, (list, tuple)) or len(item) != 2:
+            raise TypeError(f"Query at index {idx} must be a 2-tuple (nums, target), got {item!r}")
+        nums, target = item
+        results.append(two_sum_hash_map(nums, target))
+
+    return results
+
+
+def two_sum_matrix(
+    matrix: List[List[int]], target: int
+) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]:
+    """
+    Finds two distinct cell coordinates in a 2D matrix whose values sum to target.
+
+    Args:
+        matrix: 2D list of integers.
+        target: Target sum.
+
+    Returns:
+        Tuple of ((r1, c1), (r2, c2)) or None.
+
+    Raises:
+        TypeError: If matrix format is invalid or contains non-integers.
+    """
+    if not isinstance(matrix, (list, tuple)):
+        raise TypeError(f"Expected 2D list or tuple for matrix, got {type(matrix).__name__}")
+    if not isinstance(target, int) or isinstance(target, bool):
+        raise TypeError(f"Expected int for target, got {type(target).__name__}")
+
+    seen: Dict[int, Tuple[int, int]] = {}
+    for r, row in enumerate(matrix):
+        if not isinstance(row, (list, tuple)):
+            raise TypeError(f"Row {r} must be a list or tuple, got {type(row).__name__}")
+        for c, val in enumerate(row):
+            if not isinstance(val, int) or isinstance(val, bool):
+                raise TypeError(f"Matrix element at ({r}, {c}) is not an int: {val!r}")
+            complement = target - val
+            if complement in seen:
+                return (seen[complement], (r, c))
+            seen[val] = (r, c)
+
+    return None
+
+
+
 
 
