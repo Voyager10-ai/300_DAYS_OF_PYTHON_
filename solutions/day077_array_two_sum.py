@@ -126,3 +126,105 @@ def two_sum_all_pairs(
         unique_vals.add(pair)
 
     return sorted(list(unique_vals))
+
+
+# ─── 2. Two Sum II - Sorted Array Solvers (LeetCode 167) ─────────────────────
+
+
+def two_sum_two_pointers(
+    nums: List[int], target: int, one_indexed: bool = False
+) -> Optional[Tuple[int, int]]:
+    """
+    Finds two indices in a sorted array that sum to target using the two-pointer technique.
+    Achieves O(n) time and O(1) auxiliary space (LeetCode 167).
+
+    Args:
+        nums: Sorted list of integers in non-decreasing order.
+        target: Target sum.
+        one_indexed: If True, returns 1-based indices (as required by LeetCode 167).
+
+    Returns:
+        Tuple of (index1, index2) or None if no pair exists.
+
+    Raises:
+        TypeError: If inputs are invalid.
+        ValueError: If nums is not sorted.
+    """
+    if not isinstance(nums, (list, tuple)):
+        raise TypeError(f"Expected list or tuple for nums, got {type(nums).__name__}")
+    if not isinstance(target, int) or isinstance(target, bool):
+        raise TypeError(f"Expected int for target, got {type(target).__name__}")
+
+    n = len(nums)
+    if n < 2:
+        return None
+
+    for i, x in enumerate(nums):
+        if not isinstance(x, int) or isinstance(x, bool):
+            raise TypeError(f"Element at index {i} is not an integer: {x!r}")
+        if i > 0 and x < nums[i - 1]:
+            raise ValueError(f"Array must be sorted in non-decreasing order: {nums[i-1]} > {x}")
+
+    left, right = 0, n - 1
+    while left < right:
+        current_sum = nums[left] + nums[right]
+        if current_sum == target:
+            offset = 1 if one_indexed else 0
+            return (left + offset, right + offset)
+        elif current_sum < target:
+            left += 1
+        else:
+            right -= 1
+
+    return None
+
+
+def two_sum_binary_search(
+    nums: List[int], target: int, one_indexed: bool = False
+) -> Optional[Tuple[int, int]]:
+    """
+    Finds two indices in a sorted array using binary search for each complement.
+    Runs in O(n log n) time and O(1) auxiliary space.
+
+    Args:
+        nums: Sorted list of integers.
+        target: Target sum.
+        one_indexed: If True, returns 1-based indices.
+
+    Returns:
+        Tuple of (index1, index2) or None.
+
+    Raises:
+        TypeError: If inputs are invalid.
+        ValueError: If nums is not sorted.
+    """
+    if not isinstance(nums, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(nums).__name__}")
+    if not isinstance(target, int) or isinstance(target, bool):
+        raise TypeError(f"Expected int for target, got {type(target).__name__}")
+
+    n = len(nums)
+    for i, x in enumerate(nums):
+        if not isinstance(x, int) or isinstance(x, bool):
+            raise TypeError(f"Element at index {i} is not an integer: {x!r}")
+        if i > 0 and x < nums[i - 1]:
+            raise ValueError(f"nums must be sorted: {nums[i-1]} > {x}")
+
+    offset = 1 if one_indexed else 0
+
+    for i in range(n - 1):
+        complement = target - nums[i]
+        # Binary search for complement in nums[i + 1:]
+        low = i + 1
+        high = n - 1
+        while low <= high:
+            mid = (low + high) // 2
+            if nums[mid] == complement:
+                return (i + offset, mid + offset)
+            elif nums[mid] < complement:
+                low = mid + 1
+            else:
+                high = mid - 1
+
+    return None
+
