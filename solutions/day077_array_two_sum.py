@@ -327,3 +327,99 @@ def two_sum_less_than_k(nums: List[int], k: int) -> Optional[Tuple[int, int, int
     return None
 
 
+# ─── 4. Dynamic TwoSum Data Structure (LeetCode 170) ─────────────────────────
+
+
+class TwoSum:
+    """
+    Data structure supporting dynamic number additions and O(n) two-sum lookups (LeetCode 170).
+
+    Uses a frequency counter hash map to handle duplicates and duplicate complements.
+    """
+
+    def __init__(self) -> None:
+        """Initializes an empty TwoSum container."""
+        self._counts: Dict[int, int] = {}
+
+    def add(self, number: int) -> None:
+        """
+        Adds a number to the internal data structure.
+
+        Args:
+            number: Integer to store.
+
+        Raises:
+            TypeError: If number is not an integer.
+        """
+        if not isinstance(number, int) or isinstance(number, bool):
+            raise TypeError(f"Expected int for number, got {type(number).__name__}")
+        self._counts[number] = self._counts.get(number, 0) + 1
+
+    def find(self, value: int) -> bool:
+        """
+        Finds if there exists any pair of numbers whose sum equals the value.
+
+        Args:
+            value: Target sum to search for.
+
+        Returns:
+            True if a valid pair exists, False otherwise.
+
+        Raises:
+            TypeError: If value is not an integer.
+        """
+        if not isinstance(value, int) or isinstance(value, bool):
+            raise TypeError(f"Expected int for value, got {type(value).__name__}")
+
+        for num, count in self._counts.items():
+            complement = value - num
+            if complement == num:
+                if count >= 2:
+                    return True
+            else:
+                if complement in self._counts:
+                    return True
+        return False
+
+    def remove(self, number: int) -> bool:
+        """
+        Removes one occurrence of number from the structure if present.
+
+        Args:
+            number: Integer to decrement/remove.
+
+        Returns:
+            True if removed, False if number was not present.
+        """
+        if not isinstance(number, int) or isinstance(number, bool):
+            raise TypeError(f"Expected int for number, got {type(number).__name__}")
+
+        if number not in self._counts:
+            return False
+
+        self._counts[number] -= 1
+        if self._counts[number] == 0:
+            del self._counts[number]
+        return True
+
+    def get_count(self, number: int) -> int:
+        """Returns the occurrence frequency of the given number."""
+        return self._counts.get(number, 0)
+
+    def get_all_elements(self) -> List[int]:
+        """Returns all elements stored in the structure in ascending order."""
+        res: List[int] = []
+        for num in sorted(self._counts.keys()):
+            res.extend([num] * self._counts[num])
+        return res
+
+    def clear(self) -> None:
+        """Resets the data structure to empty."""
+        self._counts.clear()
+
+    def __len__(self) -> int:
+        """Returns total count of stored numbers including duplicates."""
+        return sum(self._counts.values())
+
+
+
