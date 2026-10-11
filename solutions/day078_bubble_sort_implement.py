@@ -642,6 +642,128 @@ def verify_stability() -> bool:
     return True
 
 
+# ─── 8. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestBubbleSort(unittest.TestCase):
+    """Test suite covering Bubble Sort and all its algorithmic variants."""
+
+    def test_bubble_sort_standard(self):
+        self.assertEqual(bubble_sort([64, 34, 25, 12, 22, 11, 90]), [11, 12, 22, 25, 34, 64, 90])
+        self.assertEqual(bubble_sort([5, 1, 4, 2, 8]), [1, 2, 4, 5, 8])
+        self.assertEqual(bubble_sort([-3, -1, -7, 0, 5, -2]), [-7, -3, -2, -1, 0, 5])
+        self.assertEqual(bubble_sort([3.14, 2.71, -1.0, 0.0]), [-1.0, 0.0, 2.71, 3.14])
+        self.assertEqual(bubble_sort(["banana", "apple", "cherry"]), ["apple", "banana", "cherry"])
+
+    def test_bubble_sort_edge_cases(self):
+        self.assertEqual(bubble_sort([]), [])
+        self.assertEqual(bubble_sort([42]), [42])
+        self.assertEqual(bubble_sort([7, 7, 7, 7]), [7, 7, 7, 7])
+        self.assertEqual(bubble_sort([1, 2, 3, 4, 5]), [1, 2, 3, 4, 5])
+        self.assertEqual(bubble_sort([5, 4, 3, 2, 1]), [1, 2, 3, 4, 5])
+
+    def test_bubble_sort_inplace(self):
+        data = [9, 3, 7, 1, 5]
+        bubble_sort_inplace(data)
+        self.assertEqual(data, [1, 3, 5, 7, 9])
+
+    def test_bubble_sort_reverse(self):
+        self.assertEqual(bubble_sort([1, 2, 3, 4, 5], reverse=True), [5, 4, 3, 2, 1])
+        self.assertEqual(bubble_sort([10, -5, 20, 0], reverse=True), [20, 10, 0, -5])
+
+    def test_bubble_sort_with_key(self):
+        words = ["elephant", "cat", "dog", "hippopotamus"]
+        # Sort by length
+        sorted_words = bubble_sort(words, key=len)
+        self.assertEqual(sorted_words, ["cat", "dog", "elephant", "hippopotamus"])
+
+    def test_bubble_sort_optimized(self):
+        already_sorted = [1, 2, 3, 4, 5]
+        res, metrics = bubble_sort_optimized(already_sorted)
+        self.assertEqual(res, [1, 2, 3, 4, 5])
+        self.assertEqual(metrics["swaps"], 0)
+        self.assertEqual(metrics["passes_executed"], 1)  # Early exit on pass 1!
+
+        reversed_data = [5, 4, 3, 2, 1]
+        res, metrics = bubble_sort_optimized(reversed_data)
+        self.assertEqual(res, [1, 2, 3, 4, 5])
+        self.assertEqual(metrics["swaps"], 10)  # 5 * 4 / 2 = 10 swaps
+
+    def test_cocktail_shaker_sort(self):
+        data = [5, 1, 4, 2, 8, 0, 2]
+        self.assertEqual(cocktail_shaker_sort(data), [0, 1, 2, 2, 4, 5, 8])
+        self.assertEqual(cocktail_shaker_sort(data, reverse=True), [8, 5, 4, 2, 2, 1, 0])
+
+    def test_comb_sort(self):
+        data = [8, 4, 1, 56, 3, -44, 23, -6, 28, 0]
+        self.assertEqual(comb_sort(data), sorted(data))
+        self.assertEqual(comb_sort(data, reverse=True), sorted(data, reverse=True))
+
+    def test_odd_even_sort(self):
+        data = [34, 2, 10, -9, 0, 8]
+        self.assertEqual(odd_even_sort(data), [-9, 0, 2, 8, 10, 34])
+        self.assertEqual(odd_even_sort(data, reverse=True), [34, 10, 8, 2, 0, -9])
+
+    def test_bubble_sort_recursive(self):
+        data = [64, 34, 25, 12, 22, 11, 90]
+        self.assertEqual(bubble_sort_recursive(data), [11, 12, 22, 25, 34, 64, 90])
+        self.assertEqual(bubble_sort_recursive([]), [])
+        self.assertEqual(bubble_sort_recursive([5]), [5])
+
+    def test_bubble_sort_k_passes(self):
+        data = [5, 1, 4, 2, 8]
+        # After 1 pass: 8 must be at the end
+        pass1 = bubble_sort_k_passes(data, 1)
+        self.assertEqual(pass1[-1], 8)
+
+        # Top-k largest
+        self.assertEqual(find_k_largest_via_bubble([10, 2, 8, 50, 4, 30], 3), [50, 30, 10])
+        self.assertEqual(find_k_largest_via_bubble([10, 2, 8], 0), [])
+
+        # Top-k smallest
+        self.assertEqual(find_k_smallest_via_bubble([10, 2, 8, 50, 4, 30], 3), [2, 4, 8])
+
+    def test_trace_and_ascii_visualizer(self):
+        data = [4, 3, 1]
+        trace = trace_bubble_sort(data)
+        self.assertTrue(len(trace) > 0)
+        self.assertIn("snapshot", trace[0])
+        self.assertIn("swapped", trace[0])
+
+        ascii_repr = render_ascii_trace(trace, max_events=5)
+        self.assertIn("Step", ascii_repr)
+        self.assertIn("Array Snapshot", ascii_repr)
+
+    def test_inversion_and_sortedness(self):
+        self.assertEqual(count_inversions_via_bubble([1, 2, 3]), 0)
+        self.assertEqual(count_inversions_via_bubble([3, 2, 1]), 3)  # (3,2), (3,1), (2,1)
+        self.assertEqual(count_inversions_via_bubble([2, 4, 1, 3, 5]), 3)
+
+        stats_sorted = measure_sortedness([1, 2, 3, 4])
+        self.assertEqual(stats_sorted["sortedness_score"], 100.0)
+        self.assertTrue(stats_sorted["is_sorted"])
+
+        stats_rev = measure_sortedness([4, 3, 2, 1])
+        self.assertEqual(stats_rev["sortedness_score"], 0.0)
+        self.assertFalse(stats_rev["is_sorted"])
+
+    def test_batch_and_stability(self):
+        batches = [[3, 1, 2], [9, 8], [5]]
+        self.assertEqual(batch_bubble_sort(batches), [[1, 2, 3], [8, 9], [5]])
+        self.assertTrue(verify_stability())
+
+    def test_error_handling(self):
+        with self.assertRaises(TypeError):
+            bubble_sort(123)
+        with self.assertRaises(TypeError):
+            bubble_sort_inplace("not a list")
+        with self.assertRaises(ValueError):
+            comb_sort([1, 2, 3], shrink_factor=0.9)
+        with self.assertRaises(ValueError):
+            find_k_largest_via_bubble([1, 2], 5)
+
+
+
 
 
 
