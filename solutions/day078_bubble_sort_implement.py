@@ -432,4 +432,84 @@ def find_k_smallest_via_bubble(arr: List[Any], k: int) -> List[Any]:
     return list(reversed(partially_sorted[-k:]))
 
 
+# ─── 5. Step-by-Step Trace & ASCII Visualizer ─────────────────────────────────
+
+
+def trace_bubble_sort(arr: List[Any], reverse: bool = False) -> List[Dict[str, Any]]:
+    """
+    Generates a step-by-step pedagogical trace of Bubble Sort comparisons and swaps.
+
+    Args:
+        arr: Input sequence.
+        reverse: If True, sorts descending.
+
+    Returns:
+        List of trace event dictionaries.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    items = list(arr)
+    n = len(items)
+    trace: List[Dict[str, Any]] = []
+    step_num = 1
+
+    for i in range(n):
+        swapped = False
+        for j in range(0, n - 1 - i):
+            condition = (items[j] < items[j + 1]) if reverse else (items[j] > items[j + 1])
+            swap_done = False
+            val_a, val_b = items[j], items[j + 1]
+
+            if condition:
+                items[j], items[j + 1] = items[j + 1], items[j]
+                swapped = True
+                swap_done = True
+
+            trace.append({
+                "step": step_num,
+                "pass": i + 1,
+                "indices": (j, j + 1),
+                "compared_values": (val_a, val_b),
+                "swapped": swap_done,
+                "snapshot": list(items),
+            })
+            step_num += 1
+
+        if not swapped:
+            break
+
+    return trace
+
+
+def render_ascii_trace(trace: List[Dict[str, Any]], max_events: int = 10) -> str:
+    """
+    Renders trace events as a clean ASCII diagram.
+
+    Args:
+        trace: List of trace events.
+        max_events: Maximum events to render.
+
+    Returns:
+        Formatted multi-line ASCII string.
+    """
+    lines: List[str] = []
+    lines.append(f"{'Step':<6} | {'Pass':<5} | {'Indices':<9} | {'Action':<10} | {'Array Snapshot'}")
+    lines.append("-" * 65)
+
+    displayed = trace[:max_events]
+    for ev in displayed:
+        action = "SWAP" if ev["swapped"] else "keep"
+        idx_str = f"({ev['indices'][0]},{ev['indices'][1]})"
+        lines.append(
+            f"{ev['step']:<6} | {ev['pass']:<5} | {idx_str:<9} | {action:<10} | {ev['snapshot']}"
+        )
+
+    if len(trace) > max_events:
+        lines.append(f"... ({len(trace) - max_events} more comparison steps omitted) ...")
+
+    return "\n".join(lines)
+
+
+
 
