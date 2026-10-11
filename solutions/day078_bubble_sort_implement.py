@@ -229,3 +229,105 @@ def comb_sort(arr: List[Any], reverse: bool = False, shrink_factor: float = 1.3)
 
     return items
 
+
+# ─── 3. Odd-Even Transposition Sort & Recursive Bubble Sort ──────────────────
+
+
+def odd_even_sort(arr: List[Any], reverse: bool = False) -> List[Any]:
+    """
+    Sorts a sequence using Odd-Even Transposition Sort (Brick Sort).
+    Alternates between comparing odd-indexed pairs and even-indexed pairs.
+
+    Args:
+        arr: Input sequence.
+        reverse: If True, sorts descending.
+
+    Returns:
+        New sorted list.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    copied = list(arr)
+    odd_even_sort_inplace(copied, reverse=reverse)
+    return copied
+
+
+def odd_even_sort_inplace(arr: List[Any], reverse: bool = False) -> None:
+    """
+    In-place odd-even transposition sort.
+
+    Args:
+        arr: Mutable list.
+        reverse: If True, sorts descending.
+    """
+    if not isinstance(arr, list):
+        raise TypeError(f"Expected list for in-place sorting, got {type(arr).__name__}")
+
+    n = len(arr)
+    if n <= 1:
+        return
+
+    is_sorted = False
+    while not is_sorted:
+        is_sorted = True
+
+        # Odd phase: compare elements at odd indices (1, 3, 5, ...)
+        for i in range(1, n - 1, 2):
+            condition = (arr[i] < arr[i + 1]) if reverse else (arr[i] > arr[i + 1])
+            if condition:
+                arr[i], arr[i + 1] = arr[i + 1], arr[i]
+                is_sorted = False
+
+        # Even phase: compare elements at even indices (0, 2, 4, ...)
+        for i in range(0, n - 1, 2):
+            condition = (arr[i] < arr[i + 1]) if reverse else (arr[i] > arr[i + 1])
+            if condition:
+                arr[i], arr[i + 1] = arr[i + 1], arr[i]
+                is_sorted = False
+
+
+def bubble_sort_recursive(
+    arr: List[Any], n: Optional[int] = None, reverse: bool = False
+) -> List[Any]:
+    """
+    Recursive implementation of Bubble Sort.
+
+    Base case: n == 1 (array of 1 element is sorted).
+    Recursive step: Execute 1 pass to move maximum element to end, then recurse on n - 1 elements.
+
+    Args:
+        arr: Input list.
+        n: Length of subarray to consider (defaults to len(arr)).
+        reverse: If True, sorts descending.
+
+    Returns:
+        New sorted list.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    copied = list(arr)
+    _bubble_sort_recursive_helper(copied, len(copied) if n is None else n, reverse=reverse)
+    return copied
+
+
+def _bubble_sort_recursive_helper(arr: List[Any], n: int, reverse: bool = False) -> None:
+    """Helper mutating arr recursively."""
+    if n <= 1:
+        return
+
+    swapped = False
+    for i in range(n - 1):
+        condition = (arr[i] < arr[i + 1]) if reverse else (arr[i] > arr[i + 1])
+        if condition:
+            arr[i], arr[i + 1] = arr[i + 1], arr[i]
+            swapped = True
+
+    # If no swap occurred in this pass, array is already sorted
+    if not swapped:
+        return
+
+    _bubble_sort_recursive_helper(arr, n - 1, reverse=reverse)
+
+
