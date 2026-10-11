@@ -331,3 +331,105 @@ def _bubble_sort_recursive_helper(arr: List[Any], n: int, reverse: bool = False)
     _bubble_sort_recursive_helper(arr, n - 1, reverse=reverse)
 
 
+# ─── 4. K-Pass Partial Sorters & Top-K Extraction ────────────────────────────
+
+
+def bubble_sort_k_passes(arr: List[Any], k: int, reverse: bool = False) -> List[Any]:
+    """
+    Executes exactly k passes of Bubble Sort.
+    After k passes, the k extreme elements are guaranteed to be in their final sorted positions.
+
+    Args:
+        arr: Input sequence.
+        k: Number of passes to execute (0 <= k <= len(arr)).
+        reverse: If True, sorts descending.
+
+    Returns:
+        Partially sorted list.
+
+    Raises:
+        TypeError: If inputs are invalid.
+        ValueError: If k < 0.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+    if not isinstance(k, int) or isinstance(k, bool):
+        raise TypeError(f"Expected int for k, got {type(k).__name__}")
+    if k < 0:
+        raise ValueError(f"k must be non-negative, got {k}")
+
+    items = list(arr)
+    n = len(items)
+    effective_k = min(k, n)
+
+    for i in range(effective_k):
+        swapped = False
+        for j in range(0, n - 1 - i):
+            condition = (items[j] < items[j + 1]) if reverse else (items[j] > items[j + 1])
+            if condition:
+                items[j], items[j + 1] = items[j + 1], items[j]
+                swapped = True
+        if not swapped:
+            break
+
+    return items
+
+
+def find_k_largest_via_bubble(arr: List[Any], k: int) -> List[Any]:
+    """
+    Finds the k largest elements in O(k * n) time using k passes of standard bubble sort.
+    Efficient when k << n without full O(n log n) overhead.
+
+    Args:
+        arr: Input list.
+        k: Number of largest elements to find.
+
+    Returns:
+        List of k largest elements sorted in descending order.
+
+    Raises:
+        ValueError: If k < 0 or k > len(arr).
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+    if not isinstance(k, int) or isinstance(k, bool):
+        raise TypeError(f"Expected int for k, got {type(k).__name__}")
+    if k < 0 or k > len(arr):
+        raise ValueError(f"k must be in range [0, {len(arr)}], got {k}")
+
+    if k == 0:
+        return []
+
+    partially_sorted = bubble_sort_k_passes(arr, k, reverse=False)
+    # The k largest elements are at the end: partially_sorted[-k:]
+    # Return them in descending order
+    return list(reversed(partially_sorted[-k:]))
+
+
+def find_k_smallest_via_bubble(arr: List[Any], k: int) -> List[Any]:
+    """
+    Finds the k smallest elements in O(k * n) time using k passes of reverse bubble sort.
+
+    Args:
+        arr: Input list.
+        k: Number of smallest elements to find.
+
+    Returns:
+        List of k smallest elements sorted in ascending order.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+    if not isinstance(k, int) or isinstance(k, bool):
+        raise TypeError(f"Expected int for k, got {type(k).__name__}")
+    if k < 0 or k > len(arr):
+        raise ValueError(f"k must be in range [0, {len(arr)}], got {k}")
+
+    if k == 0:
+        return []
+
+    partially_sorted = bubble_sort_k_passes(arr, k, reverse=True)
+    # The k smallest elements are at the end in descending order; reverse to ascending
+    return list(reversed(partially_sorted[-k:]))
+
+
+
