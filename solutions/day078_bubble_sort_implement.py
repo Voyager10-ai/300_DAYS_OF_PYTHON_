@@ -122,3 +122,110 @@ def bubble_sort_optimized(
         "total_elements": n,
     }
     return (items, metrics)
+
+
+# ─── 2. Bidirectional Cocktail Shaker Sort & Comb Sort ────────────────────────
+
+
+def cocktail_shaker_sort(arr: List[Any], reverse: bool = False) -> List[Any]:
+    """
+    Sorts a sequence using bidirectional bubble sort (Cocktail Shaker / Ripple Sort).
+    Eliminates the 'turtles' problem (small values at the end of the list).
+
+    Args:
+        arr: Input sequence.
+        reverse: If True, sorts descending.
+
+    Returns:
+        New sorted list.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple for arr, got {type(arr).__name__}")
+
+    copied = list(arr)
+    cocktail_shaker_sort_inplace(copied, reverse=reverse)
+    return copied
+
+
+def cocktail_shaker_sort_inplace(arr: List[Any], reverse: bool = False) -> None:
+    """
+    In-place bidirectional cocktail shaker sort.
+
+    Args:
+        arr: Mutable list.
+        reverse: If True, sorts descending.
+    """
+    if not isinstance(arr, list):
+        raise TypeError(f"Expected list for in-place sorting, got {type(arr).__name__}")
+
+    n = len(arr)
+    if n <= 1:
+        return
+
+    start = 0
+    end = n - 1
+    swapped = True
+
+    while swapped:
+        swapped = False
+
+        # Forward pass (left to right)
+        for i in range(start, end):
+            condition = (arr[i] < arr[i + 1]) if reverse else (arr[i] > arr[i + 1])
+            if condition:
+                arr[i], arr[i + 1] = arr[i + 1], arr[i]
+                swapped = True
+
+        if not swapped:
+            break
+
+        swapped = False
+        end -= 1
+
+        # Backward pass (right to left)
+        for i in range(end - 1, start - 1, -1):
+            condition = (arr[i] < arr[i + 1]) if reverse else (arr[i] > arr[i + 1])
+            if condition:
+                arr[i], arr[i + 1] = arr[i + 1], arr[i]
+                swapped = True
+
+        start += 1
+
+
+def comb_sort(arr: List[Any], reverse: bool = False, shrink_factor: float = 1.3) -> List[Any]:
+    """
+    Sorts an array using Comb Sort, an optimization over Bubble Sort with gap shrinking.
+    Reduces time complexity towards O(n log n) by eliminating distant inversions early.
+
+    Args:
+        arr: Input sequence.
+        reverse: If True, sorts descending.
+        shrink_factor: Factor to reduce gap on each pass (ideally 1.3).
+
+    Returns:
+        New sorted list.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+    if shrink_factor <= 1.0:
+        raise ValueError(f"shrink_factor must be > 1.0, got {shrink_factor}")
+
+    items = list(arr)
+    n = len(items)
+    gap = n
+    swapped = True
+
+    while gap > 1 or swapped:
+        gap = int(gap / shrink_factor)
+        if gap < 1:
+            gap = 1
+
+        swapped = False
+        for i in range(0, n - gap):
+            condition = (items[i] < items[i + gap]) if reverse else (items[i] > items[i + gap])
+            if condition:
+                items[i], items[i + gap] = items[i + gap], items[i]
+                swapped = True
+
+    return items
+
