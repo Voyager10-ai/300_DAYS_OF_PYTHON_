@@ -511,5 +511,81 @@ def render_ascii_trace(trace: List[Dict[str, Any]], max_events: int = 10) -> str
     return "\n".join(lines)
 
 
+# ─── 6. Inversion Counter & Sortedness Metrics Engine ─────────────────────────
+
+
+def count_inversions_via_bubble(arr: List[Any]) -> int:
+    """
+    Counts the exact number of inversions in a sequence via adjacent bubble swaps.
+    An inversion is a pair (i, j) where i < j and arr[i] > arr[j].
+
+    Args:
+        arr: Input sequence.
+
+    Returns:
+        Integer count of inversions.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    items = list(arr)
+    n = len(items)
+    inversions = 0
+
+    for i in range(n):
+        swapped = False
+        for j in range(0, n - 1 - i):
+            if items[j] > items[j + 1]:
+                items[j], items[j + 1] = items[j + 1], items[j]
+                inversions += 1
+                swapped = True
+        if not swapped:
+            break
+
+    return inversions
+
+
+def measure_sortedness(arr: List[Any]) -> Dict[str, Any]:
+    """
+    Calculates sortedness metrics including Kendall's tau inversion measure.
+
+    Args:
+        arr: Input sequence.
+
+    Returns:
+        Dictionary containing:
+            - total_elements: Count of elements
+            - inversion_count: Number of out-of-order pairs
+            - max_possible_inversions: n * (n - 1) / 2
+            - sortedness_score: Percentage from 0.0% (reversed) to 100.0% (sorted)
+            - is_sorted: Boolean flag
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    n = len(arr)
+    if n <= 1:
+        return {
+            "total_elements": n,
+            "inversion_count": 0,
+            "max_possible_inversions": 0,
+            "sortedness_score": 100.0,
+            "is_sorted": True,
+        }
+
+    max_inversions = (n * (n - 1)) // 2
+    inversions = count_inversions_via_bubble(arr)
+    sortedness_score = round((1.0 - (inversions / max_inversions)) * 100.0, 2)
+
+    return {
+        "total_elements": n,
+        "inversion_count": inversions,
+        "max_possible_inversions": max_inversions,
+        "sortedness_score": sortedness_score,
+        "is_sorted": inversions == 0,
+    }
+
+
+
 
 
