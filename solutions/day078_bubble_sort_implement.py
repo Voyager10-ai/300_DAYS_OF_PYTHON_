@@ -586,6 +586,63 @@ def measure_sortedness(arr: List[Any]) -> Dict[str, Any]:
     }
 
 
+# ─── 7. Batch Sorter & Stability Verification Engine ──────────────────────────
+
+
+def batch_bubble_sort(
+    arrays: List[List[Any]], reverse: bool = False
+) -> List[List[Any]]:
+    """
+    Executes Bubble Sort across a batch of sequences.
+
+    Args:
+        arrays: List of sequences to sort.
+        reverse: If True, sorts descending.
+
+    Returns:
+        List of sorted lists.
+    """
+    if not isinstance(arrays, (list, tuple)):
+        raise TypeError(f"Expected list or tuple of arrays, got {type(arrays).__name__}")
+
+    return [bubble_sort(a, reverse=reverse) for a in arrays]
+
+
+def verify_stability() -> bool:
+    """
+    Verifies that Bubble Sort is a stable sorting algorithm.
+    Stability means elements with equal keys maintain their relative input order.
+
+    Returns:
+        True if relative order of equal keys is preserved, False otherwise.
+    """
+    items = [
+        ("Alice", 85),
+        ("Bob", 92),
+        ("Charlie", 85),
+        ("David", 92),
+        ("Eve", 85),
+    ]
+
+    # Sort primarily by score ascending using key lambda x: x[1]
+    sorted_items = bubble_sort(items, key=lambda x: x[1])
+
+    # Extract all items with score 85
+    score_85 = [name for name, score in sorted_items if score == 85]
+    # Original relative order was Alice, Charlie, Eve
+    if score_85 != ["Alice", "Charlie", "Eve"]:
+        return False
+
+    # Extract all items with score 92
+    score_92 = [name for name, score in sorted_items if score == 92]
+    # Original relative order was Bob, David
+    if score_92 != ["Bob", "David"]:
+        return False
+
+    return True
+
+
+
 
 
 
