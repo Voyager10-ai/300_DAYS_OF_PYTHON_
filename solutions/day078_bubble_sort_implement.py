@@ -763,6 +763,62 @@ class TestBubbleSort(unittest.TestCase):
             find_k_largest_via_bubble([1, 2], 5)
 
 
+# ─── 9. Interactive CLI Demo Runner ───────────────────────────────────────────
+
+
+def main() -> None:
+    print("=" * 68)
+    print(" Day 78: Bubble Sort Implement - Algorithmic Demonstration Engine")
+    print("=" * 68)
+
+    sample = [64, 34, 25, 12, 22, 11, 90]
+    print(f"\n[1] Core Bubble Sort:")
+    print(f"  Original Array  : {sample}")
+    print(f"  Ascending Sort  : {bubble_sort(sample)}")
+    print(f"  Descending Sort : {bubble_sort(sample, reverse=True)}")
+
+    res_opt, metrics = bubble_sort_optimized(sample)
+    print(f"  Optimized Stats : comparisons={metrics['comparisons']}, swaps={metrics['swaps']}, passes={metrics['passes_executed']}")
+
+    print(f"\n[2] Advanced Bubble Sort Variations:")
+    shaker_sample = [5, 1, 4, 2, 8, 0, 2]
+    print(f"  Input Sequence  : {shaker_sample}")
+    print(f"  Cocktail Shaker : {cocktail_shaker_sort(shaker_sample)}")
+    print(f"  Comb Sort       : {comb_sort(shaker_sample)}")
+    print(f"  Odd-Even Sort   : {odd_even_sort(shaker_sample)}")
+    print(f"  Recursive Sort  : {bubble_sort_recursive(shaker_sample)}")
+
+    print(f"\n[3] K-Pass & Top-K Extraction:")
+    top_k_sample = [10, 2, 8, 50, 4, 30, 25]
+    print(f"  Input Array     : {top_k_sample}")
+    print(f"  Top 3 Largest   : {find_k_largest_via_bubble(top_k_sample, 3)}")
+    print(f"  Top 3 Smallest  : {find_k_smallest_via_bubble(top_k_sample, 3)}")
+
+    print(f"\n[4] Inversion & Sortedness Analysis:")
+    inv_sample = [2, 4, 1, 3, 5]
+    sortedness = measure_sortedness(inv_sample)
+    print(f"  Array           : {inv_sample}")
+    print(f"  Inversions      : {sortedness['inversion_count']} (out of {sortedness['max_possible_inversions']} max)")
+    print(f"  Sortedness Score: {sortedness['sortedness_score']}% (is_sorted={sortedness['is_sorted']})")
+
+    print(f"\n[5] Step-by-Step Pedagogical Trace (First 8 Steps):")
+    trace = trace_bubble_sort([5, 3, 1, 4])
+    print(render_ascii_trace(trace, max_events=8))
+
+    print(f"\n[6] Stability Verification:")
+    print(f"  Is Bubble Sort Stable? -> {verify_stability()}")
+
+    print("\n--- Running Unit Test Suite ---")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestBubbleSort)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 
