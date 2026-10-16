@@ -127,3 +127,85 @@ def insertion_sort_metrics(
         "total_elements": n,
     }
     return (items, metrics)
+
+
+# ─── 2. Binary Insertion Sort (O(n log n) Comparisons) ───────────────────────
+
+
+def binary_search_insert_pos(
+    arr: List[Any], val: Any, low: int, high: int, reverse: bool = False
+) -> int:
+    """
+    Finds the insertion index for `val` in sorted subsegment `arr[low..high]` using binary search.
+    Preserves stability by inserting after equal elements.
+
+    Args:
+        arr: List containing sorted elements in arr[low..high].
+        val: Target value to place.
+        low: Start index.
+        high: End index (inclusive).
+        reverse: If True, indicates subsegment is descending.
+
+    Returns:
+        Insertion index.
+    """
+    while low <= high:
+        mid = (low + high) // 2
+        if not reverse:
+            if arr[mid] <= val:
+                low = mid + 1
+            else:
+                high = mid - 1
+        else:
+            if arr[mid] >= val:
+                low = mid + 1
+            else:
+                high = mid - 1
+    return low
+
+
+def binary_insertion_sort(arr: List[Any], reverse: bool = False) -> List[Any]:
+    """
+    Sorts a sequence using Binary Insertion Sort.
+    Reduces total comparisons from O(n^2) to O(n log n) using binary search for placement.
+
+    Args:
+        arr: Input sequence.
+        reverse: If True, sorts descending.
+
+    Returns:
+        New sorted list.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    copied = list(arr)
+    binary_insertion_sort_inplace(copied, reverse=reverse)
+    return copied
+
+
+def binary_insertion_sort_inplace(arr: List[Any], reverse: bool = False) -> None:
+    """
+    In-place Binary Insertion Sort.
+
+    Args:
+        arr: Mutable list.
+        reverse: If True, sorts descending.
+    """
+    if not isinstance(arr, list):
+        raise TypeError(f"Expected mutable list, got {type(arr).__name__}")
+
+    n = len(arr)
+    for i in range(1, n):
+        selected = arr[i]
+        # Find position where selected should be inserted in arr[0..i-1]
+        insert_idx = binary_search_insert_pos(arr, selected, 0, i - 1, reverse=reverse)
+
+        # Shift elements from insert_idx to i - 1 one position right
+        j = i - 1
+        while j >= insert_idx:
+            arr[j + 1] = arr[j]
+            j -= 1
+
+        arr[insert_idx] = selected
+
