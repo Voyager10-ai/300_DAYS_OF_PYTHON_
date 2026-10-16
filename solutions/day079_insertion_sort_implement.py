@@ -622,6 +622,130 @@ def verify_insertion_sort_stability() -> bool:
     return True
 
 
+# ─── 8. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestInsertionSort(unittest.TestCase):
+    """Test suite covering Insertion Sort and its advanced algorithmic variations."""
+
+    def test_insertion_sort_standard(self):
+        self.assertEqual(insertion_sort([12, 11, 13, 5, 6]), [5, 6, 11, 12, 13])
+        self.assertEqual(insertion_sort([64, 34, 25, 12, 22, 11, 90]), [11, 12, 22, 25, 34, 64, 90])
+        self.assertEqual(insertion_sort([-5, 3, -2, 0, 8, -1]), [-5, -2, -1, 0, 3, 8])
+        self.assertEqual(insertion_sort([3.14, -1.0, 2.71, 0.0]), [-1.0, 0.0, 2.71, 3.14])
+        self.assertEqual(insertion_sort(["pear", "apple", "orange"]), ["apple", "orange", "pear"])
+
+    def test_insertion_sort_edge_cases(self):
+        self.assertEqual(insertion_sort([]), [])
+        self.assertEqual(insertion_sort([42]), [42])
+        self.assertEqual(insertion_sort([5, 5, 5, 5]), [5, 5, 5, 5])
+        self.assertEqual(insertion_sort([1, 2, 3, 4, 5]), [1, 2, 3, 4, 5])
+        self.assertEqual(insertion_sort([5, 4, 3, 2, 1]), [1, 2, 3, 4, 5])
+
+    def test_insertion_sort_inplace(self):
+        data = [9, 1, 8, 2, 7]
+        insertion_sort_inplace(data)
+        self.assertEqual(data, [1, 2, 7, 8, 9])
+
+    def test_insertion_sort_reverse(self):
+        self.assertEqual(insertion_sort([1, 2, 3, 4, 5], reverse=True), [5, 4, 3, 2, 1])
+        self.assertEqual(insertion_sort([10, -5, 20, 0], reverse=True), [20, 10, 0, -5])
+
+    def test_insertion_sort_with_key(self):
+        words = ["python", "c", "javascript", "go"]
+        self.assertEqual(insertion_sort(words, key=len), ["c", "go", "python", "javascript"])
+
+    def test_insertion_sort_metrics(self):
+        sorted_arr = [1, 2, 3, 4, 5]
+        res, metrics = insertion_sort_metrics(sorted_arr)
+        self.assertEqual(res, [1, 2, 3, 4, 5])
+        self.assertEqual(metrics["shifts"], 0)  # Best case O(n): zero shifts!
+
+        rev_arr = [5, 4, 3, 2, 1]
+        res, metrics = insertion_sort_metrics(rev_arr)
+        self.assertEqual(res, [1, 2, 3, 4, 5])
+        self.assertEqual(metrics["shifts"], 10)  # 5 * 4 / 2 = 10 shifts
+
+    def test_binary_insertion_sort(self):
+        data = [37, 23, 0, 17, 12, 72, 31, 46, 100, 88, 54]
+        self.assertEqual(binary_insertion_sort(data), sorted(data))
+        self.assertEqual(binary_insertion_sort(data, reverse=True), sorted(data, reverse=True))
+
+    def test_insertion_sort_range(self):
+        arr = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+        # Sort only index 2 to 5: arr[2..5] were [8, 7, 6, 5] -> becomes [5, 6, 7, 8]
+        insertion_sort_range(arr, 2, 5)
+        self.assertEqual(arr, [10, 9, 5, 6, 7, 8, 4, 3, 2, 1])
+
+    def test_insertion_sort_blocks(self):
+        data = [9, 8, 7, 6, 5, 4, 3, 2, 1]
+        # Sort in blocks of size 3
+        blocked = insertion_sort_blocks(data, block_size=3)
+        self.assertEqual(blocked, [7, 8, 9, 4, 5, 6, 1, 2, 3])
+
+    def test_insertion_sort_recursive(self):
+        data = [12, 11, 13, 5, 6]
+        self.assertEqual(insertion_sort_recursive(data), [5, 6, 11, 12, 13])
+        self.assertEqual(insertion_sort_recursive([]), [])
+        self.assertEqual(insertion_sort_recursive([5]), [5])
+
+    def test_online_insertion_sorter(self):
+        stream = OnlineInsertionSorter()
+        stream.insert(5)
+        stream.insert(2)
+        stream.insert(8)
+        stream.insert(1)
+        self.assertEqual(stream.get_sorted(), [1, 2, 5, 8])
+        self.assertEqual(stream.peek_median(), 3.5)  # (2 + 5) / 2
+        stream.insert(4)
+        self.assertEqual(stream.get_sorted(), [1, 2, 4, 5, 8])
+        self.assertEqual(stream.peek_median(), 4.0)
+
+        stream.clear()
+        self.assertEqual(len(stream), 0)
+
+    def test_trace_and_ascii_visualizer(self):
+        trace = trace_insertion_sort([5, 2, 4, 1])
+        self.assertEqual(len(trace), 4)  # 1 initial + 3 passes
+        self.assertEqual(trace[-1]["snapshot"], [1, 2, 4, 5])
+
+        rendered = render_insertion_trace(trace, max_events=5)
+        self.assertIn("Pass", rendered)
+        self.assertIn("Array Snapshot", rendered)
+
+    def test_shift_counter_and_efficiency(self):
+        self.assertEqual(count_shifts_via_insertion([1, 2, 3]), 0)
+        self.assertEqual(count_shifts_via_insertion([3, 2, 1]), 3)
+
+        eff_sorted = analyze_insertion_efficiency([1, 2, 3, 4])
+        self.assertTrue(eff_sorted["is_already_sorted"])
+        self.assertIn("Best-Case", eff_sorted["efficiency_rating"])
+
+        eff_rev = analyze_insertion_efficiency([4, 3, 2, 1])
+        self.assertFalse(eff_rev["is_already_sorted"])
+        self.assertIn("Heavily Inverted", eff_rev["efficiency_rating"])
+
+    def test_batch_and_stability(self):
+        batch = [[4, 2], [10, 5, 8], [1]]
+        self.assertEqual(batch_insertion_sort(batch), [[2, 4], [5, 8, 10], [1]])
+        self.assertTrue(verify_insertion_sort_stability())
+
+    def test_error_handling(self):
+        with self.assertRaises(TypeError):
+            insertion_sort(12345)
+        with self.assertRaises(TypeError):
+            insertion_sort_inplace("string is immutable")
+        with self.assertRaises(ValueError):
+            insertion_sort_range([1, 2, 3], left=-1, right=2)
+        with self.assertRaises(ValueError):
+            insertion_sort_range([1, 2, 3], left=2, right=1)
+        with self.assertRaises(ValueError):
+            insertion_sort_blocks([1, 2], block_size=0)
+        with self.assertRaises(ValueError):
+            OnlineInsertionSorter().peek_median()
+
+
+
 
 
 
