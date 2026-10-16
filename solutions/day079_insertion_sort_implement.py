@@ -209,3 +209,80 @@ def binary_insertion_sort_inplace(arr: List[Any], reverse: bool = False) -> None
 
         arr[insert_idx] = selected
 
+
+# ─── 3. Range-Bounded Slice Insertion Sort (Timsort Subroutine) ──────────────
+
+
+def insertion_sort_range(
+    arr: List[Any], left: int, right: int, reverse: bool = False
+) -> None:
+    """
+    Sorts a designated subrange arr[left..right] in-place using Insertion Sort.
+    This is the fundamental small-chunk optimization routine used in Timsort and Introsort.
+
+    Args:
+        arr: Mutable list.
+        left: Left boundary index (inclusive).
+        right: Right boundary index (inclusive).
+        reverse: If True, sorts descending.
+
+    Raises:
+        TypeError: If inputs are invalid.
+        ValueError: If indices are out of bounds or left > right.
+    """
+    if not isinstance(arr, list):
+        raise TypeError(f"Expected mutable list, got {type(arr).__name__}")
+    if not isinstance(left, int) or isinstance(left, bool):
+        raise TypeError(f"Expected int for left, got {type(left).__name__}")
+    if not isinstance(right, int) or isinstance(right, bool):
+        raise TypeError(f"Expected int for right, got {type(right).__name__}")
+
+    n = len(arr)
+    if left < 0 or right >= n or left > right:
+        raise ValueError(f"Invalid range [{left}, {right}] for array of length {n}")
+
+    for i in range(left + 1, right + 1):
+        key = arr[i]
+        j = i - 1
+
+        if not reverse:
+            while j >= left and arr[j] > key:
+                arr[j + 1] = arr[j]
+                j -= 1
+        else:
+            while j >= left and arr[j] < key:
+                arr[j + 1] = arr[j]
+                j -= 1
+
+        arr[j + 1] = key
+
+
+def insertion_sort_blocks(arr: List[Any], block_size: int = 16) -> List[Any]:
+    """
+    Partitions an array into blocks of size `block_size` and sorts each block in-place.
+    Serves as the preliminary run-creation step in hybrid algorithms like Timsort.
+
+    Args:
+        arr: Input sequence.
+        block_size: Size of individual chunks to sort (must be >= 1).
+
+    Returns:
+        New list with internally sorted blocks.
+
+    Raises:
+        ValueError: If block_size < 1.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+    if block_size < 1:
+        raise ValueError(f"block_size must be >= 1, got {block_size}")
+
+    items = list(arr)
+    n = len(items)
+    for start in range(0, n, block_size):
+        end = min(start + block_size - 1, n - 1)
+        insertion_sort_range(items, start, end)
+
+    return items
+
+
