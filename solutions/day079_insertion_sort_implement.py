@@ -567,6 +567,62 @@ def analyze_insertion_efficiency(arr: List[Any]) -> Dict[str, Any]:
     }
 
 
+# ─── 7. Batch Sorter & Stability Verification Engine ──────────────────────────
+
+
+def batch_insertion_sort(
+    arrays: List[List[Any]], reverse: bool = False
+) -> List[List[Any]]:
+    """
+    Sorts a collection of sequences using Insertion Sort.
+
+    Args:
+        arrays: List of sequences to sort.
+        reverse: If True, sorts descending.
+
+    Returns:
+        List of sorted lists.
+    """
+    if not isinstance(arrays, (list, tuple)):
+        raise TypeError(f"Expected list or tuple of arrays, got {type(arrays).__name__}")
+
+    return [insertion_sort(a, reverse=reverse) for a in arrays]
+
+
+def verify_insertion_sort_stability() -> bool:
+    """
+    Verifies that Insertion Sort is intrinsically stable.
+    Since elements are shifted strictly when they are greater (or smaller),
+    elements with equal keys are never swapped past one another.
+
+    Returns:
+        True if stability is preserved, False otherwise.
+    """
+    records = [
+        ("TaskA", 3),
+        ("TaskB", 1),
+        ("TaskC", 3),
+        ("TaskD", 2),
+        ("TaskE", 3),
+        ("TaskF", 1),
+    ]
+
+    sorted_records = insertion_sort(records, key=lambda x: x[1])
+
+    # Check priority 3 items preserved relative order: TaskA, TaskC, TaskE
+    priority_3 = [name for name, p in sorted_records if p == 3]
+    if priority_3 != ["TaskA", "TaskC", "TaskE"]:
+        return False
+
+    # Check priority 1 items preserved relative order: TaskB, TaskF
+    priority_1 = [name for name, p in sorted_records if p == 1]
+    if priority_1 != ["TaskB", "TaskF"]:
+        return False
+
+    return True
+
+
+
 
 
 
