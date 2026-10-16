@@ -391,4 +391,100 @@ class OnlineInsertionSorter:
         return len(self._data)
 
 
+# ─── 5. Step-by-Step Pedagogical Trace & ASCII Visualizer ─────────────────────
+
+
+def trace_insertion_sort(
+    arr: List[Any], reverse: bool = False
+) -> List[Dict[str, Any]]:
+    """
+    Generates a step-by-step trace of how Insertion Sort progressively builds the sorted prefix.
+
+    Args:
+        arr: Input sequence.
+        reverse: If True, sorts descending.
+
+    Returns:
+        List of trace dictionaries for each pass.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    items = list(arr)
+    n = len(items)
+    trace: List[Dict[str, Any]] = []
+
+    # Initial state
+    trace.append({
+        "step": 0,
+        "inserted_item": None,
+        "from_index": None,
+        "to_index": None,
+        "shifts": 0,
+        "sorted_prefix_len": 1 if n > 0 else 0,
+        "snapshot": list(items),
+    })
+
+    for i in range(1, n):
+        key = items[i]
+        j = i - 1
+        shifts = 0
+
+        if not reverse:
+            while j >= 0 and items[j] > key:
+                items[j + 1] = items[j]
+                shifts += 1
+                j -= 1
+        else:
+            while j >= 0 and items[j] < key:
+                items[j + 1] = items[j]
+                shifts += 1
+                j -= 1
+
+        items[j + 1] = key
+        trace.append({
+            "step": i,
+            "inserted_item": key,
+            "from_index": i,
+            "to_index": j + 1,
+            "shifts": shifts,
+            "sorted_prefix_len": i + 1,
+            "snapshot": list(items),
+        })
+
+    return trace
+
+
+def render_insertion_trace(trace: List[Dict[str, Any]], max_events: int = 10) -> str:
+    """
+    Formats the trace into an ASCII diagram illustrating the growing sorted prefix.
+
+    Args:
+        trace: List of trace event dicts.
+        max_events: Maximum rows to display.
+
+    Returns:
+        Multi-line formatted string.
+    """
+    lines: List[str] = []
+    lines.append(f"{'Pass':<5} | {'Item':<6} | {'From->To':<9} | {'Shifts':<6} | {'Array Snapshot'}")
+    lines.append("-" * 65)
+
+    displayed = trace[:max_events]
+    for ev in displayed:
+        if ev["step"] == 0:
+            lines.append(f"{'Init':<5} | {'-':<6} | {'-':<9} | {0:<6} | {ev['snapshot']}")
+        else:
+            path = f"{ev['from_index']}->{ev['to_index']}"
+            lines.append(
+                f"{ev['step']:<5} | {str(ev['inserted_item']):<6} | {path:<9} | {ev['shifts']:<6} | {ev['snapshot']}"
+            )
+
+    if len(trace) > max_events:
+        lines.append(f"... ({len(trace) - max_events} more insertion steps omitted) ...")
+
+    return "\n".join(lines)
+
+
+
 
