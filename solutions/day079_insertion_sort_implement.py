@@ -486,5 +486,87 @@ def render_insertion_trace(trace: List[Dict[str, Any]], max_events: int = 10) ->
     return "\n".join(lines)
 
 
+# ─── 6. Shift Counter & Efficiency Analytics Engine ──────────────────────────
+
+
+def count_shifts_via_insertion(arr: List[Any]) -> int:
+    """
+    Counts the exact number of element shift operations performed during Insertion Sort.
+    For standard unique arrays, this equals the number of inversions.
+
+    Args:
+        arr: Input sequence.
+
+    Returns:
+        Total count of shifts.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    items = list(arr)
+    n = len(items)
+    shifts = 0
+
+    for i in range(1, n):
+        key = items[i]
+        j = i - 1
+        while j >= 0 and items[j] > key:
+            items[j + 1] = items[j]
+            shifts += 1
+            j -= 1
+        items[j + 1] = key
+
+    return shifts
+
+
+def analyze_insertion_efficiency(arr: List[Any]) -> Dict[str, Any]:
+    """
+    Analyzes how efficiently Insertion Sort handles a given input sequence.
+    Contrasts actual performance against best-case O(n) and worst-case O(n^2).
+
+    Args:
+        arr: Input sequence.
+
+    Returns:
+        Dictionary containing efficiency metrics.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    n = len(arr)
+    if n <= 1:
+        return {
+            "total_elements": n,
+            "actual_shifts": 0,
+            "max_shifts": 0,
+            "shift_ratio": 0.0,
+            "is_already_sorted": True,
+            "efficiency_rating": "Optimal (O(1))",
+        }
+
+    max_shifts = (n * (n - 1)) // 2
+    actual_shifts = count_shifts_via_insertion(arr)
+    shift_ratio = round(actual_shifts / max_shifts, 4) if max_shifts > 0 else 0.0
+
+    if actual_shifts == 0:
+        rating = "Best-Case (O(n) linear time)"
+    elif shift_ratio < 0.25:
+        rating = "Nearly Sorted (Near-linear time)"
+    elif shift_ratio > 0.75:
+        rating = "Heavily Inverted (Near worst-case O(n^2))"
+    else:
+        rating = "Average-Case (O(n^2))"
+
+    return {
+        "total_elements": n,
+        "actual_shifts": actual_shifts,
+        "max_shifts": max_shifts,
+        "shift_ratio": shift_ratio,
+        "is_already_sorted": actual_shifts == 0,
+        "efficiency_rating": rating,
+    }
+
+
+
 
 
