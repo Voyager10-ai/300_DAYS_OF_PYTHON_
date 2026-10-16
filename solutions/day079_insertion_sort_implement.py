@@ -286,3 +286,109 @@ def insertion_sort_blocks(arr: List[Any], block_size: int = 16) -> List[Any]:
     return items
 
 
+# ─── 4. Recursive Insertion Sort & Online Streaming Sorter ───────────────────
+
+
+def insertion_sort_recursive(
+    arr: List[Any], n: Optional[int] = None, reverse: bool = False
+) -> List[Any]:
+    """
+    Sorts an array using recursive Insertion Sort.
+
+    Base case: n <= 1 (already sorted).
+    Recursive step: Recursively sort arr[0..n-2], then insert arr[n-1] into sorted prefix.
+
+    Args:
+        arr: Input sequence.
+        n: Subarray size (defaults to len(arr)).
+        reverse: If True, sorts descending.
+
+    Returns:
+        New sorted list.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    copied = list(arr)
+    _insertion_sort_recursive_helper(copied, len(copied) if n is None else n, reverse=reverse)
+    return copied
+
+
+def _insertion_sort_recursive_helper(arr: List[Any], n: int, reverse: bool = False) -> None:
+    """Helper mutating arr in-place recursively."""
+    if n <= 1:
+        return
+
+    # Sort first n - 1 elements
+    _insertion_sort_recursive_helper(arr, n - 1, reverse=reverse)
+
+    # Insert last element at its correct position in sorted array
+    last = arr[n - 1]
+    j = n - 2
+
+    if not reverse:
+        while j >= 0 and arr[j] > last:
+            arr[j + 1] = arr[j]
+            j -= 1
+    else:
+        while j >= 0 and arr[j] < last:
+            arr[j + 1] = arr[j]
+            j -= 1
+
+    arr[j + 1] = last
+
+
+class OnlineInsertionSorter:
+    """
+    Online data stream sorter that maintains sorted order as new elements arrive dynamically.
+    Demonstrates the premier practical strength of insertion sort: efficient online streaming insertion.
+    """
+
+    def __init__(self, reverse: bool = False) -> None:
+        """Initializes empty online sorter."""
+        self.reverse = reverse
+        self._data: List[Any] = []
+
+    def insert(self, item: Any) -> int:
+        """
+        Inserts a new item into the stream maintaining sorted invariant.
+
+        Args:
+            item: Comparable element.
+
+        Returns:
+            The insertion index where item was placed.
+        """
+        pos = binary_search_insert_pos(self._data, item, 0, len(self._data) - 1, reverse=self.reverse)
+        self._data.insert(pos, item)
+        return pos
+
+    def get_sorted(self) -> List[Any]:
+        """Returns a copy of the currently maintained sorted stream."""
+        return list(self._data)
+
+    def peek_median(self) -> float:
+        """
+        Returns the median of the current stream in O(1) time.
+
+        Raises:
+            ValueError: If stream is empty.
+        """
+        if not self._data:
+            raise ValueError("Cannot calculate median of empty stream")
+
+        n = len(self._data)
+        mid = n // 2
+        if n % 2 == 1:
+            return float(self._data[mid])
+        return (self._data[mid - 1] + self._data[mid]) / 2.0
+
+    def clear(self) -> None:
+        """Resets stream."""
+        self._data.clear()
+
+    def __len__(self) -> int:
+        return len(self._data)
+
+
+
