@@ -745,6 +745,68 @@ class TestInsertionSort(unittest.TestCase):
             OnlineInsertionSorter().peek_median()
 
 
+# ─── 9. Interactive CLI Demo Runner ───────────────────────────────────────────
+
+
+def main() -> None:
+    print("=" * 68)
+    print(" Day 79: Insertion Sort Implement - Algorithmic Demonstration Engine")
+    print("=" * 68)
+
+    sample = [12, 11, 13, 5, 6]
+    print(f"\n[1] Core Insertion Sort:")
+    print(f"  Original Array   : {sample}")
+    print(f"  Ascending Sort   : {insertion_sort(sample)}")
+    print(f"  Descending Sort  : {insertion_sort(sample, reverse=True)}")
+
+    res_opt, metrics = insertion_sort_metrics(sample)
+    print(f"  Execution Metrics: comparisons={metrics['comparisons']}, shifts={metrics['shifts']}, passes={metrics['passes_executed']}")
+
+    print(f"\n[2] Binary Insertion Sort (O(n log n) Comparisons):")
+    binary_sample = [37, 23, 0, 17, 12, 72, 31, 46, 100, 88, 54]
+    print(f"  Unsorted Array   : {binary_sample}")
+    print(f"  Binary Sorted    : {binary_insertion_sort(binary_sample)}")
+
+    print(f"\n[3] Range-Bounded Slice Sorting (Timsort Subroutine):")
+    range_arr = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+    print(f"  Original Array   : {range_arr}")
+    insertion_sort_range(range_arr, 3, 7)
+    print(f"  Sorted [3..7]    : {range_arr}")
+
+    print(f"\n[4] Online Data Stream Sorter:")
+    stream = OnlineInsertionSorter()
+    incoming = [15, 3, 9, 1, 12, 6]
+    print(f"  Incoming Stream  : {incoming}")
+    for item in incoming:
+        stream.insert(item)
+    print(f"  Maintained Stream: {stream.get_sorted()}")
+    print(f"  Real-time Median : {stream.peek_median()}")
+
+    print(f"\n[5] Efficiency & Inversion Analysis:")
+    inv_sample = [4, 3, 2, 1]
+    eff = analyze_insertion_efficiency(inv_sample)
+    print(f"  Sample Array     : {inv_sample}")
+    print(f"  Actual Shifts    : {eff['actual_shifts']} / {eff['max_shifts']} max")
+    print(f"  Efficiency Rating: {eff['efficiency_rating']}")
+
+    print(f"\n[6] Pedagogical Step-by-Step Trace:")
+    trace = trace_insertion_sort([5, 2, 4, 6, 1, 3])
+    print(render_insertion_trace(trace, max_events=6))
+
+    print(f"\n[7] Stability Verification:")
+    print(f"  Is Insertion Sort Stable? -> {verify_insertion_sort_stability()}")
+
+    print("\n--- Running Unit Test Suite ---")
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestInsertionSort)
+    runner = unittest.TextTestRunner(verbosity=2)
+    runner.run(suite)
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 
