@@ -433,4 +433,118 @@ def find_kth_largest_via_selection(
     return partially_sorted[k - 1]
 
 
+# ─── 5. Recursive Selection Sort & Range-Bounded Slice Sorting ────────────────
+
+
+def selection_sort_recursive(
+    arr: List[Any],
+    start_idx: int = 0,
+    reverse: bool = False,
+    key: Optional[Callable[[Any], Any]] = None,
+) -> List[Any]:
+    """
+    Pure recursive implementation of Selection Sort.
+    At recursion level i, selects the minimum in arr[i:] and swaps with arr[i],
+    then recursively sorts the remaining subproblem arr[i + 1:].
+
+    Args:
+        arr: Input sequence.
+        start_idx: Current recursion frontier index (internal use).
+        reverse: If True, sorts descending.
+        key: Comparison key function.
+
+    Returns:
+        New sorted list.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    # Top-level entry: make copy to maintain purity
+    items = list(arr)
+    n = len(items)
+    key_func = key if key is not None else (lambda x: x)
+
+    def _recurse(idx: int) -> None:
+        if idx >= n - 1:
+            return
+
+        target_idx = idx
+        target_val = key_func(items[idx])
+
+        for j in range(idx + 1, n):
+            val_j = key_func(items[j])
+            condition = (val_j > target_val) if reverse else (val_j < target_val)
+            if condition:
+                target_idx = j
+                target_val = val_j
+
+        if target_idx != idx:
+            items[idx], items[target_idx] = items[target_idx], items[idx]
+
+        _recurse(idx + 1)
+
+    _recurse(start_idx)
+    return items
+
+
+def selection_sort_range(
+    arr: List[Any],
+    start: int = 0,
+    end: Optional[int] = None,
+    reverse: bool = False,
+    key: Optional[Callable[[Any], Any]] = None,
+) -> List[Any]:
+    """
+    Sorts an in-place bounded range arr[start:end] using Selection Sort,
+    leaving elements before start and after end strictly untouched.
+
+    Supports Python-style negative indices and boundary normalization.
+
+    Args:
+        arr: Mutable list.
+        start: Starting index of slice to sort (inclusive).
+        end: Ending index of slice to sort (exclusive). Defaults to len(arr).
+        reverse: If True, sorts range descending.
+        key: Optional comparison key projection.
+
+    Returns:
+        The mutated input list arr.
+    """
+    if not isinstance(arr, list):
+        raise TypeError(f"Expected mutable list, got {type(arr).__name__}")
+
+    n = len(arr)
+    if n <= 1:
+        return arr
+
+    # Normalize start and end
+    norm_start = start if start >= 0 else max(0, n + start)
+    norm_end = n if end is None else (end if end >= 0 else max(0, n + end))
+
+    norm_start = max(0, min(n, norm_start))
+    norm_end = max(0, min(n, norm_end))
+
+    if norm_start >= norm_end - 1:
+        return arr
+
+    key_func = key if key is not None else (lambda x: x)
+
+    for i in range(norm_start, norm_end - 1):
+        target_idx = i
+        target_val = key_func(arr[i])
+
+        for j in range(i + 1, norm_end):
+            val_j = key_func(arr[j])
+            condition = (val_j > target_val) if reverse else (val_j < target_val)
+            if condition:
+                target_idx = j
+                target_val = val_j
+
+        if target_idx != i:
+            arr[i], arr[target_idx] = arr[target_idx], arr[i]
+
+    return arr
+
+
+
 
