@@ -656,6 +656,95 @@ def render_selection_trace(trace: List[Dict[str, Any]]) -> str:
     return "\n".join(lines)
 
 
+# ─── 7. Write-Minimization Analytics Engine & Batch Sorter ────────────────────
+
+
+def analyze_selection_memory_writes(
+    sizes: Optional[List[int]] = None,
+) -> List[Dict[str, Any]]:
+    """
+    Analyzes the write-minimization property of Selection Sort.
+    Unlike Bubble Sort (up to n(n-1)/2 swaps) or Insertion Sort (up to n(n-1)/2 writes),
+    Selection Sort guarantees at most n - 1 swaps (at most 2(n - 1) writes).
+    This makes Selection Sort historically preferred for EEPROM/Flash memory architectures
+    where write operations inflict physical cell wear or consume significant energy.
+
+    Args:
+        sizes: List of sample input sizes to evaluate. Defaults to [5, 10, 20, 50, 100].
+
+    Returns:
+        List of analytical reports for each input size across different permutations.
+    """
+    if sizes is None:
+        sizes = [5, 10, 20, 50, 100]
+
+    report = []
+    for n in sizes:
+        # Worst-case scenario for swaps in selection sort
+        # A cycle permutation can require n - 1 swaps
+        worst_case_arr = list(range(2, n + 1)) + [1]
+        sorted_arr = list(range(1, n + 1))
+        reversed_arr = list(range(n, 0, -1))
+
+        _, worst_metrics = selection_sort_metrics(worst_case_arr)
+        _, sorted_metrics = selection_sort_metrics(sorted_arr)
+        _, rev_metrics = selection_sort_metrics(reversed_arr)
+
+        theoretical_max_swaps = n - 1
+        theoretical_comparisons = n * (n - 1) // 2
+
+        report.append({
+            "size": n,
+            "theoretical_comparisons": theoretical_comparisons,
+            "theoretical_max_swaps": theoretical_max_swaps,
+            "sorted_input_swaps": sorted_metrics["swaps"],
+            "reversed_input_swaps": rev_metrics["swaps"],
+            "worst_case_swaps": worst_metrics["swaps"],
+            "max_memory_write_operations": theoretical_max_swaps * 2,
+            "bubble_sort_max_swaps": theoretical_comparisons,
+            "write_reduction_factor": (
+                round(theoretical_comparisons / theoretical_max_swaps, 2)
+                if theoretical_max_swaps > 0
+                else 1.0
+            ),
+        })
+
+    return report
+
+
+def batch_selection_sort(
+    datasets: List[List[Any]],
+    reverse: bool = False,
+    key: Optional[Callable[[Any], Any]] = None,
+) -> List[List[Any]]:
+    """
+    Sorts a collection of distinct datasets using Selection Sort.
+    Ensures input immutability by producing fresh lists for each dataset.
+
+    Args:
+        datasets: List of lists/tuples to sort.
+        reverse: If True, sorts each dataset descending.
+        key: Key projection function.
+
+    Returns:
+        List of newly sorted lists.
+
+    Raises:
+        TypeError: If datasets is not a list or contains non-sequence elements.
+    """
+    if not isinstance(datasets, list):
+        raise TypeError(f"Expected list of datasets, got {type(datasets).__name__}")
+
+    results = []
+    for idx, ds in enumerate(datasets):
+        if not isinstance(ds, (list, tuple)):
+            raise TypeError(f"Dataset at index {idx} must be a list or tuple")
+        results.append(selection_sort(ds, reverse=reverse, key=key))
+
+    return results
+
+
+
 
 
 
