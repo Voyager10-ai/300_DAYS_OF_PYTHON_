@@ -342,3 +342,103 @@ def get_gap_sequence(strategy: Union[str, List[int]], n: int) -> List[int]:
     else:
         raise ValueError(f"Unknown gap sequence strategy: {strategy}")
 
+
+# ─── 3. Gap Comparative Benchmark & Scalability Analytics ─────────────────────
+
+
+def compare_gap_sequences(
+    arr: List[Any], strategies: Optional[List[str]] = None
+) -> Dict[str, Dict[str, Any]]:
+    """
+    Evaluates and compares different gap sequence strategies on the exact same dataset.
+
+    Args:
+        arr: Input sequence to sort.
+        strategies: List of strategy names. Defaults to ['ciura', 'knuth', 'sedgewick', 'hibbard', 'shell'].
+
+    Returns:
+        Mapping of strategy name to performance metrics (comparisons, shifts, time_us, etc.).
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    if strategies is None:
+        strategies = ["ciura", "knuth", "sedgewick", "hibbard", "shell"]
+
+    expected = sorted(arr)
+    results = {}
+
+    for strat in strategies:
+        data_copy = list(arr)
+        t0 = time.perf_counter()
+        sorted_res, metrics = shell_sort_metrics(data_copy, gap_sequence=strat)
+        t1 = time.perf_counter()
+
+        elapsed_us = round((t1 - t0) * 1_000_000, 2)
+        is_correct = (sorted_res == expected)
+
+        results[strat] = {
+            "is_correct": is_correct,
+            "comparisons": metrics["comparisons"],
+            "shifts": metrics["shifts"],
+            "gaps": metrics["gaps_applied"],
+            "gap_count": metrics["gap_count"],
+            "elapsed_us": elapsed_us,
+        }
+
+    return results
+
+
+def analyze_shell_sort_scalability(
+    sizes: Optional[List[int]] = None,
+) -> List[Dict[str, Any]]:
+    """
+    Analyzes algorithmic scalability across input sizes and permutation topologies:
+    random, sorted, reversed, and duplicate-dense.
+
+    Args:
+        sizes: Sample input sizes. Defaults to [10, 30, 60, 120].
+
+    Returns:
+        List of analytical reports for each input size.
+    """
+    if sizes is None:
+        sizes = [10, 30, 60, 120]
+
+    report = []
+    for n in sizes:
+        # 1. Sorted array
+        sorted_arr = list(range(n))
+        _, sorted_m = shell_sort_metrics(sorted_arr, gap_sequence="ciura")
+
+        # 2. Reverse sorted array
+        rev_arr = list(range(n, 0, -1))
+        _, rev_m = shell_sort_metrics(rev_arr, gap_sequence="ciura")
+
+        # 3. Deterministic pseudo-random / alternating array
+        pseudo_random = [(i * 37 + 13) % (n * 3) for i in range(n)]
+        _, rand_m = shell_sort_metrics(pseudo_random, gap_sequence="ciura")
+
+        # 4. Duplicate heavy
+        dup_arr = [i % 5 for i in range(n)]
+        _, dup_m = shell_sort_metrics(dup_arr, gap_sequence="ciura")
+
+        report.append({
+            "size": n,
+            "sorted_comparisons": sorted_m["comparisons"],
+            "sorted_shifts": sorted_m["shifts"],
+            "reversed_comparisons": rev_m["comparisons"],
+            "reversed_shifts": rev_m["shifts"],
+            "random_comparisons": rand_m["comparisons"],
+            "random_shifts": rand_m["shifts"],
+            "duplicates_comparisons": dup_m["comparisons"],
+            "duplicates_shifts": dup_m["shifts"],
+            "insertion_sort_worst_case_shifts": n * (n - 1) // 2,
+            "shell_vs_insertion_speedup_ratio": (
+                round((n * (n - 1) / 2) / max(1, rev_m["shifts"]), 2)
+            ),
+        })
+
+    return report
+
+
