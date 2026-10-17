@@ -770,18 +770,17 @@ def verify_shell_sort_instability() -> Dict[str, Any]:
     Returns:
         Dictionary with stability verification report and comparison against stable insertion sort.
     """
-    # Canonical counterexample where gap-2 swaps invert identical keys
-    # Original order has (4, 'x') at index 0 and (4, 'y') at index 1.
+    # Canonical counterexamples demonstrating instability under default Ciura and custom gaps
     test_cases = [
-        [(4, "x"), (4, "y"), (3, "z"), (2, "w")],
-        [(5, "alpha"), (5, "beta"), (3, "gamma"), (1, "delta"), (5, "epsilon")],
+        [(3, "a"), (3, "b"), (1, "c"), (2, "d"), (3, "e"), (1, "f")],
+        [(2, "alpha"), (2, "beta"), (1, "gamma"), (3, "delta"), (2, "epsilon")],
     ]
 
     case_reports = []
 
     for case in test_cases:
-        # Sort with Shell sort using gap sequence [2, 1] or ciura
-        shell_res = shell_sort(case, key=lambda x: x[0], gap_sequence=[2, 1])
+        # Sort with Shell sort using default Ciura gaps
+        shell_res = shell_sort(case, key=lambda x: x[0])
 
         # Stable reference: python's stable Timsort
         stable_ref = sorted(case, key=lambda x: x[0])
@@ -790,18 +789,18 @@ def verify_shell_sort_instability() -> Dict[str, Any]:
         unstable_detected = False
         inversion_pairs = []
 
-        for i in range(len(shell_res) - 1):
-            if shell_res[i][0] == shell_res[i + 1][0]:
-                orig_i = case.index(shell_res[i])
-                orig_next = case.index(shell_res[i + 1])
-                if orig_i > orig_next:
-                    unstable_detected = True
-                    inversion_pairs.append({
-                        "earlier_in_result": shell_res[i],
-                        "later_in_result": shell_res[i + 1],
-                        "original_earlier_index": orig_i,
-                        "original_later_index": orig_next,
-                    })
+        # Compare occurrences of equal keys
+        unique_keys = set(x[0] for x in case)
+        for k in unique_keys:
+            orig_sub = [x for x in case if x[0] == k]
+            res_sub = [x for x in shell_res if x[0] == k]
+            if orig_sub != res_sub:
+                unstable_detected = True
+                inversion_pairs.append({
+                    "key": k,
+                    "original_order": orig_sub,
+                    "result_order": res_sub,
+                })
 
         case_reports.append({
             "input": case,
@@ -817,6 +816,169 @@ def verify_shell_sort_instability() -> Dict[str, Any]:
         "instability_demonstrated": any(c["is_unstable"] for c in case_reports),
         "cases": case_reports,
     }
+
+
+# ─── 8. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestShellSort(unittest.TestCase):
+    """Exhaustive unit test suite covering Shell Sort algorithms and edge cases."""
+
+    def setUp(self):
+        self.sample = [64, 34, 25, 12, 22, 11, 90]
+        self.expected = sorted(self.sample)
+        self.duplicates = [5, 2, 8, 2, 5, 1, 9, 1, 8]
+        self.negatives = [-15, 30, -2, 0, 18, -45, 9]
+
+    # --- Core Sorting Tests ---
+    def test_shell_sort_empty_and_single(self):
+        self.assertEqual(shell_sort([]), [])
+        self.assertEqual(shell_sort([42]), [42])
+
+    def test_shell_sort_standard(self):
+        self.assertEqual(shell_sort(self.sample), self.expected)
+        self.assertEqual(shell_sort(self.duplicates), sorted(self.duplicates))
+        self.assertEqual(shell_sort(self.negatives), sorted(self.negatives))
+
+    def test_shell_sort_reverse(self):
+        self.assertEqual(
+            shell_sort(self.sample, reverse=True), sorted(self.sample, reverse=True)
+        )
+        self.assertEqual(
+            shell_sort(self.duplicates, reverse=True),
+            sorted(self.duplicates, reverse=True),
+        )
+
+    def test_shell_sort_key(self):
+        words = ["elephant", "cat", "hippopotamus", "dog", "bear"]
+        self.assertEqual(shell_sort(words, key=len), sorted(words, key=len))
+
+    def test_shell_sort_inplace(self):
+        arr = list(self.sample)
+        shell_sort_inplace(arr)
+        self.assertEqual(arr, self.expected)
+
+    def test_shell_sort_type_errors(self):
+        with self.assertRaises(TypeError):
+            shell_sort(12345)  # type: ignore
+        with self.assertRaises(TypeError):
+            shell_sort_inplace((1, 2, 3))  # type: ignore
+
+    # --- Gap Sequence Generators Tests ---
+    def test_generate_shell_gaps(self):
+        gaps = generate_shell_gaps(100)
+        self.assertEqual(gaps, [50, 25, 12, 6, 3, 1])
+        self.assertEqual(generate_shell_gaps(1), [])
+
+    def test_generate_knuth_gaps(self):
+        gaps = generate_knuth_gaps(100)
+        self.assertEqual(gaps, [40, 13, 4, 1])
+        self.assertEqual(generate_knuth_gaps(1), [])
+
+    def test_generate_hibbard_gaps(self):
+        gaps = generate_hibbard_gaps(50)
+        self.assertEqual(gaps, [31, 15, 7, 3, 1])
+        self.assertEqual(generate_hibbard_gaps(1), [])
+
+    def test_generate_sedgewick_gaps(self):
+        gaps = generate_sedgewick_gaps(100)
+        self.assertEqual(gaps[0], 77)
+        self.assertEqual(gaps[-1], 1)
+        self.assertTrue(all(gaps[i] > gaps[i + 1] for i in range(len(gaps) - 1)))
+
+    def test_generate_ciura_gaps(self):
+        gaps = generate_ciura_gaps(100)
+        self.assertEqual(gaps, [57, 23, 10, 4, 1])
+        self.assertEqual(generate_ciura_gaps(1), [])
+
+    def test_get_gap_sequence_dispatch(self):
+        for strat in ["shell", "knuth", "hibbard", "sedgewick", "ciura"]:
+            gaps = get_gap_sequence(strat, 50)
+            self.assertEqual(gaps[-1], 1)
+            self.assertTrue(all(gaps[i] > gaps[i + 1] for i in range(len(gaps) - 1)))
+
+    def test_get_gap_sequence_custom_and_invalid(self):
+        custom = [7, 3, 1]
+        self.assertEqual(get_gap_sequence(custom, 20), [7, 3, 1])
+        with self.assertRaises(ValueError):
+            get_gap_sequence("non_existent_strategy", 50)
+
+    # --- Metrics & Benchmark Tests ---
+    def test_shell_sort_metrics(self):
+        arr = [9, 8, 7, 6, 5, 4, 3, 2, 1]
+        sorted_arr, metrics = shell_sort_metrics(arr, gap_sequence="ciura")
+        self.assertEqual(sorted_arr, list(range(1, 10)))
+        self.assertGreater(metrics["comparisons"], 0)
+        self.assertGreater(metrics["shifts"], 0)
+        self.assertEqual(metrics["gaps_applied"][-1], 1)
+
+    def test_compare_gap_sequences(self):
+        data = [54, 26, 93, 17, 77, 31, 44, 55, 20]
+        comp = compare_gap_sequences(data)
+        for strat in ["ciura", "knuth", "sedgewick", "hibbard", "shell"]:
+            self.assertIn(strat, comp)
+            self.assertTrue(comp[strat]["is_correct"])
+
+    def test_analyze_shell_sort_scalability(self):
+        report = analyze_shell_sort_scalability([10, 20])
+        self.assertEqual(len(report), 2)
+        for r in report:
+            self.assertIn("shell_vs_insertion_speedup_ratio", r)
+
+    # --- Range & Chunk Tests ---
+    def test_shell_sort_range(self):
+        arr = [100, 90, 80, 70, 60, 50, 40]
+        # Sort range [2:5] -> [80, 70, 60] becomes [60, 70, 80]
+        shell_sort_range(arr, start=2, end=5)
+        self.assertEqual(arr[:2], [100, 90])
+        self.assertEqual(arr[2:5], [60, 70, 80])
+        self.assertEqual(arr[5:], [50, 40])
+
+    def test_shell_sort_chunks(self):
+        arr = [4, 3, 2, 1, 8, 7, 6, 5]
+        res = shell_sort_chunks(arr, chunk_size=4)
+        self.assertEqual(res, [1, 2, 3, 4, 5, 6, 7, 8])
+
+    def test_shell_sort_chunks_invalid(self):
+        with self.assertRaises(ValueError):
+            shell_sort_chunks([1, 2, 3], chunk_size=0)
+
+    # --- Trace Visualizer Tests ---
+    def test_trace_and_render_shell(self):
+        arr = [35, 33, 42, 10, 14, 19, 27, 44]
+        trace = trace_shell_sort(arr, gap_sequence=[4, 2, 1])
+        self.assertEqual(len(trace), 3)
+        rendered = render_shell_trace(trace)
+        self.assertIn("SHELL SORT DIMINISHING GAP TRACE", rendered)
+        self.assertIn("Final 1-Sorted Output", rendered)
+
+    # --- Batch & Record Sorter Tests ---
+    def test_batch_shell_sort(self):
+        datasets = [[3, 1, 2], [9, 6, 8], [100]]
+        res = batch_shell_sort(datasets)
+        self.assertEqual(res, [[1, 2, 3], [6, 8, 9], [100]])
+
+    def test_shell_sort_records(self):
+        employees = [
+            {"name": "Alice", "dept": "Eng", "salary": 90000},
+            {"name": "Bob", "dept": "HR", "salary": 70000},
+            {"name": "Charlie", "dept": "Eng", "salary": 110000},
+            {"name": "Diana", "dept": "Eng", "salary": 90000},
+        ]
+        # Sort by dept ascending, then salary descending
+        sorted_records = shell_sort_records(
+            employees, sort_keys=[("dept", False), ("salary", True)]
+        )
+        self.assertEqual(sorted_records[0]["name"], "Charlie")  # Eng, 110000
+        self.assertEqual(sorted_records[1]["dept"], "Eng")      # Eng, 90000
+        self.assertEqual(sorted_records[3]["dept"], "HR")       # HR, 70000
+
+    # --- Stability Verification Tests ---
+    def test_verify_shell_sort_instability(self):
+        report = verify_shell_sort_instability()
+        self.assertFalse(report["is_stable"])
+        self.assertTrue(report["instability_demonstrated"])
+
 
 
 
