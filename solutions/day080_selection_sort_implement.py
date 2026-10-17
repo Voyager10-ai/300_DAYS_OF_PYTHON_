@@ -744,6 +744,169 @@ def batch_selection_sort(
     return results
 
 
+# ─── 8. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestSelectionSort(unittest.TestCase):
+    """Exhaustive unit test suite covering all Selection Sort variations and edge cases."""
+
+    def setUp(self):
+        self.sample = [64, 25, 12, 22, 11]
+        self.expected = [11, 12, 22, 25, 64]
+        self.duplicates = [3, 1, 4, 1, 5, 9, 2, 6, 5]
+        self.negatives = [-10, 5, -2, 0, 15, -7]
+
+    # --- Core Selection Sort Tests ---
+    def test_selection_sort_empty_and_single(self):
+        self.assertEqual(selection_sort([]), [])
+        self.assertEqual(selection_sort([42]), [42])
+
+    def test_selection_sort_standard(self):
+        self.assertEqual(selection_sort(self.sample), self.expected)
+        self.assertEqual(selection_sort(self.duplicates), sorted(self.duplicates))
+        self.assertEqual(selection_sort(self.negatives), sorted(self.negatives))
+
+    def test_selection_sort_reverse(self):
+        self.assertEqual(
+            selection_sort(self.sample, reverse=True), sorted(self.sample, reverse=True)
+        )
+        self.assertEqual(
+            selection_sort(self.duplicates, reverse=True),
+            sorted(self.duplicates, reverse=True),
+        )
+
+    def test_selection_sort_key(self):
+        words = ["banana", "pie", "apple", "fig"]
+        self.assertEqual(
+            selection_sort(words, key=len), sorted(words, key=len)
+        )
+
+    def test_selection_sort_inplace(self):
+        arr = list(self.sample)
+        selection_sort_inplace(arr)
+        self.assertEqual(arr, self.expected)
+
+    def test_selection_sort_type_error(self):
+        with self.assertRaises(TypeError):
+            selection_sort(12345)  # type: ignore
+        with self.assertRaises(TypeError):
+            selection_sort_inplace((1, 2, 3))  # type: ignore
+
+    # --- Metrics Tests ---
+    def test_selection_sort_metrics(self):
+        arr = [5, 4, 3, 2, 1]
+        sorted_arr, metrics = selection_sort_metrics(arr)
+        self.assertEqual(sorted_arr, [1, 2, 3, 4, 5])
+        n = len(arr)
+        # Selection sort always executes strictly n(n-1)/2 comparisons
+        self.assertEqual(metrics["comparisons"], n * (n - 1) // 2)
+        self.assertLessEqual(metrics["swaps"], n - 1)
+        self.assertEqual(metrics["passes_executed"], n - 1)
+
+    # --- Double Selection Sort Tests ---
+    def test_double_selection_sort_basics(self):
+        self.assertEqual(double_selection_sort([]), [])
+        self.assertEqual(double_selection_sort([99]), [99])
+        self.assertEqual(double_selection_sort(self.sample), self.expected)
+        self.assertEqual(
+            double_selection_sort(self.sample, reverse=True),
+            sorted(self.sample, reverse=True),
+        )
+        self.assertEqual(
+            double_selection_sort(self.duplicates), sorted(self.duplicates)
+        )
+
+    def test_double_selection_sort_edge_cases(self):
+        # Max at left boundary, min at right boundary
+        inverted = [100, 50, 20, 10, 1]
+        self.assertEqual(double_selection_sort(inverted), [1, 10, 20, 50, 100])
+        self.assertEqual(
+            double_selection_sort(inverted, reverse=True), [100, 50, 20, 10, 1]
+        )
+        # All identical elements
+        identical = [7, 7, 7, 7]
+        self.assertEqual(double_selection_sort(identical), [7, 7, 7, 7])
+
+    # --- Stable Selection Sort Tests ---
+    def test_stable_selection_sort_preserves_order(self):
+        items = [(2, "first"), (1, "only"), (2, "second"), (2, "third")]
+        result = stable_selection_sort(items, key=lambda x: x[0])
+        expected_tuples = [(1, "only"), (2, "first"), (2, "second"), (2, "third")]
+        self.assertEqual(result, expected_tuples)
+
+    def test_verify_selection_sort_stability(self):
+        res = verify_selection_sort_stability()
+        self.assertTrue(res["all_cases_passed"])
+        self.assertTrue(res["standard_sort_unstable_demonstrated"])
+
+    # --- K-Pass Partial Sorter & Order Statistics Tests ---
+    def test_selection_sort_k_passes(self):
+        arr = [50, 20, 10, 40, 30]
+        # After 2 passes, first 2 elements must be 10, 20
+        res = selection_sort_k_passes(arr, k=2)
+        self.assertEqual(res[:2], [10, 20])
+        self.assertEqual(sorted(res), [10, 20, 30, 40, 50])
+
+    def test_find_kth_order_statistics(self):
+        arr = [7, 10, 4, 3, 20, 15]
+        # Sorted: [3, 4, 7, 10, 15, 20]
+        self.assertEqual(find_kth_smallest_via_selection(arr, 1), 3)
+        self.assertEqual(find_kth_smallest_via_selection(arr, 3), 7)
+        self.assertEqual(find_kth_smallest_via_selection(arr, 6), 20)
+
+        self.assertEqual(find_kth_largest_via_selection(arr, 1), 20)
+        self.assertEqual(find_kth_largest_via_selection(arr, 2), 15)
+        self.assertEqual(find_kth_largest_via_selection(arr, 6), 3)
+
+    def test_kth_statistics_invalid_k(self):
+        with self.assertRaises(ValueError):
+            find_kth_smallest_via_selection([1, 2, 3], 0)
+        with self.assertRaises(ValueError):
+            find_kth_smallest_via_selection([1, 2, 3], 4)
+
+    # --- Recursive Selection Sort Tests ---
+    def test_selection_sort_recursive(self):
+        self.assertEqual(selection_sort_recursive([]), [])
+        self.assertEqual(selection_sort_recursive([5]), [5])
+        self.assertEqual(selection_sort_recursive(self.sample), self.expected)
+        self.assertEqual(
+            selection_sort_recursive(self.sample, reverse=True),
+            sorted(self.sample, reverse=True),
+        )
+
+    # --- Range Slice Selection Sort Tests ---
+    def test_selection_sort_range(self):
+        arr = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+        # Sort only index 3 to 7: elements at indices 3,4,5,6 -> [7, 6, 5, 4] -> [4, 5, 6, 7]
+        selection_sort_range(arr, start=3, end=7)
+        self.assertEqual(arr[:3], [10, 9, 8])
+        self.assertEqual(arr[3:7], [4, 5, 6, 7])
+        self.assertEqual(arr[7:], [3, 2, 1])
+
+    # --- Trace Visualizer & ASCII Tests ---
+    def test_trace_and_render(self):
+        arr = [5, 2, 4, 1]
+        trace = trace_selection_sort(arr)
+        self.assertEqual(len(trace), 3)
+        output = render_selection_trace(trace)
+        self.assertIn("SELECTION SORT STEP-BY-STEP EXECUTION TRACE", output)
+        self.assertIn("Final Sorted State: [1, 2, 4, 5]", output)
+
+    # --- Memory Analytics & Batch Tests ---
+    def test_analyze_selection_memory_writes(self):
+        report = analyze_selection_memory_writes([4, 8])
+        self.assertEqual(len(report), 2)
+        for row in report:
+            self.assertIn("write_reduction_factor", row)
+            self.assertLessEqual(row["worst_case_swaps"], row["size"] - 1)
+
+    def test_batch_selection_sort(self):
+        sets = [[3, 2, 1], [9, 5, 7], [1]]
+        results = batch_selection_sort(sets)
+        self.assertEqual(results, [[1, 2, 3], [5, 7, 9], [1]])
+
+
+
 
 
 
