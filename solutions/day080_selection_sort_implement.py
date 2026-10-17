@@ -906,6 +906,71 @@ class TestSelectionSort(unittest.TestCase):
         self.assertEqual(results, [[1, 2, 3], [5, 7, 9], [1]])
 
 
+# ─── 9. Interactive CLI Demonstration ─────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates Selection Sort features, order statistics, stability, and write analytics."""
+    print("=" * 70)
+    print("  DAY 80: SELECTION SORT & ADVANCED ALGORITHMIC VARIANTS")
+    print("=" * 70)
+
+    # 1. Standard Selection Sort & Metrics
+    sample = [64, 25, 12, 22, 11]
+    sorted_sample, metrics = selection_sort_metrics(sample)
+    print("\n[1] Core Selection Sort Execution:")
+    print(f"  Original Input : {sample}")
+    print(f"  Sorted Output  : {sorted_sample}")
+    print(f"  Comparisons    : {metrics['comparisons']} (Strictly n(n-1)/2)")
+    print(f"  Swaps          : {metrics['swaps']} (O(n) bounded writes)")
+
+    # 2. Bidirectional Double Selection Sort
+    bidirectional_res = double_selection_sort(sample)
+    print("\n[2] Bidirectional Double Selection Sort (Min-Max):")
+    print(f"  Sorted Output  : {bidirectional_res}")
+
+    # 3. Stability Verification
+    print("\n[3] Stability Verification (Standard vs Shift-Based Selection Sort):")
+    stab_res = verify_selection_sort_stability()
+    for idx, case in enumerate(stab_res["case_studies"], 1):
+        print(f"  Case {idx}:")
+        print(f"    Original : {case['original']}")
+        print(f"    Standard : {case['standard_sorted']} -> Stable? {case['standard_stable']}")
+        print(f"    Shifted  : {case['stable_sorted']} -> Stable? {case['stable_algorithm_stable']}")
+
+    # 4. Order Statistics
+    print("\n[4] K-th Order Statistics via Selection Sort:")
+    nums = [7, 10, 4, 3, 20, 15]
+    print(f"  Dataset        : {nums}")
+    print(f"  1st Smallest   : {find_kth_smallest_via_selection(nums, 1)}")
+    print(f"  3rd Smallest   : {find_kth_smallest_via_selection(nums, 3)}")
+    print(f"  1st Largest    : {find_kth_largest_via_selection(nums, 1)}")
+    print(f"  2nd Largest    : {find_kth_largest_via_selection(nums, 2)}")
+
+    # 5. Visual Step-by-Step Trace
+    print("\n[5] Step-by-Step ASCII Trace Demo:")
+    trace = trace_selection_sort([29, 10, 14, 37, 13])
+    print(render_selection_trace(trace))
+
+    # 6. Memory Write-Minimization Report
+    print("\n[6] Memory Write-Minimization Analytics Report:")
+    report = analyze_selection_memory_writes([5, 10, 20, 50])
+    print(f"  {'Size (n)':<10} | {'Max Swaps':<10} | {'Max Writes':<12} | {'Bubble Max Swaps':<18} | {'Write Reduction':<15}")
+    print("  " + "-" * 72)
+    for row in report:
+        print(
+            f"  {row['size']:<10} | {row['theoretical_max_swaps']:<10} | "
+            f"{row['max_memory_write_operations']:<12} | {row['bubble_sort_max_swaps']:<18} | "
+            f"{row['write_reduction_factor']}x"
+        )
+    print("\nExecution complete.")
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 
