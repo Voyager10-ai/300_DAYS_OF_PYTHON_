@@ -322,3 +322,115 @@ def verify_selection_sort_stability() -> Dict[str, Any]:
     }
 
 
+# ─── 4. K-Pass Partial Sorter & Order Statistics ──────────────────────────────
+
+
+def selection_sort_k_passes(
+    arr: List[Any],
+    k: int,
+    reverse: bool = False,
+    key: Optional[Callable[[Any], Any]] = None,
+) -> List[Any]:
+    """
+    Executes exactly min(k, n - 1) passes of Selection Sort.
+    Guarantees that the first k elements are the k extreme values in fully sorted order.
+    Runs in O(k * n) time and O(n) space, highly efficient when k << n.
+
+    Args:
+        arr: Input sequence.
+        k: Number of passes (0 <= k <= len(arr)).
+        reverse: If True, finds k largest in descending order.
+        key: Optional projection function.
+
+    Returns:
+        List where arr[:k] contains the first k sorted items.
+
+    Raises:
+        TypeError: If arr is invalid.
+        ValueError: If k is negative.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+    if k < 0:
+        raise ValueError(f"k must be non-negative, got {k}")
+
+    items = list(arr)
+    n = len(items)
+    if n <= 1 or k == 0:
+        return items
+
+    key_func = key if key is not None else (lambda x: x)
+    passes_to_run = min(k, n - 1)
+
+    for i in range(passes_to_run):
+        target_idx = i
+        target_val = key_func(items[i])
+
+        for j in range(i + 1, n):
+            val_j = key_func(items[j])
+            condition = (val_j > target_val) if reverse else (val_j < target_val)
+            if condition:
+                target_idx = j
+                target_val = val_j
+
+        if target_idx != i:
+            items[i], items[target_idx] = items[target_idx], items[i]
+
+    return items
+
+
+def find_kth_smallest_via_selection(
+    arr: List[Any], k: int, key: Optional[Callable[[Any], Any]] = None
+) -> Any:
+    """
+    Finds the k-th smallest element (1-indexed) using k passes of Selection Sort in O(k * n) time.
+
+    Args:
+        arr: Sequence of elements.
+        k: 1-indexed order statistic (1 <= k <= len(arr)).
+        key: Optional comparison projection.
+
+    Returns:
+        The k-th smallest element.
+
+    Raises:
+        ValueError: If k is outside [1, len(arr)].
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+    n = len(arr)
+    if k < 1 or k > n:
+        raise ValueError(f"k must be in range [1, {n}], got {k}")
+
+    partially_sorted = selection_sort_k_passes(arr, k=k, reverse=False, key=key)
+    return partially_sorted[k - 1]
+
+
+def find_kth_largest_via_selection(
+    arr: List[Any], k: int, key: Optional[Callable[[Any], Any]] = None
+) -> Any:
+    """
+    Finds the k-th largest element (1-indexed) using k passes of Selection Sort in O(k * n) time.
+
+    Args:
+        arr: Sequence of elements.
+        k: 1-indexed order statistic (1 <= k <= len(arr)).
+        key: Optional comparison projection.
+
+    Returns:
+        The k-th largest element.
+
+    Raises:
+        ValueError: If k is outside [1, len(arr)].
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+    n = len(arr)
+    if k < 1 or k > n:
+        raise ValueError(f"k must be in range [1, {n}], got {k}")
+
+    partially_sorted = selection_sort_k_passes(arr, k=k, reverse=True, key=key)
+    return partially_sorted[k - 1]
+
+
+
