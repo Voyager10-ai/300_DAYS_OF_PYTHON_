@@ -123,3 +123,98 @@ def selection_sort_metrics(
         "max_possible_swaps": max(0, n - 1),
     }
     return (items, metrics)
+
+
+# ─── 2. Bidirectional Double Selection Sort (Min-Max) ─────────────────────────
+
+
+def double_selection_sort(
+    arr: List[Any], reverse: bool = False, key: Optional[Callable[[Any], Any]] = None
+) -> List[Any]:
+    """
+    Pure bidirectional selection sort placing min and max in each pass.
+    Reduces total passes from n - 1 to floor(n / 2).
+
+    Args:
+        arr: Input sequence.
+        reverse: If True, sorts descending.
+        key: Optional comparison key function.
+
+    Returns:
+        New sorted list.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    copied = list(arr)
+    double_selection_sort_inplace(copied, reverse=reverse, key=key)
+    return copied
+
+
+def double_selection_sort_inplace(
+    arr: List[Any], reverse: bool = False, key: Optional[Callable[[Any], Any]] = None
+) -> None:
+    """
+    In-place bidirectional selection sort (cocktail / min-max selection sort).
+    Carefully handles the edge case where the max element resides at the left boundary
+    before the min element is swapped.
+
+    Args:
+        arr: Mutable list.
+        reverse: If True, sorts descending.
+        key: Key projection function.
+    """
+    if not isinstance(arr, list):
+        raise TypeError(f"Expected mutable list, got {type(arr).__name__}")
+
+    n = len(arr)
+    if n <= 1:
+        return
+
+    key_func = key if key is not None else (lambda x: x)
+    left = 0
+    right = n - 1
+
+    while left < right:
+        min_idx = left
+        max_idx = left
+        min_val = key_func(arr[left])
+        max_val = min_val
+
+        for i in range(left + 1, right + 1):
+            val = key_func(arr[i])
+            if val < min_val:
+                min_idx = i
+                min_val = val
+            elif val > max_val:
+                max_idx = i
+                max_val = val
+
+        # If all elements in range are identical, subarray is already sorted
+        if min_val == max_val:
+            break
+
+        if not reverse:
+            # Ascending: place min at left, max at right
+            if min_idx != left:
+                arr[left], arr[min_idx] = arr[min_idx], arr[left]
+                # If maximum was at left, it was swapped to min_idx
+                if max_idx == left:
+                    max_idx = min_idx
+
+            if max_idx != right:
+                arr[right], arr[max_idx] = arr[max_idx], arr[right]
+        else:
+            # Descending: place max at left, min at right
+            if max_idx != left:
+                arr[left], arr[max_idx] = arr[max_idx], arr[left]
+                # If minimum was at left, it was swapped to max_idx
+                if min_idx == left:
+                    min_idx = max_idx
+
+            if min_idx != right:
+                arr[right], arr[min_idx] = arr[min_idx], arr[right]
+
+        left += 1
+        right -= 1
+
