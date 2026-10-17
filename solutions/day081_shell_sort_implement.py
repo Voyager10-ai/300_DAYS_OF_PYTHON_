@@ -980,6 +980,81 @@ class TestShellSort(unittest.TestCase):
         self.assertTrue(report["instability_demonstrated"])
 
 
+# ─── 9. Interactive CLI Demonstration ─────────────────────────────────────────
+
+
+def main() -> None:
+    """Runs an interactive demonstration of Shell Sort and all algorithmic variations."""
+    print("=" * 72)
+    print("  DAY 81: SHELL SORT (DIMINISHING INCREMENT SORT) IMPLEMENTATION")
+    print("=" * 72)
+
+    sample = [64, 34, 25, 12, 22, 11, 90, 48, 77, 31]
+
+    # 1. Core Shell Sort & Metrics
+    print("\n[1] Core Shell Sort Execution:")
+    sorted_sample, metrics = shell_sort_metrics(sample, gap_sequence="ciura")
+    print(f"  Input Array  : {sample}")
+    print(f"  Sorted Array : {sorted_sample}")
+    print(f"  Comparisons  : {metrics['comparisons']}")
+    print(f"  Shifts       : {metrics['shifts']}")
+    print(f"  Gaps Applied : {metrics['gaps_applied']}")
+
+    # 2. Multi-Gap Benchmark
+    print("\n[2] Gap Sequence Comparative Benchmark (n = 10):")
+    comp = compare_gap_sequences(sample)
+    print(f"  {'Strategy':<12} | {'Comparisons':<12} | {'Shifts':<8} | {'Gaps Count':<10} | {'Gaps Used':<20}")
+    print("  " + "-" * 70)
+    for strat, data in comp.items():
+        gaps_str = str(data["gaps"][:5]) + ("..." if len(data["gaps"]) > 5 else "")
+        print(f"  {strat:<12} | {data['comparisons']:<12} | {data['shifts']:<8} | {data['gap_count']:<10} | {gaps_str:<20}")
+
+    # 3. Visual Trace
+    print("\n[3] Step-by-Step Diminishing Gap Visual Trace:")
+    trace = trace_shell_sort([35, 33, 42, 10, 14, 19, 27, 44], gap_sequence=[4, 2, 1])
+    print(render_shell_trace(trace))
+
+    # 4. Multi-Attribute Record Sort
+    print("\n[4] Multi-Attribute Record Sorting (Dept ASC, Salary DESC):")
+    staff = [
+        {"name": "Alice", "dept": "Eng", "salary": 90000},
+        {"name": "Bob", "dept": "HR", "salary": 70000},
+        {"name": "Charlie", "dept": "Eng", "salary": 115000},
+        {"name": "Diana", "dept": "HR", "salary": 85000},
+        {"name": "Eve", "dept": "Eng", "salary": 90000},
+    ]
+    sorted_staff = shell_sort_records(staff, sort_keys=[("dept", False), ("salary", True)])
+    for s in sorted_staff:
+        print(f"  {s['dept']:<5} | ${s['salary']:<7} | {s['name']}")
+
+    # 5. Instability Demonstration
+    print("\n[5] Shell Sort Instability Proof:")
+    instab_report = verify_shell_sort_instability()
+    print(f"  Algorithm is stable? {instab_report['is_stable']}")
+    for idx, c in enumerate(instab_report["cases"], 1):
+        print(f"  Case {idx}: Input={c['input']}")
+        print(f"          Shell Result={c['shell_sorted']}")
+        print(f"          Unstable inversion detected? {c['is_unstable']}")
+
+    # 6. Scalability Analysis
+    print("\n[6] Scalability Analysis (Shell Sort vs O(n^2) Insertion Sort):")
+    sc_report = analyze_shell_sort_scalability([20, 50, 100, 200])
+    print(f"  {'Size n':<8} | {'Sorted Comps':<12} | {'Rev Comps':<10} | {'Rev Shifts':<10} | {'Insert Worst':<12} | {'Speedup':<8}")
+    print("  " + "-" * 72)
+    for row in sc_report:
+        print(
+            f"  {row['size']:<8} | {row['sorted_comparisons']:<12} | {row['reversed_comparisons']:<10} | "
+            f"{row['reversed_shifts']:<10} | {row['insertion_sort_worst_case_shifts']:<12} | "
+            f"{row['shell_vs_insertion_speedup_ratio']}x"
+        )
+    print("\nDemonstration complete.")
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 
