@@ -442,3 +442,111 @@ def analyze_shell_sort_scalability(
     return report
 
 
+# ─── 4. Range-Bounded Slice Sorter & Chunk Sorter ─────────────────────────────
+
+
+def shell_sort_range(
+    arr: List[Any],
+    start: int = 0,
+    end: Optional[int] = None,
+    reverse: bool = False,
+    key: Optional[Callable[[Any], Any]] = None,
+    gap_sequence: Optional[Union[str, List[int]]] = None,
+) -> List[Any]:
+    """
+    Sorts an in-place bounded range arr[start:end] using Shell Sort.
+    Leaves all elements before start and after end unmodified.
+
+    Args:
+        arr: Mutable list to sort in-place.
+        start: Start index (inclusive). Supports negative indices.
+        end: End index (exclusive). Supports negative indices. Defaults to len(arr).
+        reverse: If True, sorts descending.
+        key: Optional comparison key function.
+        gap_sequence: Strategy or custom gaps.
+
+    Returns:
+        The mutated array arr.
+
+    Raises:
+        TypeError: If arr is not a mutable list.
+    """
+    if not isinstance(arr, list):
+        raise TypeError(f"Expected mutable list, got {type(arr).__name__}")
+
+    n = len(arr)
+    if n <= 1:
+        return arr
+
+    norm_start = start if start >= 0 else max(0, n + start)
+    norm_end = n if end is None else (end if end >= 0 else max(0, n + end))
+
+    norm_start = max(0, min(n, norm_start))
+    norm_end = max(0, min(n, norm_end))
+
+    sub_len = norm_end - norm_start
+    if sub_len <= 1:
+        return arr
+
+    gaps = get_gap_sequence(gap_sequence if gap_sequence is not None else "ciura", sub_len)
+    key_func = key if key is not None else (lambda x: x)
+
+    for gap in gaps:
+        for i in range(norm_start + gap, norm_end):
+            temp_item = arr[i]
+            temp_key = key_func(temp_item)
+            j = i
+
+            while j >= norm_start + gap:
+                prev_key = key_func(arr[j - gap])
+                condition = (prev_key < temp_key) if reverse else (prev_key > temp_key)
+                if condition:
+                    arr[j] = arr[j - gap]
+                    j -= gap
+                else:
+                    break
+
+            arr[j] = temp_item
+
+    return arr
+
+
+def shell_sort_chunks(
+    arr: List[Any],
+    chunk_size: int,
+    reverse: bool = False,
+    key: Optional[Callable[[Any], Any]] = None,
+) -> List[Any]:
+    """
+    Partitions the input into consecutive chunks of chunk_size and sorts each chunk
+    independently using Shell Sort (pure function).
+
+    Args:
+        arr: Input sequence.
+        chunk_size: Size of each chunk to sort independently.
+        reverse: If True, sorts each chunk descending.
+        key: Key projection function.
+
+    Returns:
+        New list with individually sorted chunks.
+
+    Raises:
+        ValueError: If chunk_size <= 0.
+        TypeError: If arr is not list or tuple.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+    if chunk_size <= 0:
+        raise ValueError(f"chunk_size must be positive, got {chunk_size}")
+
+    result = list(arr)
+    n = len(result)
+
+    for start in range(0, n, chunk_size):
+        end = min(n, start + chunk_size)
+        shell_sort_range(result, start=start, end=end, reverse=reverse, key=key)
+
+    return result
+
+
+
