@@ -218,3 +218,107 @@ def double_selection_sort_inplace(
         left += 1
         right -= 1
 
+
+# ─── 3. Stable Selection Sort & Stability Verification ────────────────────────
+
+
+def stable_selection_sort(
+    arr: List[Any], reverse: bool = False, key: Optional[Callable[[Any], Any]] = None
+) -> List[Any]:
+    """
+    Stable variation of Selection Sort.
+    Standard selection sort is unstable because long-distance swaps can move an element
+    past an identical element. Stable selection sort fixes this by shifting elements
+    between index i and min_idx one position right instead of swapping.
+
+    Time Complexity: O(n^2) comparisons, O(n^2) element shifts.
+    Space Complexity: O(n) for pure list copy, O(1) auxiliary.
+
+    Args:
+        arr: Input sequence.
+        reverse: If True, sorts descending.
+        key: Optional comparison key function.
+
+    Returns:
+        New sorted list preserving relative order of equal keys.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    items = list(arr)
+    n = len(items)
+    if n <= 1:
+        return items
+
+    key_func = key if key is not None else (lambda x: x)
+
+    for i in range(n - 1):
+        target_idx = i
+        target_val = key_func(items[i])
+
+        for j in range(i + 1, n):
+            val_j = key_func(items[j])
+            condition = (val_j > target_val) if reverse else (val_j < target_val)
+            if condition:
+                target_idx = j
+                target_val = val_j
+
+        # Shift elements rightward instead of swapping to preserve stability
+        if target_idx != i:
+            selected_item = items[target_idx]
+            for k in range(target_idx, i, -1):
+                items[k] = items[k - 1]
+            items[i] = selected_item
+
+    return items
+
+
+def verify_selection_sort_stability() -> Dict[str, Any]:
+    """
+    Verifies that standard selection sort is unstable on tied keys,
+    whereas stable_selection_sort preserves relative input order.
+
+    Returns:
+        Dictionary with stability verification results and before/after pairs.
+    """
+    # Sample with tied primary keys and distinctive tag values
+    test_cases = [
+        [(4, "alpha"), (4, "beta"), (2, "gamma"), (4, "delta"), (1, "epsilon")],
+        [(3, "first"), (2, "apple"), (3, "second"), (3, "third"), (1, "banana")],
+    ]
+
+    results = []
+    for case in test_cases:
+        # Sort using standard selection sort by key (first tuple item)
+        std_sorted = selection_sort(case, key=lambda x: x[0])
+        # Sort using stable selection sort by key
+        stable_sorted = stable_selection_sort(case, key=lambda x: x[0])
+
+        # Check relative order of equal keys
+        def is_stable(original, sorted_arr):
+            for i in range(len(sorted_arr) - 1):
+                if sorted_arr[i][0] == sorted_arr[i + 1][0]:
+                    orig_pos_i = original.index(sorted_arr[i])
+                    orig_pos_next = original.index(sorted_arr[i + 1])
+                    if orig_pos_i > orig_pos_next:
+                        return False
+            return True
+
+        std_stable = is_stable(case, std_sorted)
+        stb_stable = is_stable(case, stable_sorted)
+
+        results.append({
+            "original": case,
+            "standard_sorted": std_sorted,
+            "standard_stable": std_stable,
+            "stable_sorted": stable_sorted,
+            "stable_algorithm_stable": stb_stable,
+        })
+
+    return {
+        "all_cases_passed": all(r["stable_algorithm_stable"] for r in results),
+        "standard_sort_unstable_demonstrated": any(not r["standard_stable"] for r in results),
+        "case_studies": results,
+    }
+
+
