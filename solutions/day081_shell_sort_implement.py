@@ -92,16 +92,7 @@ def shell_sort_inplace(
     if n <= 1:
         return
 
-    # Determine gaps
-    if gap_sequence is None or gap_sequence == "ciura":
-        gaps = _default_gaps(n)
-    elif isinstance(gap_sequence, list):
-        gaps = [g for g in gap_sequence if 0 < g < n]
-        if not gaps or gaps[-1] != 1:
-            gaps.append(1)
-    else:
-        gaps = _default_gaps(n)
-
+    gaps = get_gap_sequence(gap_sequence if gap_sequence is not None else "ciura", n)
     key_func = key if key is not None else (lambda x: x)
 
     for gap in gaps:
@@ -133,7 +124,7 @@ def shell_sort_metrics(
     Args:
         arr: Input sequence.
         reverse: If True, sorts descending.
-        gap_sequence: Gap sequence to use.
+        gap_sequence: Gap sequence to use ('ciura', 'knuth', 'shell', 'sedgewick', 'hibbard', or List[int]).
 
     Returns:
         Tuple of (sorted_list, metrics_dict).
@@ -144,17 +135,9 @@ def shell_sort_metrics(
     items = list(arr)
     n = len(items)
     if n <= 1:
-        return (items, {"comparisons": 0, "shifts": 0, "gaps_applied": [], "gap_count": 0})
+        return (items, {"comparisons": 0, "shifts": 0, "gaps_applied": [], "gap_count": 0, "phase_breakdown": []})
 
-    if gap_sequence is None or gap_sequence == "ciura":
-        gaps = _default_gaps(n)
-    elif isinstance(gap_sequence, list):
-        gaps = [g for g in gap_sequence if 0 < g < n]
-        if not gaps or gaps[-1] != 1:
-            gaps.append(1)
-    else:
-        gaps = _default_gaps(n)
-
+    gaps = get_gap_sequence(gap_sequence if gap_sequence is not None else "ciura", n)
     comparisons = 0
     shifts = 0
     phase_stats = []
@@ -195,3 +178,167 @@ def shell_sort_metrics(
         "phase_breakdown": phase_stats,
     }
     return (items, metrics)
+
+
+# ─── 2. Historical & Optimized Gap Sequence Generators ────────────────────────
+
+
+def generate_shell_gaps(n: int) -> List[int]:
+    """
+    Donald Shell's original 1959 sequence: floor(n / 2^k).
+    Worst-case time complexity: O(n^2).
+
+    Args:
+        n: Number of elements.
+
+    Returns:
+        Decreasing list of gaps ending in 1.
+    """
+    if n <= 1:
+        return []
+    gaps = []
+    gap = n // 2
+    while gap > 0:
+        gaps.append(gap)
+        gap //= 2
+    return gaps
+
+
+def generate_knuth_gaps(n: int) -> List[int]:
+    """
+    Donald Knuth's 1973 sequence: h = 3*h + 1 => (3^k - 1) / 2.
+    Gaps: 1, 4, 13, 40, 121, 364, 1093, ...
+    Worst-case time complexity: O(n^(3/2)).
+
+    Args:
+        n: Number of elements.
+
+    Returns:
+        Decreasing list of gaps ending in 1.
+    """
+    if n <= 1:
+        return []
+    gaps = []
+    h = 1
+    while h < n:
+        gaps.append(h)
+        h = 3 * h + 1
+    gaps.reverse()
+    return gaps if gaps else [1]
+
+
+def generate_hibbard_gaps(n: int) -> List[int]:
+    """
+    Hibbard's 1963 sequence: 2^k - 1.
+    Gaps: 1, 3, 7, 15, 31, 63, 127, 255, ...
+    Worst-case time complexity: O(n^(3/2)).
+
+    Args:
+        n: Number of elements.
+
+    Returns:
+        Decreasing list of gaps ending in 1.
+    """
+    if n <= 1:
+        return []
+    gaps = []
+    k = 1
+    while True:
+        h = (1 << k) - 1
+        if h >= n:
+            break
+        gaps.append(h)
+        k += 1
+    gaps.reverse()
+    return gaps if gaps else [1]
+
+
+def generate_sedgewick_gaps(n: int) -> List[int]:
+    """
+    Robert Sedgewick's 1982/1986 sequence interleaving:
+    9 * (4^k - 2^k) + 1  and  4^(k+1) + 3 * 2^k + 1.
+    Gaps: 1, 5, 19, 41, 109, 209, 505, 929, 2161, 3905, ...
+    Worst-case time complexity: O(n^(4/3)).
+
+    Args:
+        n: Number of elements.
+
+    Returns:
+        Decreasing list of gaps ending in 1.
+    """
+    if n <= 1:
+        return []
+    gap_set = set()
+    k = 0
+    while True:
+        term1 = 9 * (4**k - 2**k) + 1
+        term2 = 4 ** (k + 1) + 3 * (2**k) + 1
+        if term1 < n:
+            gap_set.add(term1)
+        if term2 < n:
+            gap_set.add(term2)
+        if term1 >= n and term2 >= n:
+            break
+        k += 1
+
+    gaps = sorted(gap_set, reverse=True)
+    return gaps if gaps else [1]
+
+
+def generate_ciura_gaps(n: int) -> List[int]:
+    """
+    Marcin Ciura's 2001 empirical gap sequence, proven most efficient for practical inputs:
+    [1, 4, 10, 23, 57, 132, 301, 701, 1750], extended by floor(gap * 2.25).
+    Optimized for modern cache hierarchies.
+
+    Args:
+        n: Number of elements.
+
+    Returns:
+        Decreasing list of gaps ending in 1.
+    """
+    if n <= 1:
+        return []
+    base_ciura = [1, 4, 10, 23, 57, 132, 301, 701, 1750]
+    gaps = [g for g in base_ciura if g < n]
+    if not gaps:
+        gaps = [1]
+    last = gaps[-1]
+    while int(last * 2.25) < n:
+        last = int(last * 2.25)
+        gaps.append(last)
+    gaps.reverse()
+    return gaps
+
+
+def get_gap_sequence(strategy: Union[str, List[int]], n: int) -> List[int]:
+    """
+    Resolves a gap sequence by strategy name or validates a custom gap list.
+
+    Args:
+        strategy: 'ciura', 'knuth', 'sedgewick', 'hibbard', 'shell', or custom List[int].
+        n: Number of elements.
+
+    Returns:
+        Sorted decreasing list of positive gaps ending with 1.
+    """
+    if isinstance(strategy, list):
+        filtered = sorted([g for g in strategy if 0 < g < n], reverse=True)
+        if not filtered or filtered[-1] != 1:
+            filtered.append(1)
+        return filtered
+
+    strat = str(strategy).lower().strip()
+    if strat == "shell":
+        return generate_shell_gaps(n)
+    elif strat == "knuth":
+        return generate_knuth_gaps(n)
+    elif strat == "hibbard":
+        return generate_hibbard_gaps(n)
+    elif strat == "sedgewick":
+        return generate_sedgewick_gaps(n)
+    elif strat == "ciura":
+        return generate_ciura_gaps(n)
+    else:
+        raise ValueError(f"Unknown gap sequence strategy: {strategy}")
+
