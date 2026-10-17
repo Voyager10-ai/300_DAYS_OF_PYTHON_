@@ -666,5 +666,98 @@ def render_shell_trace(trace: List[Dict[str, Any]]) -> str:
     return "\n".join(lines)
 
 
+# ─── 6. Batch Processor & Multi-Attribute Record Shell Sorter ─────────────────
+
+
+def batch_shell_sort(
+    datasets: List[List[Any]],
+    reverse: bool = False,
+    key: Optional[Callable[[Any], Any]] = None,
+    gap_sequence: Optional[Union[str, List[int]]] = None,
+) -> List[List[Any]]:
+    """
+    Sorts a collection of distinct datasets using Shell Sort.
+    Ensures input immutability by returning newly allocated sorted lists.
+
+    Args:
+        datasets: List of lists/tuples to sort.
+        reverse: If True, sorts each dataset descending.
+        key: Key projection function.
+        gap_sequence: Gap sequence strategy or custom list.
+
+    Returns:
+        List of newly sorted lists.
+
+    Raises:
+        TypeError: If datasets is not a list or contains non-sequence elements.
+    """
+    if not isinstance(datasets, list):
+        raise TypeError(f"Expected list of datasets, got {type(datasets).__name__}")
+
+    results = []
+    for idx, ds in enumerate(datasets):
+        if not isinstance(ds, (list, tuple)):
+            raise TypeError(f"Dataset at index {idx} must be a list or tuple")
+        results.append(shell_sort(ds, reverse=reverse, key=key, gap_sequence=gap_sequence))
+
+    return results
+
+
+def shell_sort_records(
+    records: List[Dict[str, Any]],
+    sort_keys: List[Tuple[str, bool]],
+) -> List[Dict[str, Any]]:
+    """
+    Sorts an array of dictionaries by multiple attributes with individual asc/desc directions.
+    Since Shell Sort is unstable, multi-column sorting requires building a single composite comparison key.
+
+    For string fields, reverse sorting is handled by custom invertible key wrappers.
+    For numeric fields, reverse sorting negates the value.
+
+    Args:
+        records: List of dictionary records.
+        sort_keys: List of (field_name, is_descending) tuples in order of sorting priority.
+
+    Returns:
+        New list of sorted dictionary records.
+
+    Raises:
+        TypeError: If records is not a list or sort_keys is not a list.
+        KeyError: If a field in sort_keys is missing from any record.
+    """
+    if not isinstance(records, list):
+        raise TypeError(f"Expected list of records, got {type(records).__name__}")
+    if not isinstance(sort_keys, list):
+        raise TypeError(f"Expected list of sort keys, got {type(sort_keys).__name__}")
+
+    class InvertedKey:
+        def __init__(self, val: Any):
+            self.val = val
+
+        def __lt__(self, other: "InvertedKey") -> bool:
+            return self.val > other.val
+
+        def __gt__(self, other: "InvertedKey") -> bool:
+            return self.val < other.val
+
+        def __eq__(self, other: Any) -> bool:
+            return isinstance(other, InvertedKey) and self.val == other.val
+
+    def record_key(item: Dict[str, Any]) -> Tuple[Any, ...]:
+        key_parts = []
+        for field, is_desc in sort_keys:
+            if field not in item:
+                raise KeyError(f"Field '{field}' missing from record {item}")
+            val = item[field]
+            if is_desc:
+                key_parts.append(InvertedKey(val))
+            else:
+                key_parts.append(val)
+        return tuple(key_parts)
+
+    return shell_sort(records, reverse=False, key=record_key)
+
+
+
 
 
