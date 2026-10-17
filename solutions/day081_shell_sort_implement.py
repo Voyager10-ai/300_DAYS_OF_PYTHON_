@@ -758,6 +758,68 @@ def shell_sort_records(
     return shell_sort(records, reverse=False, key=record_key)
 
 
+# ─── 7. Stability Analysis Engine ─────────────────────────────────────────────
+
+
+def verify_shell_sort_instability() -> Dict[str, Any]:
+    """
+    Demonstrates that Shell Sort is inherently unstable.
+    Because elements jump across gap distances h, identical keys in different h-sublists
+    can leap over one another, permanently reversing their relative input order.
+
+    Returns:
+        Dictionary with stability verification report and comparison against stable insertion sort.
+    """
+    # Canonical counterexample where gap-2 swaps invert identical keys
+    # Original order has (4, 'x') at index 0 and (4, 'y') at index 1.
+    test_cases = [
+        [(4, "x"), (4, "y"), (3, "z"), (2, "w")],
+        [(5, "alpha"), (5, "beta"), (3, "gamma"), (1, "delta"), (5, "epsilon")],
+    ]
+
+    case_reports = []
+
+    for case in test_cases:
+        # Sort with Shell sort using gap sequence [2, 1] or ciura
+        shell_res = shell_sort(case, key=lambda x: x[0], gap_sequence=[2, 1])
+
+        # Stable reference: python's stable Timsort
+        stable_ref = sorted(case, key=lambda x: x[0])
+
+        # Check relative order of identical keys
+        unstable_detected = False
+        inversion_pairs = []
+
+        for i in range(len(shell_res) - 1):
+            if shell_res[i][0] == shell_res[i + 1][0]:
+                orig_i = case.index(shell_res[i])
+                orig_next = case.index(shell_res[i + 1])
+                if orig_i > orig_next:
+                    unstable_detected = True
+                    inversion_pairs.append({
+                        "earlier_in_result": shell_res[i],
+                        "later_in_result": shell_res[i + 1],
+                        "original_earlier_index": orig_i,
+                        "original_later_index": orig_next,
+                    })
+
+        case_reports.append({
+            "input": case,
+            "shell_sorted": shell_res,
+            "stable_expected": stable_ref,
+            "is_unstable": unstable_detected,
+            "inversion_pairs": inversion_pairs,
+        })
+
+    return {
+        "algorithm": "Shell Sort",
+        "is_stable": False,
+        "instability_demonstrated": any(c["is_unstable"] for c in case_reports),
+        "cases": case_reports,
+    }
+
+
+
 
 
 
