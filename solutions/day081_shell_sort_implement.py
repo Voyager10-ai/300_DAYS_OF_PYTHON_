@@ -549,4 +549,122 @@ def shell_sort_chunks(
     return result
 
 
+# ─── 5. Step-by-Step Gap Phase Trace & ASCII Visualizer ───────────────────────
+
+
+def trace_shell_sort(
+    arr: List[Any],
+    reverse: bool = False,
+    gap_sequence: Optional[Union[str, List[int]]] = None,
+) -> List[Dict[str, Any]]:
+    """
+    Executes Shell Sort while collecting snapshots after each diminishing gap phase.
+    Each phase renders the array h-sorted for the current gap h.
+
+    Args:
+        arr: Sequence of items.
+        reverse: If True, sorts descending.
+        gap_sequence: Gap sequence strategy or custom gaps.
+
+    Returns:
+        List of phase dictionaries with detailed metrics and states.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    items = list(arr)
+    n = len(items)
+    if n <= 1:
+        return []
+
+    gaps = get_gap_sequence(gap_sequence if gap_sequence is not None else "ciura", n)
+    trace = []
+
+    for phase_idx, gap in enumerate(gaps, 1):
+        state_before = list(items)
+        comparisons = 0
+        shifts = 0
+
+        for i in range(gap, n):
+            temp_item = items[i]
+            j = i
+
+            while j >= gap:
+                comparisons += 1
+                condition = (items[j - gap] < temp_item) if reverse else (items[j - gap] > temp_item)
+                if condition:
+                    items[j] = items[j - gap]
+                    shifts += 1
+                    j -= gap
+                else:
+                    break
+
+            items[j] = temp_item
+
+        desc = (
+            f"Phase {phase_idx} (Gap = {gap}): Processed {gap} interleaved sub-array(s). "
+            f"Array is now {gap}-sorted with {comparisons} comps and {shifts} shifts."
+        )
+
+        trace.append({
+            "phase_index": phase_idx,
+            "gap": gap,
+            "state_before": state_before,
+            "state_after": list(items),
+            "comparisons": comparisons,
+            "shifts": shifts,
+            "description": desc,
+        })
+
+    return trace
+
+
+def render_shell_trace(trace: List[Dict[str, Any]]) -> str:
+    """
+    Formats a list of phase traces into an ASCII execution diagram.
+
+    Args:
+        trace: Result from trace_shell_sort.
+
+    Returns:
+        Multi-line formatted ASCII string.
+    """
+    if not trace:
+        return "Array has <= 1 element; already in trivial 1-sorted state."
+
+    lines = []
+    lines.append("=" * 72)
+    lines.append("           SHELL SORT DIMINISHING GAP TRACE & VISUALIZER         ")
+    lines.append("=" * 72)
+
+    initial = trace[0]["state_before"]
+    lines.append(f"Initial State : {initial}")
+    lines.append("-" * 72)
+
+    total_comps = 0
+    total_shifts = 0
+
+    for step in trace:
+        p = step["phase_index"]
+        gap = step["gap"]
+        comps = step["comparisons"]
+        shifts = step["shifts"]
+        after = step["state_after"]
+
+        total_comps += comps
+        total_shifts += shifts
+
+        lines.append(f"[Phase {p} | Gap h = {gap:<3}] Comps: {comps:<4} | Shifts: {shifts:<4}")
+        lines.append(f"  Description : {step['description']}")
+        lines.append(f"  h-Sorted Array: {after}")
+        lines.append("-" * 72)
+
+    final = trace[-1]["state_after"]
+    lines.append(f"Final 1-Sorted Output : {final}")
+    lines.append(f"Cumulative Totals     : Comparisons = {total_comps}, Shifts = {total_shifts}")
+    lines.append("=" * 72)
+    return "\n".join(lines)
+
+
+
 
