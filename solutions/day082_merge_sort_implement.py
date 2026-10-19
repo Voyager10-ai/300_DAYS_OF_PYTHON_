@@ -199,3 +199,103 @@ def merge_sort_metrics(
         "input_length": len(arr),
     }
     return (sorted_result, metrics)
+
+
+# ─── 2. Bottom-Up Iterative Merge Sort ────────────────────────────────────────
+
+
+def iterative_merge_sort(
+    arr: List[Any],
+    reverse: bool = False,
+    key: Optional[Callable[[Any], Any]] = None,
+) -> List[Any]:
+    """
+    Sorts a sequence using Bottom-Up (Iterative) Merge Sort (pure function).
+
+    Instead of recursive splitting, starts with width = 1 and iteratively merges
+    adjacent sub-lists of doubling sizes (1, 2, 4, 8, ...).
+    Eliminates recursion stack frames, making it immune to recursion limit overflow.
+
+    Time Complexity: O(n log n) comparisons.
+    Space Complexity: O(n) auxiliary memory.
+
+    Args:
+        arr: Input sequence.
+        reverse: If True, sorts descending.
+        key: Optional comparison key projection.
+
+    Returns:
+        New sorted list.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    n = len(arr)
+    if n <= 1:
+        return list(arr)
+
+    src = list(arr)
+    dst = [None] * n
+    key_func = key if key is not None else (lambda x: x)
+
+    width = 1
+    while width < n:
+        for i in range(0, n, 2 * width):
+            left = i
+            mid = min(i + width, n)
+            right = min(i + 2 * width, n)
+
+            # Merge src[left:mid] and src[mid:right] into dst[left:right]
+            l_idx = left
+            r_idx = mid
+            k = left
+
+            while l_idx < mid and r_idx < right:
+                k_l = key_func(src[l_idx])
+                k_r = key_func(src[r_idx])
+                cond = (k_l >= k_r) if reverse else (k_l <= k_r)
+                if cond:
+                    dst[k] = src[l_idx]
+                    l_idx += 1
+                else:
+                    dst[k] = src[r_idx]
+                    r_idx += 1
+                k += 1
+
+            while l_idx < mid:
+                dst[k] = src[l_idx]
+                l_idx += 1
+                k += 1
+
+            while r_idx < right:
+                dst[k] = src[r_idx]
+                r_idx += 1
+                k += 1
+
+        # Ping-pong buffer swap
+        src, dst = dst, src
+        width *= 2
+
+    return src
+
+
+def iterative_merge_sort_inplace(
+    arr: List[Any],
+    reverse: bool = False,
+    key: Optional[Callable[[Any], Any]] = None,
+) -> None:
+    """
+    In-place wrapper for iterative bottom-up merge sort.
+
+    Args:
+        arr: Mutable list to sort in-place.
+        reverse: If True, sorts descending.
+        key: Key projection function.
+    """
+    if not isinstance(arr, list):
+        raise TypeError(f"Expected mutable list, got {type(arr).__name__}")
+
+    res = iterative_merge_sort(arr, reverse=reverse, key=key)
+    for idx, val in enumerate(res):
+        arr[idx] = val
+
