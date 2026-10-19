@@ -299,3 +299,131 @@ def iterative_merge_sort_inplace(
     for idx, val in enumerate(res):
         arr[idx] = val
 
+
+# ─── 3. Hybrid Merge Sort (Insertion Cutoff & Skip-Merge Optimization) ─────────
+
+
+def _insertion_sort_slice(
+    arr: List[Any],
+    start: int,
+    end: int,
+    reverse: bool = False,
+    key: Optional[Callable[[Any], Any]] = None,
+) -> None:
+    """Helper: In-place insertion sort on arr[start:end] slice."""
+    key_func = key if key is not None else (lambda x: x)
+    for i in range(start + 1, end):
+        temp = arr[i]
+        k_temp = key_func(temp)
+        j = i - 1
+        while j >= start:
+            k_prev = key_func(arr[j])
+            cond = (k_prev < k_temp) if reverse else (k_prev > k_temp)
+            if cond:
+                arr[j + 1] = arr[j]
+                j -= 1
+            else:
+                break
+        arr[j + 1] = temp
+
+
+def hybrid_merge_sort(
+    arr: List[Any],
+    cutoff: int = 16,
+    reverse: bool = False,
+    key: Optional[Callable[[Any], Any]] = None,
+) -> List[Any]:
+    """
+    Sorts using Hybrid Merge Sort combining Merge Sort with Insertion Sort for small slices.
+    Also incorporates the Skip-Merge optimization: if arr[mid] <= arr[mid+1],
+    the two halves are already in relative order, avoiding the merge step entirely.
+
+    Args:
+        arr: Input sequence.
+        cutoff: Sub-array size threshold to switch to Insertion Sort (default 16).
+        reverse: If True, sorts descending.
+        key: Comparison key projection.
+
+    Returns:
+        New sorted list.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+    if cutoff < 1:
+        cutoff = 1
+
+    items = list(arr)
+    n = len(items)
+    if n <= 1:
+        return items
+
+    key_func = key if key is not None else (lambda x: x)
+    aux = [None] * n
+
+    def _sort(low: int, high: int) -> None:
+        if high - low <= cutoff:
+            _insertion_sort_slice(items, low, high, reverse=reverse, key=key)
+            return
+
+        mid = low + (high - low) // 2
+        _sort(low, mid)
+        _sort(mid, high)
+
+        # Skip-merge optimization: already ordered?
+        k_mid = key_func(items[mid - 1])
+        k_next = key_func(items[mid])
+        already_sorted = (k_mid >= k_next) if reverse else (k_mid <= k_next)
+        if already_sorted:
+            return
+
+        # Merge items[low:mid] and items[mid:high] using aux buffer
+        for idx in range(low, high):
+            aux[idx] = items[idx]
+
+        i = low
+        j = mid
+        for k in range(low, high):
+            if i >= mid:
+                items[k] = aux[j]
+                j += 1
+            elif j >= high:
+                items[k] = aux[i]
+                i += 1
+            else:
+                k_i = key_func(aux[i])
+                k_j = key_func(aux[j])
+                cond = (k_i >= k_j) if reverse else (k_i <= k_j)
+                if cond:
+                    items[k] = aux[i]
+                    i += 1
+                else:
+                    items[k] = aux[j]
+                    j += 1
+
+    _sort(0, n)
+    return items
+
+
+def hybrid_merge_sort_inplace(
+    arr: List[Any],
+    cutoff: int = 16,
+    reverse: bool = False,
+    key: Optional[Callable[[Any], Any]] = None,
+) -> None:
+    """
+    In-place wrapper for hybrid merge sort.
+
+    Args:
+        arr: Mutable list.
+        cutoff: Cutoff threshold for insertion sort.
+        reverse: If True, sorts descending.
+        key: Key projection function.
+    """
+    if not isinstance(arr, list):
+        raise TypeError(f"Expected mutable list, got {type(arr).__name__}")
+
+    sorted_res = hybrid_merge_sort(arr, cutoff=cutoff, reverse=reverse, key=key)
+    for idx, val in enumerate(sorted_res):
+        arr[idx] = val
+
+
