@@ -427,3 +427,100 @@ def hybrid_merge_sort_inplace(
         arr[idx] = val
 
 
+# ─── 4. Heap-Based K-Way Merge for Multi-Stream Sorting ───────────────────────
+
+
+def merge_sorted_streams(
+    iterators: List[Iterator[Any]],
+    reverse: bool = False,
+    key: Optional[Callable[[Any], Any]] = None,
+) -> Iterator[Any]:
+    """
+    Lazily merges k pre-sorted iterators into a single sorted generator in O(N log k) time.
+    Maintains a min-heap (or max-heap if reverse) of size at most k.
+
+    Args:
+        iterators: List of iterators, each producing elements in sorted order.
+        reverse: If True, input streams and output stream are descending.
+        key: Projection function.
+
+    Yields:
+        Elements in globally sorted order.
+    """
+    key_func = key if key is not None else (lambda x: x)
+    heap: List[Tuple[Any, int, Any, Iterator[Any]]] = []
+    entry_counter = 0
+
+    class InvertWrapper:
+        """Helper to invert comparisons for reverse=True in Python's min-heap."""
+        def __init__(self, val: Any):
+            self.val = val
+
+        def __lt__(self, other: "InvertWrapper") -> bool:
+            return self.val > other.val
+
+        def __gt__(self, other: "InvertWrapper") -> bool:
+            return self.val < other.val
+
+        def __eq__(self, other: Any) -> bool:
+            return isinstance(other, InvertWrapper) and self.val == other.val
+
+    # Initialize heap with the first item from each iterator
+    for it in iterators:
+        try:
+            val = next(it)
+            k_val = key_func(val)
+            proj = InvertWrapper(k_val) if reverse else k_val
+            heapq.heappush(heap, (proj, entry_counter, val, it))
+            entry_counter += 1
+        except StopIteration:
+            continue
+
+    # Pop minimum, push next from that iterator
+    while heap:
+        _, _, min_val, it = heapq.heappop(heap)
+        yield min_val
+        try:
+            next_val = next(it)
+            next_k = key_func(next_val)
+            proj = InvertWrapper(next_k) if reverse else next_k
+            heapq.heappush(heap, (proj, entry_counter, next_val, it))
+            entry_counter += 1
+        except StopIteration:
+            pass
+
+
+def k_way_merge(
+    sorted_arrays: List[List[Any]],
+    reverse: bool = False,
+    key: Optional[Callable[[Any], Any]] = None,
+) -> List[Any]:
+    """
+    Merges k sorted lists into a single consolidated sorted list.
+    Standard building block for External Merge Sort.
+
+    Time Complexity: O(N log k), where N is total items across all k lists.
+    Space Complexity: O(N) for result list, O(k) auxiliary heap space.
+
+    Args:
+        sorted_arrays: List of k sorted sequences.
+        reverse: If True, merges descending sorted lists.
+        key: Key projection function.
+
+    Returns:
+        Consolidated sorted list.
+
+    Raises:
+        TypeError: If sorted_arrays is not a list.
+    """
+    if not isinstance(sorted_arrays, list):
+        raise TypeError(f"Expected list of sorted arrays, got {type(sorted_arrays).__name__}")
+
+    iterators = [iter(sub) for sub in sorted_arrays if len(sub) > 0]
+    if not iterators:
+        return []
+
+    return list(merge_sorted_streams(iterators, reverse=reverse, key=key))
+
+
+
