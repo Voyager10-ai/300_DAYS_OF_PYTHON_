@@ -523,4 +523,99 @@ def k_way_merge(
     return list(merge_sorted_streams(iterators, reverse=reverse, key=key))
 
 
+# ─── 5. Divide-and-Conquer Inversion Counting Engine ──────────────────────────
+
+
+def count_inversions(arr: List[Any]) -> Tuple[int, List[Any]]:
+    """
+    Counts the number of inversions in a sequence in O(n log n) time using Divide and Conquer.
+    An inversion is a pair of indices (i, j) such that i < j and arr[i] > arr[j].
+    Also returns the sorted version of the array.
+
+    Args:
+        arr: Input sequence.
+
+    Returns:
+        Tuple of (inversion_count, sorted_list).
+
+    Raises:
+        TypeError: If arr is not list or tuple.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    n = len(arr)
+    if n <= 1:
+        return (0, list(arr))
+
+    def _merge_and_count(items: List[Any]) -> Tuple[int, List[Any]]:
+        m = len(items)
+        if m <= 1:
+            return (0, list(items))
+
+        mid = m // 2
+        inv_left, left = _merge_and_count(items[:mid])
+        inv_right, right = _merge_and_count(items[mid:])
+
+        merged = []
+        i = 0
+        j = 0
+        split_invs = 0
+        len_l = len(left)
+        len_r = len(right)
+
+        while i < len_l and j < len_r:
+            if left[i] <= right[j]:
+                merged.append(left[i])
+                i += 1
+            else:
+                merged.append(right[j])
+                # All remaining elements in left[i:] are > right[j]
+                split_invs += (len_l - i)
+                j += 1
+
+        if i < len_l:
+            merged.extend(left[i:])
+        if j < len_r:
+            merged.extend(right[j:])
+
+        total_invs = inv_left + inv_right + split_invs
+        return (total_invs, merged)
+
+    return _merge_and_count(list(arr))
+
+
+def inversion_distance_metric(arr: List[Any]) -> Dict[str, Any]:
+    """
+    Computes inversion count and normalized unsortedness ratio (Kendall tau metric).
+
+    Args:
+        arr: Input sequence.
+
+    Returns:
+        Dictionary with inversion metrics, theoretical bounds, and normalized ratio [0.0, 1.0].
+    """
+    n = len(arr)
+    if n <= 1:
+        return {
+            "inversion_count": 0,
+            "max_possible_inversions": 0,
+            "unsortedness_ratio": 0.0,
+            "is_already_sorted": True,
+        }
+
+    max_invs = n * (n - 1) // 2
+    inv_count, _ = count_inversions(arr)
+    ratio = round(inv_count / max_invs, 4) if max_invs > 0 else 0.0
+
+    return {
+        "inversion_count": inv_count,
+        "max_possible_inversions": max_invs,
+        "unsortedness_ratio": ratio,
+        "is_already_sorted": (inv_count == 0),
+        "is_reverse_sorted": (inv_count == max_invs),
+    }
+
+
+
 
