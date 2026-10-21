@@ -840,6 +840,171 @@ def analyze_merge_sort_benchmarks(
     return report
 
 
+# ─── 8. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestMergeSort(unittest.TestCase):
+    """Exhaustive unit test suite covering Merge Sort algorithms and edge cases."""
+
+    def setUp(self):
+        self.sample = [38, 27, 43, 3, 9, 82, 10]
+        self.expected = sorted(self.sample)
+        self.duplicates = [5, 2, 8, 2, 5, 1, 9, 1, 8]
+        self.negatives = [-12, 45, 0, -3, 89, -50, 23]
+        self.floats = [3.14, 1.41, 2.71, 0.58, 1.73]
+
+    # --- Core Merge Function Tests ---
+    def test_merge_primitives(self):
+        self.assertEqual(merge([], []), [])
+        self.assertEqual(merge([1, 3], []), [1, 3])
+        self.assertEqual(merge([], [2, 4]), [2, 4])
+        self.assertEqual(merge([1, 5, 9], [2, 6, 10]), [1, 2, 5, 6, 9, 10])
+        # Stability on ties: elements from left should precede elements from right
+        left = [(1, "L1"), (3, "L2")]
+        right = [(1, "R1"), (2, "R2")]
+        merged = merge(left, right, key=lambda x: x[0])
+        self.assertEqual(merged, [(1, "L1"), (1, "R1"), (2, "R2"), (3, "L2")])
+
+    # --- Core Merge Sort Tests ---
+    def test_merge_sort_empty_and_single(self):
+        self.assertEqual(merge_sort([]), [])
+        self.assertEqual(merge_sort([99]), [99])
+
+    def test_merge_sort_standard(self):
+        self.assertEqual(merge_sort(self.sample), self.expected)
+        self.assertEqual(merge_sort(self.duplicates), sorted(self.duplicates))
+        self.assertEqual(merge_sort(self.negatives), sorted(self.negatives))
+        self.assertEqual(merge_sort(self.floats), sorted(self.floats))
+
+    def test_merge_sort_reverse(self):
+        self.assertEqual(
+            merge_sort(self.sample, reverse=True), sorted(self.sample, reverse=True)
+        )
+        self.assertEqual(
+            merge_sort(self.duplicates, reverse=True),
+            sorted(self.duplicates, reverse=True),
+        )
+
+    def test_merge_sort_key(self):
+        words = ["apple", "fig", "banana", "watermelon", "kiwi"]
+        self.assertEqual(merge_sort(words, key=len), sorted(words, key=len))
+
+    def test_merge_sort_inplace(self):
+        arr = list(self.sample)
+        merge_sort_inplace(arr)
+        self.assertEqual(arr, self.expected)
+
+    def test_merge_sort_type_error(self):
+        with self.assertRaises(TypeError):
+            merge_sort(12345)  # type: ignore
+        with self.assertRaises(TypeError):
+            merge_sort_inplace((1, 2, 3))  # type: ignore
+
+    # --- Profiling Metrics Tests ---
+    def test_merge_sort_metrics(self):
+        arr = [8, 4, 2, 1]
+        sorted_arr, metrics = merge_sort_metrics(arr)
+        self.assertEqual(sorted_arr, [1, 2, 4, 8])
+        self.assertGreater(metrics["comparisons"], 0)
+        self.assertEqual(metrics["merge_operations"], 3)
+        self.assertEqual(metrics["max_recursion_depth"], 3)
+
+    # --- Iterative Bottom-Up Tests ---
+    def test_iterative_merge_sort(self):
+        self.assertEqual(iterative_merge_sort([]), [])
+        self.assertEqual(iterative_merge_sort([5]), [5])
+        self.assertEqual(iterative_merge_sort(self.sample), self.expected)
+        self.assertEqual(
+            iterative_merge_sort(self.sample, reverse=True),
+            sorted(self.sample, reverse=True),
+        )
+
+    def test_iterative_merge_sort_inplace(self):
+        arr = list(self.duplicates)
+        iterative_merge_sort_inplace(arr)
+        self.assertEqual(arr, sorted(self.duplicates))
+
+    # --- Hybrid Merge Sort Tests ---
+    def test_hybrid_merge_sort(self):
+        self.assertEqual(hybrid_merge_sort([]), [])
+        self.assertEqual(hybrid_merge_sort([10]), [10])
+        self.assertEqual(hybrid_merge_sort(self.sample, cutoff=4), self.expected)
+        self.assertEqual(
+            hybrid_merge_sort(self.sample, cutoff=32), self.expected
+        )
+
+    def test_hybrid_merge_sort_inplace(self):
+        arr = list(self.negatives)
+        hybrid_merge_sort_inplace(arr, cutoff=3)
+        self.assertEqual(arr, sorted(self.negatives))
+
+    # --- K-Way Merge Tests ---
+    def test_k_way_merge(self):
+        arrays = [
+            [1, 5, 9],
+            [2, 6, 10],
+            [0, 3, 7, 11],
+            [],
+            [4, 8],
+        ]
+        merged = k_way_merge(arrays)
+        self.assertEqual(merged, list(range(12)))
+
+    def test_k_way_merge_reverse(self):
+        arrays = [
+            [9, 5, 1],
+            [10, 6, 2],
+            [11, 7, 3, 0],
+            [8, 4],
+        ]
+        merged = k_way_merge(arrays, reverse=True)
+        self.assertEqual(merged, list(range(11, -1, -1)))
+
+    def test_k_way_merge_empty(self):
+        self.assertEqual(k_way_merge([]), [])
+        self.assertEqual(k_way_merge([[], []]), [])
+
+    # --- Inversion Counting Tests ---
+    def test_count_inversions(self):
+        # Already sorted: 0 inversions
+        self.assertEqual(count_inversions([1, 2, 3, 4, 5])[0], 0)
+        # Reverse sorted: n*(n-1)/2 inversions
+        self.assertEqual(count_inversions([5, 4, 3, 2, 1])[0], 10)
+        # Arbitrary: [2, 4, 1, 3, 5] -> (2,1), (4,1), (4,3) -> 3 inversions
+        invs, sorted_arr = count_inversions([2, 4, 1, 3, 5])
+        self.assertEqual(invs, 3)
+        self.assertEqual(sorted_arr, [1, 2, 3, 4, 5])
+
+    def test_inversion_distance_metric(self):
+        res = inversion_distance_metric([3, 2, 1])
+        self.assertEqual(res["inversion_count"], 3)
+        self.assertEqual(res["max_possible_inversions"], 3)
+        self.assertEqual(res["unsortedness_ratio"], 1.0)
+        self.assertTrue(res["is_reverse_sorted"])
+
+    # --- Trace Visualizer Tests ---
+    def test_trace_and_render_merge(self):
+        trace = trace_merge_sort([38, 27, 43, 3])
+        self.assertGreater(len(trace), 0)
+        rendered = render_merge_trace(trace)
+        self.assertIn("MERGE SORT RECURSION TRACE VISUALIZER", rendered)
+        self.assertIn("Final Globally Sorted State: [3, 27, 38, 43]", rendered)
+
+    # --- Stability Verification Tests ---
+    def test_verify_merge_sort_stability(self):
+        report = verify_merge_sort_stability()
+        self.assertTrue(report["is_stable"])
+        self.assertTrue(report["all_variants_passed"])
+
+    # --- Performance Benchmark Tests ---
+    def test_analyze_merge_sort_benchmarks(self):
+        report = analyze_merge_sort_benchmarks([10, 20])
+        self.assertEqual(len(report), 2)
+        for r in report:
+            self.assertIn("hybrid_speedup", r)
+
+
+
 
 
 
