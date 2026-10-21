@@ -617,5 +617,119 @@ def inversion_distance_metric(arr: List[Any]) -> Dict[str, Any]:
     }
 
 
+# ─── 6. Divide-and-Conquer Step-by-Step Trace Visualizer ──────────────────────
+
+
+def trace_merge_sort(
+    arr: List[Any],
+    reverse: bool = False,
+) -> List[Dict[str, Any]]:
+    """
+    Executes Merge Sort and returns a complete hierarchical trace of divide steps and merge steps.
+
+    Args:
+        arr: Input sequence.
+        reverse: If True, sorts descending.
+
+    Returns:
+        List of chronological trace event dictionaries.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    events = []
+    step_counter = 0
+
+    def _trace(sub: List[Any], depth: int, path: str) -> List[Any]:
+        nonlocal step_counter
+        m = len(sub)
+        if m <= 1:
+            step_counter += 1
+            events.append({
+                "step": step_counter,
+                "type": "BASE_CASE",
+                "depth": depth,
+                "path": path,
+                "input": list(sub),
+                "output": list(sub),
+                "description": f"Depth {depth} ({path}): Base case element {sub}",
+            })
+            return list(sub)
+
+        mid = m // 2
+        step_counter += 1
+        left_sub = sub[:mid]
+        right_sub = sub[mid:]
+
+        events.append({
+            "step": step_counter,
+            "type": "DIVIDE",
+            "depth": depth,
+            "path": path,
+            "input": list(sub),
+            "left_split": list(left_sub),
+            "right_split": list(right_sub),
+            "description": f"Depth {depth} ({path}): Divide {sub} into {left_sub} and {right_sub}",
+        })
+
+        sorted_left = _trace(left_sub, depth + 1, path + "L")
+        sorted_right = _trace(right_sub, depth + 1, path + "R")
+
+        merged = merge(sorted_left, sorted_right, reverse=reverse)
+        step_counter += 1
+        events.append({
+            "step": step_counter,
+            "type": "MERGE",
+            "depth": depth,
+            "path": path,
+            "left_sorted": sorted_left,
+            "right_sorted": sorted_right,
+            "output": list(merged),
+            "description": f"Depth {depth} ({path}): Merged {sorted_left} and {sorted_right} -> {merged}",
+        })
+        return merged
+
+    _trace(list(arr), depth=1, path="root")
+    return events
+
+
+def render_merge_trace(trace: List[Dict[str, Any]]) -> str:
+    """
+    Renders trace events into an indented ASCII recursion and merge diagram.
+
+    Args:
+        trace: Events list from trace_merge_sort.
+
+    Returns:
+        Multi-line formatted string.
+    """
+    if not trace:
+        return "Array has <= 1 elements; trivial base case."
+
+    lines = []
+    lines.append("=" * 74)
+    lines.append("        DIVIDE-AND-CONQUER MERGE SORT RECURSION TRACE VISUALIZER       ")
+    lines.append("=" * 74)
+
+    for ev in trace:
+        step = ev["step"]
+        depth = ev["depth"]
+        ev_type = ev["type"]
+        desc = ev["description"]
+
+        indent = "  " * (depth - 1)
+        tag = f"[{ev_type:<9}]"
+        lines.append(f"{indent}{tag} Step {step:<2} | {desc}")
+
+    final_merges = [e for e in trace if e["type"] == "MERGE"]
+    final_output = final_merges[-1]["output"] if final_merges else trace[0]["output"]
+
+    lines.append("-" * 74)
+    lines.append(f"Final Globally Sorted State: {final_output}")
+    lines.append("=" * 74)
+    return "\n".join(lines)
+
+
+
 
 
