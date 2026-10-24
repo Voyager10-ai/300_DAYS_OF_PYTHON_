@@ -1048,6 +1048,86 @@ class TestQuickSort(unittest.TestCase):
             self.assertIn("hoare_swap_reduction_ratio", r)
 
 
+# ─── 9. Interactive CLI Demonstration ─────────────────────────────────────────
+
+
+def main() -> None:
+    """Runs an interactive demonstration of Quick Sort and its advanced algorithmic variations."""
+    print("=" * 74)
+    print("  DAY 83: QUICK SORT (PARTITIONING & ORDER STATISTICS) IMPLEMENTATION")
+    print("=" * 74)
+
+    sample = [38, 27, 43, 3, 9, 82, 10, 19, 50, 1]
+
+    # 1. Core Quick Sort & Schemes
+    print("\n[1] Core Quick Sort Execution (Hoare vs Lomuto):")
+    sorted_hoare, h_metrics = quick_sort_metrics(sample, scheme="hoare")
+    sorted_lomuto, l_metrics = quick_sort_metrics(sample, scheme="lomuto")
+    print(f"  Input Sequence   : {sample}")
+    print(f"  Hoare Sorted     : {sorted_hoare}")
+    print(f"  Hoare Metrics    : Comparisons = {h_metrics['comparisons']}, Swaps = {h_metrics['swaps']}, Max Depth = {h_metrics['max_depth']}")
+    print(f"  Lomuto Metrics   : Comparisons = {l_metrics['comparisons']}, Swaps = {l_metrics['swaps']}, Max Depth = {l_metrics['max_depth']}")
+    print(f"  Hoare Swap Ratio : Lomuto performed {l_metrics['swaps'] / max(1, h_metrics['swaps']):.2f}x as many swaps as Hoare!")
+
+    # 2. Pivot Selection Strategies
+    print("\n[2] Robust Pivot Selection (Median-of-Three):")
+    sorted_piv = quick_sort_with_pivot(sample, strategy="median_of_three")
+    print(f"  Median-of-Three  : {sorted_piv}")
+
+    # 3. 3-Way Quick Sort on Duplicates
+    print("\n[3] Dutch National Flag 3-Way Quick Sort on Duplicates:")
+    dup_sample = [4, 2, 4, 1, 4, 3, 4, 2, 4]
+    sorted_3way = quick_sort_3way(dup_sample)
+    print(f"  Input with Dups  : {dup_sample}")
+    print(f"  3-Way Sorted     : {sorted_3way}")
+
+    # 4. Quickselect Order Statistics
+    print("\n[4] Quickselect O(n) Order Statistics:")
+    dataset = [7, 10, 4, 3, 20, 15]
+    print(f"  Dataset          : {dataset}")
+    print(f"  1st Smallest     : {quickselect(dataset, 1)}")
+    print(f"  3rd Smallest     : {quickselect(dataset, 3)}")
+    print(f"  1st Largest      : {quickselect(dataset, 1, reverse=True)}")
+    print(f"  Median Element   : {find_median_via_quickselect(dataset)}")
+
+    # 5. Iterative Quick Sort
+    print("\n[5] Iterative Quick Sort (Explicit Stack with O(log n) Space Bound):")
+    iter_sorted = iterative_quick_sort(sample)
+    print(f"  Iterative Sorted : {iter_sorted}")
+
+    # 6. Step-by-Step Visual Trace
+    print("\n[6] Partitioning Step-by-Step Visual Trace:")
+    trace = trace_quick_sort([29, 10, 14, 37, 13], scheme="lomuto")
+    print(render_quick_trace(trace))
+
+    # 7. Instability Proof
+    print("\n[7] Quick Sort Instability Proof:")
+    instab = verify_quick_sort_instability()
+    print(f"  Is Quick Sort stable? {instab['is_stable']}")
+    for idx, c in enumerate(instab["cases"], 1):
+        print(f"  Case {idx}: Input={c['input']}")
+        print(f"          Lomuto Result={c['lomuto_output']}")
+        print(f"          Unstable detected? {c['lomuto_unstable']}")
+
+    # 8. Performance Benchmark
+    print("\n[8] Performance Benchmark & Swap Optimization Analytics:")
+    benchmarks = analyze_quick_sort_benchmarks([20, 50, 100, 200])
+    print(f"  {'Size n':<8} | {'Hoare Comps':<12} | {'Lomuto Comps':<13} | {'Hoare Swaps':<12} | {'Lomuto Swaps':<13} | {'Swap Ratio':<10}")
+    print("  " + "-" * 78)
+    for b in benchmarks:
+        print(
+            f"  {b['size']:<8} | {b['hoare_comparisons']:<12} | {b['lomuto_comparisons']:<13} | "
+            f"{b['hoare_swaps']:<12} | {b['lomuto_swaps']:<13} | "
+            f"{b['hoare_swap_reduction_ratio']}x"
+        )
+    print("\nDemonstration complete.")
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 
