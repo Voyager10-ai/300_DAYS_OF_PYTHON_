@@ -387,3 +387,118 @@ def quick_sort_with_pivot(
     _quick_sort(0, n - 1)
     return items
 
+
+# ─── 3. Dutch National Flag 3-Way Quick Sort (Dijkstra's Fat Partition) ────────
+
+
+def dutch_flag_partition(
+    arr: List[Any],
+    low: int,
+    high: int,
+    reverse: bool = False,
+    key: Optional[Callable[[Any], Any]] = None,
+) -> Tuple[int, int]:
+    """
+    Dijkstra's 3-way Dutch National Flag partition.
+    Partitions arr[low..high] into three contiguous sub-slices:
+      - arr[low..lt-1]   : elements strictly less than pivot (or greater if reverse)
+      - arr[lt..gt]       : elements strictly equal to pivot
+      - arr[gt+1..high]  : elements strictly greater than pivot (or less if reverse)
+
+    Args:
+        arr: Mutable list.
+        low: Start index.
+        high: End index.
+        reverse: If True, partitions for descending order.
+        key: Key projection function.
+
+    Returns:
+        Tuple of (lt, gt) boundaries.
+    """
+    key_func = key if key is not None else (lambda x: x)
+    pivot_val = key_func(arr[low])
+    lt = low
+    gt = high
+    i = low + 1
+
+    while i <= gt:
+        val_i = key_func(arr[i])
+        if not reverse:
+            if val_i < pivot_val:
+                arr[lt], arr[i] = arr[i], arr[lt]
+                lt += 1
+                i += 1
+            elif val_i > pivot_val:
+                arr[i], arr[gt] = arr[gt], arr[i]
+                gt -= 1
+            else:
+                i += 1
+        else:
+            if val_i > pivot_val:
+                arr[lt], arr[i] = arr[i], arr[lt]
+                lt += 1
+                i += 1
+            elif val_i < pivot_val:
+                arr[i], arr[gt] = arr[gt], arr[i]
+                gt -= 1
+            else:
+                i += 1
+
+    return (lt, gt)
+
+
+def quick_sort_3way(
+    arr: List[Any],
+    reverse: bool = False,
+    key: Optional[Callable[[Any], Any]] = None,
+) -> List[Any]:
+    """
+    Sorts a sequence using 3-Way Quick Sort (pure function).
+    Achieves O(n) linear performance on inputs with many duplicate keys,
+    avoiding the O(n^2) degradation of standard 2-way quicksort.
+
+    Args:
+        arr: Input sequence.
+        reverse: If True, sorts descending.
+        key: Comparison key function.
+
+    Returns:
+        New sorted list.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    copied = list(arr)
+    quick_sort_3way_inplace(copied, reverse=reverse, key=key)
+    return copied
+
+
+def quick_sort_3way_inplace(
+    arr: List[Any],
+    reverse: bool = False,
+    key: Optional[Callable[[Any], Any]] = None,
+) -> None:
+    """
+    Sorts a mutable list in-place using 3-way Dutch National Flag Quick Sort.
+
+    Args:
+        arr: Mutable list.
+        reverse: If True, sorts descending.
+        key: Comparison key function.
+    """
+    if not isinstance(arr, list):
+        raise TypeError(f"Expected mutable list, got {type(arr).__name__}")
+
+    n = len(arr)
+    if n <= 1:
+        return
+
+    def _sort(low: int, high: int) -> None:
+        if low < high:
+            lt, gt = dutch_flag_partition(arr, low, high, reverse=reverse, key=key)
+            _sort(low, lt - 1)
+            _sort(gt + 1, high)
+
+    _sort(0, n - 1)
+
+
