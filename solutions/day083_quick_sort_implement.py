@@ -287,3 +287,103 @@ def quick_sort_metrics(
         "length": n,
     }
     return (items, metrics)
+
+
+# ─── 2. Randomized & Median-of-Three Pivot Selection Strategies ───────────────
+
+
+def select_pivot_index(
+    arr: List[Any],
+    low: int,
+    high: int,
+    strategy: str = "median_of_three",
+    key: Optional[Callable[[Any], Any]] = None,
+) -> int:
+    """
+    Selects a pivot index based on strategy to prevent O(n^2) worst-case degradation.
+
+    Strategies:
+      - 'first': Returns low.
+      - 'last': Returns high.
+      - 'random': Returns uniform random index in [low, high].
+      - 'median_of_three': Inspects arr[low], arr[mid], arr[high] and returns the index
+                           of the median element. Standard in production sorts (qsort/Introsort).
+
+    Args:
+        arr: Sequence of elements.
+        low: Sub-array lower bound.
+        high: Sub-array upper bound.
+        strategy: 'median_of_three', 'random', 'first', or 'last'.
+        key: Key projection function.
+
+    Returns:
+        Index of the chosen pivot.
+
+    Raises:
+        ValueError: If strategy is unrecognized.
+    """
+    strat = strategy.lower().strip()
+    if strat == "first":
+        return low
+    elif strat == "last":
+        return high
+    elif strat == "random":
+        return random.randint(low, high)
+    elif strat == "median_of_three":
+        mid = low + (high - low) // 2
+        key_func = key if key is not None else (lambda x: x)
+        a = key_func(arr[low])
+        b = key_func(arr[mid])
+        c = key_func(arr[high])
+
+        # Find median of {a, b, c}
+        if (a <= b <= c) or (c <= b <= a):
+            return mid
+        elif (b <= a <= c) or (c <= a <= b):
+            return low
+        else:
+            return high
+    else:
+        raise ValueError(f"Unknown pivot strategy: {strategy}")
+
+
+def quick_sort_with_pivot(
+    arr: List[Any],
+    strategy: str = "median_of_three",
+    reverse: bool = False,
+    key: Optional[Callable[[Any], Any]] = None,
+) -> List[Any]:
+    """
+    Pure Quick Sort applying a specified pivot selection strategy.
+    Prevents degenerate O(n^2) complexity on sorted or adversarial inputs.
+
+    Args:
+        arr: Input sequence.
+        strategy: 'median_of_three', 'random', 'first', or 'last'.
+        reverse: If True, sorts descending.
+        key: Comparison key function.
+
+    Returns:
+        New sorted list.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    items = list(arr)
+    n = len(items)
+    if n <= 1:
+        return items
+
+    def _quick_sort(low: int, high: int) -> None:
+        if low < high:
+            # Select pivot and swap with low to integrate with Hoare partition
+            pivot_idx = select_pivot_index(items, low, high, strategy=strategy, key=key)
+            items[low], items[pivot_idx] = items[pivot_idx], items[low]
+
+            p = hoare_partition(items, low, high, reverse=reverse, key=key)
+            _quick_sort(low, p)
+            _quick_sort(p + 1, high)
+
+    _quick_sort(0, n - 1)
+    return items
+
