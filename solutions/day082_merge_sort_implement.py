@@ -1004,6 +1004,88 @@ class TestMergeSort(unittest.TestCase):
             self.assertIn("hybrid_speedup", r)
 
 
+# ─── 9. Interactive CLI Demonstration ─────────────────────────────────────────
+
+
+def main() -> None:
+    """Runs a comprehensive demonstration of Merge Sort and all algorithmic variations."""
+    print("=" * 74)
+    print("  DAY 82: MERGE SORT (DIVIDE-AND-CONQUER) IMPLEMENTATION")
+    print("=" * 74)
+
+    sample = [38, 27, 43, 3, 9, 82, 10, 19, 50, 1]
+
+    # 1. Top-Down Merge Sort & Metrics
+    print("\n[1] Top-Down Recursive Merge Sort:")
+    sorted_sample, metrics = merge_sort_metrics(sample)
+    print(f"  Input Sequence      : {sample}")
+    print(f"  Sorted Output       : {sorted_sample}")
+    print(f"  Comparisons         : {metrics['comparisons']}")
+    print(f"  Merge Operations    : {metrics['merge_operations']}")
+    print(f"  Max Recursion Depth : {metrics['max_recursion_depth']}")
+
+    # 2. Bottom-Up Iterative Merge Sort
+    print("\n[2] Bottom-Up Iterative Merge Sort (Zero Call-Stack Overhead):")
+    bu_sorted = iterative_merge_sort(sample)
+    print(f"  Iterative Sorted    : {bu_sorted}")
+
+    # 3. Hybrid Merge Sort with Skip-Merge
+    print("\n[3] Hybrid Merge Sort (Cutoff = 4 + Skip-Merge Optimization):")
+    hybrid_sorted = hybrid_merge_sort(sample, cutoff=4)
+    print(f"  Hybrid Sorted       : {hybrid_sorted}")
+
+    # 4. K-Way Stream Merge
+    print("\n[4] K-Way Merge for Multi-Stream Sorting:")
+    streams = [
+        [10, 25, 40],
+        [5, 20, 35, 50],
+        [2, 12, 22, 32],
+        [1, 9, 15],
+    ]
+    for idx, s in enumerate(streams, 1):
+        print(f"  Stream {idx}: {s}")
+    k_merged = k_way_merge(streams)
+    print(f"  Consolidated Output : {k_merged}")
+
+    # 5. Inversion Counting Metric
+    print("\n[5] Inversion Counting & Kendall's Tau Distance Metric:")
+    test_arr = [8, 4, 2, 1]
+    inv_info = inversion_distance_metric(test_arr)
+    print(f"  Dataset             : {test_arr}")
+    print(f"  Inversions Count    : {inv_info['inversion_count']}")
+    print(f"  Max Inversions      : {inv_info['max_possible_inversions']}")
+    print(f"  Unsortedness Ratio  : {inv_info['unsortedness_ratio'] * 100:.1f}%")
+
+    # 6. Step-by-Step Divide & Conquer Visual Trace
+    print("\n[6] Divide-and-Conquer Recursion Visual Trace:")
+    trace = trace_merge_sort([38, 27, 43, 3])
+    print(render_merge_trace(trace))
+
+    # 7. Stability Verification Report
+    print("\n[7] Algorithmic Stability Verification:")
+    stab_rep = verify_merge_sort_stability()
+    print(f"  Is Merge Sort strictly stable? {stab_rep['is_stable']}")
+    print(f"  All variant test cases passed: {stab_rep['all_variants_passed']}")
+
+    # 8. Performance Benchmark & Speedup Analytics
+    print("\n[8] Performance Benchmark & Hybrid Speedup Analytics:")
+    benchmarks = analyze_merge_sort_benchmarks([20, 50, 100, 200])
+    print(f"  {'Size n':<8} | {'Comps':<8} | {'Depth':<6} | {'Top-Down us':<12} | {'Bottom-Up us':<13} | {'Hybrid us':<10} | {'Speedup':<8}")
+    print("  " + "-" * 74)
+    for b in benchmarks:
+        print(
+            f"  {b['size']:<8} | {b['random_comparisons']:<8} | {b['max_recursion_depth']:<6} | "
+            f"{b['top_down_us']:<12} | {b['bottom_up_us']:<13} | {b['hybrid_us']:<10} | "
+            f"{b['hybrid_speedup']}x"
+        )
+    print("\nDemonstration complete.")
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 
