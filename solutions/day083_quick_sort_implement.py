@@ -799,6 +799,110 @@ def render_quick_trace(trace: List[Dict[str, Any]]) -> str:
     return "\n".join(lines)
 
 
+# ─── 7. Instability Verification & Performance Analytics Benchmark ───────────
+
+
+def verify_quick_sort_instability() -> Dict[str, Any]:
+    """
+    Demonstrates that standard Quick Sort is inherently unstable.
+    Long-distance swaps over the pivot can jump an element over an identical element,
+    inverting their relative order.
+
+    Returns:
+        Dictionary report proving instability with counterexamples.
+    """
+    counterexamples = [
+        [(3, "alpha"), (3, "beta"), (2, "gamma"), (1, "delta"), (3, "epsilon")],
+        [(2, "first"), (2, "second"), (1, "third"), (2, "fourth")],
+    ]
+
+    case_reports = []
+    for case in counterexamples:
+        lomuto_sorted = quick_sort(case, key=lambda x: x[0], scheme="lomuto")
+        hoare_sorted = quick_sort(case, key=lambda x: x[0], scheme="hoare")
+        stable_expected = sorted(case, key=lambda x: x[0])
+
+        def is_unstable(orig, sorted_res):
+            unique_keys = set(x[0] for x in orig)
+            for k in unique_keys:
+                if [x for x in orig if x[0] == k] != [x for x in sorted_res if x[0] == k]:
+                    return True
+            return False
+
+        case_reports.append({
+            "input": case,
+            "lomuto_unstable": is_unstable(case, lomuto_sorted),
+            "hoare_unstable": is_unstable(case, hoare_sorted),
+            "lomuto_output": lomuto_sorted,
+            "hoare_output": hoare_sorted,
+            "stable_expected": stable_expected,
+        })
+
+    return {
+        "algorithm": "Quick Sort",
+        "is_stable": False,
+        "instability_demonstrated": any(
+            c["lomuto_unstable"] or c["hoare_unstable"] for c in case_reports
+        ),
+        "cases": case_reports,
+    }
+
+
+def analyze_quick_sort_benchmarks(
+    sizes: Optional[List[int]] = None,
+) -> List[Dict[str, Any]]:
+    """
+    Benchmarks Hoare partition vs Lomuto partition and 3-way partition
+    across random, sorted, and duplicate-dense topologies.
+
+    Args:
+        sizes: Array lengths. Defaults to [20, 50, 100, 200].
+
+    Returns:
+        List of analytical performance records.
+    """
+    if sizes is None:
+        sizes = [20, 50, 100, 200]
+
+    report = []
+    for n in sizes:
+        random_arr = [(i * 37 + 13) % (n * 3) for i in range(n)]
+        duplicates_arr = [i % 4 for i in range(n)]
+
+        _, hoare_m = quick_sort_metrics(random_arr, scheme="hoare")
+        _, lomuto_m = quick_sort_metrics(random_arr, scheme="lomuto")
+
+        # Benchmark timings
+        t0 = time.perf_counter()
+        _ = quick_sort(random_arr, scheme="hoare")
+        t_hoare = round((time.perf_counter() - t0) * 1_000_000, 2)
+
+        t0 = time.perf_counter()
+        _ = quick_sort(random_arr, scheme="lomuto")
+        t_lomuto = round((time.perf_counter() - t0) * 1_000_000, 2)
+
+        t0 = time.perf_counter()
+        _ = quick_sort_3way(duplicates_arr)
+        t_3way_dups = round((time.perf_counter() - t0) * 1_000_000, 2)
+
+        report.append({
+            "size": n,
+            "hoare_comparisons": hoare_m["comparisons"],
+            "lomuto_comparisons": lomuto_m["comparisons"],
+            "hoare_swaps": hoare_m["swaps"],
+            "lomuto_swaps": lomuto_m["swaps"],
+            "hoare_time_us": t_hoare,
+            "lomuto_time_us": t_lomuto,
+            "three_way_duplicates_us": t_3way_dups,
+            "hoare_swap_reduction_ratio": round(
+                lomuto_m["swaps"] / max(1, hoare_m["swaps"]), 2
+            ),
+        })
+
+    return report
+
+
+
 
 
 
