@@ -502,3 +502,102 @@ def quick_sort_3way_inplace(
     _sort(0, n - 1)
 
 
+# ─── 4. Iterative Quick Sort & Tail-Call Optimization ─────────────────────────
+
+
+def iterative_quick_sort(
+    arr: List[Any],
+    reverse: bool = False,
+    key: Optional[Callable[[Any], Any]] = None,
+) -> List[Any]:
+    """
+    Non-recursive Quick Sort using an explicit stack of sub-array bounds.
+    Guarantees O(log n) maximum stack space by always pushing the larger partition
+    to the stack and evaluating the smaller partition first.
+    Completely avoids Python's recursion limit.
+
+    Args:
+        arr: Input sequence.
+        reverse: If True, sorts descending.
+        key: Comparison key function.
+
+    Returns:
+        New sorted list.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    items = list(arr)
+    n = len(items)
+    if n <= 1:
+        return items
+
+    stack: List[Tuple[int, int]] = [(0, n - 1)]
+
+    while stack:
+        low, high = stack.pop()
+        if low >= high:
+            continue
+
+        p = hoare_partition(items, low, high, reverse=reverse, key=key)
+
+        left_len = p - low + 1
+        right_len = high - (p + 1) + 1
+
+        # Push larger partition first so smaller partition is processed immediately,
+        # guaranteeing O(log n) maximum stack space
+        if left_len > right_len:
+            if low < p:
+                stack.append((low, p))
+            if p + 1 < high:
+                stack.append((p + 1, high))
+        else:
+            if p + 1 < high:
+                stack.append((p + 1, high))
+            if low < p:
+                stack.append((low, p))
+
+    return items
+
+
+def quick_sort_tail_optimized(
+    arr: List[Any],
+    reverse: bool = False,
+    key: Optional[Callable[[Any], Any]] = None,
+) -> List[Any]:
+    """
+    Tail-call optimized recursive Quick Sort.
+    Recourses only on the smaller subproblem while iterating on the larger one,
+    strictly bounding call-stack depth to O(log n).
+
+    Args:
+        arr: Input sequence.
+        reverse: If True, sorts descending.
+        key: Comparison key projection.
+
+    Returns:
+        New sorted list.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    items = list(arr)
+    n = len(items)
+    if n <= 1:
+        return items
+
+    def _tail_sort(low: int, high: int) -> None:
+        while low < high:
+            p = hoare_partition(items, low, high, reverse=reverse, key=key)
+            if (p - low) < (high - p):
+                _tail_sort(low, p)
+                low = p + 1  # Tail loop on larger right subproblem
+            else:
+                _tail_sort(p + 1, high)
+                high = p     # Tail loop on larger left subproblem
+
+    _tail_sort(0, n - 1)
+    return items
+
+
+
