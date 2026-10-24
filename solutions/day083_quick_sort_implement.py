@@ -684,5 +684,121 @@ def find_median_via_quickselect(
     return quickselect(arr, k=mid_k, reverse=False, key=key)
 
 
+# ─── 6. Partition Step-by-Step Trace Visualizer ───────────────────────────────
+
+
+def trace_quick_sort(
+    arr: List[Any],
+    reverse: bool = False,
+    scheme: str = "lomuto",
+) -> List[Dict[str, Any]]:
+    """
+    Executes Quick Sort while recording step-by-step diagnostic partition events.
+
+    Args:
+        arr: Sequence of items.
+        reverse: If True, sorts descending.
+        scheme: 'lomuto' or 'hoare'.
+
+    Returns:
+        List of chronological partition trace events.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    items = list(arr)
+    n = len(items)
+    events = []
+    step_num = 0
+
+    def _trace(low: int, high: int, depth: int) -> None:
+        nonlocal step_num
+        if low < high:
+            step_num += 1
+            before = list(items)
+
+            if scheme.lower() == "lomuto":
+                p = lomuto_partition(items, low, high, reverse=reverse)
+                pivot_val = items[p]
+                desc = (
+                    f"Depth {depth}: Lomuto partitioned items[{low}..{high}] around pivot {pivot_val} "
+                    f"at index {p}."
+                )
+                events.append({
+                    "step": step_num,
+                    "depth": depth,
+                    "low": low,
+                    "high": high,
+                    "pivot_index": p,
+                    "pivot_value": pivot_val,
+                    "state_before": before,
+                    "state_after": list(items),
+                    "description": desc,
+                })
+                _trace(low, p - 1, depth + 1)
+                _trace(p + 1, high, depth + 1)
+            else:
+                p = hoare_partition(items, low, high, reverse=reverse)
+                desc = (
+                    f"Depth {depth}: Hoare split items[{low}..{high}] at boundary index {p}."
+                )
+                events.append({
+                    "step": step_num,
+                    "depth": depth,
+                    "low": low,
+                    "high": high,
+                    "pivot_index": p,
+                    "pivot_value": items[p],
+                    "state_before": before,
+                    "state_after": list(items),
+                    "description": desc,
+                })
+                _trace(low, p, depth + 1)
+                _trace(p + 1, high, depth + 1)
+
+    _trace(0, n - 1, depth=1)
+    return events
+
+
+def render_quick_trace(trace: List[Dict[str, Any]]) -> str:
+    """
+    Renders trace events into an indented ASCII partitioning execution log.
+
+    Args:
+        trace: Events list from trace_quick_sort.
+
+    Returns:
+        Multi-line formatted string.
+    """
+    if not trace:
+        return "Array has <= 1 elements; no partition steps required."
+
+    lines = []
+    lines.append("=" * 74)
+    lines.append("            QUICK SORT DIVIDE-AND-CONQUER PARTITION TRACE        ")
+    lines.append("=" * 74)
+
+    initial = trace[0]["state_before"]
+    lines.append(f"Initial State : {initial}")
+    lines.append("-" * 74)
+
+    for ev in trace:
+        step = ev["step"]
+        depth = ev["depth"]
+        desc = ev["description"]
+        after = ev["state_after"]
+
+        indent = "  " * (depth - 1)
+        lines.append(f"{indent}[Step {step:<2}] {desc}")
+        lines.append(f"{indent}         Array state: {after}")
+
+    final = trace[-1]["state_after"]
+    lines.append("-" * 74)
+    lines.append(f"Final Sorted State: {final}")
+    lines.append("=" * 74)
+    return "\n".join(lines)
+
+
+
 
 
