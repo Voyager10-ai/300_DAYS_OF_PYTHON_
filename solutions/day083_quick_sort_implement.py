@@ -600,4 +600,89 @@ def quick_sort_tail_optimized(
     return items
 
 
+# ─── 5. Quickselect (Hoare's Selection Algorithm for Order Statistics) ────────
+
+
+def quickselect(
+    arr: List[Any],
+    k: int,
+    reverse: bool = False,
+    key: Optional[Callable[[Any], Any]] = None,
+) -> Any:
+    """
+    Finds the k-th smallest (or largest if reverse=True) element in average O(n) time.
+    Uses Lomuto partitioning to place the pivot at its exact sorted index,
+    recursing only into the single partition containing index k - 1.
+
+    Args:
+        arr: Sequence of items.
+        k: 1-indexed order statistic (1 <= k <= len(arr)).
+        reverse: If True, finds k-th largest element.
+        key: Optional comparison projection.
+
+    Returns:
+        The k-th element in sorted order.
+
+    Raises:
+        TypeError: If arr is not list or tuple.
+        ValueError: If k is out of bounds [1, len(arr)].
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    n = len(arr)
+    if k < 1 or k > n:
+        raise ValueError(f"k must be in range [1, {n}], got {k}")
+
+    items = list(arr)
+    target_idx = k - 1
+    low = 0
+    high = n - 1
+
+    while low <= high:
+        if low == high:
+            return items[low]
+
+        # Use median-of-three for robust partitioning
+        pivot_idx = select_pivot_index(items, low, high, strategy="median_of_three", key=key)
+        items[pivot_idx], items[high] = items[high], items[pivot_idx]
+
+        p = lomuto_partition(items, low, high, reverse=reverse, key=key)
+
+        if p == target_idx:
+            return items[p]
+        elif p > target_idx:
+            high = p - 1
+        else:
+            low = p + 1
+
+    return items[target_idx]
+
+
+def find_median_via_quickselect(
+    arr: List[Any],
+    key: Optional[Callable[[Any], Any]] = None,
+) -> Any:
+    """
+    Finds the median element in O(n) average time using Quickselect.
+    For even lengths, returns the lower median element (len(arr) // 2).
+
+    Args:
+        arr: Non-empty sequence of items.
+        key: Comparison key function.
+
+    Returns:
+        The median item.
+
+    Raises:
+        ValueError: If arr is empty.
+    """
+    if not arr:
+        raise ValueError("Cannot find median of empty sequence")
+    n = len(arr)
+    mid_k = (n + 1) // 2
+    return quickselect(arr, k=mid_k, reverse=False, key=key)
+
+
+
 
