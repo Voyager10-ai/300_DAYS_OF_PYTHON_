@@ -97,7 +97,7 @@
     {"day": 79, "title": "Insertion Sort Implement", "status": "done"},
     {"day": 80, "title": "Selection Sort Implement", "status": "done"},
     {"day": 81, "title": "Shell Sort Implement", "status": "done"},
-    {"day": 82, "title": "Merge Sort Implement", "status": "pending"},
+    {"day": 82, "title": "Merge Sort Implement", "status": "done"},
     {"day": 83, "title": "Quick Sort Implement", "status": "pending"},
     {"day": 84, "title": "Sequential Search", "status": "pending"},
     {"day": 85, "title": "Binary Search Implement", "status": "pending"},
