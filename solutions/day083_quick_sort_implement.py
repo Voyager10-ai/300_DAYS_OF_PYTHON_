@@ -902,6 +902,153 @@ def analyze_quick_sort_benchmarks(
     return report
 
 
+# ─── 8. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestQuickSort(unittest.TestCase):
+    """Exhaustive unit test suite covering Quick Sort algorithms and edge cases."""
+
+    def setUp(self):
+        self.sample = [38, 27, 43, 3, 9, 82, 10]
+        self.expected = sorted(self.sample)
+        self.duplicates = [5, 2, 8, 2, 5, 1, 9, 1, 8]
+        self.all_same = [7, 7, 7, 7, 7, 7]
+        self.negatives = [-15, 30, -2, 0, 18, -45, 9]
+        self.floats = [3.14, 1.41, 2.71, 0.58, 1.73]
+
+    # --- Core Tests ---
+    def test_quick_sort_empty_and_single(self):
+        self.assertEqual(quick_sort([]), [])
+        self.assertEqual(quick_sort([42]), [42])
+
+    def test_quick_sort_standard(self):
+        self.assertEqual(quick_sort(self.sample), self.expected)
+        self.assertEqual(quick_sort(self.duplicates), sorted(self.duplicates))
+        self.assertEqual(quick_sort(self.all_same), self.all_same)
+        self.assertEqual(quick_sort(self.negatives), sorted(self.negatives))
+        self.assertEqual(quick_sort(self.floats), sorted(self.floats))
+
+    def test_quick_sort_reverse(self):
+        self.assertEqual(
+            quick_sort(self.sample, reverse=True), sorted(self.sample, reverse=True)
+        )
+        self.assertEqual(
+            quick_sort(self.duplicates, reverse=True),
+            sorted(self.duplicates, reverse=True),
+        )
+
+    def test_quick_sort_key(self):
+        words = ["apple", "fig", "banana", "watermelon", "kiwi"]
+        self.assertEqual(quick_sort(words, key=len), sorted(words, key=len))
+
+    def test_quick_sort_inplace(self):
+        arr = list(self.sample)
+        quick_sort_inplace(arr)
+        self.assertEqual(arr, self.expected)
+
+    def test_quick_sort_schemes(self):
+        for scheme in ["hoare", "lomuto"]:
+            self.assertEqual(quick_sort(self.sample, scheme=scheme), self.expected)
+
+    def test_quick_sort_invalid_inputs(self):
+        with self.assertRaises(TypeError):
+            quick_sort(12345)  # type: ignore
+        with self.assertRaises(TypeError):
+            quick_sort_inplace((1, 2, 3))  # type: ignore
+        with self.assertRaises(ValueError):
+            quick_sort(self.sample, scheme="invalid_scheme")
+
+    # --- Metrics Tests ---
+    def test_quick_sort_metrics(self):
+        sorted_arr, metrics = quick_sort_metrics(self.sample, scheme="hoare")
+        self.assertEqual(sorted_arr, self.expected)
+        self.assertGreater(metrics["comparisons"], 0)
+        self.assertGreater(metrics["max_depth"], 0)
+
+    # --- Pivot Strategy Tests ---
+    def test_select_pivot_index(self):
+        arr = [10, 50, 30]
+        self.assertEqual(select_pivot_index(arr, 0, 2, strategy="first"), 0)
+        self.assertEqual(select_pivot_index(arr, 0, 2, strategy="last"), 2)
+        # Median of 10, 50, 30 is 30 at index 2
+        self.assertEqual(select_pivot_index(arr, 0, 2, strategy="median_of_three"), 2)
+        rand_idx = select_pivot_index(arr, 0, 2, strategy="random")
+        self.assertTrue(0 <= rand_idx <= 2)
+
+    def test_quick_sort_with_pivot(self):
+        for strat in ["median_of_three", "random", "first", "last"]:
+            self.assertEqual(
+                quick_sort_with_pivot(self.sample, strategy=strat), self.expected
+            )
+
+    # --- Dutch Flag 3-Way Tests ---
+    def test_quick_sort_3way(self):
+        self.assertEqual(quick_sort_3way(self.all_same), self.all_same)
+        self.assertEqual(quick_sort_3way(self.duplicates), sorted(self.duplicates))
+        self.assertEqual(
+            quick_sort_3way(self.duplicates, reverse=True),
+            sorted(self.duplicates, reverse=True),
+        )
+
+    # --- Iterative & Tail-Call Tests ---
+    def test_iterative_quick_sort(self):
+        self.assertEqual(iterative_quick_sort([]), [])
+        self.assertEqual(iterative_quick_sort(self.sample), self.expected)
+        self.assertEqual(
+            iterative_quick_sort(self.sample, reverse=True),
+            sorted(self.sample, reverse=True),
+        )
+
+    def test_quick_sort_tail_optimized(self):
+        self.assertEqual(quick_sort_tail_optimized(self.sample), self.expected)
+
+    # --- Quickselect Tests ---
+    def test_quickselect(self):
+        arr = [7, 10, 4, 3, 20, 15]
+        # Sorted: [3, 4, 7, 10, 15, 20]
+        self.assertEqual(quickselect(arr, 1), 3)
+        self.assertEqual(quickselect(arr, 3), 7)
+        self.assertEqual(quickselect(arr, 6), 20)
+        # Reverse (k-th largest)
+        self.assertEqual(quickselect(arr, 1, reverse=True), 20)
+        self.assertEqual(quickselect(arr, 2, reverse=True), 15)
+
+    def test_find_median_via_quickselect(self):
+        odd_arr = [7, 10, 4, 3, 20]  # Sorted: [3, 4, 7, 10, 20] -> median 7
+        self.assertEqual(find_median_via_quickselect(odd_arr), 7)
+        even_arr = [1, 2, 3, 4]       # Lower median: 2
+        self.assertEqual(find_median_via_quickselect(even_arr), 2)
+
+    def test_quickselect_invalid_k(self):
+        with self.assertRaises(ValueError):
+            quickselect([1, 2, 3], 0)
+        with self.assertRaises(ValueError):
+            quickselect([1, 2, 3], 4)
+        with self.assertRaises(ValueError):
+            find_median_via_quickselect([])
+
+    # --- Trace Visualizer Tests ---
+    def test_trace_and_render_quick(self):
+        trace = trace_quick_sort([29, 10, 14, 37])
+        self.assertGreater(len(trace), 0)
+        rendered = render_quick_trace(trace)
+        self.assertIn("QUICK SORT DIVIDE-AND-CONQUER PARTITION TRACE", rendered)
+        self.assertIn("Final Sorted State: [10, 14, 29, 37]", rendered)
+
+    # --- Stability & Benchmark Tests ---
+    def test_verify_quick_sort_instability(self):
+        report = verify_quick_sort_instability()
+        self.assertFalse(report["is_stable"])
+        self.assertTrue(report["instability_demonstrated"])
+
+    def test_analyze_quick_sort_benchmarks(self):
+        report = analyze_quick_sort_benchmarks([10, 20])
+        self.assertEqual(len(report), 2)
+        for r in report:
+            self.assertIn("hoare_swap_reduction_ratio", r)
+
+
+
 
 
 
