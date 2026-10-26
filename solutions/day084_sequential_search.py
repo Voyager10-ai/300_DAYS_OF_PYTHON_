@@ -733,8 +733,8 @@ def benchmark_self_organizing_searches(
     static_comps = 0
     t0 = time.perf_counter()
     for q in queries:
-        res = sequential_search(static_arr, q)
-        static_comps += res.comparisons
+        _, m = sequential_search_metrics(static_arr, q)
+        static_comps += m["comparisons"]
     static_time = time.perf_counter() - t0
 
     # 2. Move-To-Front (MTF)
@@ -742,8 +742,8 @@ def benchmark_self_organizing_searches(
     mtf_comps = 0
     t0 = time.perf_counter()
     for q in queries:
-        res = sequential_search_mtf(mtf_arr, q)
-        mtf_comps += res.comparisons
+        idx = move_to_front_search(mtf_arr, q)
+        mtf_comps += (idx + 1) if idx != -1 else len(mtf_arr)
     mtf_time = time.perf_counter() - t0
 
     # 3. Transpose
@@ -751,17 +751,17 @@ def benchmark_self_organizing_searches(
     trans_comps = 0
     t0 = time.perf_counter()
     for q in queries:
-        res = sequential_search_transpose(trans_arr, q)
-        trans_comps += res.comparisons
+        idx = transpose_search(trans_arr, q)
+        trans_comps += (idx + 1) if idx != -1 else len(trans_arr)
     trans_time = time.perf_counter() - t0
 
     # 4. Frequency Count
-    freq_organizer = FrequencyCountSearch(list(base_items))
+    records = [{"id": x, "access_count": 0} for x in base_items]
     freq_comps = 0
     t0 = time.perf_counter()
     for q in queries:
-        res = freq_organizer.search(q)
-        freq_comps += res.comparisons
+        idx, _ = frequency_count_search(records, q)
+        freq_comps += (idx + 1) if idx != -1 else len(records)
     freq_time = time.perf_counter() - t0
 
     return {
@@ -795,6 +795,33 @@ def benchmark_self_organizing_searches(
             },
         },
     }
+
+
+class FrequencyCountSearch:
+    """
+    Object-oriented wrapper for frequency count self-organizing search.
+    """
+
+    def __init__(self, items: List[Any]):
+        self.records = [{"id": x, "access_count": 0} for x in items]
+
+    def search(self, target: Any) -> Tuple[int, int]:
+        return frequency_count_search(self.records, target)
+
+    def get_items(self) -> List[Any]:
+        return [r["id"] for r in self.records]
+
+    def get_frequency(self, target: Any) -> int:
+        for r in self.records:
+            if r["id"] == target:
+                return r["access_count"]
+        return 0
+
+
+# Convenient algorithm aliases
+sequential_search_mtf = move_to_front_search
+sequential_search_transpose = transpose_search
+sentinel_linear_search_with_metrics = sentinel_search_metrics
 
 
 def analyze_linear_search_complexity(
@@ -846,3 +873,204 @@ def format_complexity_table(records: List[Dict[str, Any]]) -> str:
         )
         rows.append(row)
     return "\n".join(rows)
+
+
+# ─── 8. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestSequentialSearch(unittest.TestCase):
+    """Unit tests covering all sequential search algorithms and heuristics."""
+
+    def test_sequential_search_found(self):
+        arr = [10, 45, 23, 78, 90, 12]
+        idx = sequential_search(arr, 78)
+        self.assertEqual(idx, 3)
+
+    def test_sequential_search_metrics(self):
+        arr = [10, 45, 23, 78, 90, 12]
+        idx, m = sequential_search_metrics(arr, 78)
+        self.assertEqual(idx, 3)
+        self.assertTrue(m["found"])
+        self.assertEqual(m["comparisons"], 4)
+        self.assertEqual(m["total_elements"], 6)
+
+    def test_sequential_search_first_element(self):
+        arr = [10, 20, 30]
+        self.assertEqual(sequential_search(arr, 10), 0)
+        idx, m = sequential_search_metrics(arr, 10)
+        self.assertEqual(idx, 0)
+        self.assertEqual(m["comparisons"], 1)
+
+    def test_sequential_search_last_element(self):
+        arr = [10, 20, 30]
+        self.assertEqual(sequential_search(arr, 30), 2)
+        idx, m = sequential_search_metrics(arr, 30)
+        self.assertEqual(idx, 2)
+        self.assertEqual(m["comparisons"], 3)
+
+    def test_sequential_search_not_found(self):
+        arr = [1, 2, 3, 4]
+        self.assertEqual(sequential_search(arr, 99), -1)
+        idx, m = sequential_search_metrics(arr, 99)
+        self.assertEqual(idx, -1)
+        self.assertFalse(m["found"])
+        self.assertEqual(m["comparisons"], 4)
+
+    def test_sequential_search_empty(self):
+        self.assertEqual(sequential_search([], 5), -1)
+        idx, m = sequential_search_metrics([], 5)
+        self.assertEqual(idx, -1)
+        self.assertFalse(m["found"])
+        self.assertEqual(m["comparisons"], 0)
+
+    def test_sequential_search_invalid_type(self):
+        with self.assertRaises(TypeError):
+            sequential_search(12345, 5)  # type: ignore
+
+    def test_sequential_search_all_occurrences(self):
+        arr = [5, 2, 8, 5, 1, 5, 9]
+        matches = sequential_search_all(arr, 5)
+        self.assertEqual(matches, [0, 3, 5])
+
+        none_matches = sequential_search_all(arr, 999)
+        self.assertEqual(none_matches, [])
+
+    def test_sequential_search_last_occurrence(self):
+        arr = [5, 2, 8, 5, 1, 5, 9]
+        self.assertEqual(sequential_search_last(arr, 5), 5)
+        self.assertEqual(sequential_search_last(arr, 8), 2)
+        self.assertEqual(sequential_search_last(arr, 999), -1)
+
+    def test_sentinel_search(self):
+        arr = [42, 17, 88, 33, 99]
+        self.assertEqual(sentinel_linear_search(arr, 88), 2)
+        self.assertEqual(sentinel_linear_search(arr, 42), 0)
+        self.assertEqual(sentinel_linear_search(arr, 99), 4)
+        self.assertEqual(sentinel_linear_search(arr, 1000), -1)
+        self.assertEqual(sentinel_linear_search([], 10), -1)
+
+        # In-place sentinel
+        arr_mut = [42, 17, 88, 33, 99]
+        self.assertEqual(sentinel_linear_search_inplace(arr_mut, 88), 2)
+        self.assertEqual(sentinel_linear_search_inplace(arr_mut, 999), -1)
+        # Ensure array is restored
+        self.assertEqual(arr_mut, [42, 17, 88, 33, 99])
+
+    def test_sentinel_search_metrics(self):
+        arr = [10, 20, 30, 40]
+        idx, m = sentinel_search_metrics(arr, 30)
+        self.assertEqual(idx, 2)
+        self.assertEqual(m["element_comparisons"], 3)
+        self.assertEqual(m["boundary_checks_saved"], 3)
+
+        idx_miss, m_miss = sentinel_search_metrics(arr, 99)
+        self.assertEqual(idx_miss, -1)
+        self.assertEqual(m_miss["element_comparisons"], 4)
+
+    def test_ordered_sequential_search_success(self):
+        arr = [11, 22, 33, 44, 55, 66]
+        self.assertEqual(ordered_sequential_search(arr, 44), 3)
+        idx, m = ordered_sequential_search_metrics(arr, 44)
+        self.assertEqual(idx, 3)
+        self.assertEqual(m["comparisons"], 4)
+
+    def test_ordered_sequential_search_early_exit(self):
+        arr = [10, 20, 30, 40, 50]
+        # Target 5 is less than arr[0] -> early exit at index 0 after 1 comparison
+        self.assertEqual(ordered_sequential_search(arr, 5), -1)
+        idx, m = ordered_sequential_search_metrics(arr, 5)
+        self.assertEqual(idx, -1)
+        self.assertEqual(m["comparisons"], 1)
+        self.assertTrue(m["early_exit_triggered"])
+
+        # Target 25 is between 20 and 30 -> stops at index 2 (value 30 > 25)
+        self.assertEqual(ordered_sequential_search(arr, 25), -1)
+        idx_mid, m_mid = ordered_sequential_search_metrics(arr, 25)
+        self.assertEqual(idx_mid, -1)
+        self.assertEqual(m_mid["comparisons"], 3)
+        self.assertTrue(m_mid["early_exit_triggered"])
+
+    def test_ordered_sequential_search_validation(self):
+        with self.assertRaises(TypeError):
+            ordered_sequential_search(12345, 10)  # type: ignore
+
+    def test_move_to_front_search(self):
+        arr = ["apple", "banana", "cherry", "date"]
+        # Search cherry -> index 2
+        res1 = sequential_search_mtf(arr, "cherry")
+        self.assertEqual(res1, 2)
+        self.assertEqual(arr, ["cherry", "apple", "banana", "date"])
+
+        # Second search for cherry should now be at index 0
+        res2 = sequential_search_mtf(arr, "cherry")
+        self.assertEqual(res2, 0)
+
+        # Miss should not alter list
+        res_miss = sequential_search_mtf(arr, "elderberry")
+        self.assertEqual(res_miss, -1)
+        self.assertEqual(arr, ["cherry", "apple", "banana", "date"])
+
+    def test_transpose_search(self):
+        arr = [10, 20, 30, 40]
+        # Search 30 -> index 2, swapped with index 1
+        res = sequential_search_transpose(arr, 30)
+        self.assertEqual(res, 2)
+        self.assertEqual(arr, [10, 30, 20, 40])
+
+        # Head element search -> index 0 remains at 0
+        res_head = sequential_search_transpose(arr, 10)
+        self.assertEqual(res_head, 0)
+        self.assertEqual(arr, [10, 30, 20, 40])
+
+    def test_frequency_count_search(self):
+        fcs = FrequencyCountSearch(["alpha", "beta", "gamma"])
+        # Query beta 3 times, gamma once
+        fcs.search("beta")
+        fcs.search("beta")
+        fcs.search("beta")
+        fcs.search("gamma")
+
+        # beta has 3 hits, gamma 1 hit, alpha 0 hits
+        self.assertEqual(fcs.get_items(), ["beta", "gamma", "alpha"])
+        self.assertEqual(fcs.get_frequency("beta"), 3)
+        self.assertEqual(fcs.get_frequency("gamma"), 1)
+        self.assertEqual(fcs.get_frequency("alpha"), 0)
+
+    def test_predicate_search(self):
+        nums = [1, 3, 7, 8, 11, 14, 15]
+        # First even number
+        first_even = sequential_search_predicate(nums, lambda x: x % 2 == 0)
+        self.assertEqual(first_even, (3, 8))
+
+        # No multiples of 100
+        no_hit = sequential_search_predicate(nums, lambda x: x % 100 == 0)
+        self.assertIsNone(no_hit)
+
+        # All even numbers
+        all_evens = sequential_search_predicate_all(nums, lambda x: x % 2 == 0)
+        self.assertEqual(all_evens, [(3, 8), (5, 14)])
+
+        # Last even number
+        last_even = sequential_search_predicate_last(nums, lambda x: x % 2 == 0)
+        self.assertEqual(last_even, (5, 14))
+
+    def test_trace_and_renderer(self):
+        arr = [5, 12, 19, 24]
+        trace = trace_sequential_search(arr, 19)
+        self.assertEqual(len(trace), 3)
+        self.assertTrue(trace[-1]["is_match"])
+
+        rendered = render_sequential_trace(arr, trace, 19)
+        self.assertIn("SEQUENTIAL SEARCH STEP-BY-STEP", rendered)
+        self.assertIn("SUCCESS! Target 19 found", rendered)
+
+    def test_benchmark_and_complexity(self):
+        bench = benchmark_self_organizing_searches(n=30, query_count=100, seed=123)
+        self.assertEqual(bench["n_elements"], 30)
+        self.assertIn("Standard (Static)", bench["results"])
+        self.assertIn("Move-To-Front (MTF)", bench["results"])
+
+        records = analyze_linear_search_complexity([10, 50])
+        self.assertEqual(len(records), 2)
+        table = format_complexity_table(records)
+        self.assertIn("N Size", table)
