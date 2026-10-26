@@ -398,3 +398,101 @@ def sentinel_search_metrics(
     return (idx, metrics)
 
 
+# ─── 4. Ordered Sequential Search (Sorted Early-Exit Optimization) ───────────
+
+
+def ordered_sequential_search(
+    arr: List[Any],
+    target: Any,
+    reverse: bool = False,
+    key: Optional[Callable[[Any], Any]] = None,
+) -> int:
+    """
+    Performs Sequential Search on a pre-sorted sequence with early-exit termination.
+    Terminates immediately when an element surpasses target, cutting unsuccessful search
+    comparisons from n down to an average of n / 2 without needing random access indexing.
+
+    Args:
+        arr: Pre-sorted list or tuple.
+        target: Target item to search for.
+        reverse: If True, assumes arr is sorted descending.
+        key: Optional comparison projection.
+
+    Returns:
+        Index of target, or -1 if missing.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    key_func = key if key is not None else (lambda x: x)
+    target_key = key_func(target) if key is not None else target
+
+    for idx, item in enumerate(arr):
+        k_item = key_func(item)
+        if k_item == target_key:
+            return idx
+
+        # Early exit check on ordered elements
+        early_exit = (k_item < target_key) if reverse else (k_item > target_key)
+        if early_exit:
+            break
+
+    return -1
+
+
+def ordered_sequential_search_metrics(
+    arr: List[Any],
+    target: Any,
+    reverse: bool = False,
+    key: Optional[Callable[[Any], Any]] = None,
+) -> Tuple[int, Dict[str, Any]]:
+    """
+    Evaluates Ordered Sequential Search while tracking early-exit savings.
+
+    Args:
+        arr: Sorted sequence.
+        target: Target item.
+        reverse: If True, sorted descending.
+        key: Key projection.
+
+    Returns:
+        Tuple of (found_index, metrics_dict).
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    key_func = key if key is not None else (lambda x: x)
+    target_key = key_func(target) if key is not None else target
+
+    n = len(arr)
+    comparisons = 0
+    found_idx = -1
+    early_exit_triggered = False
+
+    for idx, item in enumerate(arr):
+        comparisons += 1
+        k_item = key_func(item)
+        if k_item == target_key:
+            found_idx = idx
+            break
+
+        early_exit = (k_item < target_key) if reverse else (k_item > target_key)
+        if early_exit:
+            early_exit_triggered = True
+            break
+
+    comparisons_saved = n - comparisons
+
+    metrics = {
+        "found": (found_idx != -1),
+        "index": found_idx,
+        "comparisons": comparisons,
+        "total_elements": n,
+        "early_exit_triggered": early_exit_triggered,
+        "comparisons_saved": comparisons_saved,
+        "savings_percentage": round((comparisons_saved / max(1, n)) * 100, 2),
+    }
+    return (found_idx, metrics)
+
+
+
