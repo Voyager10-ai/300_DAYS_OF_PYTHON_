@@ -284,3 +284,117 @@ def frequency_count_search(
 
     return (-1, 0)
 
+
+# ─── 3. Sentinel Linear Search (Knuth's Boundary Check Elimination) ───────────
+
+
+def sentinel_linear_search(arr: List[Any], target: Any) -> int:
+    """
+    Executes Sentinel Linear Search (Donald Knuth's optimization).
+    Eliminates the array boundary check (i < n) from the inner loop by appending
+    target as a guaranteed terminator at the end of a working copy.
+
+    Halves the number of conditional branches evaluated per loop iteration.
+
+    Args:
+        arr: Sequence of elements.
+        target: Value to search for.
+
+    Returns:
+        Index of first occurrence of target, or -1 if missing.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    n = len(arr)
+    if n == 0:
+        return -1
+
+    # Check last element first so sentinel doesn't mask it
+    if arr[n - 1] == target:
+        # Check if an earlier occurrence exists
+        for i in range(n - 1):
+            if arr[i] == target:
+                return i
+        return n - 1
+
+    # Append sentinel to temporary list copy
+    work_list = list(arr)
+    work_list.append(target)
+
+    i = 0
+    while work_list[i] != target:
+        i += 1
+
+    return i if i < n else -1
+
+
+def sentinel_linear_search_inplace(arr: List[Any], target: Any) -> int:
+    """
+    In-place Sentinel Linear Search avoiding list reallocation.
+    Temporarily replaces the last element arr[n - 1] with the sentinel target,
+    executes the boundary-free loop, and restores the original value before returning.
+
+    Args:
+        arr: Mutable list.
+        target: Value to find.
+
+    Returns:
+        Index of target, or -1 if missing.
+
+    Raises:
+        TypeError: If arr is not a mutable list.
+    """
+    if not isinstance(arr, list):
+        raise TypeError(f"Expected mutable list, got {type(arr).__name__}")
+
+    n = len(arr)
+    if n == 0:
+        return -1
+
+    last = arr[n - 1]
+    # Place sentinel at the last position
+    arr[n - 1] = target
+
+    i = 0
+    while arr[i] != target:
+        i += 1
+
+    # Restore original last element
+    arr[n - 1] = last
+
+    if i < n - 1 or last == target:
+        return i
+    return -1
+
+
+def sentinel_search_metrics(
+    arr: List[Any], target: Any
+) -> Tuple[int, Dict[str, Any]]:
+    """
+    Evaluates Sentinel Linear Search and calculates boundary conditions saved.
+
+    Args:
+        arr: Input sequence.
+        target: Target item.
+
+    Returns:
+        Tuple of (found_index, metrics_dict).
+    """
+    n = len(arr)
+    idx = sentinel_linear_search(arr, target)
+    steps_executed = (idx + 1) if idx != -1 else n
+
+    metrics = {
+        "found_index": idx,
+        "element_comparisons": steps_executed,
+        "boundary_checks_saved": steps_executed,  # Standard search executes steps_executed boundary checks
+        "total_checks_standard": steps_executed * 2,
+        "total_checks_sentinel": steps_executed + 1,
+        "branch_reduction_percent": round(
+            ((steps_executed - 1) / max(1, steps_executed * 2)) * 100, 2
+        ),
+    }
+    return (idx, metrics)
+
+
