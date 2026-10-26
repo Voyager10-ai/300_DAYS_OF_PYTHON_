@@ -686,6 +686,163 @@ def render_sequential_trace(
     return "\n".join(lines)
 
 
+# ─── 7. Self-Organizing Search Benchmark & Complexity Analytics Engine ─────────
 
 
+def benchmark_self_organizing_searches(
+    n: int = 100,
+    query_count: int = 1000,
+    skew_ratio: float = 0.8,
+    seed: int = 42,
+) -> Dict[str, Any]:
+    """
+    Simulates non-uniform access patterns (80/20 Pareto distribution) across
+    Standard Sequential Search vs. Move-To-Front (MTF) vs. Transpose
+    vs. Frequency Count heuristics.
 
+    Args:
+        n: Number of unique items in list.
+        query_count: Total queries to perform.
+        skew_ratio: Fraction of queries targeted at the top 20% "hot" items.
+        seed: Random seed for reproducibility.
+
+    Returns:
+        Dict with benchmark comparative statistics.
+    """
+    if n <= 0 or query_count <= 0:
+        raise ValueError("n and query_count must be positive integers.")
+
+    rng = random.Random(seed)
+    base_items = list(range(n))
+
+    # Partition into hot (20%) and cold (80%) keys
+    hot_count = max(1, int(n * 0.2))
+    hot_keys = base_items[:hot_count]
+    cold_keys = base_items[hot_count:]
+
+    # Generate synthetic queries following skewed Pareto distribution
+    queries = []
+    for _ in range(query_count):
+        if rng.random() < skew_ratio and hot_keys:
+            queries.append(rng.choice(hot_keys))
+        else:
+            queries.append(rng.choice(cold_keys) if cold_keys else rng.choice(hot_keys))
+
+    # 1. Standard (Static) Search
+    static_arr = list(base_items)
+    static_comps = 0
+    t0 = time.perf_counter()
+    for q in queries:
+        res = sequential_search(static_arr, q)
+        static_comps += res.comparisons
+    static_time = time.perf_counter() - t0
+
+    # 2. Move-To-Front (MTF)
+    mtf_arr = list(base_items)
+    mtf_comps = 0
+    t0 = time.perf_counter()
+    for q in queries:
+        res = sequential_search_mtf(mtf_arr, q)
+        mtf_comps += res.comparisons
+    mtf_time = time.perf_counter() - t0
+
+    # 3. Transpose
+    trans_arr = list(base_items)
+    trans_comps = 0
+    t0 = time.perf_counter()
+    for q in queries:
+        res = sequential_search_transpose(trans_arr, q)
+        trans_comps += res.comparisons
+    trans_time = time.perf_counter() - t0
+
+    # 4. Frequency Count
+    freq_organizer = FrequencyCountSearch(list(base_items))
+    freq_comps = 0
+    t0 = time.perf_counter()
+    for q in queries:
+        res = freq_organizer.search(q)
+        freq_comps += res.comparisons
+    freq_time = time.perf_counter() - t0
+
+    return {
+        "n_elements": n,
+        "query_count": query_count,
+        "skew_ratio": skew_ratio,
+        "results": {
+            "Standard (Static)": {
+                "total_comparisons": static_comps,
+                "avg_comparisons": static_comps / query_count,
+                "time_sec": static_time,
+                "efficiency_gain_pct": 0.0,
+            },
+            "Move-To-Front (MTF)": {
+                "total_comparisons": mtf_comps,
+                "avg_comparisons": mtf_comps / query_count,
+                "time_sec": mtf_time,
+                "efficiency_gain_pct": ((static_comps - mtf_comps) / static_comps) * 100.0,
+            },
+            "Transpose": {
+                "total_comparisons": trans_comps,
+                "avg_comparisons": trans_comps / query_count,
+                "time_sec": trans_time,
+                "efficiency_gain_pct": ((static_comps - trans_comps) / static_comps) * 100.0,
+            },
+            "Frequency Count": {
+                "total_comparisons": freq_comps,
+                "avg_comparisons": freq_comps / query_count,
+                "time_sec": freq_time,
+                "efficiency_gain_pct": ((static_comps - freq_comps) / static_comps) * 100.0,
+            },
+        },
+    }
+
+
+def analyze_linear_search_complexity(
+    sizes: Optional[List[int]] = None,
+) -> List[Dict[str, Any]]:
+    """
+    Computes theoretical best, average (successful and unsuccessful), and worst case
+    comparison numbers for standard unordered vs. ordered sequential search.
+
+    Args:
+        sizes: Sequence of array sizes N to evaluate.
+
+    Returns:
+        List of complexity records for each size.
+    """
+    if sizes is None:
+        sizes = [10, 50, 100, 500, 1000, 5000, 10000]
+
+    records = []
+    for n in sizes:
+        if n <= 0:
+            continue
+        records.append({
+            "size": n,
+            "best_case": 1,
+            "avg_case_successful": (n + 1) / 2.0,
+            "avg_case_unsuccessful_unordered": n,
+            "avg_case_unsuccessful_ordered": (n + 1) / 2.0,
+            "worst_case": n,
+        })
+    return records
+
+
+def format_complexity_table(records: List[Dict[str, Any]]) -> str:
+    """
+    Renders complexity analysis records into a formatted Markdown/ASCII table.
+    """
+    header = (
+        f"{'N Size':>8} | {'Best':>6} | {'Avg (Hit)':>10} | {'Avg Unordered Miss':>18} | "
+        f"{'Avg Ordered Miss':>16} | {'Worst':>8}"
+    )
+    sep = "-" * len(header)
+    rows = [header, sep]
+    for r in records:
+        row = (
+            f"{r['size']:>8} | {r['best_case']:>6} | {r['avg_case_successful']:>10.1f} | "
+            f"{r['avg_case_unsuccessful_unordered']:>18} | {r['avg_case_unsuccessful_ordered']:>16.1f} | "
+            f"{r['worst_case']:>8}"
+        )
+        rows.append(row)
+    return "\n".join(rows)
