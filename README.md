@@ -86,6 +86,7 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 81: Shell Sort Implement
 - Day 82: Merge Sort Implement
 - Day 83: Quick Sort Implement
+- Day 84: Sequential Search
 
 
 
