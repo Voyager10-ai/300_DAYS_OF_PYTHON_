@@ -1633,6 +1633,45 @@ import java.util.*;
 //     }
 // }
 
+// Java Sequential Search Practice (Day 84)
+// class SequentialSearchPractice {
+//     // Standard Sequential Search: O(n) worst/avg, O(1) best
+//     public static int sequentialSearch(int[] arr, int target) {
+//         for (int i = 0; i < arr.length; i++) {
+//             if (arr[i] == target) return i;
+//         }
+//         return -1;
+//     }
+//     // Knuth's Sentinel Linear Search: eliminates boundary check (i < arr.length)
+//     public static int sentinelSearch(int[] arr, int target) {
+//         int n = arr.length;
+//         if (n == 0) return -1;
+//         int last = arr[n - 1];
+//         arr[n - 1] = target; // Sentinel placed at end
+//         int i = 0;
+//         while (arr[i] != target) {
+//             i++;
+//         }
+//         arr[n - 1] = last; // Restore original value
+//         if (i < n - 1 || last == target) return i;
+//         return -1;
+//     }
+//     // Ordered Sequential Search on ascending array with early exit
+//     public static int orderedSearch(int[] arr, int target) {
+//         for (int i = 0; i < arr.length; i++) {
+//             if (arr[i] == target) return i;
+//             if (arr[i] > target) break; // Early termination on sorted array
+//         }
+//         return -1;
+//     }
+//     public static void main(String[] args) {
+//         int[] arr = {12, 34, 45, 67, 89, 90};
+//         System.out.println("Sequential Search index for 45: " + sequentialSearch(arr, 45));
+//         System.out.println("Sentinel Search index for 67: " + sentinelSearch(arr, 67));
+//         System.out.println("Ordered Search index for 50 (miss): " + orderedSearch(arr, 50));
+//     }
+// }
+
 public class main{
 
 

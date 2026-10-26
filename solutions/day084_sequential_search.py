@@ -1074,3 +1074,85 @@ class TestSequentialSearch(unittest.TestCase):
         self.assertEqual(len(records), 2)
         table = format_complexity_table(records)
         self.assertIn("N Size", table)
+
+
+# ─── 9. Interactive CLI Demonstration ─────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates all Sequential Search variants and performance metrics."""
+    print("=" * 72)
+    print("    DAY 84: SEQUENTIAL SEARCH & ADVANCED HEURISTIC ALGORITHMS    ")
+    print("=" * 72)
+
+    # 1. Core Sequential Search
+    sample = [42, 18, 95, 27, 63, 18, 81]
+    print(f"\n[1] Core Sequential Search:")
+    print(f"    Dataset: {sample}")
+    idx_first = sequential_search(sample, 18)
+    idx_last = sequential_search_last(sample, 18)
+    indices_all = sequential_search_all(sample, 18)
+    _, metrics = sequential_search_metrics(sample, 63)
+    print(f"    First occurrence of 18 : Index {idx_first}")
+    print(f"    Last occurrence of 18  : Index {idx_last}")
+    print(f"    All occurrences of 18  : Indices {indices_all}")
+    print(f"    Search 63 metrics      : {metrics}")
+
+    # 2. Sentinel Search
+    print(f"\n[2] Knuth's Sentinel Linear Search:")
+    idx_sent, sent_m = sentinel_search_metrics(sample, 95)
+    print(f"    Found 95 at index {idx_sent}")
+    print(f"    Boundary checks saved  : {sent_m['boundary_checks_saved']}")
+    print(f"    Branch reduction       : {sent_m['branch_reduction_percent']}%")
+
+    # 3. Ordered Sequential Search
+    sorted_sample = [11, 24, 39, 52, 68, 77, 89, 95]
+    print(f"\n[3] Ordered Sequential Search (Sorted with Early Exit):")
+    print(f"    Sorted Dataset: {sorted_sample}")
+    _, ord_m = ordered_sequential_search_metrics(sorted_sample, 45)
+    print(f"    Search 45 (miss) comparisons: {ord_m['comparisons']} / {ord_m['total_elements']}")
+    print(f"    Comparisons saved via early exit: {ord_m['comparisons_saved']} ({ord_m['savings_percentage']}%)")
+
+    # 4. Self-Organizing Heuristics
+    print(f"\n[4] Self-Organizing Search Heuristics:")
+    mtf_list = ["alpha", "beta", "gamma", "delta", "epsilon"]
+    print(f"    Initial MTF list       : {mtf_list}")
+    move_to_front_search(mtf_list, "delta")
+    print(f"    After querying 'delta' : {mtf_list}")
+
+    trans_list = [100, 200, 300, 400, 500]
+    print(f"    Initial Transpose list : {trans_list}")
+    transpose_search(trans_list, 400)
+    print(f"    After querying 400     : {trans_list}")
+
+    # 5. Predicate Search
+    print(f"\n[5] Predicate-Based Search:")
+    even_hit = sequential_search_predicate(sample, lambda x: x % 2 == 0)
+    all_gt_50 = sequential_search_predicate_all(sample, lambda x: x > 50)
+    if even_hit:
+        print(f"    First even number      : Index {even_hit[0]}, Value {even_hit[1]}")
+    print(f"    All items > 50         : {all_gt_50}")
+
+    # 6. Traversal Visualizer
+    print(f"\n[6] Step-by-Step Traversal Visualizer:")
+    trace = trace_sequential_search([14, 28, 42, 56, 70], 42)
+    print(render_sequential_trace([14, 28, 42, 56, 70], trace, 42))
+
+    # 7. Complexity Table
+    print(f"\n[7] Theoretical Search Complexity:")
+    records = analyze_linear_search_complexity([10, 100, 1000, 10000])
+    print(format_complexity_table(records))
+
+    # 8. Benchmark Self-Organizing Search (Pareto 80/20)
+    print(f"\n[8] Non-Uniform Access Benchmark (Pareto 80/20 Distribution):")
+    bench = benchmark_self_organizing_searches(n=100, query_count=2000, skew_ratio=0.8, seed=42)
+    for name, res in bench["results"].items():
+        print(f"    {name:<22} -> Total Comps: {res['total_comparisons']:<6} | Avg/Query: {res['avg_comparisons']:<5.1f} | Gain: {res['efficiency_gain_pct']:+.1f}%")
+
+    print("\n" + "=" * 72)
+    print("                    DEMONSTRATION COMPLETE                      ")
+    print("=" * 72)
+
+
+if __name__ == "__main__":
+    main()
