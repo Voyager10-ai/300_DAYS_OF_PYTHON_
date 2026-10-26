@@ -582,5 +582,110 @@ def sequential_search_predicate_all(
     return matches
 
 
+# ─── 6. Step-by-Step Traversal Visualizer & ASCII Pointer Renderer ────────────
+
+
+def trace_sequential_search(
+    arr: List[Any],
+    target: Any,
+) -> List[Dict[str, Any]]:
+    """
+    Executes Sequential Search while recording every inspection step.
+
+    Args:
+        arr: Sequence of elements.
+        target: Target item to locate.
+
+    Returns:
+        List of trace dictionaries describing each inspection step.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+
+    steps = []
+    for idx, item in enumerate(arr):
+        is_match = (item == target)
+        desc = (
+            f"Step {idx + 1}: Inspecting index {idx} (value = {item}). "
+            + (f"MATCH FOUND! Target {target} located." if is_match else f"No match; advancing pointer.")
+        )
+        steps.append({
+            "step": idx + 1,
+            "index": idx,
+            "value": item,
+            "target": target,
+            "is_match": is_match,
+            "description": desc,
+        })
+        if is_match:
+            break
+
+    return steps
+
+
+def render_sequential_trace(
+    arr: List[Any],
+    trace: List[Dict[str, Any]],
+    target: Any,
+) -> str:
+    """
+    Formats the search trace into a graphical ASCII step-by-step diagram
+    with moving pointers pointing to the active cell.
+
+    Args:
+        arr: Original sequence.
+        trace: Events list from trace_sequential_search.
+        target: Searched value.
+
+    Returns:
+        Multi-line formatted string.
+    """
+    if not arr:
+        return "Array is empty; search terminates immediately with -1."
+
+    lines = []
+    lines.append("=" * 72)
+    lines.append("           SEQUENTIAL SEARCH STEP-BY-STEP TRAVERSAL TRACE         ")
+    lines.append("=" * 72)
+    lines.append(f"Array  : {arr}")
+    lines.append(f"Target : {target}")
+    lines.append("-" * 72)
+
+    for ev in trace:
+        step = ev["step"]
+        idx = ev["index"]
+        val = ev["value"]
+        is_match = ev["is_match"]
+        tag = "[MATCH]" if is_match else "[SCAN ]"
+
+        lines.append(f"{tag} Step {step:<2} | Index {idx:<2}: {val} == {target} -> {is_match}")
+
+        # Build visual pointer over array cells
+        cell_strs = [str(x) for x in arr]
+        # Calculate visual offset of current cell
+        prefix = "  Array: [ "
+        cell_offsets = []
+        curr_offset = len(prefix)
+        for i, cs in enumerate(cell_strs):
+            cell_offsets.append(curr_offset)
+            curr_offset += len(cs) + 2  # plus ", "
+
+        rendered_cells = prefix + ", ".join(cell_strs) + " ]"
+        lines.append(rendered_cells)
+
+        pointer_pad = " " * cell_offsets[idx]
+        lines.append(f"{pointer_pad}^-- (Active cursor)")
+        lines.append("-" * 72)
+
+    found_step = next((e for e in trace if e["is_match"]), None)
+    if found_step:
+        lines.append(f"Search Result: SUCCESS! Target {target} found at index {found_step['index']}.")
+    else:
+        lines.append(f"Search Result: FAILED. Target {target} not present after {len(trace)} comparisons.")
+    lines.append("=" * 72)
+    return "\n".join(lines)
+
+
+
 
 
