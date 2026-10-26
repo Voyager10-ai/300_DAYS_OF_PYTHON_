@@ -495,4 +495,92 @@ def ordered_sequential_search_metrics(
     return (found_idx, metrics)
 
 
+# ─── 5. Predicate / Conditional Sequential Search ─────────────────────────────
+
+
+def sequential_search_predicate(
+    arr: List[Any],
+    predicate: Callable[[Any], bool],
+) -> Optional[Tuple[int, Any]]:
+    """
+    Finds the first element in arr that satisfies the predicate function.
+    Equivalent to C++ std::find_if or Javascript Array.prototype.find.
+
+    Args:
+        arr: Sequence of items.
+        predicate: Callable taking an element and returning True if matching.
+
+    Returns:
+        Tuple of (index, item) for first match, or None if no match found.
+
+    Raises:
+        TypeError: If arr is not list or tuple, or predicate is not callable.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+    if not callable(predicate):
+        raise TypeError(f"Expected callable predicate, got {type(predicate).__name__}")
+
+    for idx, item in enumerate(arr):
+        if predicate(item):
+            return (idx, item)
+
+    return None
+
+
+def sequential_search_predicate_last(
+    arr: List[Any],
+    predicate: Callable[[Any], bool],
+) -> Optional[Tuple[int, Any]]:
+    """
+    Finds the last element in arr that satisfies the predicate (scans backward).
+
+    Args:
+        arr: Sequence of items.
+        predicate: Predicate callable.
+
+    Returns:
+        Tuple of (index, item) for last match, or None if no match.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+    if not callable(predicate):
+        raise TypeError(f"Expected callable predicate, got {type(predicate).__name__}")
+
+    for idx in range(len(arr) - 1, -1, -1):
+        item = arr[idx]
+        if predicate(item):
+            return (idx, item)
+
+    return None
+
+
+def sequential_search_predicate_all(
+    arr: List[Any],
+    predicate: Callable[[Any], bool],
+) -> List[Tuple[int, Any]]:
+    """
+    Collects all elements and their indices that satisfy the predicate.
+
+    Args:
+        arr: Sequence of items.
+        predicate: Predicate callable.
+
+    Returns:
+        List of (index, item) tuples matching the condition.
+    """
+    if not isinstance(arr, (list, tuple)):
+        raise TypeError(f"Expected list or tuple, got {type(arr).__name__}")
+    if not callable(predicate):
+        raise TypeError(f"Expected callable predicate, got {type(predicate).__name__}")
+
+    matches = []
+    for idx, item in enumerate(arr):
+        if predicate(item):
+            matches.append((idx, item))
+
+    return matches
+
+
+
 
