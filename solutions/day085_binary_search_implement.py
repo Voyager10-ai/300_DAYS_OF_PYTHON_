@@ -112,3 +112,17 @@ def binary_search_with_steps(nums, target):
         else:
             right = mid -1
     return -1, steps
+
+    def recursive_binary_search(nums, target, left, right):
+        if right is None:
+            right = len(nums) - 1
+        if left > right:
+            return -1
+        mid = (left + right) // 2
+        if nums[mid] == target:
+            return mid
+        if nums[mid] < target:
+            return recursive_binary_search(nums, target, mid +1, right)
+        else:
+            return recursive_binary_search(nums, target, left, mid -1 )
+            
