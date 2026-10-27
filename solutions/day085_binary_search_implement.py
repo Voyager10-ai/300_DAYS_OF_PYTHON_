@@ -162,5 +162,23 @@ def last_occurrence(nums, target):
 
     return result
 
+import unittest
+# pyrefly: ignore[missing-import]
+from solutions.day085_binary_search_implement import *
 
+class TestBinarySearch(unittest.TestCase):
+    def test_target_found(self):
+        self.assertEqual(binary_search([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 5), 4)
+
+    def test_target_not_found(self):
+        self.assertEqual(binary_search([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 11), -1)
+
+    def test_empty_list(self):
+        self.assertEqual(binary_search([], 5), -1)
+    
+    def test_single_element(self):
+        self.assertEqual(binary_search([5], 5), 0)
+        
+if __name__ == "__main__":
+    unittest.main()
     
