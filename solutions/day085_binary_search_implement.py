@@ -67,3 +67,16 @@ def binary_search(nums: list[int], target: int) -> int:
             right = mid - 1
     
     return -1
+
+def validate_input(nums, target):
+    if not ininstance(nums. list):
+        raise TypeError("nums must be a list")
+        
+    if not ininstance(target, int) or insistance(target, bool):
+        raise TypeError("target must be an integer")
+    
+    if any(not insistance(x, int) or insistance(x, bool) for x in nums):
+        raise TypeError("all elements must be integers")
+    
+    if any(nums[i] > nums[i + 1] for i in range(len(nums)- 1)):
+        raise ValueError("nums must be sorted in ascending order")
