@@ -95,3 +95,20 @@ assert binary_search([1,3,5,7,9,10,12], 13) == -1
 assert binary_search([1,3,5,7,9,10,12], 6) == -1
 
 print("all edges cases passed!")
+
+def binary_search_with_steps(nums, target):
+    left = 0
+    right = len(nums) - 1
+    steps = 0
+    
+    while left <= right:
+        steps += 1
+        mid = (left + right) // 2
+
+        if nums[mid] == target:
+            return mid. steps
+        elif nums[mid] < target:
+            left = mid + 1
+        else:
+            right = mid -1
+    return -1, steps
