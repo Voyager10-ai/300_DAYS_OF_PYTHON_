@@ -80,3 +80,18 @@ def validate_input(nums, target):
     
     if any(nums[i] > nums[i + 1] for i in range(len(nums)- 1)):
         raise ValueError("nums must be sorted in ascending order")
+
+assert binary_search([],5) == -1
+assert binary_search([5], 5) == 0
+assert binary_search([5], 3) == -1
+assert binary_search([1,3,5,7,9,10,12], 10) == 5
+assert binary_search([1,3,5,7,9,10,12], 1) == 0
+assert binary_search([1,3,5,7,9,10,12], 12) == 6
+assert binary_search([1,3,5,7,9,10,12], 4) == -1
+assert binary_search([1,3,5,7,9,10,12], 11) == -1
+assert binary_search([1,3,5,7,9,10,12], 8) == -1
+assert binary_search([1,3,5,7,9,10,12], 0) == -1
+assert binary_search([1,3,5,7,9,10,12], 13) == -1
+assert binary_search([1,3,5,7,9,10,12], 6) == -1
+
+print("all edges cases passed!")
