@@ -404,3 +404,119 @@ class Solution:
             Computed float value of x^n.
         """
         return float(power_binary_iterative(x, n))
+
+
+# ─── 4. Modular Exponentiation (A^B mod M) & Modular Inverse ─────────────────
+
+
+def extended_gcd(a: int, b: int) -> Tuple[int, int, int]:
+    """
+    Computes Extended Euclidean Algorithm.
+    Returns tuple (gcd, x, y) such that a*x + b*y = gcd(a, b).
+    """
+    if b == 0:
+        return (a, 1, 0)
+    gcd_val, x1, y1 = extended_gcd(b, a % b)
+    x = y1
+    y = x1 - (a // b) * y1
+    return (gcd_val, x, y)
+
+
+def modular_inverse(a: int, m: int) -> int:
+    """
+    Computes modular multiplicative inverse of a modulo m using extended GCD.
+    Solves for x in: (a * x) % m == 1.
+
+    Args:
+        a: Integer.
+        m: Modulus.
+
+    Returns:
+        Inverse x in range [0, m - 1].
+
+    Raises:
+        ValueError: If gcd(a, m) != 1 (inverse does not exist).
+    """
+    gcd_val, x, _ = extended_gcd(a % m, m)
+    if gcd_val != 1:
+        raise ValueError(f"Modular inverse does not exist: gcd({a}, {m}) = {gcd_val} != 1")
+    return (x % m + m) % m
+
+
+def modular_power(
+    base: int,
+    exp: int,
+    mod: int,
+) -> int:
+    """
+    Computes (base^exp) % mod using binary exponentiation with modulo reduction.
+
+    Prevents numeric overflow by bounding all intermediate products to [0, mod - 1].
+    Fundamental in modern cryptography (RSA public-key encryption, Diffie-Hellman key exchange).
+
+    Time Complexity: O(log |exp|) multiplications modulo mod.
+    Space Complexity: O(1) auxiliary space.
+
+    Args:
+        base: Base integer.
+        exp: Exponent integer (can be negative if gcd(base, mod) == 1).
+        mod: Modulus integer (must be >= 1).
+
+    Returns:
+        Integer result in range [0, mod - 1].
+
+    Raises:
+        ValueError: If mod <= 0.
+        TypeError: If arguments are not integers.
+    """
+    if not isinstance(base, int) or isinstance(base, bool):
+        raise TypeError(f"base must be an integer, got {type(base).__name__}")
+    if not isinstance(exp, int) or isinstance(exp, bool):
+        raise TypeError(f"exp must be an integer, got {type(exp).__name__}")
+    if not isinstance(mod, int) or isinstance(mod, bool):
+        raise TypeError(f"mod must be an integer, got {type(mod).__name__}")
+
+    if mod <= 0:
+        raise ValueError(f"Modulus must be a positive integer, got {mod}")
+
+    if mod == 1:
+        return 0
+
+    # Handle negative exponent via modular inverse
+    if exp < 0:
+        base = modular_inverse(base, mod)
+        exp = -exp
+
+    result = 1
+    curr_base = base % mod
+
+    while exp > 0:
+        if exp & 1:
+            result = (result * curr_base) % mod
+        curr_base = (curr_base * curr_base) % mod
+        exp >>= 1
+
+    return result
+
+
+def modular_power_with_metrics(
+    base: int,
+    exp: int,
+    mod: int,
+) -> Tuple[int, Dict[str, Any]]:
+    """
+    Computes modular power while tracking modular multiplications and runtime.
+    """
+    t0 = time.perf_counter()
+    ans = modular_power(base, exp, mod)
+    elapsed = time.perf_counter() - t0
+
+    metrics = {
+        "base": base,
+        "exponent": exp,
+        "modulus": mod,
+        "result": ans,
+        "time_seconds": elapsed,
+        "algorithm": "Modular Binary Exponentiation (O(log |exp|))",
+    }
+    return (ans, metrics)
