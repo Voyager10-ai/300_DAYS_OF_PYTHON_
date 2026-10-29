@@ -658,3 +658,116 @@ def power_fractional(
     # a^b = exp(b * ln(a))
     ln_a = natural_log(float(a))
     return exponential_series(float(b) * ln_a)
+
+
+# ─── 6. 2x2 Matrix Binary Exponentiation & O(log N) Fibonacci ─────────────────
+
+
+Matrix2x2 = List[List[int]]
+
+
+def matrix_2x2_mult(
+    A: Matrix2x2,
+    B: Matrix2x2,
+    mod: Optional[int] = None,
+) -> Matrix2x2:
+    """
+    Multiplies two 2x2 integer matrices with optional modulo arithmetic.
+    """
+    m00 = A[0][0] * B[0][0] + A[0][1] * B[1][0]
+    m01 = A[0][0] * B[0][1] + A[0][1] * B[1][1]
+    m10 = A[1][0] * B[0][0] + A[1][1] * B[1][0]
+    m11 = A[1][0] * B[0][1] + A[1][1] * B[1][1]
+
+    if mod is not None:
+        return [
+            [m00 % mod, m01 % mod],
+            [m10 % mod, m11 % mod],
+        ]
+    return [
+        [m00, m01],
+        [m10, m11],
+    ]
+
+
+def matrix_2x2_power(
+    M: Matrix2x2,
+    n: int,
+    mod: Optional[int] = None,
+) -> Matrix2x2:
+    """
+    Computes M^n for a 2x2 matrix using binary exponentiation by squaring.
+
+    Time Complexity: O(log n) matrix multiplications.
+    Space Complexity: O(1) auxiliary space.
+
+    Args:
+        M: 2x2 matrix as list of two 2-element lists.
+        n: Exponent non-negative integer.
+        mod: Optional integer modulus.
+
+    Returns:
+        2x2 matrix result.
+
+    Raises:
+        ValueError: If n < 0.
+    """
+    if n < 0:
+        raise ValueError("Matrix power currently only supports non-negative exponents")
+
+    # 2x2 Identity matrix
+    result: Matrix2x2 = [[1, 0], [0, 1]]
+    curr: Matrix2x2 = [[M[0][0], M[0][1]], [M[1][0], M[1][1]]]
+
+    if mod is not None:
+        curr[0][0] %= mod
+        curr[0][1] %= mod
+        curr[1][0] %= mod
+        curr[1][1] %= mod
+
+    exp = n
+    while exp > 0:
+        if exp & 1:
+            result = matrix_2x2_mult(result, curr, mod)
+        curr = matrix_2x2_mult(curr, curr, mod)
+        exp >>= 1
+
+    return result
+
+
+def fibonacci_matrix_power(
+    n: int,
+    mod: Optional[int] = None,
+) -> int:
+    """
+    Computes the n-th Fibonacci number F(n) in O(log n) time using matrix binary exponentiation.
+    F(0) = 0, F(1) = 1, F(2) = 1, F(3) = 2, F(4) = 3, F(5) = 5, ...
+
+    Uses the matrix transformation:
+      [[1, 1], [1, 0]]^n = [[F(n+1), F(n)], [F(n), F(n-1)]]
+
+    Args:
+        n: 0-indexed Fibonacci index (n >= 0).
+        mod: Optional modulus for large n.
+
+    Returns:
+        F(n) integer value.
+
+    Raises:
+        ValueError: If n < 0.
+    """
+    if not isinstance(n, int) or isinstance(n, bool):
+        raise TypeError(f"n must be an integer, got {type(n).__name__}")
+    if n < 0:
+        raise ValueError("Fibonacci index must be non-negative")
+
+    if n == 0:
+        return 0
+    if n == 1:
+        return 1 if mod is None else (1 % mod)
+
+    T: Matrix2x2 = [[1, 1], [1, 0]]
+    powered = matrix_2x2_power(T, n - 1, mod)
+    ans = powered[0][0]
+
+    return ans if mod is None else (ans % mod)
