@@ -153,3 +153,121 @@ def power_naive_with_metrics(
         "algorithm": "Naive Iterative (O(|b|))",
     }
     return (ans, metrics)
+
+
+# ─── 2. Divide-and-Conquer Binary Exponentiation (Recursive Squaring) ─────────
+
+
+def power_binary_recursive(
+    a: Union[int, float],
+    b: int,
+) -> Union[int, float]:
+    """
+    Computes a^b using recursive binary exponentiation (exponentiation by squaring).
+
+    Divides the exponent by 2 at each step:
+      - If b == 0: return 1
+      - If b is even: (a^(b // 2))^2
+      - If b is odd:  a * (a^(b // 2))^2
+
+    Time Complexity: O(log |b|) multiplications.
+    Space Complexity: O(log |b|) recursion call stack.
+
+    Args:
+        a: Base number.
+        b: Exponent integer.
+
+    Returns:
+        Value of a^b.
+
+    Raises:
+        TypeError: If b is not an integer.
+        ZeroDivisionError: If 0 is raised to negative power.
+    """
+    if not isinstance(b, int) or isinstance(b, bool):
+        raise TypeError(f"Exponent b must be an integer, got {type(b).__name__}")
+    if not isinstance(a, (int, float)) or isinstance(a, bool):
+        raise TypeError(f"Base a must be an int or float, got {type(a).__name__}")
+
+    if a == 0:
+        if b < 0:
+            raise ZeroDivisionError("0.0 cannot be raised to a negative power")
+        if b == 0:
+            return 1
+        return 0
+
+    if b < 0:
+        return 1.0 / power_binary_recursive(a, -b)
+
+    if b == 0:
+        return 1
+
+    half = power_binary_recursive(a, b // 2)
+    squared = half * half
+
+    return (a * squared) if (b % 2 == 1) else squared
+
+
+def power_binary_recursive_with_metrics(
+    a: Union[int, float],
+    b: int,
+) -> Tuple[Union[int, float], Dict[str, Any]]:
+    """
+    Computes a^b via recursive squaring while profiling exact operations.
+
+    Args:
+        a: Base.
+        b: Exponent.
+
+    Returns:
+        Tuple of (result, metrics_dict).
+    """
+    if not isinstance(b, int) or isinstance(b, bool):
+        raise TypeError("Exponent b must be an integer")
+    if a == 0 and b < 0:
+        raise ZeroDivisionError("0.0 cannot be raised to a negative power")
+
+    multiplications = 0
+    max_depth = 0
+
+    def _helper(base: Union[int, float], exp: int, depth: int) -> Union[int, float]:
+        nonlocal multiplications, max_depth
+        max_depth = max(max_depth, depth)
+
+        if exp == 0:
+            return 1
+
+        half = _helper(base, exp // 2, depth + 1)
+        res = half * half
+        multiplications += 1
+
+        if exp % 2 == 1:
+            res *= base
+            multiplications += 1
+
+        return res
+
+    t0 = time.perf_counter()
+    if a == 0:
+        ans = 1 if b == 0 else 0
+    elif b == 0:
+        ans = 1
+    elif b < 0:
+        raw = _helper(a, -b, 1)
+        ans = 1.0 / raw
+    else:
+        ans = _helper(a, b, 1)
+
+    elapsed = time.perf_counter() - t0
+
+    metrics = {
+        "base": a,
+        "exponent": b,
+        "result": ans,
+        "multiplications": multiplications,
+        "recursion_depth": max_depth,
+        "time_seconds": elapsed,
+        "algorithm": "Recursive Binary Exponentiation (O(log |b|))",
+    }
+    return (ans, metrics)
+
