@@ -771,3 +771,123 @@ def fibonacci_matrix_power(
     ans = powered[0][0]
 
     return ans if mod is None else (ans % mod)
+
+
+# ─── 7. Step-by-Step Bitwise Exponentiation Trace Visualizer ──────────────────
+
+
+def trace_binary_exponentiation(
+    a: Union[int, float],
+    b: int,
+) -> List[Dict[str, Any]]:
+    """
+    Simulates bitwise binary exponentiation while recording state transitions at each bit.
+
+    Args:
+        a: Base.
+        b: Exponent.
+
+    Returns:
+        List of trace dictionaries describing bit inspection, multiplication, and squaring.
+    """
+    if not isinstance(b, int) or isinstance(b, bool):
+        raise TypeError(f"Exponent must be an int, got {type(b).__name__}")
+    if not isinstance(a, (int, float)) or isinstance(a, bool):
+        raise TypeError(f"Base must be an int or float, got {type(a).__name__}")
+
+    steps = []
+    exp = abs(b)
+    curr_base = a
+    result = 1
+    step_num = 1
+
+    if exp == 0:
+        steps.append({
+            "step": 1,
+            "exponent_remaining": 0,
+            "binary_remaining": "0b0",
+            "active_bit": 0,
+            "current_base": curr_base,
+            "action": "Exponent is 0 -> Result is 1 immediately",
+            "accumulator": 1,
+            "next_base": curr_base,
+        })
+        return steps
+
+    while exp > 0:
+        active_bit = exp & 1
+        prev_result = result
+        prev_base = curr_base
+
+        if active_bit == 1:
+            result *= curr_base
+            action_desc = f"Bit is 1: acc = {prev_result} * {curr_base} = {result}"
+        else:
+            action_desc = f"Bit is 0: skip acc multiply (remains {result})"
+
+        next_base = curr_base * curr_base
+        steps.append({
+            "step": step_num,
+            "exponent_remaining": exp,
+            "binary_remaining": bin(exp),
+            "active_bit": active_bit,
+            "current_base": prev_base,
+            "action": action_desc,
+            "accumulator": result,
+            "next_base": next_base,
+        })
+
+        curr_base = next_base
+        exp >>= 1
+        step_num += 1
+
+    return steps
+
+
+def render_exponentiation_trace(
+    trace: List[Dict[str, Any]],
+    a: Union[int, float],
+    b: int,
+) -> str:
+    """
+    Renders the recorded exponentiation trace as a formatted ASCII diagram.
+
+    Args:
+        trace: List of trace steps from trace_binary_exponentiation.
+        a: Initial base.
+        b: Initial exponent.
+
+    Returns:
+        Multi-line formatted ASCII table.
+    """
+    lines = []
+    lines.append("=" * 78)
+    lines.append("         BINARY EXPONENTIATION (FAST POW) STEP-BY-STEP TRACE          ")
+    lines.append("=" * 78)
+    lines.append(f"Problem  : {a}^{b}")
+    lines.append(f"Exponent : {b} (Binary: {bin(abs(b))}, Bits: {abs(b).bit_length()})")
+    lines.append("-" * 78)
+    header = f"{'Step':<5} | {'Bit':<4} | {'Exp (bin)':<10} | {'Base Value':<12} | {'Accumulator':<14} | {'Action'}"
+    lines.append(header)
+    lines.append("-" * 78)
+
+    for step in trace:
+        step_str = f"{step['step']:<5} | {step['active_bit']:<4} | {step['binary_remaining']:<10} | "
+        base_val = f"{step['current_base']:.4g}" if isinstance(step['current_base'], float) else str(step['current_base'])
+        acc_val = f"{step['accumulator']:.4g}" if isinstance(step['accumulator'], float) else str(step['accumulator'])
+        step_str += f"{base_val:<12} | {acc_val:<14} | {step['action']}"
+        lines.append(step_str)
+
+    lines.append("-" * 78)
+    final_res = trace[-1]["accumulator"] if trace else 1
+    if b < 0:
+        final_res = 1.0 / final_res
+        lines.append(f"Negative Exponent Inversion: 1.0 / {trace[-1]['accumulator']} = {final_res}")
+
+    mult_done = sum(1 for s in trace if s["active_bit"] == 1) + (len(trace) - 1)
+    naive_mult = abs(b)
+    saved = max(0, naive_mult - mult_done)
+    lines.append(f"Final Answer : {final_res}")
+    lines.append(f"Multiplications : {mult_done} vs Naive {naive_mult} (Saved: {saved} ops, ~{round(saved/max(1, naive_mult)*100, 1)}% reduction)")
+    lines.append("=" * 78)
+    return "\n".join(lines)
