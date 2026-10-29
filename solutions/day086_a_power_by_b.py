@@ -271,3 +271,136 @@ def power_binary_recursive_with_metrics(
     }
     return (ans, metrics)
 
+
+# ─── 3. Iterative Bitwise Fast Exponentiation & LeetCode 50 Solution ──────────
+
+
+def power_binary_iterative(
+    a: Union[int, float],
+    b: int,
+) -> Union[int, float]:
+    """
+    Computes a^b using iterative bitwise binary exponentiation.
+
+    Inspects each bit of b from least significant to most significant:
+      - If bit is 1 (exp & 1): multiply accumulator by current base.
+      - Square base for next bit position: base *= base.
+      - Shift exponent right: exp >>= 1.
+
+    Time Complexity: O(log |b|) multiplications.
+    Space Complexity: O(1) auxiliary space (no recursion stack).
+
+    Args:
+        a: Base number (int or float).
+        b: Exponent integer.
+
+    Returns:
+        Result of a^b.
+
+    Raises:
+        TypeError: If invalid types provided.
+        ZeroDivisionError: If a == 0 and b < 0.
+    """
+    if not isinstance(b, int) or isinstance(b, bool):
+        raise TypeError(f"Exponent b must be an integer, got {type(b).__name__}")
+    if not isinstance(a, (int, float)) or isinstance(a, bool):
+        raise TypeError(f"Base a must be an int or float, got {type(a).__name__}")
+
+    if a == 0:
+        if b < 0:
+            raise ZeroDivisionError("0.0 cannot be raised to a negative power")
+        if b == 0:
+            return 1
+        return 0
+
+    if b == 0:
+        return 1
+
+    exp = abs(b)
+    curr_base = a
+    result = 1
+
+    while exp > 0:
+        if exp & 1:
+            result *= curr_base
+        curr_base *= curr_base
+        exp >>= 1
+
+    return (1.0 / result) if b < 0 else result
+
+
+def power_binary_iterative_with_metrics(
+    a: Union[int, float],
+    b: int,
+) -> Tuple[Union[int, float], Dict[str, Any]]:
+    """
+    Computes a^b via bitwise iterative exponentiation while tracking operations.
+
+    Args:
+        a: Base.
+        b: Exponent.
+
+    Returns:
+        Tuple of (result, metrics_dict).
+    """
+    if not isinstance(b, int) or isinstance(b, bool):
+        raise TypeError("Exponent b must be an integer")
+    if a == 0 and b < 0:
+        raise ZeroDivisionError("0.0 cannot be raised to a negative power")
+
+    t0 = time.perf_counter()
+    multiplications = 0
+    bit_shifts = 0
+
+    if a == 0:
+        ans = 1 if b == 0 else 0
+    elif b == 0:
+        ans = 1
+    else:
+        exp = abs(b)
+        curr_base = a
+        result = 1
+
+        while exp > 0:
+            if exp & 1:
+                result *= curr_base
+                multiplications += 1
+            if exp > 1:
+                curr_base *= curr_base
+                multiplications += 1
+            exp >>= 1
+            bit_shifts += 1
+
+        ans = (1.0 / result) if b < 0 else result
+
+    elapsed = time.perf_counter() - t0
+    metrics = {
+        "base": a,
+        "exponent": b,
+        "result": ans,
+        "multiplications": multiplications,
+        "bit_shifts": bit_shifts,
+        "time_seconds": elapsed,
+        "algorithm": "Iterative Bitwise Binary Exponentiation (O(log |b|))",
+    }
+    return (ans, metrics)
+
+
+class Solution:
+    """
+    LeetCode 50: Pow(x, n) solution class wrapper.
+    https://leetcode.com/problems/powx-n/
+    """
+
+    def myPow(self, x: float, n: int) -> float:
+        """
+        Calculates x raised to the power n (x^n).
+
+        Args:
+            x: Base float.
+            n: Exponent integer.
+
+        Returns:
+            Computed float value of x^n.
+        """
+        return float(power_binary_iterative(x, n))
