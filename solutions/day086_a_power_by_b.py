@@ -1009,3 +1009,161 @@ def format_benchmark_table(bench_results: Dict[str, Any]) -> str:
 
     lines.append(sep)
     return "\n".join(lines)
+
+
+# ─── 9. Comprehensive Unit Test Suite ─────────────────────────────────────────
+
+
+class TestPowerAlgorithms(unittest.TestCase):
+    """Unit test suite verifying all power algorithms, edge cases, and heuristics."""
+
+    def test_naive_iterative_positive(self):
+        self.assertEqual(power_naive_iterative(2, 3), 8)
+        self.assertEqual(power_naive_iterative(3, 4), 81)
+        self.assertEqual(power_naive_iterative(10, 5), 100000)
+        self.assertEqual(power_naive_iterative(7, 1), 7)
+
+    def test_naive_iterative_zero_exponent(self):
+        self.assertEqual(power_naive_iterative(5, 0), 1)
+        self.assertEqual(power_naive_iterative(-5, 0), 1)
+        self.assertEqual(power_naive_iterative(0, 0), 1)
+
+    def test_naive_iterative_negative_exponent(self):
+        self.assertEqual(power_naive_iterative(2, -3), 0.125)
+        self.assertEqual(power_naive_iterative(4, -2), 0.0625)
+
+    def test_naive_iterative_zero_base(self):
+        self.assertEqual(power_naive_iterative(0, 5), 0)
+        with self.assertRaises(ZeroDivisionError):
+            power_naive_iterative(0, -2)
+
+    def test_naive_iterative_invalid_types(self):
+        with self.assertRaises(TypeError):
+            power_naive_iterative(2, 2.5)  # type: ignore
+        with self.assertRaises(TypeError):
+            power_naive_iterative("2", 3)  # type: ignore
+
+    def test_naive_recursive(self):
+        self.assertEqual(power_naive_recursive(2, 4), 16)
+        self.assertEqual(power_naive_recursive(5, 0), 1)
+        self.assertEqual(power_naive_recursive(2, -2), 0.25)
+        self.assertEqual(power_naive_recursive(0, 3), 0)
+        with self.assertRaises(ZeroDivisionError):
+            power_naive_recursive(0, -1)
+
+    def test_binary_recursive(self):
+        self.assertEqual(power_binary_recursive(2, 10), 1024)
+        self.assertEqual(power_binary_recursive(3, 5), 243)
+        self.assertEqual(power_binary_recursive(2, -3), 0.125)
+        self.assertEqual(power_binary_recursive(-2, 3), -8)
+        self.assertEqual(power_binary_recursive(-2, 4), 16)
+        self.assertEqual(power_binary_recursive(0, 10), 0)
+        self.assertEqual(power_binary_recursive(0, 0), 1)
+        with self.assertRaises(ZeroDivisionError):
+            power_binary_recursive(0, -3)
+
+    def test_binary_iterative(self):
+        self.assertEqual(power_binary_iterative(2, 10), 1024)
+        self.assertEqual(power_binary_iterative(3, 5), 243)
+        self.assertEqual(power_binary_iterative(2, -3), 0.125)
+        self.assertEqual(power_binary_iterative(-2, 3), -8)
+        self.assertEqual(power_binary_iterative(-2, 4), 16)
+        # Large power
+        self.assertEqual(power_binary_iterative(2, 30), 1 << 30)
+
+    def test_binary_metrics(self):
+        res_rec, m_rec = power_binary_recursive_with_metrics(2, 16)
+        self.assertEqual(res_rec, 65536)
+        # 16 in binary is 10000_2 -> 4 squarings
+        self.assertLessEqual(m_rec["multiplications"], 10)
+
+        res_iter, m_iter = power_binary_iterative_with_metrics(2, 16)
+        self.assertEqual(res_iter, 65536)
+        self.assertLessEqual(m_iter["multiplications"], 10)
+
+    def test_leetcode_solution(self):
+        sol = Solution()
+        self.assertAlmostEqual(sol.myPow(2.0, 10), 1024.0, places=5)
+        self.assertAlmostEqual(sol.myPow(2.1, 3), 9.261, places=3)
+        self.assertAlmostEqual(sol.myPow(2.0, -2), 0.25, places=5)
+
+    def test_modular_power_basic(self):
+        # 2^5 = 32 % 13 = 6
+        self.assertEqual(modular_power(2, 5, 13), 6)
+        # 7^0 % 11 = 1
+        self.assertEqual(modular_power(7, 0, 11), 1)
+        # Modulus 1 is always 0
+        self.assertEqual(modular_power(5, 10, 1), 0)
+
+    def test_modular_power_fermats_little_theorem(self):
+        # a^(p-1) == 1 (mod p) for prime p
+        p = 1000000007
+        a = 42
+        self.assertEqual(modular_power(a, p - 1, p), 1)
+
+    def test_modular_power_negative_exponent(self):
+        # 3^-1 mod 7: 3 * 5 = 15 = 2 * 7 + 1 -> inverse is 5
+        self.assertEqual(modular_power(3, -1, 7), 5)
+        # 3^-2 mod 7 = (5^2) mod 7 = 25 mod 7 = 4
+        self.assertEqual(modular_power(3, -2, 7), 4)
+
+    def test_modular_power_validation(self):
+        with self.assertRaises(ValueError):
+            modular_power(2, 5, 0)
+        with self.assertRaises(ValueError):
+            modular_power(2, 5, -5)
+
+    def test_fractional_power_integer_exponents(self):
+        self.assertAlmostEqual(power_fractional(2, 4), 16.0, places=5)
+        self.assertAlmostEqual(power_fractional(2, -2), 0.25, places=5)
+        self.assertAlmostEqual(power_fractional(5, 0), 1.0, places=5)
+
+    def test_fractional_power_real_exponents(self):
+        # Square root
+        self.assertAlmostEqual(power_fractional(4, 0.5), 2.0, places=4)
+        self.assertAlmostEqual(power_fractional(9, 0.5), 3.0, places=4)
+        # Arbitrary real exponents
+        self.assertAlmostEqual(power_fractional(2.5, 3.2), 2.5 ** 3.2, places=4)
+        self.assertAlmostEqual(power_fractional(10, 2.5), 10 ** 2.5, places=3)
+
+    def test_fractional_power_domain_errors(self):
+        with self.assertRaises(ValueError):
+            power_fractional(-4, 0.5)
+        with self.assertRaises(ZeroDivisionError):
+            power_fractional(0, -0.5)
+
+    def test_matrix_multiplication_and_power(self):
+        A = [[1, 2], [3, 4]]
+        # A^0 is identity
+        self.assertEqual(matrix_2x2_power(A, 0), [[1, 0], [0, 1]])
+        # A^1 is A
+        self.assertEqual(matrix_2x2_power(A, 1), A)
+        # A^2
+        self.assertEqual(matrix_2x2_power(A, 2), [[7, 10], [15, 22]])
+
+    def test_fibonacci_matrix_power(self):
+        fib_seq = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
+        for idx, expected in enumerate(fib_seq):
+            self.assertEqual(fibonacci_matrix_power(idx), expected)
+
+        # Large fibonacci modulo 10^9+7
+        mod = 1000000007
+        f_50 = fibonacci_matrix_power(50, mod)
+        self.assertIsInstance(f_50, int)
+        self.assertGreater(f_50, 0)
+
+    def test_trace_and_renderer(self):
+        trace = trace_binary_exponentiation(3, 5)
+        # 5 is 101_2 -> 3 steps
+        self.assertEqual(len(trace), 3)
+        self.assertEqual(trace[-1]["accumulator"], 243)
+
+        rendered = render_exponentiation_trace(trace, 3, 5)
+        self.assertIn("BINARY EXPONENTIATION", rendered)
+        self.assertIn("Final Answer : 243", rendered)
+
+    def test_benchmark_runs_cleanly(self):
+        bench = benchmark_power_algorithms([10, 20], base=3, repeats=2)
+        self.assertEqual(len(bench["results"]), 2)
+        rendered_table = format_benchmark_table(bench)
+        self.assertIn("Power Benchmark Results", rendered_table)
