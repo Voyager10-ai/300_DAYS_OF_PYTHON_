@@ -520,3 +520,141 @@ def modular_power_with_metrics(
         "algorithm": "Modular Binary Exponentiation (O(log |exp|))",
     }
     return (ans, metrics)
+
+
+# ─── 5. Fractional & Real Exponentiation Engine (a^b = exp(b * ln(a))) ────────
+
+
+LN2: float = 0.693147180559945309417232121458
+
+
+def natural_log(x: float, max_terms: int = 50) -> float:
+    """
+    Computes natural logarithm ln(x) using argument reduction and artanh series.
+
+    Decomposes x = m * 2^k where m in [1, 2).
+    Then ln(x) = ln(m) + k * ln(2).
+    For m, uses:
+      z = (m - 1) / (m + 1)
+      ln(m) = 2 * sum_{i=0}^N (z^(2i + 1) / (2i + 1))
+
+    Args:
+        x: Real positive float.
+        max_terms: Truncation threshold for series.
+
+    Returns:
+        Natural logarithm ln(x).
+
+    Raises:
+        ValueError: If x <= 0 (outside real logarithm domain).
+    """
+    if x <= 0.0:
+        raise ValueError(f"Domain error: ln(x) is only defined for x > 0, got {x}")
+
+    if x == 1.0:
+        return 0.0
+
+    # Range reduction: decompose x = m * 2^k with m in [1.0, 2.0)
+    k = 0
+    m = float(x)
+    while m >= 2.0:
+        m /= 2.0
+        k += 1
+    while m < 1.0:
+        m *= 2.0
+        k -= 1
+
+    # Artanh series for m in [1, 2)
+    z = (m - 1.0) / (m + 1.0)
+    z_sq = z * z
+    curr_pow = z
+    total = 0.0
+
+    for i in range(max_terms):
+        term = curr_pow / (2 * i + 1)
+        total += term
+        if abs(term) < 1e-16:
+            break
+        curr_pow *= z_sq
+
+    return 2.0 * total + (k * LN2)
+
+
+def exponential_series(x: float, max_terms: int = 60) -> float:
+    """
+    Computes e^x using range reduction and Maclaurin Taylor expansion.
+
+    Decomposes x = k * ln(2) + r where |r| <= ln(2) / 2.
+    Then e^x = 2^k * e^r, with e^r = sum_{n=0}^inf (r^n / n!).
+
+    Args:
+        x: Real exponent.
+        max_terms: Number of Taylor polynomial terms.
+
+    Returns:
+        e^x float approximation.
+    """
+    if x == 0.0:
+        return 1.0
+
+    # Range reduction: x = k * ln(2) + r
+    k = round(x / LN2)
+    r = x - (k * LN2)
+
+    # Maclaurin series for e^r
+    term = 1.0
+    total = 1.0
+    for n in range(1, max_terms):
+        term *= r / n
+        total += term
+        if abs(term) < 1e-16:
+            break
+
+    # Scale by 2^k
+    return total * (2.0 ** k)
+
+
+def power_fractional(
+    a: Union[int, float],
+    b: Union[int, float],
+) -> float:
+    """
+    Computes a^b for arbitrary real numbers a and b using analytical identity:
+      a^b = exp(b * ln(a))
+
+    Falls back to exact integer binary exponentiation when b is an integer.
+
+    Args:
+        a: Base (int or float).
+        b: Exponent (int or float).
+
+    Returns:
+        Float value of a^b.
+
+    Raises:
+        ZeroDivisionError: If a == 0 and b < 0.
+        ValueError: If a < 0 and b is non-integer (complex result).
+    """
+    if not isinstance(a, (int, float)) or isinstance(a, bool):
+        raise TypeError(f"Base a must be int or float, got {type(a).__name__}")
+    if not isinstance(b, (int, float)) or isinstance(b, bool):
+        raise TypeError(f"Exponent b must be int or float, got {type(b).__name__}")
+
+    # Check for integer exponent shortcut for exact precision
+    if isinstance(b, int) or (isinstance(b, float) and b.is_integer()):
+        int_exp = int(b)
+        return float(power_binary_iterative(a, int_exp))
+
+    if a == 0.0:
+        if b < 0:
+            raise ZeroDivisionError("0.0 cannot be raised to a negative power")
+        return 0.0
+
+    if a < 0.0:
+        raise ValueError(
+            f"Negative base {a} raised to non-integer power {b} results in a complex number."
+        )
+
+    # a^b = exp(b * ln(a))
+    ln_a = natural_log(float(a))
+    return exponential_series(float(b) * ln_a)
