@@ -891,3 +891,121 @@ def render_exponentiation_trace(
     lines.append(f"Multiplications : {mult_done} vs Naive {naive_mult} (Saved: {saved} ops, ~{round(saved/max(1, naive_mult)*100, 1)}% reduction)")
     lines.append("=" * 78)
     return "\n".join(lines)
+
+
+# ─── 8. Benchmark Comparison Engine ───────────────────────────────────────────
+
+
+def benchmark_power_algorithms(
+    sizes: Optional[List[int]] = None,
+    base: int = 2,
+    repeats: int = 5,
+) -> Dict[str, Any]:
+    """
+    Benchmarks execution time and multiplication counts across:
+      1. Naive Iterative (O(B))
+      2. Recursive Binary Squaring (O(log B))
+      3. Iterative Bitwise (O(log B))
+      4. Python Built-in operator (**)
+
+    Args:
+        sizes: Exponent values to test.
+        base: Base value.
+        repeats: Iterations for timing averaging.
+
+    Returns:
+        Structured dictionary with comparative metrics.
+    """
+    if sizes is None:
+        sizes = [10, 50, 200, 1000, 5000, 20000]
+
+    bench_data = []
+
+    for b in sizes:
+        row: Dict[str, Any] = {"exponent": b, "base": base}
+
+        # 1. Naive (only run if b <= 25000 to avoid extreme slowdown)
+        if b <= 25000:
+            t0 = time.perf_counter()
+            for _ in range(repeats):
+                _ = power_naive_iterative(base, b)
+            naive_time = (time.perf_counter() - t0) / repeats
+            naive_mults = b
+        else:
+            naive_time = float("inf")
+            naive_mults = b
+        row["naive_time_sec"] = naive_time
+        row["naive_mults"] = naive_mults
+
+        # 2. Recursive Binary Squaring
+        t0 = time.perf_counter()
+        for _ in range(repeats):
+            _ = power_binary_recursive(base, b)
+        rec_time = (time.perf_counter() - t0) / repeats
+        _, m_rec = power_binary_recursive_with_metrics(base, b)
+        row["rec_time_sec"] = rec_time
+        row["rec_mults"] = m_rec["multiplications"]
+
+        # 3. Iterative Bitwise
+        t0 = time.perf_counter()
+        for _ in range(repeats):
+            _ = power_binary_iterative(base, b)
+        iter_time = (time.perf_counter() - t0) / repeats
+        _, m_iter = power_binary_iterative_with_metrics(base, b)
+        row["iter_time_sec"] = iter_time
+        row["iter_mults"] = m_iter["multiplications"]
+
+        # 4. Built-in **
+        t0 = time.perf_counter()
+        for _ in range(repeats):
+            _ = base ** b
+        builtin_time = (time.perf_counter() - t0) / repeats
+        row["builtin_time_sec"] = builtin_time
+
+        # Speedup of iterative bitwise vs naive
+        if naive_time > 0 and naive_time != float("inf"):
+            row["speedup_ratio"] = naive_time / max(1e-12, iter_time)
+        else:
+            row["speedup_ratio"] = float("inf")
+
+        bench_data.append(row)
+
+    return {
+        "base": base,
+        "repeats": repeats,
+        "results": bench_data,
+    }
+
+
+def format_benchmark_table(bench_results: Dict[str, Any]) -> str:
+    """
+    Renders benchmark metrics into a structured ASCII table.
+    """
+    lines = []
+    base = bench_results["base"]
+    lines.append(f"Power Benchmark Results (Base = {base}):")
+    header = (
+        f"{'Exp (B)':>8} | {'Naive (O(B))':>14} | {'Rec Squaring':>14} | "
+        f"{'Bitwise (O(log B))':>18} | {'Built-in (**)':>14} | {'Speedup':>9}"
+    )
+    sep = "-" * len(header)
+    lines.append(sep)
+    lines.append(header)
+    lines.append(sep)
+
+    for r in bench_results["results"]:
+        exp_val = r["exponent"]
+        naive_str = f"{r['naive_time_sec']*1e6:10.2f} us" if r['naive_time_sec'] != float("inf") else "N/A (too slow)"
+        rec_str = f"{r['rec_time_sec']*1e6:10.2f} us"
+        iter_str = f"{r['iter_time_sec']*1e6:10.2f} us"
+        builtin_str = f"{r['builtin_time_sec']*1e6:10.2f} us"
+        speedup_str = f"{r['speedup_ratio']:8.1f}x" if r['speedup_ratio'] != float("inf") else "Huge"
+
+        row = (
+            f"{exp_val:>8} | {naive_str:>14} | {rec_str:>14} | "
+            f"{iter_str:>18} | {builtin_str:>14} | {speedup_str:>9}"
+        )
+        lines.append(row)
+
+    lines.append(sep)
+    return "\n".join(lines)
