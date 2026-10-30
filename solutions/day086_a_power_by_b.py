@@ -1167,3 +1167,69 @@ class TestPowerAlgorithms(unittest.TestCase):
         self.assertEqual(len(bench["results"]), 2)
         rendered_table = format_benchmark_table(bench)
         self.assertIn("Power Benchmark Results", rendered_table)
+
+
+# ─── 10. Interactive CLI Demonstration ────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates all A Power by B exponentiation algorithms and metrics."""
+    print("=" * 78)
+    print("       DAY 86: A POWER BY B (FAST BINARY EXPONENTIATION & VARIANTS)      ")
+    print("=" * 78)
+
+    # 1. Compare Naive vs Binary Exponentiation
+    base, exp = 3, 13
+    ans_naive, m_naive = power_naive_with_metrics(base, exp)
+    ans_fast, m_fast = power_binary_iterative_with_metrics(base, exp)
+
+    print(f"\n[1] Basic Power Comparison ({base}^{exp}):")
+    print(f"    Naive Iterative       : Result = {ans_naive} | Multiplications = {m_naive['multiplications']}")
+    print(f"    Bitwise Fast Power    : Result = {ans_fast} | Multiplications = {m_fast['multiplications']}")
+    print(f"    Operations Saved      : {m_naive['multiplications'] - m_fast['multiplications']} ops")
+
+    # 2. LeetCode 50: Pow(x, n) with negative exponent
+    sol = Solution()
+    print(f"\n[2] LeetCode 50: Pow(x, n) Handles Negative Exponents:")
+    print(f"    2.0 ^ 10   = {sol.myPow(2.0, 10)}")
+    print(f"    2.1 ^ 3    = {sol.myPow(2.1, 3):.4f}")
+    print(f"    2.0 ^ (-2) = {sol.myPow(2.0, -2)}")
+
+    # 3. Modular Exponentiation (RSA / Cryptography)
+    big_base = 7
+    big_exp = 256
+    mod = 1000000007
+    mod_ans, mod_m = modular_power_with_metrics(big_base, big_exp, mod)
+    print(f"\n[3] Modular Exponentiation ({big_base}^{big_exp} mod {mod}):")
+    print(f"    Result = {mod_ans}")
+    print(f"    Time   = {mod_m['time_seconds']*1e6:.2f} microseconds (no BigInt overflow)")
+
+    # 4. Fractional and Real Powers
+    print(f"\n[4] Real & Fractional Exponentiation (a^b = exp(b * ln a)):")
+    print(f"    4 ^ 0.5   = {power_fractional(4, 0.5):.6f} (Exact: 2.0)")
+    print(f"    27 ^ (1/3)= {power_fractional(27, 1/3):.6f} (Exact: 3.0)")
+    print(f"    2.5 ^ 3.2 = {power_fractional(2.5, 3.2):.6f} (math.pow: {2.5**3.2:.6f})")
+
+    # 5. O(log N) Matrix Fibonacci Exponentiation
+    print(f"\n[5] Matrix Exponentiation for O(log N) Fibonacci:")
+    for n in [10, 20, 50, 100]:
+        fn = fibonacci_matrix_power(n, mod=1000000007)
+        print(f"    F({n:<3}) mod 10^9+7 = {fn}")
+
+    # 6. Step-by-Step Bitwise Traversal
+    print(f"\n[6] Bitwise Traversal Visualizer:")
+    trace = trace_binary_exponentiation(3, 11)
+    print(render_exponentiation_trace(trace, 3, 11))
+
+    # 7. Performance Benchmark Table
+    print(f"\n[7] Algorithm Performance Benchmark:")
+    bench = benchmark_power_algorithms([10, 100, 500, 2000, 10000], base=2, repeats=5)
+    print(format_benchmark_table(bench))
+
+    print("\n" + "=" * 78)
+    print("                    DEMONSTRATION COMPLETE                              ")
+    print("=" * 78)
+
+
+if __name__ == "__main__":
+    main()

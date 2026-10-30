@@ -87,6 +87,8 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 82: Merge Sort Implement
 - Day 83: Quick Sort Implement
 - Day 84: Sequential Search
+- Day 85: Binary Search Implement
+- Day 86: A Power by B
 
 
 

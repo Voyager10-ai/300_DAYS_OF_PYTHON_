@@ -1672,6 +1672,48 @@ import java.util.*;
 //     }
 // }
 
+// Java A Power by B Practice (Day 86)
+// class APowerByBPractice {
+//     // Iterative Binary Exponentiation: O(log B) time, O(1) space
+//     public static double power(double a, int b) {
+//         if (a == 0) return b < 0 ? Double.POSITIVE_INFINITY : (b == 0 ? 1.0 : 0.0);
+//         long exp = b;
+//         if (exp < 0) {
+//             a = 1.0 / a;
+//             exp = -exp;
+//         }
+//         double ans = 1.0;
+//         double currBase = a;
+//         while (exp > 0) {
+//             if ((exp & 1) == 1) {
+//                 ans *= currBase;
+//             }
+//             currBase *= currBase;
+//             exp >>= 1;
+//         }
+//         return ans;
+//     }
+//     // Modular Exponentiation: (base^exp) % mod in O(log exp)
+//     public static long modularPower(long base, long exp, long mod) {
+//         if (mod == 1) return 0;
+//         long ans = 1;
+//         long curr = base % mod;
+//         while (exp > 0) {
+//             if ((exp & 1) == 1) {
+//                 ans = (ans * curr) % mod;
+//             }
+//             curr = (curr * curr) % mod;
+//             exp >>= 1;
+//         }
+//         return ans;
+//     }
+//     public static void main(String[] args) {
+//         System.out.println("2.0 ^ 10 = " + power(2.0, 10));
+//         System.out.println("2.0 ^ -3 = " + power(2.0, -3));
+//         System.out.println("7 ^ 256 mod 1000000007 = " + modularPower(7, 256, 1000000007));
+//     }
+// }
+
 public class main{
 
 
