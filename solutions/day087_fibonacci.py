@@ -605,3 +605,117 @@ def fibonacci_matrix_with_metrics(
         "algorithm": "2x2 Matrix Binary Exponentiation O(log n)",
     }
     return (res, metrics)
+
+
+
+# ─── 6. Fibonacci Generator, Streamer & Identification ────────────────────────
+
+
+def _is_perfect_square(x: int) -> bool:
+    """Returns True if integer x is a non-negative perfect square."""
+    if x < 0:
+        return False
+    s = math.isqrt(x)
+    return s * s == x
+
+
+def is_fibonacci_number(x: int) -> bool:
+    """
+    Determines if a number x is a valid Fibonacci number in O(1) time.
+
+    By Gessel's theorem, an integer x is a Fibonacci number if and only if
+    5*x^2 + 4 or 5*x^2 - 4 is a perfect square.
+
+    Args:
+        x: Non-negative integer to test.
+
+    Returns:
+        True if x is in the Fibonacci sequence, False otherwise.
+
+    Raises:
+        TypeError: If x is not an integer.
+        ValueError: If x is negative.
+    """
+    if not isinstance(x, int) or isinstance(x, bool):
+        raise TypeError(f"x must be an integer, got {type(x).__name__}")
+    if x < 0:
+        raise ValueError(f"x must be non-negative, got {x}")
+
+    return _is_perfect_square(5 * x * x + 4) or _is_perfect_square(5 * x * x - 4)
+
+
+def fibonacci_generator(
+    limit: Optional[int] = None,
+) -> Generator[int, None, None]:
+    """
+    Generates Fibonacci numbers lazily in O(1) memory space.
+
+    Args:
+        limit: Optional maximum number of Fibonacci terms to yield.
+               If None, yields indefinitely.
+
+    Yields:
+        Consecutive Fibonacci numbers: F(0), F(1), F(2), ...
+
+    Raises:
+        TypeError: If limit is not an int or None.
+        ValueError: If limit < 0.
+    """
+    if limit is not None:
+        if not isinstance(limit, int) or isinstance(limit, bool):
+            raise TypeError(f"limit must be an integer or None, got {type(limit).__name__}")
+        if limit < 0:
+            raise ValueError(f"limit must be non-negative, got {limit}")
+
+    a, b = 0, 1
+    yielded = 0
+
+    while limit is None or yielded < limit:
+        yield a
+        a, b = b, a + b
+        yielded += 1
+
+
+def fibonacci_sequence_list(count: int) -> List[int]:
+    """
+    Generates a list containing the first count Fibonacci numbers.
+
+    Args:
+        count: Number of elements to generate.
+
+    Returns:
+        List of first count Fibonacci numbers.
+    """
+    return list(fibonacci_generator(limit=count))
+
+
+def nearest_fibonacci(x: int) -> Tuple[int, int]:
+    """
+    Finds the Fibonacci number closest to x, and returns (nearest_fib, distance).
+
+    Args:
+        x: Non-negative integer.
+
+    Returns:
+        Tuple of (closest_fibonacci_number, abs_difference).
+
+    Raises:
+        TypeError: If x is not an integer.
+        ValueError: If x is negative.
+    """
+    if not isinstance(x, int) or isinstance(x, bool):
+        raise TypeError(f"x must be an integer, got {type(x).__name__}")
+    if x < 0:
+        raise ValueError(f"x must be non-negative, got {x}")
+
+    if x == 0:
+        return (0, 0)
+
+    a, b = 0, 1
+    while b < x:
+        a, b = b, a + b
+
+    # Closest is either a or b
+    if abs(x - a) <= abs(b - x):
+        return (a, abs(x - a))
+    return (b, abs(b - x))
