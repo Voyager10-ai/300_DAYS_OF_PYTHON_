@@ -719,3 +719,151 @@ def nearest_fibonacci(x: int) -> Tuple[int, int]:
     if abs(x - a) <= abs(b - x):
         return (a, abs(x - a))
     return (b, abs(b - x))
+
+
+
+# ─── 7. Fibonacci Search Algorithm for Sorted Arrays ──────────────────────────
+
+
+def fibonacci_search(arr: List[Any], target: Any) -> int:
+    """
+    Searches for target in a sorted list using the Fibonacci Search algorithm.
+
+    Fibonacci search divides the search space according to Fibonacci numbers.
+    Unlike Binary Search, it requires only addition and subtraction rather than
+    division or bit shifts, offering advantages on constrained arithmetic hardware.
+
+    Time Complexity: O(log n) comparisons.
+    Space Complexity: O(1) auxiliary space.
+
+    Args:
+        arr: Sorted list of comparable elements in ascending order.
+        target: Element to find.
+
+    Returns:
+        Index of target if found; -1 otherwise.
+
+    Raises:
+        TypeError: If arr is not a list.
+    """
+    if not isinstance(arr, list):
+        raise TypeError(f"arr must be a list, got {type(arr).__name__}")
+
+    n = len(arr)
+    if n == 0:
+        return -1
+
+    # Initialize Fibonacci numbers:
+    # fib_m2 is (m-2)'th Fibonacci number
+    # fib_m1 is (m-1)'th Fibonacci number
+    # fib_m is m'th Fibonacci number (smallest >= n)
+    fib_m2 = 0
+    fib_m1 = 1
+    fib_m = fib_m2 + fib_m1
+
+    while fib_m < n:
+        fib_m2 = fib_m1
+        fib_m1 = fib_m
+        fib_m = fib_m2 + fib_m1
+
+    # Marks eliminated range from front
+    offset = -1
+
+    while fib_m > 1:
+        # Check valid index
+        i = min(offset + fib_m2, n - 1)
+
+        if arr[i] < target:
+            # Move Fibonacci numbers 1 down, reset offset
+            fib_m = fib_m1
+            fib_m1 = fib_m2
+            fib_m2 = fib_m - fib_m1
+            offset = i
+        elif arr[i] > target:
+            # Move Fibonacci numbers 2 down
+            fib_m = fib_m2
+            fib_m1 = fib_m1 - fib_m2
+            fib_m2 = fib_m - fib_m1
+        else:
+            return i
+
+    # Comparing the last candidate element
+    if fib_m1 and offset + 1 < n and arr[offset + 1] == target:
+        return offset + 1
+
+    return -1
+
+
+def fibonacci_search_with_metrics(
+    arr: List[Any],
+    target: Any,
+) -> Tuple[int, Dict[str, Any]]:
+    """
+    Performs Fibonacci search on a sorted list while recording probe path and metrics.
+
+    Args:
+        arr: Sorted list of comparable elements.
+        target: Element to locate.
+
+    Returns:
+        Tuple of (index_or_minus_1, metrics_dict).
+    """
+    if not isinstance(arr, list):
+        raise TypeError(f"arr must be a list, got {type(arr).__name__}")
+
+    t0 = time.perf_counter()
+    n = len(arr)
+    probes: List[int] = []
+    comparisons = 0
+
+    if n == 0:
+        elapsed = time.perf_counter() - t0
+        return (-1, {"index": -1, "comparisons": 0, "probes": [], "time_seconds": elapsed})
+
+    fib_m2 = 0
+    fib_m1 = 1
+    fib_m = fib_m2 + fib_m1
+
+    while fib_m < n:
+        fib_m2 = fib_m1
+        fib_m1 = fib_m
+        fib_m = fib_m2 + fib_m1
+
+    offset = -1
+    result_idx = -1
+
+    while fib_m > 1:
+        i = min(offset + fib_m2, n - 1)
+        probes.append(i)
+        comparisons += 1
+
+        if arr[i] < target:
+            fib_m = fib_m1
+            fib_m1 = fib_m2
+            fib_m2 = fib_m - fib_m1
+            offset = i
+        elif arr[i] > target:
+            fib_m = fib_m2
+            fib_m1 = fib_m1 - fib_m2
+            fib_m2 = fib_m - fib_m1
+        else:
+            result_idx = i
+            break
+
+    if result_idx == -1 and fib_m1 and offset + 1 < n:
+        probes.append(offset + 1)
+        comparisons += 1
+        if arr[offset + 1] == target:
+            result_idx = offset + 1
+
+    elapsed = time.perf_counter() - t0
+    metrics = {
+        "index": result_idx,
+        "found": result_idx != -1,
+        "comparisons": comparisons,
+        "probes": probes,
+        "array_size": n,
+        "time_seconds": elapsed,
+        "algorithm": "Fibonacci Search O(log n)",
+    }
+    return (result_idx, metrics)
