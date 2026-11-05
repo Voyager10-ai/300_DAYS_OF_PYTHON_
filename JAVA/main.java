@@ -1714,6 +1714,38 @@ import java.util.*;
 //     }
 // }
 
+// Java Fibonacci Practice (Day 87)
+// class FibonacciPractice {
+//     // Fast Doubling: O(log n) time, O(log n) recursion stack
+//     public static long[] fibPair(int n) {
+//         if (n == 0) return new long[]{0, 1};
+//         long[] p = fibPair(n >> 1);
+//         long c = p[0] * (2 * p[1] - p[0]);
+//         long d = p[0] * p[0] + p[1] * p[1];
+//         if ((n & 1) == 1) return new long[]{d, c + d};
+//         return new long[]{c, d};
+//     }
+//     public static long fibFast(int n) {
+//         return fibPair(n)[0];
+//     }
+//     // Bottom-Up Iterative: O(n) time, O(1) space
+//     public static long fibIterative(int n) {
+//         if (n <= 1) return n;
+//         long a = 0, b = 1;
+//         for (int i = 2; i <= n; i++) {
+//             long next = a + b;
+//             a = b;
+//             b = next;
+//         }
+//         return b;
+//     }
+//     public static void main(String[] args) {
+//         System.out.println("Fib(10) = " + fibFast(10));
+//         System.out.println("Fib(20) = " + fibFast(20));
+//         System.out.println("Fib(50) = " + fibFast(50));
+//     }
+// }
+
 public class main{
 
 

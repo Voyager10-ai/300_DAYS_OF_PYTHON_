@@ -89,6 +89,7 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 84: Sequential Search
 - Day 85: Binary Search Implement
 - Day 86: A Power by B
+- Day 87: Fibonacci
 
 
 

@@ -1234,3 +1234,80 @@ class TestFibonacciImplementations(unittest.TestCase):
         self.assertEqual(idx, 3)
         self.assertIn("probes", m_search)
         self.assertIn("comparisons", m_search)
+
+
+
+# ─── 11. Interactive CLI Demonstration ────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates all Fibonacci implementations, search, visualizers, and benchmark."""
+    print("=" * 80)
+    print("                 DAY 87: FIBONACCI ALGORITHMS & SUITE                   ")
+    print("=" * 80)
+
+    # 1. Compare Core Algorithms for F(15)
+    n = 15
+    f_rec = fibonacci_recursive(n)
+    f_iter = fibonacci_iterative(n)
+    f_memo = fibonacci_memoized(n)
+    f_fast = fibonacci_fast_doubling_iterative(n)
+    f_mat = fibonacci_matrix(n)
+    f_bin = fibonacci_binet(n)
+
+    print(f"\n[1] Algorithm Output Consistency for F({n}):")
+    print(f"    - Naive Recursive      : {f_rec}")
+    print(f"    - Memoized Top-Down DP : {f_memo}")
+    print(f"    - Iterative Bottom-Up  : {f_iter}")
+    print(f"    - Fast Doubling O(log) : {f_fast}")
+    print(f"    - 2x2 Matrix O(log)    : {f_mat}")
+    print(f"    - Binet Closed-Form    : {f_bin}")
+
+    # 2. Large Scale Computation (F(100) and F(300))
+    big_n = 100
+    big_fast = fibonacci_fast_doubling_iterative(big_n)
+    big_mat = fibonacci_matrix(big_n)
+    big_dec = fibonacci_binet_decimal(big_n)
+    print(f"\n[2] High-Precision Evaluation for F({big_n}):")
+    print(f"    - Fast Doubling : {big_fast}")
+    print(f"    - 2x2 Matrix    : {big_mat}")
+    print(f"    - Decimal Binet : {big_dec}")
+    print(f"    - Digits count  : {len(str(big_fast))} digits")
+
+    # 3. Fibonacci Streaming & Membership Detection
+    print("\n[3] Generator Stream & Gessel Membership Test:")
+    first_12 = fibonacci_sequence_list(12)
+    print(f"    First 12 terms : {first_12}")
+    test_vals = [55, 89, 90, 144, 200]
+    for v in test_vals:
+        print(f"    is_fibonacci_number({v:<3}) -> {is_fibonacci_number(v)}")
+
+    # 4. Fibonacci Search on Sorted Array
+    sample_arr = [10, 22, 35, 40, 45, 50, 80, 82, 85, 90, 100, 235]
+    target = 85
+    idx, m_search = fibonacci_search_with_metrics(sample_arr, target)
+    print(f"\n[4] Fibonacci Search in Sorted List:")
+    print(f"    Array       : {sample_arr}")
+    print(f"    Target      : {target}")
+    print(f"    Found Index : {idx} (Probes visited: {m_search['probes']}, Comparisons: {m_search['comparisons']})")
+
+    # 5. Call Tree Visualization for F(4)
+    print("\n[5] Naive Call Tree Visualizer:")
+    print(visualize_fibonacci_call_tree(4))
+
+    # 6. Step-by-Step Table and Golden Ratio Convergence
+    print("\n[6] Step-by-Step Sequence Derivation (0..8):")
+    print(visualize_fibonacci_steps(8))
+
+    # 7. Benchmark Comparison
+    print("\n[7] Multi-Algorithm Benchmark Comparison:")
+    bench_data = benchmark_fibonacci_algorithms(test_values=[10, 25, 30, 100, 1000], iterations=3)
+    print(format_benchmark_table(bench_data))
+
+    print("\n" + "=" * 80)
+    print("                      DEMONSTRATION COMPLETE                                   ")
+    print("=" * 80)
+
+
+if __name__ == "__main__":
+    main()
