@@ -867,3 +867,84 @@ def fibonacci_search_with_metrics(
         "algorithm": "Fibonacci Search O(log n)",
     }
     return (result_idx, metrics)
+
+
+
+# ─── 8. Step-by-Step Visualizer & Recursion Call Tree ─────────────────────────
+
+
+def visualize_fibonacci_call_tree(n: int) -> str:
+    """
+    Renders an ASCII tree diagram representing the naive recursive execution call tree.
+
+    Illustrates exponential branching and repeated subproblem calculations.
+
+    Args:
+        n: Non-negative integer index (recommended <= 6).
+
+    Returns:
+        Formatted ASCII string diagram.
+
+    Raises:
+        ValueError: If n > 7 (to avoid console buffer explosion).
+    """
+    if n > 7:
+        raise ValueError("Call tree visualizer is limited to n <= 7 due to exponential size")
+    if n < 0:
+        raise ValueError("n must be non-negative")
+
+    lines: List[str] = []
+    lines.append(f"Naive Recursive Call Tree for F({n}) [Total calls: {2 * fibonacci_iterative(n + 1) - 1 if n > 0 else 1}]:")
+    lines.append("=" * 60)
+
+    def _build_tree(val: int, prefix: str = "", is_last: bool = True) -> None:
+        branch = "└── " if is_last else "├── "
+        lines.append(f"{prefix}{branch}F({val})")
+        if val > 1:
+            next_prefix = prefix + ("    " if is_last else "│   ")
+            _build_tree(val - 1, next_prefix, False)
+            _build_tree(val - 2, next_prefix, True)
+
+    _build_tree(n, "", True)
+    return "\n".join(lines)
+
+
+def visualize_fibonacci_steps(n: int) -> str:
+    """
+    Generates a step-by-step ASCII table tracing Fibonacci progression up to n.
+
+    Displays index, subproblem terms, computed sum, and convergence to Golden Ratio.
+
+    Args:
+        n: Target Fibonacci index.
+
+    Returns:
+        Formatted table as a string.
+    """
+    if n < 0:
+        raise ValueError("n must be non-negative")
+
+    lines: List[str] = []
+    lines.append(f"Fibonacci Sequence Derivation & Golden Ratio Convergence (0..{n})")
+    lines.append("=" * 72)
+    header = f"{'k':>4} | {'F(k-2)':>12} | {'F(k-1)':>12} | {'F(k)':>14} | {'Ratio F(k)/F(k-1)':>18}"
+    lines.append(header)
+    lines.append("-" * 72)
+
+    if n == 0:
+        lines.append(f"{0:>4} | {'-':>12} | {'-':>12} | {0:>14} | {'-':>18}")
+        return "\n".join(lines)
+
+    lines.append(f"{0:>4} | {'-':>12} | {'-':>12} | {0:>14} | {'-':>18}")
+    lines.append(f"{1:>4} | {'-':>12} | {0:>12} | {1:>14} | {'-':>18}")
+
+    a, b = 0, 1
+    for k in range(2, n + 1):
+        prev2, prev1 = a, b
+        a, b = b, a + b
+        ratio_str = f"{(b / prev1):.10f}" if prev1 > 0 else "-"
+        lines.append(f"{k:>4} | {prev2:>12} | {prev1:>12} | {b:>14} | {ratio_str:>18}")
+
+    lines.append("=" * 72)
+    lines.append(f"Golden Ratio (phi) exact limit: {(1 + math.sqrt(5)) / 2:.10f}")
+    return "\n".join(lines)
