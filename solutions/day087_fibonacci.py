@@ -10,6 +10,8 @@
 
 import time
 import math
+import decimal
+from decimal import Decimal, getcontext
 import unittest
 from typing import List, Dict, Tuple, Any, Optional, Generator
 from functools import lru_cache
@@ -228,3 +230,122 @@ def fibonacci_memoized_with_metrics(
         "algorithm": "Top-Down Memoized DP O(n)",
     }
     return (result, metrics)
+
+
+
+# ─── 3. Closed-Form Binet's Formula & Precision-Safe Approximation ────────────
+
+
+def fibonacci_binet(n: int) -> int:
+    """
+    Computes F(n) using Binet's closed-form formula using 64-bit floating point.
+
+    Formula:
+        phi = (1 + sqrt(5)) / 2  (the Golden Ratio ~ 1.6180339887)
+        F(n) = round(phi^n / sqrt(5))
+
+    Time Complexity: O(1) mathematical power operation.
+    Space Complexity: O(1) auxiliary space.
+
+    Note on Precision:
+        Standard IEEE 754 64-bit double precision has 53 bits of mantissa,
+        retaining accuracy strictly for n <= 70. For n >= 71, floating-point
+        rounding errors corrupt the lowest significant digits. For larger n,
+        use `fibonacci_binet_decimal` or exact integer algorithms.
+
+    Args:
+        n: Non-negative integer Fibonacci index.
+
+    Returns:
+        F(n) integer value.
+
+    Raises:
+        TypeError: If n is not an integer.
+        ValueError: If n is negative.
+    """
+    if not isinstance(n, int) or isinstance(n, bool):
+        raise TypeError(f"n must be an integer, got {type(n).__name__}")
+    if n < 0:
+        raise ValueError(f"n must be non-negative, got {n}")
+
+    if n <= 1:
+        return n
+
+    sqrt_5 = math.sqrt(5)
+    phi = (1.0 + sqrt_5) / 2.0
+    return round((phi ** n) / sqrt_5)
+
+
+def fibonacci_binet_decimal(n: int, precision: Optional[int] = None) -> int:
+    """
+    Computes F(n) via Binet's formula using arbitrary-precision Decimals.
+
+    Dynamically scales decimal context precision to avoid precision truncation,
+    allowing exact results for n > 70.
+
+    Time Complexity: O(M(d)) where d is precision digits and M is multiplication cost.
+    Space Complexity: O(d) for Decimal storage.
+
+    Args:
+        n: Non-negative integer index.
+        precision: Optional decimal precision. Defaults to max(100, int(n * 0.21) + 50).
+
+    Returns:
+        Exact F(n) integer value.
+    """
+    if not isinstance(n, int) or isinstance(n, bool):
+        raise TypeError(f"n must be an integer, got {type(n).__name__}")
+    if n < 0:
+        raise ValueError(f"n must be non-negative, got {n}")
+
+    if n <= 1:
+        return n
+
+    req_prec = max(100, int(n * 0.22) + 50) if precision is None else precision
+    current_prec = decimal.getcontext().prec
+    try:
+        decimal.getcontext().prec = req_prec
+        d5 = Decimal(5)
+        sqrt_5 = d5.sqrt()
+        phi = (Decimal(1) + sqrt_5) / Decimal(2)
+        psi = (Decimal(1) - sqrt_5) / Decimal(2)
+        # F(n) = (phi^n - psi^n) / sqrt(5)
+        fn_dec = (phi ** n - psi ** n) / sqrt_5
+        return int(fn_dec.to_integral_value(rounding=decimal.ROUND_HALF_UP))
+    finally:
+        decimal.getcontext().prec = current_prec
+
+
+def fibonacci_binet_with_metrics(n: int) -> Tuple[int, Dict[str, Any]]:
+    """
+    Computes F(n) using Binet formula and returns metrics on accuracy and speed.
+
+    Args:
+        n: Non-negative integer Fibonacci index.
+
+    Returns:
+        Tuple of (result, metrics_dict).
+    """
+    if not isinstance(n, int) or isinstance(n, bool):
+        raise TypeError(f"n must be an integer, got {type(n).__name__}")
+    if n < 0:
+        raise ValueError(f"n must be non-negative, got {n}")
+
+    t0 = time.perf_counter()
+    if n <= 70:
+        res = fibonacci_binet(n)
+        method = "64-bit Float Binet"
+    else:
+        res = fibonacci_binet_decimal(n)
+        method = "Arbitrary-Precision Decimal Binet"
+    elapsed = time.perf_counter() - t0
+
+    metrics = {
+        "n": n,
+        "result": res,
+        "method": method,
+        "exact_within_float_limits": n <= 70,
+        "time_seconds": elapsed,
+        "algorithm": "Closed-Form Binet O(1) / O(log n)",
+    }
+    return (res, metrics)
