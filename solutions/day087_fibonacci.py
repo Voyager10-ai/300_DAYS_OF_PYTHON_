@@ -478,3 +478,130 @@ def fibonacci_fast_doubling_with_metrics(
         "algorithm": "Iterative Fast Doubling O(log n)",
     }
     return (res, metrics)
+
+
+
+# ─── 5. 2x2 Matrix Binary Exponentiation O(log n) ─────────────────────────────
+
+Matrix2x2 = Tuple[Tuple[int, int], Tuple[int, int]]
+
+
+def _matrix_multiply_2x2(
+    A: Matrix2x2,
+    B: Matrix2x2,
+    mod: Optional[int] = None,
+) -> Matrix2x2:
+    """Multiplies two 2x2 integer matrices with optional modular reduction."""
+    if mod is not None:
+        return (
+            (
+                (A[0][0] * B[0][0] + A[0][1] * B[1][0]) % mod,
+                (A[0][0] * B[0][1] + A[0][1] * B[1][1]) % mod,
+            ),
+            (
+                (A[1][0] * B[0][0] + A[1][1] * B[1][0]) % mod,
+                (A[1][0] * B[0][1] + A[1][1] * B[1][1]) % mod,
+            ),
+        )
+    return (
+        (
+            A[0][0] * B[0][0] + A[0][1] * B[1][0],
+            A[0][0] * B[0][1] + A[0][1] * B[1][1],
+        ),
+        (
+            A[1][0] * B[0][0] + A[1][1] * B[1][0],
+            A[1][0] * B[0][1] + A[1][1] * B[1][1],
+        ),
+    )
+
+
+def _matrix_power_2x2(
+    M: Matrix2x2,
+    p: int,
+    mod: Optional[int] = None,
+) -> Matrix2x2:
+    """Raises a 2x2 matrix to the p-th power in O(log p) matrix multiplications."""
+    result: Matrix2x2 = ((1, 0), (0, 1))  # Identity matrix
+    base = M
+
+    while p > 0:
+        if p & 1:
+            result = _matrix_multiply_2x2(result, base, mod)
+        base = _matrix_multiply_2x2(base, base, mod)
+        p >>= 1
+
+    return result
+
+
+def fibonacci_matrix(n: int, mod: Optional[int] = None) -> int:
+    """
+    Computes F(n) [optionally modulo mod] using 2x2 matrix binary exponentiation.
+
+    Based on the linear recurrence transformation:
+        [[F(n+1), F(n)], [F(n), F(n-1)]] = [[1, 1], [1, 0]]^n
+
+    Time Complexity: O(log n) matrix multiplications.
+    Space Complexity: O(1) auxiliary space.
+
+    Args:
+        n: Non-negative integer Fibonacci index.
+        mod: Optional positive integer modulus for modular arithmetic.
+
+    Returns:
+        F(n) [mod mod] integer value.
+
+    Raises:
+        TypeError: If n or mod is not an integer.
+        ValueError: If n is negative or mod <= 0.
+    """
+    if not isinstance(n, int) or isinstance(n, bool):
+        raise TypeError(f"n must be an integer, got {type(n).__name__}")
+    if n < 0:
+        raise ValueError(f"n must be non-negative, got {n}")
+    if mod is not None:
+        if not isinstance(mod, int) or isinstance(mod, bool):
+            raise TypeError(f"mod must be an integer, got {type(mod).__name__}")
+        if mod <= 0:
+            raise ValueError(f"mod must be positive, got {mod}")
+
+    if n == 0:
+        return 0
+
+    trans: Matrix2x2 = ((1, 1), (1, 0))
+    powered = _matrix_power_2x2(trans, n - 1, mod)
+    result = powered[0][0]
+    return (result % mod) if mod is not None else result
+
+
+def fibonacci_matrix_with_metrics(
+    n: int,
+    mod: Optional[int] = None,
+) -> Tuple[int, Dict[str, Any]]:
+    """
+    Computes F(n) via matrix exponentiation while measuring execution metrics.
+
+    Args:
+        n: Non-negative integer Fibonacci index.
+        mod: Optional modulus.
+
+    Returns:
+        Tuple of (result, metrics_dict).
+    """
+    if not isinstance(n, int) or isinstance(n, bool):
+        raise TypeError(f"n must be an integer, got {type(n).__name__}")
+    if n < 0:
+        raise ValueError(f"n must be non-negative, got {n}")
+
+    t0 = time.perf_counter()
+    res = fibonacci_matrix(n, mod)
+    elapsed = time.perf_counter() - t0
+
+    metrics = {
+        "n": n,
+        "result": res,
+        "mod": mod,
+        "matrix_multiplications": (n - 1).bit_length() if n > 1 else 0,
+        "time_seconds": elapsed,
+        "algorithm": "2x2 Matrix Binary Exponentiation O(log n)",
+    }
+    return (res, metrics)
