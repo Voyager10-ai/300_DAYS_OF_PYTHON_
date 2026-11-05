@@ -1098,3 +1098,139 @@ def format_benchmark_table(benchmark_data: Dict[str, Any]) -> str:
 
     lines.append("=" * 95)
     return "\n".join(lines)
+
+
+
+# ─── 10. Comprehensive Unit Test Suite ────────────────────────────────────────
+
+
+class TestFibonacciImplementations(unittest.TestCase):
+    """Exhaustive test suite verifying correctness, edge cases, and consistency."""
+
+    def setUp(self) -> None:
+        # Standard known sequence 0..15
+        self.known_sequence = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610]
+
+    def test_base_cases(self) -> None:
+        """Tests F(0) and F(1) across all implementation engines."""
+        engines = [
+            fibonacci_recursive,
+            fibonacci_iterative,
+            fibonacci_memoized,
+            fibonacci_lru_cached,
+            fibonacci_fast_doubling,
+            fibonacci_fast_doubling_iterative,
+            fibonacci_matrix,
+            fibonacci_binet,
+            fibonacci_binet_decimal,
+        ]
+        for engine in engines:
+            with self.subTest(engine=engine.__name__):
+                self.assertEqual(engine(0), 0)
+                self.assertEqual(engine(1), 1)
+
+    def test_known_sequence_consistency(self) -> None:
+        """Verifies that all algorithms compute identical values for n in 0..15."""
+        for n, expected in enumerate(self.known_sequence):
+            self.assertEqual(fibonacci_recursive(n), expected)
+            self.assertEqual(fibonacci_iterative(n), expected)
+            self.assertEqual(fibonacci_memoized(n), expected)
+            self.assertEqual(fibonacci_lru_cached(n), expected)
+            self.assertEqual(fibonacci_fast_doubling(n), expected)
+            self.assertEqual(fibonacci_fast_doubling_iterative(n), expected)
+            self.assertEqual(fibonacci_matrix(n), expected)
+            self.assertEqual(fibonacci_binet(n), expected)
+            self.assertEqual(fibonacci_binet_decimal(n), expected)
+
+    def test_large_fibonacci_values(self) -> None:
+        """Verifies large Fibonacci computations for fast doubling, matrix and decimal Binet."""
+        test_n = [50, 100, 200, 500]
+        for n in test_n:
+            val_iter = fibonacci_iterative(n)
+            val_fast = fibonacci_fast_doubling_iterative(n)
+            val_matrix = fibonacci_matrix(n)
+            val_binet_dec = fibonacci_binet_decimal(n)
+
+            self.assertEqual(val_fast, val_iter)
+            self.assertEqual(val_matrix, val_iter)
+            self.assertEqual(val_binet_dec, val_iter)
+
+    def test_modular_fibonacci(self) -> None:
+        """Verifies modular arithmetic properties using matrix exponentiation."""
+        mod = 1_000_000_007
+        for n in [10, 50, 100, 250]:
+            expected = fibonacci_iterative(n) % mod
+            self.assertEqual(fibonacci_matrix(n, mod=mod), expected)
+
+    def test_invalid_types_raise_type_error(self) -> None:
+        """Ensures non-integer types raise TypeError."""
+        invalid_inputs = ["10", 3.14, None, [5], (1, 2), True, False]
+        for val in invalid_inputs:
+            with self.assertRaises(TypeError):
+                fibonacci_iterative(val)  # type: ignore
+            with self.assertRaises(TypeError):
+                fibonacci_fast_doubling_iterative(val)  # type: ignore
+            with self.assertRaises(TypeError):
+                fibonacci_matrix(val)  # type: ignore
+
+    def test_negative_values_raise_value_error(self) -> None:
+        """Ensures negative indices raise ValueError."""
+        negatives = [-1, -5, -100]
+        for val in negatives:
+            with self.assertRaises(ValueError):
+                fibonacci_iterative(val)
+            with self.assertRaises(ValueError):
+                fibonacci_fast_doubling_iterative(val)
+            with self.assertRaises(ValueError):
+                fibonacci_matrix(val)
+
+    def test_generator_and_sequence(self) -> None:
+        """Tests infinite generator and list slice helper."""
+        gen = fibonacci_generator()
+        first_10 = [next(gen) for _ in range(10)]
+        self.assertEqual(first_10, self.known_sequence[:10])
+        self.assertEqual(fibonacci_sequence_list(10), self.known_sequence[:10])
+
+    def test_is_fibonacci_number(self) -> None:
+        """Tests mathematical identification of Fibonacci numbers."""
+        for num in self.known_sequence:
+            self.assertTrue(is_fibonacci_number(num))
+        non_fibs = [4, 6, 7, 9, 10, 11, 12, 14, 15, 16, 20, 22, 100]
+        for num in non_fibs:
+            self.assertFalse(is_fibonacci_number(num))
+
+    def test_nearest_fibonacci(self) -> None:
+        """Tests closest Fibonacci calculation."""
+        self.assertEqual(nearest_fibonacci(0), (0, 0))
+        self.assertIn(nearest_fibonacci(4), [(3, 1), (5, 1)])
+        self.assertEqual(nearest_fibonacci(10), (8, 2))
+        self.assertEqual(nearest_fibonacci(13), (13, 0))
+
+    def test_fibonacci_search(self) -> None:
+        """Tests Fibonacci search on sorted lists."""
+        arr = [2, 5, 8, 12, 16, 23, 38, 56, 72, 91]
+        for idx, val in enumerate(arr):
+            self.assertEqual(fibonacci_search(arr, val), idx)
+        self.assertEqual(fibonacci_search(arr, 999), -1)
+        self.assertEqual(fibonacci_search(arr, 1), -1)
+        self.assertEqual(fibonacci_search([], 5), -1)
+        self.assertEqual(fibonacci_search([42], 42), 0)
+        self.assertEqual(fibonacci_search([42], 10), -1)
+
+    def test_metrics_structures(self) -> None:
+        """Tests structure and keys in metrics return dictionaries."""
+        _, m_iter = fibonacci_iterative_with_metrics(10)
+        self.assertIn("additions", m_iter)
+        self.assertIn("time_seconds", m_iter)
+
+        _, m_memo = fibonacci_memoized_with_metrics(10)
+        self.assertIn("cache_hits", m_memo)
+        self.assertIn("cache_misses", m_memo)
+
+        _, m_fast = fibonacci_fast_doubling_with_metrics(10)
+        self.assertIn("doubling_steps", m_fast)
+
+        idx, m_search = fibonacci_search_with_metrics([1, 3, 5, 7, 9], 7)
+        self.assertEqual(idx, 3)
+        self.assertIn("probes", m_search)
+        self.assertIn("comparisons", m_search)
