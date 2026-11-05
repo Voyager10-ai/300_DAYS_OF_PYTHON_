@@ -149,7 +149,12 @@ def fibonacci_memoized(
         raise ValueError(f"n must be non-negative, got {n}")
 
     if memo is None:
-        memo = {0: 0, 1: 1}
+        memo = {}
+
+    if 0 not in memo:
+        memo[0] = 0
+    if 1 not in memo:
+        memo[1] = 1
 
     if n in memo:
         return memo[n]
@@ -947,4 +952,149 @@ def visualize_fibonacci_steps(n: int) -> str:
 
     lines.append("=" * 72)
     lines.append(f"Golden Ratio (phi) exact limit: {(1 + math.sqrt(5)) / 2:.10f}")
+    return "\n".join(lines)
+
+
+
+# ─── 9. Algorithm Performance Benchmarking Engine ─────────────────────────────
+
+
+def benchmark_fibonacci_algorithms(
+    test_values: Optional[List[int]] = None,
+    iterations: int = 5,
+) -> Dict[str, Any]:
+    """
+    Benchmarks and compares all Fibonacci calculation algorithms across scale orders.
+
+    Measures average execution duration across multiple trials for:
+      - Naive Recursive (n <= 30)
+      - Top-Down Memoized DP
+      - Iterative Bottom-Up
+      - Closed-Form Binet Formula (n <= 70)
+      - 2x2 Matrix Exponentiation
+      - Fast Doubling Iterative
+
+    Args:
+        test_values: List of n values to benchmark. Defaults to [10, 25, 30, 100, 1000, 10000].
+        iterations: Number of warmup/timed runs per algorithm per n.
+
+    Returns:
+        Structured dictionary containing benchmarking metrics.
+    """
+    if test_values is None:
+        test_values = [10, 25, 30, 100, 1000, 10000]
+
+    records: List[Dict[str, Any]] = []
+
+    for n in test_values:
+        row: Dict[str, Any] = {"n": n}
+
+        # 1. Naive recursive (only up to 30 to prevent execution timeout)
+        if n <= 30:
+            times: List[float] = []
+            for _ in range(iterations):
+                t0 = time.perf_counter()
+                fibonacci_recursive(n)
+                times.append(time.perf_counter() - t0)
+            row["recursive"] = min(times)
+        else:
+            row["recursive"] = None
+
+        # 2. Memoized DP (n <= 500 to avoid recursion stack overflow)
+        if n <= 500:
+            times = []
+            try:
+                for _ in range(iterations):
+                    t0 = time.perf_counter()
+                    fibonacci_memoized(n, {})
+                    times.append(time.perf_counter() - t0)
+                row["memoized"] = min(times)
+            except RecursionError:
+                row["memoized"] = None
+        else:
+            row["memoized"] = None
+
+        # 3. Iterative bottom-up
+        times = []
+        for _ in range(iterations):
+            t0 = time.perf_counter()
+            fibonacci_iterative(n)
+            times.append(time.perf_counter() - t0)
+        row["iterative"] = min(times)
+
+        # 4. Binet Formula
+        if n <= 70:
+            times = []
+            for _ in range(iterations):
+                t0 = time.perf_counter()
+                fibonacci_binet(n)
+                times.append(time.perf_counter() - t0)
+            row["binet"] = min(times)
+        else:
+            row["binet"] = None
+
+        # 5. Matrix Exponentiation
+        times = []
+        for _ in range(iterations):
+            t0 = time.perf_counter()
+            fibonacci_matrix(n)
+            times.append(time.perf_counter() - t0)
+        row["matrix"] = min(times)
+
+        # 6. Fast Doubling Iterative
+        times = []
+        for _ in range(iterations):
+            t0 = time.perf_counter()
+            fibonacci_fast_doubling_iterative(n)
+            times.append(time.perf_counter() - t0)
+        row["fast_doubling"] = min(times)
+
+        records.append(row)
+
+    return {"test_values": test_values, "records": records, "iterations": iterations}
+
+
+def format_benchmark_table(benchmark_data: Dict[str, Any]) -> str:
+    """
+    Formats the benchmark dictionary into an ASCII comparison table.
+
+    Args:
+        benchmark_data: Output from benchmark_fibonacci_algorithms.
+
+    Returns:
+        Formatted ASCII table string.
+    """
+    lines: List[str] = []
+    lines.append("Fibonacci Algorithms Performance Benchmark (Time in Microseconds µs)")
+    lines.append("=" * 95)
+    header = (
+        f"{'n':>7} | {'Recursive':>13} | {'Memoized DP':>13} | {'Iterative':>13} | "
+        f"{'Binet O(1)':>13} | {'Matrix O(log)':>14} | {'Fast Double':>14}"
+    )
+    lines.append(header)
+    lines.append("-" * 95)
+
+    def _fmt(val: Optional[float]) -> str:
+        if val is None:
+            return "N/A (OOM/Time)"
+        us = val * 1_000_000.0
+        if us < 0.001:
+            return f"{us * 1000.0:.2f} ns"
+        if us < 1000.0:
+            return f"{us:.2f} µs"
+        return f"{us / 1000.0:.2f} ms"
+
+    for r in benchmark_data["records"]:
+        line = (
+            f"{r['n']:>7} | "
+            f"{_fmt(r['recursive']):>13} | "
+            f"{_fmt(r['memoized']):>13} | "
+            f"{_fmt(r['iterative']):>13} | "
+            f"{_fmt(r['binet']):>13} | "
+            f"{_fmt(r['matrix']):>14} | "
+            f"{_fmt(r['fast_doubling']):>14}"
+        )
+        lines.append(line)
+
+    lines.append("=" * 95)
     return "\n".join(lines)
