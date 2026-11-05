@@ -112,3 +112,119 @@ def fibonacci_iterative_with_metrics(n: int) -> Tuple[int, Dict[str, Any]]:
         "algorithm": "Iterative Bottom-Up O(n)",
     }
     return (result, metrics)
+
+
+
+# ─── 2. Top-Down Memoized Fibonacci (Dynamic Programming) ─────────────────────
+
+
+def fibonacci_memoized(
+    n: int,
+    memo: Optional[Dict[int, int]] = None,
+) -> int:
+    """
+    Computes F(n) using top-down recursion with explicit dictionary memoization.
+
+    Eliminates redundant subproblem computations by caching intermediate results.
+
+    Time Complexity: O(n) unique subproblems computed once.
+    Space Complexity: O(n) call stack depth + memo dictionary table.
+
+    Args:
+        n: Non-negative integer Fibonacci index.
+        memo: Optional dictionary storing previously computed Fibonacci values.
+
+    Returns:
+        F(n) integer value.
+
+    Raises:
+        TypeError: If n is not an integer.
+        ValueError: If n is negative.
+    """
+    if not isinstance(n, int) or isinstance(n, bool):
+        raise TypeError(f"n must be an integer, got {type(n).__name__}")
+    if n < 0:
+        raise ValueError(f"n must be non-negative, got {n}")
+
+    if memo is None:
+        memo = {0: 0, 1: 1}
+
+    if n in memo:
+        return memo[n]
+
+    memo[n] = fibonacci_memoized(n - 1, memo) + fibonacci_memoized(n - 2, memo)
+    return memo[n]
+
+
+@lru_cache(maxsize=None)
+def fibonacci_lru_cached(n: int) -> int:
+    """
+    Computes F(n) using recursion wrapped with functools.lru_cache.
+
+    Time Complexity: O(n) memoized lookup.
+    Space Complexity: O(n) call stack and cache entries.
+
+    Args:
+        n: Non-negative integer index.
+
+    Returns:
+        F(n) integer value.
+
+    Raises:
+        TypeError: If n is not an integer.
+        ValueError: If n is negative.
+    """
+    if not isinstance(n, int) or isinstance(n, bool):
+        raise TypeError(f"n must be an integer, got {type(n).__name__}")
+    if n < 0:
+        raise ValueError(f"n must be non-negative, got {n}")
+
+    if n <= 1:
+        return n
+    return fibonacci_lru_cached(n - 1) + fibonacci_lru_cached(n - 2)
+
+
+def fibonacci_memoized_with_metrics(
+    n: int,
+) -> Tuple[int, Dict[str, Any]]:
+    """
+    Computes F(n) with memoization while capturing cache hit/miss statistics.
+
+    Args:
+        n: Non-negative integer Fibonacci index.
+
+    Returns:
+        Tuple of (result, metrics_dict).
+    """
+    if not isinstance(n, int) or isinstance(n, bool):
+        raise TypeError(f"n must be an integer, got {type(n).__name__}")
+    if n < 0:
+        raise ValueError(f"n must be non-negative, got {n}")
+
+    t0 = time.perf_counter()
+    memo: Dict[int, int] = {0: 0, 1: 1}
+    hits = 0
+    misses = 0
+
+    def _helper(k: int) -> int:
+        nonlocal hits, misses
+        if k in memo:
+            hits += 1
+            return memo[k]
+        misses += 1
+        memo[k] = _helper(k - 1) + _helper(k - 2)
+        return memo[k]
+
+    result = _helper(n)
+    elapsed = time.perf_counter() - t0
+
+    metrics = {
+        "n": n,
+        "result": result,
+        "cache_hits": hits,
+        "cache_misses": misses,
+        "memo_size": len(memo),
+        "time_seconds": elapsed,
+        "algorithm": "Top-Down Memoized DP O(n)",
+    }
+    return (result, metrics)
