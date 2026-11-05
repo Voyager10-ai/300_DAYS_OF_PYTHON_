@@ -349,3 +349,132 @@ def fibonacci_binet_with_metrics(n: int) -> Tuple[int, Dict[str, Any]]:
         "algorithm": "Closed-Form Binet O(1) / O(log n)",
     }
     return (res, metrics)
+
+
+
+# ─── 4. Fast Doubling Fibonacci Algorithm O(log n) ────────────────────────────
+
+
+def fibonacci_fast_doubling_pair(n: int) -> Tuple[int, int]:
+    """
+    Computes (F(n), F(n+1)) using the Fast Doubling identities recursively.
+
+    Identities:
+        F(2k)   = F(k) * (2*F(k+1) - F(k))
+        F(2k+1) = F(k+1)^2 + F(k)^2
+
+    Time Complexity: O(log n) multiplication steps.
+    Space Complexity: O(log n) call stack frames.
+
+    Args:
+        n: Non-negative integer index.
+
+    Returns:
+        Tuple (F(n), F(n+1)).
+
+    Raises:
+        TypeError: If n is not an integer.
+        ValueError: If n is negative.
+    """
+    if not isinstance(n, int) or isinstance(n, bool):
+        raise TypeError(f"n must be an integer, got {type(n).__name__}")
+    if n < 0:
+        raise ValueError(f"n must be non-negative, got {n}")
+
+    if n == 0:
+        return (0, 1)
+
+    a, b = fibonacci_fast_doubling_pair(n >> 1)
+    c = a * ((b << 1) - a)        # F(2k) = F(k) * (2*F(k+1) - F(k))
+    d = a * a + b * b             # F(2k+1) = F(k)^2 + F(k+1)^2
+
+    if n & 1:
+        return (d, c + d)         # If odd: F(2k+1), F(2k+2) = F(2k+1) + F(2k)
+    return (c, d)                 # If even: F(2k), F(2k+1)
+
+
+def fibonacci_fast_doubling(n: int) -> int:
+    """
+    Computes F(n) in O(log n) time using fast doubling recursion.
+
+    Args:
+        n: Non-negative integer Fibonacci index.
+
+    Returns:
+        F(n) integer value.
+    """
+    return fibonacci_fast_doubling_pair(n)[0]
+
+
+def fibonacci_fast_doubling_iterative(n: int) -> int:
+    """
+    Computes F(n) using iterative fast doubling with bitwise traversal.
+
+    Traverses the binary representation of n from MSB to LSB.
+    Achieves logarithmic execution with O(1) auxiliary memory.
+
+    Time Complexity: O(log n) arithmetic operations.
+    Space Complexity: O(1) auxiliary space.
+
+    Args:
+        n: Non-negative integer Fibonacci index.
+
+    Returns:
+        F(n) integer value.
+
+    Raises:
+        TypeError: If n is not an integer.
+        ValueError: If n is negative.
+    """
+    if not isinstance(n, int) or isinstance(n, bool):
+        raise TypeError(f"n must be an integer, got {type(n).__name__}")
+    if n < 0:
+        raise ValueError(f"n must be non-negative, got {n}")
+
+    if n == 0:
+        return 0
+
+    a, b = 0, 1
+    # Iterate through bits from highest non-zero bit down to bit 0
+    bit_length = n.bit_length()
+    for i in range(bit_length - 1, -1, -1):
+        c = a * ((b << 1) - a)
+        d = a * a + b * b
+        if (n >> i) & 1:
+            a, b = d, c + d
+        else:
+            a, b = c, d
+
+    return a
+
+
+def fibonacci_fast_doubling_with_metrics(
+    n: int,
+) -> Tuple[int, Dict[str, Any]]:
+    """
+    Computes F(n) using fast doubling while measuring bit operations and time.
+
+    Args:
+        n: Non-negative integer index.
+
+    Returns:
+        Tuple of (result, metrics_dict).
+    """
+    if not isinstance(n, int) or isinstance(n, bool):
+        raise TypeError(f"n must be an integer, got {type(n).__name__}")
+    if n < 0:
+        raise ValueError(f"n must be non-negative, got {n}")
+
+    t0 = time.perf_counter()
+    res = fibonacci_fast_doubling_iterative(n)
+    elapsed = time.perf_counter() - t0
+
+    metrics = {
+        "n": n,
+        "result": res,
+        "bit_length": n.bit_length() if n > 0 else 1,
+        "doubling_steps": n.bit_length() if n > 0 else 0,
+        "time_seconds": elapsed,
+        "algorithm": "Iterative Fast Doubling O(log n)",
+    }
+    return (res, metrics)
