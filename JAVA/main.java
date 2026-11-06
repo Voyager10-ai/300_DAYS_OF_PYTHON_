@@ -1746,6 +1746,32 @@ import java.util.*;
 //     }
 // }
 
+// Java Factorial Practice (Day 88)
+// class FactorialPractice {
+//     // BigInteger binary split or long iterative
+//     public static long factorial(int n) {
+//         if (n < 0) throw new IllegalArgumentException("n must be non-negative");
+//         long ans = 1;
+//         for (int i = 2; i <= n; i++) {
+//             ans *= i;
+//         }
+//         return ans;
+//     }
+//     // Trailing zeroes using Legendre's Formula
+//     public static int trailingZeroes(int n) {
+//         int count = 0;
+//         while (n >= 5) {
+//             count += n / 5;
+//             n /= 5;
+//         }
+//         return count;
+//     }
+//     public static void main(String[] args) {
+//         System.out.println("10! = " + factorial(10));
+//         System.out.println("Trailing zeroes in 100! = " + trailingZeroes(100));
+//     }
+// }
+
 public class main{
 
 

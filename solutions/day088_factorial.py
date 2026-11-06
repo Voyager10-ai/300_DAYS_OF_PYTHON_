@@ -572,3 +572,123 @@ def format_benchmark_table(benchmark_data: Dict[str, Any]) -> str:
 
     lines.append("=" * 86)
     return "\n".join(lines)
+
+
+
+# ─── 5. Comprehensive Unit Test Suite ────────────────────────────────────────
+
+
+class TestFactorialImplementations(unittest.TestCase):
+    """Exhaustive unit test suite verifying correctness, edge cases and properties."""
+
+    def setUp(self) -> None:
+        self.known_factorials = [1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800]
+
+    def test_base_cases(self) -> None:
+        """Tests 0! = 1 and 1! = 1 across all engines."""
+        engines = [
+            factorial_iterative,
+            factorial_recursive,
+            factorial_tail_recursive,
+            factorial_binary_split,
+            factorial_memoized,
+        ]
+        for engine in engines:
+            with self.subTest(engine=engine.__name__):
+                self.assertEqual(engine(0), 1)
+                self.assertEqual(engine(1), 1)
+
+    def test_known_factorials(self) -> None:
+        """Verifies 0! through 10! match exact known mathematical values."""
+        for n, expected in enumerate(self.known_factorials):
+            self.assertEqual(factorial_iterative(n), expected)
+            self.assertEqual(factorial_recursive(n), expected)
+            self.assertEqual(factorial_tail_recursive(n), expected)
+            self.assertEqual(factorial_binary_split(n), expected)
+            self.assertEqual(factorial_memoized(n), expected)
+
+    def test_large_factorial_consistency(self) -> None:
+        """Verifies binary split against iterative for large n."""
+        for n in [50, 100, 250]:
+            val_iter = factorial_iterative(n)
+            val_split = factorial_binary_split(n)
+            self.assertEqual(val_split, val_iter)
+            self.assertEqual(val_split, math.factorial(n))
+
+    def test_trailing_zeros(self) -> None:
+        """Verifies Legendre formula for trailing zero counts."""
+        test_cases = [(0, 0), (4, 0), (5, 1), (9, 1), (10, 2), (25, 6), (100, 24), (1000, 249)]
+        for n, expected_zeros in test_cases:
+            self.assertEqual(count_trailing_zeros(n), expected_zeros)
+
+    def test_digit_counting(self) -> None:
+        """Verifies digit count function matches actual string length."""
+        for n in [0, 1, 5, 10, 20, 50, 100]:
+            actual_len = len(str(factorial_iterative(n)))
+            self.assertEqual(count_digits_in_factorial(n), actual_len)
+
+    def test_subfactorial(self) -> None:
+        """Tests derangements !n."""
+        known_derangements = [1, 0, 1, 2, 9, 44, 265, 1854]
+        for n, expected in enumerate(known_derangements):
+            self.assertEqual(subfactorial(n), expected)
+
+    def test_invalid_types_raise_type_error(self) -> None:
+        """Ensures non-integer types raise TypeError."""
+        for bad in ["5", 3.14, None, [2], (1, 2), True, False]:
+            with self.assertRaises(TypeError):
+                factorial_iterative(bad)  # type: ignore
+            with self.assertRaises(TypeError):
+                factorial_binary_split(bad)  # type: ignore
+
+    def test_negative_values_raise_value_error(self) -> None:
+        """Ensures negative inputs raise ValueError."""
+        for neg in [-1, -5, -100]:
+            with self.assertRaises(ValueError):
+                factorial_iterative(neg)
+            with self.assertRaises(ValueError):
+                factorial_binary_split(neg)
+
+
+# ─── 6. Interactive CLI Demonstration ────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates factorial implementations, visualizer, and benchmarks."""
+    print("=" * 80)
+    print("                 DAY 88: FACTORIAL ALGORITHMS & SUITE                   ")
+    print("=" * 80)
+
+    # 1. Compare outputs
+    n = 10
+    print(f"\n[1] Factorial Calculation for n = {n}:")
+    print(f"    - Iterative       : {factorial_iterative(n)}")
+    print(f"    - Recursive       : {factorial_recursive(n)}")
+    print(f"    - Tail-Recursive  : {factorial_tail_recursive(n)}")
+    print(f"    - Binary Split    : {factorial_binary_split(n)}")
+    print(f"    - math.factorial  : {math.factorial(n)}")
+
+    # 2. Number theory properties
+    test_n = 100
+    print(f"\n[2] Number Theory Properties for {test_n}!:")
+    print(f"    - Digit Count     : {count_digits_in_factorial(test_n)} digits")
+    print(f"    - Trailing Zeros  : {count_trailing_zeros(test_n)} zeros")
+    print(f"    - Factors of 2    : {prime_factor_exponent_in_factorial(test_n, 2)}")
+    print(f"    - Factors of 5    : {prime_factor_exponent_in_factorial(test_n, 5)}")
+
+    # 3. Visualizer
+    print("\n[3] Factorial and Derangement Progression (0..8):")
+    print(visualize_factorial_progression(8))
+
+    # 4. Performance Benchmark
+    print("\n[4] Multi-Algorithm Benchmark Comparison:")
+    bench = benchmark_factorial_algorithms([10, 50, 200, 1000], iterations=3)
+    print(format_benchmark_table(bench))
+
+    print("\n" + "=" * 80)
+    print("                      DEMONSTRATION COMPLETE                                   ")
+    print("=" * 80)
+
+
+if __name__ == "__main__":
+    main()
