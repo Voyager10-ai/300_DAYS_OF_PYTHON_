@@ -262,3 +262,162 @@ class FactorialLookupTable:
 
     def __len__(self) -> int:
         return len(self._table)
+
+
+
+# ─── 3. Number Theory: Trailing Zeros, Stirling & Subfactorials ───────────────
+
+
+def prime_factor_exponent_in_factorial(n: int, p: int) -> int:
+    """
+    Computes the highest exponent k such that p^k divides n!, using Legendre's Formula.
+
+    Formula:
+        E_p(n!) = floor(n / p) + floor(n / p^2) + floor(n / p^3) + ...
+
+    Time Complexity: O(log_p n) divisions.
+    Space Complexity: O(1) space.
+
+    Args:
+        n: Non-negative integer.
+        p: Prime integer >= 2.
+
+    Returns:
+        Multiplicity of prime p in the prime factorization of n!.
+
+    Raises:
+        TypeError: If n or p is not an integer.
+        ValueError: If n < 0 or p < 2.
+    """
+    if not isinstance(n, int) or isinstance(n, bool):
+        raise TypeError(f"n must be an integer, got {type(n).__name__}")
+    if not isinstance(p, int) or isinstance(p, bool):
+        raise TypeError(f"p must be an integer, got {type(p).__name__}")
+    if n < 0:
+        raise ValueError(f"n must be non-negative, got {n}")
+    if p < 2:
+        raise ValueError(f"p must be a prime integer >= 2, got {p}")
+
+    count = 0
+    power = p
+    while power <= n:
+        count += n // power
+        power *= p
+    return count
+
+
+def count_trailing_zeros(n: int) -> int:
+    """
+    Counts the number of trailing zeros in the decimal representation of n!.
+
+    Trailing zeros are formed by factors of 10 = 2 * 5. Since factors of 2 are always
+    more abundant than factors of 5 in n!, the trailing zero count equals E_5(n!).
+
+    LeetCode Reference: Problem 172: Factorial Trailing Zeroes.
+
+    Time Complexity: O(log_5 n).
+    Space Complexity: O(1).
+
+    Args:
+        n: Non-negative integer.
+
+    Returns:
+        Number of trailing zeros in n!.
+    """
+    return prime_factor_exponent_in_factorial(n, 5)
+
+
+def count_digits_in_factorial(n: int) -> int:
+    """
+    Computes the number of decimal digits in n! without evaluating the full factorial.
+
+    Uses sum of base-10 logarithms:
+        digits(n!) = 1 if n <= 1 else floor(sum_{i=1..n} log10(i)) + 1
+    For large n (n > 50000), Kamenetsky's formula provides O(1) approximation.
+
+    Args:
+        n: Non-negative integer.
+
+    Returns:
+        Number of digits in base-10 representation of n!.
+    """
+    if not isinstance(n, int) or isinstance(n, bool):
+        raise TypeError(f"n must be an integer, got {type(n).__name__}")
+    if n < 0:
+        raise ValueError(f"n must be non-negative, got {n}")
+
+    if n <= 1:
+        return 1
+
+    # Kamenetsky's formula for large n:
+    # digits = floor(log10(2 * pi * n) / 2 + n * (log10(n / e))) + 1
+    if n > 50000:
+        val = (math.log10(2 * math.pi * n) / 2.0) + (n * (math.log10(n / math.e)))
+        return math.floor(val) + 1
+
+    # Exact logarithmic summation for exact precision
+    log_sum = 0.0
+    for i in range(2, n + 1):
+        log_sum += math.log10(i)
+    return math.floor(log_sum) + 1
+
+
+def stirling_approximation(n: int) -> float:
+    """
+    Approximates n! using Stirling's asymptotic formula:
+        n! ~ sqrt(2 * pi * n) * (n / e)^n
+
+    Accurate for moderate to large n where exact factorial exceeds float bounds.
+
+    Args:
+        n: Positive integer.
+
+    Returns:
+        Approximate float value of n!.
+
+    Raises:
+        ValueError: If n <= 0 or n > 170 (float overflow).
+    """
+    if not isinstance(n, int) or isinstance(n, bool):
+        raise TypeError(f"n must be an integer, got {type(n).__name__}")
+    if n <= 0:
+        raise ValueError("Stirling approximation is defined for positive integers")
+    if n > 170:
+        raise OverflowError("n > 170 exceeds standard IEEE 754 float capacity")
+
+    return math.sqrt(2.0 * math.pi * n) * ((n / math.e) ** n)
+
+
+def subfactorial(n: int) -> int:
+    """
+    Computes the subfactorial !n (number of derangements of n elements).
+
+    A derangement is a permutation where no element appears in its original position.
+    Recurrence:
+        !0 = 1, !1 = 0
+        !n = (n - 1) * (!(n - 1) + !(n - 2)) for n >= 2.
+
+    Time Complexity: O(n).
+    Space Complexity: O(1) iterative space.
+
+    Args:
+        n: Non-negative integer.
+
+    Returns:
+        !n integer count of derangements.
+    """
+    if not isinstance(n, int) or isinstance(n, bool):
+        raise TypeError(f"n must be an integer, got {type(n).__name__}")
+    if n < 0:
+        raise ValueError(f"n must be non-negative, got {n}")
+
+    if n == 0:
+        return 1
+    if n == 1:
+        return 0
+
+    d0, d1 = 1, 0
+    for i in range(2, n + 1):
+        d0, d1 = d1, (i - 1) * (d1 + d0)
+
+    return d1
