@@ -421,3 +421,154 @@ def subfactorial(n: int) -> int:
         d0, d1 = d1, (i - 1) * (d1 + d0)
 
     return d1
+
+
+
+# ─── 4. Step-by-Step Visualizer & Performance Benchmarking ────────────────────
+
+
+def visualize_factorial_progression(n: int) -> str:
+    """
+    Renders an ASCII table showing growth, digit lengths, trailing zeros,
+    and derangements up to n.
+
+    Args:
+        n: Upper limit index (recommended <= 15 for readable integer output).
+
+    Returns:
+        Formatted ASCII table string.
+    """
+    if n < 0:
+        raise ValueError("n must be non-negative")
+
+    lines: List[str] = []
+    lines.append(f"Factorial Progression & Combinatorial Analysis (0..{n})")
+    lines.append("=" * 80)
+    header = f"{'k':>4} | {'k! (Factorial)':>24} | {'Digits':>7} | {'Zeros':>6} | {'!k (Derangements)':>24}"
+    lines.append(header)
+    lines.append("-" * 80)
+
+    for k in range(n + 1):
+        f_val = factorial_iterative(k)
+        zeros = count_trailing_zeros(k)
+        digits = len(str(f_val))
+        derange = subfactorial(k)
+        lines.append(f"{k:>4} | {f_val:>24} | {digits:>7} | {zeros:>6} | {derange:>24}")
+
+    lines.append("=" * 80)
+    return "\n".join(lines)
+
+
+def benchmark_factorial_algorithms(
+    test_values: Optional[List[int]] = None,
+    iterations: int = 5,
+) -> Dict[str, Any]:
+    """
+    Benchmarks and compares factorial implementations across scale orders.
+
+    Algorithms:
+      - Iterative Linear Multiplication
+      - Recursive Call Stack (n <= 500)
+      - Divide-and-Conquer Binary Split
+      - Builtin math.factorial (C implementation baseline)
+
+    Args:
+        test_values: List of integers n to test.
+        iterations: Number of trials per test.
+
+    Returns:
+        Dictionary of benchmark records.
+    """
+    if test_values is None:
+        test_values = [10, 50, 200, 1000, 5000, 15000]
+
+    records: List[Dict[str, Any]] = []
+
+    for n in test_values:
+        row: Dict[str, Any] = {"n": n}
+
+        # 1. Iterative linear
+        times: List[float] = []
+        for _ in range(iterations):
+            t0 = time.perf_counter()
+            factorial_iterative(n)
+            times.append(time.perf_counter() - t0)
+        row["iterative"] = min(times)
+
+        # 2. Recursive (bounded by stack)
+        if n <= 500:
+            times = []
+            try:
+                for _ in range(iterations):
+                    t0 = time.perf_counter()
+                    factorial_recursive(n)
+                    times.append(time.perf_counter() - t0)
+                row["recursive"] = min(times)
+            except RecursionError:
+                row["recursive"] = None
+        else:
+            row["recursive"] = None
+
+        # 3. Binary Split
+        times = []
+        for _ in range(iterations):
+            t0 = time.perf_counter()
+            factorial_binary_split(n)
+            times.append(time.perf_counter() - t0)
+        row["binary_split"] = min(times)
+
+        # 4. Builtin math.factorial
+        times = []
+        for _ in range(iterations):
+            t0 = time.perf_counter()
+            math.factorial(n)
+            times.append(time.perf_counter() - t0)
+        row["math_builtin"] = min(times)
+
+        records.append(row)
+
+    return {"test_values": test_values, "records": records, "iterations": iterations}
+
+
+def format_benchmark_table(benchmark_data: Dict[str, Any]) -> str:
+    """
+    Formats the benchmark dictionary into an ASCII comparison table.
+
+    Args:
+        benchmark_data: Output from benchmark_factorial_algorithms.
+
+    Returns:
+        Formatted ASCII table string.
+    """
+    lines: List[str] = []
+    lines.append("Factorial Algorithms Performance Benchmark")
+    lines.append("=" * 86)
+    header = (
+        f"{'n':>7} | {'Iterative Linear':>18} | {'Recursive':>16} | "
+        f"{'Binary Split':>18} | {'math.factorial':>16}"
+    )
+    lines.append(header)
+    lines.append("-" * 86)
+
+    def _fmt(val: Optional[float]) -> str:
+        if val is None:
+            return "N/A (Stack)"
+        us = val * 1_000_000.0
+        if us < 0.001:
+            return f"{us * 1000.0:.2f} ns"
+        if us < 1000.0:
+            return f"{us:.2f} µs"
+        return f"{us / 1000.0:.2f} ms"
+
+    for r in benchmark_data["records"]:
+        line = (
+            f"{r['n']:>7} | "
+            f"{_fmt(r['iterative']):>18} | "
+            f"{_fmt(r['recursive']):>16} | "
+            f"{_fmt(r['binary_split']):>18} | "
+            f"{_fmt(r['math_builtin']):>16}"
+        )
+        lines.append(line)
+
+    lines.append("=" * 86)
+    return "\n".join(lines)
