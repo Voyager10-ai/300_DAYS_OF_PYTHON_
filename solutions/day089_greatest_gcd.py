@@ -698,3 +698,150 @@ def format_benchmark_table(benchmark_data: Dict[str, Any]) -> str:
 
     lines.append("=" * 88)
     return "\n".join(lines)
+
+
+
+# ─── 5. Comprehensive Unit Test Suite ────────────────────────────────────────
+
+
+class TestGreatestGCDImplementations(unittest.TestCase):
+    """Exhaustive unit test suite verifying correctness, edge cases and properties."""
+
+    def test_basic_gcd_consistency(self) -> None:
+        """Verifies all GCD algorithms compute identical results on standard inputs."""
+        test_pairs = [
+            (48, 18, 6),
+            (54, 24, 6),
+            (101, 103, 1),
+            (14, 28, 14),
+            (252, 105, 21),
+            (1071, 462, 21),
+        ]
+        for a, b, expected in test_pairs:
+            self.assertEqual(gcd_naive(a, b), expected)
+            self.assertEqual(gcd_subtraction(a, b), expected)
+            self.assertEqual(gcd_euclidean_iterative(a, b), expected)
+            self.assertEqual(gcd_euclidean_recursive(a, b), expected)
+            self.assertEqual(gcd_binary_stein(a, b), expected)
+            self.assertEqual(math.gcd(a, b), expected)
+
+    def test_edge_cases_zeros_and_negatives(self) -> None:
+        """Tests gcd with zero and negative numbers."""
+        self.assertEqual(gcd_euclidean_iterative(0, 5), 5)
+        self.assertEqual(gcd_euclidean_iterative(5, 0), 5)
+        self.assertEqual(gcd_euclidean_iterative(0, 0), 0)
+        self.assertEqual(gcd_binary_stein(0, 7), 7)
+        self.assertEqual(gcd_binary_stein(7, 0), 7)
+        self.assertEqual(gcd_binary_stein(0, 0), 0)
+        self.assertEqual(gcd_euclidean_iterative(-12, 18), 6)
+        self.assertEqual(gcd_euclidean_iterative(-12, -18), 6)
+        self.assertEqual(gcd_binary_stein(-12, 18), 6)
+
+    def test_extended_gcd_and_bezout(self) -> None:
+        """Verifies Bézout identity a*x + b*y = gcd(a, b)."""
+        pairs = [(35, 15), (120, 23), (12345, 678), (99, 78)]
+        for a, b in pairs:
+            g, x, y = extended_gcd(a, b)
+            self.assertEqual(a * x + b * y, g)
+            self.assertEqual(g, math.gcd(a, b))
+
+    def test_modular_inverse(self) -> None:
+        """Tests modular inverse calculation."""
+        self.assertEqual(modular_inverse(3, 11), 4)     # (3 * 4) % 11 = 12 % 11 = 1
+        self.assertEqual(modular_inverse(10, 17), 12)   # (10 * 12) % 17 = 120 % 17 = 1
+        with self.assertRaises(ValueError):
+            modular_inverse(6, 9)  # gcd(6, 9) = 3 != 1
+
+    def test_diophantine_solver(self) -> None:
+        """Tests linear Diophantine equation solver ax + by = c."""
+        sol = solve_linear_diophantine(3, 5, 11)
+        self.assertIsNotNone(sol)
+        if sol is not None:
+            x, y = sol
+            self.assertEqual(3 * x + 5 * y, 11)
+
+        no_sol = solve_linear_diophantine(4, 6, 9)  # gcd(4, 6) = 2 does not divide 9
+        self.assertIsNone(no_sol)
+
+    def test_multi_number_gcd_and_lcm(self) -> None:
+        """Tests multi-number list GCD and LCM."""
+        self.assertEqual(gcd_list([24, 36, 60]), 12)
+        self.assertEqual(gcd_list([100, 25, 75]), 25)
+        self.assertEqual(lcm(12, 18), 36)
+        self.assertEqual(lcm_list([2, 3, 4, 5, 6]), 60)
+        self.assertTrue(are_coprime(14, 15))
+        self.assertFalse(are_coprime(14, 21))
+
+    def test_array_greatest_gcd(self) -> None:
+        """Tests LeetCode 1979 and array greatest pair GCD."""
+        self.assertEqual(gcd_smallest_and_largest([2, 5, 6, 9, 10]), 2)
+        max_g, a, b = find_greatest_gcd_pair([10, 15, 20, 25, 30])
+        self.assertEqual(max_g, 15)
+
+    def test_invalid_types_raise_type_error(self) -> None:
+        """Ensures type errors are raised for invalid inputs."""
+        for invalid in ["5", 3.14, None, [2], True]:
+            with self.assertRaises(TypeError):
+                gcd_euclidean_iterative(invalid, 10)  # type: ignore
+            with self.assertRaises(TypeError):
+                gcd_binary_stein(10, invalid)  # type: ignore
+
+
+# ─── 6. Interactive CLI Demonstration ────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates GCD implementations, visualizer, and benchmarks."""
+    print("=" * 80)
+    print("              DAY 89: GREATEST GCD (ALGORITHMS & NUMBER THEORY)         ")
+    print("=" * 80)
+
+    # 1. Compare GCD algorithms
+    a, b = 252, 105
+    print(f"\n[1] Basic GCD Comparison for ({a}, {b}):")
+    print(f"    - Naive Brute Force : {gcd_naive(a, b)}")
+    print(f"    - Subtraction Euclid: {gcd_subtraction(a, b)}")
+    print(f"    - Iterative Division: {gcd_euclidean_iterative(a, b)}")
+    print(f"    - Recursive Division: {gcd_euclidean_recursive(a, b)}")
+    print(f"    - Stein's Binary GCD: {gcd_binary_stein(a, b)}")
+    print(f"    - Builtin math.gcd  : {math.gcd(a, b)}")
+
+    # 2. Extended Euclidean and Bézout
+    g, x, y = extended_gcd(a, b)
+    print(f"\n[2] Extended Euclidean Algorithm (Bézout's Identity):")
+    print(f"    {a} * ({x}) + {b} * ({y}) = {g}")
+
+    # 3. Modular inverse and Diophantine
+    base, mod = 3, 11
+    inv = modular_inverse(base, mod)
+    print(f"\n[3] Modular Multiplicative Inverse:")
+    print(f"    ({base} * {inv}) mod {mod} = {(base * inv) % mod}")
+
+    # 4. Multi-Number and LCM
+    lst = [24, 36, 60]
+    print(f"\n[4] Multi-Number GCD & LCM:")
+    print(f"    gcd_list({lst}) = {gcd_list(lst)}")
+    print(f"    lcm_list([2, 3, 4, 5, 6]) = {lcm_list([2, 3, 4, 5, 6])}")
+
+    # 5. Array Greatest GCD Pair
+    arr = [10, 15, 20, 25, 30]
+    best_g, p1, p2 = find_greatest_gcd_pair(arr)
+    print(f"\n[5] Array Greatest GCD Pair in {arr}:")
+    print(f"    Max GCD = {best_g} between elements ({p1}, {p2})")
+
+    # 6. Step-by-Step Visualizer
+    print("\n[6] Euclidean Step-by-Step Division Trace:")
+    print(visualize_euclidean_steps(252, 105))
+
+    # 7. Benchmark
+    print("\n[7] Multi-Algorithm Benchmark Comparison:")
+    bench = benchmark_gcd_algorithms([(48, 18), (123456, 7890), (4181, 2584)], iterations=100)
+    print(format_benchmark_table(bench))
+
+    print("\n" + "=" * 80)
+    print("                      DEMONSTRATION COMPLETE                                   ")
+    print("=" * 80)
+
+
+if __name__ == "__main__":
+    main()

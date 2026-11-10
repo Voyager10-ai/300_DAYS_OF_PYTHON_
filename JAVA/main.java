@@ -1772,6 +1772,30 @@ import java.util.*;
 //     }
 // }
 
+// Java Greatest GCD Practice (Day 89)
+// class GreatestGCDPractice {
+//     // Euclidean Algorithm: O(log(min(a, b)))
+//     public static long gcd(long a, long b) {
+//         a = Math.abs(a);
+//         b = Math.abs(b);
+//         while (b != 0) {
+//             long temp = b;
+//             b = a % b;
+//             a = temp;
+//         }
+//         return a;
+//     }
+//     // Least Common Multiple (LCM)
+//     public static long lcm(long a, long b) {
+//         if (a == 0 || b == 0) return 0;
+//         return Math.abs(a * b) / gcd(a, b);
+//     }
+//     public static void main(String[] args) {
+//         System.out.println("GCD(252, 105) = " + gcd(252, 105));
+//         System.out.println("LCM(12, 18) = " + lcm(12, 18));
+//     }
+// }
+
 public class main{
 
 
