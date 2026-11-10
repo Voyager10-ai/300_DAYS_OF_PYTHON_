@@ -408,3 +408,192 @@ def count_nested_elements(nested: List[Any]) -> int:
         else:
             count += 1
     return count
+
+
+
+# ─── 4. Step-by-Step Recursion Visualizer & Benchmarking ──────────────────────
+
+
+def visualize_recursion_tree(
+    arr: List[Union[int, float]],
+    mode: str = "divide_and_conquer",
+) -> str:
+    """
+    Renders an ASCII diagram tracing recursive execution call trees.
+
+    Args:
+        arr: Small list of numbers (recommended len <= 8).
+        mode: Either "divide_and_conquer" (default) or "linear".
+
+    Returns:
+        Formatted ASCII string diagram.
+    """
+    if len(arr) > 16:
+        raise ValueError("Visualizer is limited to list length <= 16 for readable output")
+
+    lines: List[str] = []
+
+    if mode == "divide_and_conquer":
+        lines.append(f"Divide-and-Conquer Binary Split Sum Tree for {arr}:")
+        lines.append("=" * 68)
+
+        def _build_dnc(low: int, high: int, prefix: str = "", is_last: bool = True) -> Union[int, float]:
+            branch = "└── " if is_last else "├── "
+            if low == high:
+                val = arr[low]
+                lines.append(f"{prefix}{branch}arr[{low}] = {val}")
+                return val
+            mid = (low + high) // 2
+            curr_str = f"sum(arr[{low}..{high}])"
+            lines.append(f"{prefix}{branch}{curr_str}")
+
+            next_prefix = prefix + ("    " if is_last else "│   ")
+            l_val = _build_dnc(low, mid, next_prefix, False)
+            r_val = _build_dnc(mid + 1, high, next_prefix, True)
+            res = l_val + r_val
+            return res
+
+        total = _build_dnc(0, len(arr) - 1, "", True)
+        lines.append("=" * 68)
+        lines.append(f"Returned Combined Sum = {total}")
+
+    else:
+        lines.append(f"Linear Index-based Recursion Stack for {arr}:")
+        lines.append("=" * 68)
+        for i in range(len(arr)):
+            indent = "  " * i
+            lines.append(f"{indent}--> sum_list_index(arr, index={i}) [val = {arr[i]}]")
+        indent = "  " * len(arr)
+        lines.append(f"{indent}Base case hit: index={len(arr)} >= len -> return 0")
+        for i in range(len(arr) - 1, -1, -1):
+            indent = "  " * i
+            lines.append(f"{indent}<-- return {arr[i]} + sub_sum")
+        lines.append("=" * 68)
+
+    return "\n".join(lines)
+
+
+def benchmark_sum_algorithms(
+    lengths: Optional[List[int]] = None,
+    iterations: int = 20,
+) -> Dict[str, Any]:
+    """
+    Benchmarks and compares recursive and iterative summation algorithms.
+
+    Algorithms:
+      - Recursive Slicing O(n^2) (tested for n <= 500)
+      - Recursive Indexing O(n) (tested for n <= 500)
+      - Divide-and-Conquer O(log n depth)
+      - Pairwise Summation
+      - Builtin Python sum() (C implementation baseline)
+
+    Args:
+        lengths: List of array sizes to test.
+        iterations: Number of trials per test.
+
+    Returns:
+        Structured benchmark dictionary.
+    """
+    if lengths is None:
+        lengths = [10, 50, 200, 1000, 5000, 20000]
+
+    records: List[Dict[str, Any]] = []
+
+    for n in lengths:
+        data = list(range(1, n + 1))
+        row: Dict[str, Any] = {"n": n}
+
+        # 1. Recursive Slicing (only for n <= 500)
+        if n <= 500:
+            times: List[float] = []
+            for _ in range(iterations):
+                t0 = time.perf_counter()
+                sum_list_recursive_slice(data)
+                times.append(time.perf_counter() - t0)
+            row["slice"] = min(times)
+        else:
+            row["slice"] = None
+
+        # 2. Recursive Indexing (n <= 500)
+        if n <= 500:
+            times = []
+            for _ in range(iterations):
+                t0 = time.perf_counter()
+                sum_list_recursive_index(data)
+                times.append(time.perf_counter() - t0)
+            row["index"] = min(times)
+        else:
+            row["index"] = None
+
+        # 3. Divide-and-Conquer Binary Split
+        times = []
+        for _ in range(iterations):
+            t0 = time.perf_counter()
+            sum_list_divide_and_conquer(data)
+            times.append(time.perf_counter() - t0)
+        row["divide_conquer"] = min(times)
+
+        # 4. Pairwise Summation
+        times = []
+        for _ in range(iterations):
+            t0 = time.perf_counter()
+            sum_list_pairwise(data)
+            times.append(time.perf_counter() - t0)
+        row["pairwise"] = min(times)
+
+        # 5. Builtin sum()
+        times = []
+        for _ in range(iterations):
+            t0 = time.perf_counter()
+            sum(data)
+            times.append(time.perf_counter() - t0)
+        row["builtin_sum"] = min(times)
+
+        records.append(row)
+
+    return {"records": records, "iterations": iterations}
+
+
+def format_benchmark_table(benchmark_data: Dict[str, Any]) -> str:
+    """
+    Formats the benchmark dictionary into an ASCII comparison table.
+
+    Args:
+        benchmark_data: Output from benchmark_sum_algorithms.
+
+    Returns:
+        Formatted ASCII table string.
+    """
+    lines: List[str] = []
+    lines.append("List Summation Algorithms Performance Benchmark")
+    lines.append("=" * 88)
+    header = (
+        f"{'n':>7} | {'Recursive Slice':>16} | {'Recursive Index':>16} | "
+        f"{'Divide & Conquer':>17} | {'Pairwise':>11} | {'Builtin sum()':>14}"
+    )
+    lines.append(header)
+    lines.append("-" * 88)
+
+    def _fmt(val: Optional[float]) -> str:
+        if val is None:
+            return "N/A (Stack)"
+        us = val * 1_000_000.0
+        if us < 1.0:
+            return f"{us * 1000.0:.1f} ns"
+        if us < 1000.0:
+            return f"{us:.2f} µs"
+        return f"{us / 1000.0:.2f} ms"
+
+    for r in benchmark_data["records"]:
+        line = (
+            f"{r['n']:>7} | "
+            f"{_fmt(r['slice']):>16} | "
+            f"{_fmt(r['index']):>16} | "
+            f"{_fmt(r['divide_conquer']):>17} | "
+            f"{_fmt(r['pairwise']):>11} | "
+            f"{_fmt(r['builtin_sum']):>14}"
+        )
+        lines.append(line)
+
+    lines.append("=" * 88)
+    return "\n".join(lines)
