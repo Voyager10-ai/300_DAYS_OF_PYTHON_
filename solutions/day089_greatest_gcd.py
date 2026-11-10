@@ -516,3 +516,185 @@ def find_greatest_gcd_pair(arr: List[int]) -> Tuple[int, int, int]:
                 best_pair = (arr[i], arr[j])
 
     return (best_gcd, best_pair[0], best_pair[1])
+
+
+
+# ─── 4. Step-by-Step Visualizer & Performance Benchmarking ────────────────────
+
+
+def visualize_euclidean_steps(a: int, b: int) -> str:
+    """
+    Renders an ASCII step-by-step trace of Euclidean division steps for gcd(a, b).
+
+    Displays dividend, divisor, quotient, remainder, and the exact invariant equation:
+    dividend = divisor * quotient + remainder.
+
+    Args:
+        a: First integer.
+        b: Second integer.
+
+    Returns:
+        Formatted ASCII string diagram.
+    """
+    orig_a, orig_b = a, b
+    curr_a, curr_b = abs(a), abs(b)
+
+    lines: List[str] = []
+    lines.append(f"Euclidean Algorithm Division Trace for GCD({orig_a}, {orig_b})")
+    lines.append("=" * 76)
+    header = f"{'Step':>4} | {'Dividend (a)':>14} | {'Divisor (b)':>14} | {'Quotient':>9} | {'Remainder':>10} | {'Equation':>12}"
+    lines.append(header)
+    lines.append("-" * 76)
+
+    step = 1
+    if curr_b == 0:
+        lines.append(f"{step:>4} | {curr_a:>14} | {0:>14} | {'-':>9} | {0:>10} | gcd = {curr_a}")
+        lines.append("=" * 76)
+        return "\n".join(lines)
+
+    while curr_b != 0:
+        q = curr_a // curr_b
+        r = curr_a % curr_b
+        eq = f"{curr_a} = {curr_b}*{q} + {r}"
+        lines.append(f"{step:>4} | {curr_a:>14} | {curr_b:>14} | {q:>9} | {r:>10} | {eq}")
+        curr_a, curr_b = curr_b, r
+        step += 1
+
+    lines.append("=" * 76)
+    lines.append(f"Final Result: GCD({orig_a}, {orig_b}) = {curr_a}")
+    return "\n".join(lines)
+
+
+def benchmark_gcd_algorithms(
+    test_pairs: Optional[List[Tuple[int, int]]] = None,
+    iterations: int = 1000,
+) -> Dict[str, Any]:
+    """
+    Benchmarks and compares GCD algorithms across different number magnitudes and patterns.
+
+    Algorithms:
+      - Naive Brute Force (tested only on small inputs <= 20000)
+      - Subtraction Euclidean (tested on small inputs)
+      - Iterative Division Euclidean
+      - Binary Stein's Algorithm
+      - Builtin math.gcd (C implementation baseline)
+
+    Args:
+        test_pairs: List of (a, b) tuples to benchmark.
+        iterations: Number of runs per algorithm per pair.
+
+    Returns:
+        Dictionary of benchmark records.
+    """
+    if test_pairs is None:
+        test_pairs = [
+            (48, 18),               # Small inputs
+            (123456, 7890),         # Medium composite
+            (4181, 2584),           # Worst case: consecutive Fibonacci (F_19, F_18)
+            (75025, 46368),         # Consecutive Fibonacci (F_25, F_24)
+            (1_000_000_007, 1_000_000_009),  # Large twin primes
+        ]
+
+    records: List[Dict[str, Any]] = []
+
+    for a, b in test_pairs:
+        row: Dict[str, Any] = {"a": a, "b": b, "label": f"({a}, {b})"}
+
+        # 1. Naive Brute Force (only if min(a, b) <= 20,000)
+        if min(abs(a), abs(b)) <= 20_000:
+            times: List[float] = []
+            for _ in range(min(iterations, 50)):
+                t0 = time.perf_counter()
+                gcd_naive(a, b)
+                times.append(time.perf_counter() - t0)
+            row["naive"] = min(times)
+        else:
+            row["naive"] = None
+
+        # 2. Subtraction Euclidean (only if max(a, b) <= 100,000 to avoid hangs)
+        if max(abs(a), abs(b)) <= 100_000 and abs(a - b) <= 50_000:
+            times = []
+            for _ in range(min(iterations, 100)):
+                t0 = time.perf_counter()
+                gcd_subtraction(a, b)
+                times.append(time.perf_counter() - t0)
+            row["subtraction"] = min(times)
+        else:
+            row["subtraction"] = None
+
+        # 3. Iterative Division Euclidean
+        times = []
+        for _ in range(iterations):
+            t0 = time.perf_counter()
+            gcd_euclidean_iterative(a, b)
+            times.append(time.perf_counter() - t0)
+        row["euclidean"] = min(times)
+
+        # 4. Binary Stein
+        times = []
+        for _ in range(iterations):
+            t0 = time.perf_counter()
+            gcd_binary_stein(a, b)
+            times.append(time.perf_counter() - t0)
+        row["stein"] = min(times)
+
+        # 5. math.gcd builtin
+        times = []
+        for _ in range(iterations):
+            t0 = time.perf_counter()
+            math.gcd(a, b)
+            times.append(time.perf_counter() - t0)
+        row["math_gcd"] = min(times)
+
+        records.append(row)
+
+    return {"records": records, "iterations": iterations}
+
+
+def format_benchmark_table(benchmark_data: Dict[str, Any]) -> str:
+    """
+    Formats the benchmark dictionary into an ASCII comparison table.
+
+    Args:
+        benchmark_data: Output from benchmark_gcd_algorithms.
+
+    Returns:
+        Formatted ASCII table string.
+    """
+    lines: List[str] = []
+    lines.append("GCD Algorithms Performance Benchmark (Time per Operation)")
+    lines.append("=" * 88)
+    header = (
+        f"{'Pair (a, b)':>26} | {'Naive':>10} | {'Subtraction':>12} | "
+        f"{'Euclidean':>11} | {'Stein Binary':>13} | {'math.gcd':>10}"
+    )
+    lines.append(header)
+    lines.append("-" * 88)
+
+    def _fmt(val: Optional[float]) -> str:
+        if val is None:
+            return "N/A"
+        ns = val * 1_000_000_000.0
+        if ns < 1000.0:
+            return f"{ns:.1f} ns"
+        us = ns / 1000.0
+        if us < 1000.0:
+            return f"{us:.2f} µs"
+        return f"{us / 1000.0:.2f} ms"
+
+    for r in benchmark_data["records"]:
+        pair_str = f"({r['a']}, {r['b']})"
+        if len(pair_str) > 26:
+            pair_str = pair_str[:23] + "..."
+        line = (
+            f"{pair_str:>26} | "
+            f"{_fmt(r['naive']):>10} | "
+            f"{_fmt(r['subtraction']):>12} | "
+            f"{_fmt(r['euclidean']):>11} | "
+            f"{_fmt(r['stein']):>13} | "
+            f"{_fmt(r['math_gcd']):>10}"
+        )
+        lines.append(line)
+
+    lines.append("=" * 88)
+    return "\n".join(lines)
