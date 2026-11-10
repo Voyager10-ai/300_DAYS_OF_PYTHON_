@@ -258,3 +258,153 @@ def sum_list_pairwise(
         return _pairwise_helper(start, half) + _pairwise_helper(start + half, length - half)
 
     return _pairwise_helper(0, n)
+
+
+
+# ─── 3. Deep Nested List Recursive Summation & Weighted Solvers ───────────────
+
+
+def max_nesting_depth(nested: List[Any], current_depth: int = 1) -> int:
+    """
+    Computes the maximum depth of an arbitrarily nested list structure.
+
+    Args:
+        nested: List of elements and sublists.
+        current_depth: Current recursion depth.
+
+    Returns:
+        Maximum integer depth (1 for a flat non-empty list, 0 for empty list).
+    """
+    if not isinstance(nested, list):
+        return current_depth - 1
+    if not nested:
+        return current_depth if current_depth > 1 else 0
+
+    max_d = current_depth
+    for item in nested:
+        if isinstance(item, list):
+            sub_d = max_nesting_depth(item, current_depth + 1)
+            if sub_d > max_d:
+                max_d = sub_d
+    return max_d
+
+
+def sum_nested_list(nested: List[Any]) -> Union[int, float]:
+    """
+    Recursively sums all numeric values in an arbitrarily nested list of any depth.
+
+    Example:
+        sum_nested_list([1, [2, [3, 4], 5], [[6]], 7]) -> 28
+
+    Time Complexity: O(N) where N is total number of nodes/elements.
+    Space Complexity: O(D) where D is maximum nesting depth.
+
+    Args:
+        nested: List containing numbers and/or nested lists.
+
+    Returns:
+        Total accumulated numeric sum.
+
+    Raises:
+        TypeError: If non-list, non-numeric element encountered.
+    """
+    if not isinstance(nested, list):
+        raise TypeError(f"Expected a list, got {type(nested).__name__}")
+
+    total: Union[int, float] = 0
+    for item in nested:
+        if isinstance(item, list):
+            total += sum_nested_list(item)
+        elif isinstance(item, (int, float)) and not isinstance(item, bool):
+            total += item
+        else:
+            raise TypeError(f"Invalid element type in nested list: {type(item).__name__}")
+
+    return total
+
+
+def sum_nested_list_weighted(nested: List[Any], depth: int = 1) -> int:
+    """
+    LeetCode 339: Nested List Weight Sum.
+
+    Given a nested list of integers, returns the sum of all integers in the list
+    weighted by their depth. Each element at depth d is multiplied by d.
+
+    Example:
+        [[1, 1], 2, [1, 1]] -> 1*2 + 1*2 + 2*1 + 1*2 + 1*2 = 10
+        [1, [4, [6]]] -> 1*1 + 4*2 + 6*3 = 27
+
+    Args:
+        nested: Arbitrarily nested list of integers.
+        depth: Current depth level (starts at 1).
+
+    Returns:
+        Depth-weighted integer sum.
+    """
+    if not isinstance(nested, list):
+        raise TypeError(f"Expected a list, got {type(nested).__name__}")
+
+    total = 0
+    for item in nested:
+        if isinstance(item, list):
+            total += sum_nested_list_weighted(item, depth + 1)
+        elif isinstance(item, int) and not isinstance(item, bool):
+            total += item * depth
+        else:
+            raise TypeError(f"Expected integer, got {type(item).__name__}")
+
+    return total
+
+
+def sum_nested_list_inverse_weighted(nested: List[Any]) -> int:
+    """
+    LeetCode 364: Nested List Weight Sum II.
+
+    Returns the sum of all integers in the list weighted by their inverted depth:
+    Weight of an integer = (max_depth - current_depth + 1).
+
+    Example:
+        [[1, 1], 2, [1, 1]] -> max_depth = 2
+        Depth 1 weight: 2 - 1 + 1 = 2 -> 2 * 2 = 4
+        Depth 2 weight: 2 - 2 + 1 = 1 -> 4 * 1 = 4
+        Total = 4 + 4 = 8
+
+    Args:
+        nested: Arbitrarily nested list of integers.
+
+    Returns:
+        Inverted depth-weighted integer sum.
+    """
+    if not isinstance(nested, list):
+        raise TypeError(f"Expected a list, got {type(nested).__name__}")
+    if not nested:
+        return 0
+
+    max_d = max_nesting_depth(nested)
+
+    def _inverse_helper(sublist: List[Any], depth: int) -> int:
+        sub_total = 0
+        for item in sublist:
+            if isinstance(item, list):
+                sub_total += _inverse_helper(item, depth + 1)
+            elif isinstance(item, int) and not isinstance(item, bool):
+                weight = max_d - depth + 1
+                sub_total += item * weight
+            else:
+                raise TypeError(f"Expected integer, got {type(item).__name__}")
+        return sub_total
+
+    return _inverse_helper(nested, 1)
+
+
+def count_nested_elements(nested: List[Any]) -> int:
+    """Recursively counts total atomic (non-list) values inside nested list."""
+    if not isinstance(nested, list):
+        return 1
+    count = 0
+    for item in nested:
+        if isinstance(item, list):
+            count += count_nested_elements(item)
+        else:
+            count += 1
+    return count
