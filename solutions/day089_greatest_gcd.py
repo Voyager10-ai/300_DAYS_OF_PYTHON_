@@ -358,3 +358,161 @@ def solve_linear_diophantine(
 
     factor = c // g
     return (x0 * factor, y0 * factor)
+
+
+
+# ─── 3. Multi-Number GCD, LCM & Array Greatest GCD Pair ───────────────────────
+
+
+def gcd_list(numbers: List[int]) -> int:
+    """
+    Computes the GCD across an entire list or sequence of integers.
+
+    Property: gcd(a, b, c) = gcd(gcd(a, b), c).
+
+    Args:
+        numbers: Non-empty list of integers.
+
+    Returns:
+        Greatest common divisor of all elements.
+
+    Raises:
+        ValueError: If numbers list is empty.
+        TypeError: If elements are not integers.
+    """
+    if not isinstance(numbers, list):
+        raise TypeError(f"numbers must be a list, got {type(numbers).__name__}")
+    if not numbers:
+        raise ValueError("Cannot compute GCD of an empty list")
+
+    res = abs(numbers[0])
+    for num in numbers[1:]:
+        if not isinstance(num, int) or isinstance(num, bool):
+            raise TypeError(f"List elements must be integers, got {type(num).__name__}")
+        res = gcd_euclidean_iterative(res, num)
+        if res == 1:
+            break
+
+    return res
+
+
+def lcm(a: int, b: int) -> int:
+    """
+    Computes the Least Common Multiple (LCM) of two integers.
+
+    Formula:
+        lcm(a, b) = (|a * b|) // gcd(a, b)
+
+    Args:
+        a: First integer.
+        b: Second integer.
+
+    Returns:
+        Non-negative LCM integer.
+    """
+    if not isinstance(a, int) or isinstance(a, bool):
+        raise TypeError(f"a must be an integer, got {type(a).__name__}")
+    if not isinstance(b, int) or isinstance(b, bool):
+        raise TypeError(f"b must be an integer, got {type(b).__name__}")
+
+    if a == 0 or b == 0:
+        return 0
+
+    g = gcd_euclidean_iterative(a, b)
+    return abs(a * b) // g
+
+
+def lcm_list(numbers: List[int]) -> int:
+    """
+    Computes the LCM of a list of integers.
+
+    Args:
+        numbers: Non-empty list of integers.
+
+    Returns:
+        Least common multiple integer.
+    """
+    if not isinstance(numbers, list):
+        raise TypeError(f"numbers must be a list, got {type(numbers).__name__}")
+    if not numbers:
+        raise ValueError("Cannot compute LCM of an empty list")
+
+    res = abs(numbers[0])
+    for num in numbers[1:]:
+        if not isinstance(num, int) or isinstance(num, bool):
+            raise TypeError(f"List elements must be integers, got {type(num).__name__}")
+        res = lcm(res, num)
+    return res
+
+
+def are_coprime(a: int, b: int) -> bool:
+    """Returns True if a and b are mutually prime (gcd(a, b) == 1)."""
+    return gcd_euclidean_iterative(a, b) == 1
+
+
+def gcd_smallest_and_largest(arr: List[int]) -> int:
+    """
+    LeetCode 1979: Find Greatest Common Divisor of Array.
+    Given an integer array nums, return the greatest common divisor of the smallest
+    number and largest number in nums.
+
+    Args:
+        arr: Non-empty list of positive integers.
+
+    Returns:
+        GCD of min(arr) and max(arr).
+    """
+    if not arr:
+        raise ValueError("arr must not be empty")
+    return gcd_euclidean_iterative(min(arr), max(arr))
+
+
+def find_greatest_gcd_pair(arr: List[int]) -> Tuple[int, int, int]:
+    """
+    Finds two distinct elements in arr that achieve the maximum GCD.
+
+    For moderate array sizes, computes max GCD via frequency bucket sieve.
+    For small arrays, evaluates pairwise GCDs.
+
+    Args:
+        arr: List of positive integers with length >= 2.
+
+    Returns:
+        Tuple of (max_gcd, elem1, elem2).
+
+    Raises:
+        ValueError: If len(arr) < 2.
+    """
+    if len(arr) < 2:
+        raise ValueError("Array must contain at least two elements")
+
+    # If maximum element is reasonably bounded, use divisor sieve O(max_val * log(max_val))
+    max_val = max(arr)
+    if max_val <= 100_000:
+        freq = [0] * (max_val + 1)
+        for x in arr:
+            if x > 0:
+                freq[x] += 1
+
+        for g in range(max_val, 0, -1):
+            count = 0
+            matching: List[int] = []
+            for multiple in range(g, max_val + 1, g):
+                if freq[multiple] > 0:
+                    count += freq[multiple]
+                    matching.extend([multiple] * freq[multiple])
+                if count >= 2:
+                    return (g, matching[0], matching[1])
+
+    # Fallback to all-pairs comparison
+    best_gcd = 1
+    best_pair = (arr[0], arr[1])
+    n = len(arr)
+    for i in range(n):
+        for j in range(i + 1, n):
+            g = gcd_euclidean_iterative(arr[i], arr[j])
+            if g > best_gcd:
+                best_gcd = g
+                best_pair = (arr[i], arr[j])
+
+    return (best_gcd, best_pair[0], best_pair[1])
