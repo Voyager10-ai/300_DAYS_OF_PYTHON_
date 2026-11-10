@@ -597,3 +597,130 @@ def format_benchmark_table(benchmark_data: Dict[str, Any]) -> str:
 
     lines.append("=" * 88)
     return "\n".join(lines)
+
+
+
+# ─── 5. Comprehensive Unit Test Suite ────────────────────────────────────────
+
+
+class TestSumListRecursion(unittest.TestCase):
+    """Exhaustive unit test suite verifying correctness, edge cases and properties."""
+
+    def test_basic_summation_consistency(self) -> None:
+        """Verifies all algorithms compute identical sums on standard integer lists."""
+        test_cases = [
+            [],
+            [42],
+            [1, 2, 3, 4, 5],
+            [-5, 5, -10, 10, 0],
+            list(range(1, 101)),
+        ]
+        for arr in test_cases:
+            expected = sum(arr)
+            self.assertEqual(sum_list_recursive_slice(arr), expected)
+            self.assertEqual(sum_list_recursive_index(arr), expected)
+            self.assertEqual(sum_list_tail_recursive(arr), expected)
+            self.assertEqual(sum_list_divide_and_conquer(arr), expected)
+            self.assertEqual(sum_list_pairwise(arr), expected)
+
+    def test_floats_and_mixed_numbers(self) -> None:
+        """Verifies summation with floating point numbers."""
+        arr = [0.1, 0.2, 0.3, 0.4]
+        expected = sum(arr)
+        self.assertAlmostEqual(sum_list_recursive_index(arr), expected, places=7)
+        self.assertAlmostEqual(sum_list_divide_and_conquer(arr), expected, places=7)
+        self.assertAlmostEqual(sum_list_pairwise(arr), expected, places=7)
+
+    def test_large_array_divide_conquer(self) -> None:
+        """Verifies divide-and-conquer executes for large n without hitting recursion limit."""
+        large_arr = list(range(1, 5001))
+        expected = (5000 * 5001) // 2
+        self.assertEqual(sum_list_divide_and_conquer(large_arr), expected)
+        self.assertEqual(sum_list_pairwise(large_arr), expected)
+
+    def test_nested_list_sum(self) -> None:
+        """Verifies arbitrarily nested list summation."""
+        nested = [1, [2, [3, 4], 5], [[6]], 7]
+        self.assertEqual(sum_nested_list(nested), 28)
+        self.assertEqual(sum_nested_list([]), 0)
+        self.assertEqual(sum_nested_list([[], [[]]]), 0)
+        self.assertEqual(count_nested_elements(nested), 7)
+
+    def test_weighted_nested_list(self) -> None:
+        """Verifies LeetCode 339 and 364 weighted sums."""
+        nested1 = [[1, 1], 2, [1, 1]]
+        self.assertEqual(sum_nested_list_weighted(nested1), 10)
+        self.assertEqual(sum_nested_list_inverse_weighted(nested1), 8)
+
+        nested2 = [1, [4, [6]]]
+        self.assertEqual(sum_nested_list_weighted(nested2), 27)
+        self.assertEqual(sum_nested_list_inverse_weighted(nested2), 17)
+
+    def test_metrics_collection(self) -> None:
+        """Verifies metrics output contains expected information."""
+        total, m = sum_list_with_metrics([10, 20, 30])
+        self.assertEqual(total, 60)
+        self.assertEqual(m["length"], 3)
+        self.assertEqual(m["additions"], 3)
+
+    def test_type_validation(self) -> None:
+        """Ensures invalid types raise TypeError."""
+        for bad in ["not a list", 123, None, True]:
+            with self.assertRaises(TypeError):
+                sum_list_recursive_slice(bad)  # type: ignore
+            with self.assertRaises(TypeError):
+                sum_list_divide_and_conquer(bad)  # type: ignore
+
+        with self.assertRaises(TypeError):
+            sum_list_recursive_index([1, "two", 3])  # type: ignore
+
+
+# ─── 6. Interactive CLI Demonstration ────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates recursive list summation, nested solvers, visualizer, and benchmarks."""
+    print("=" * 80)
+    print("             DAY 90: SUM OF LIST (RECURSION & NESTED SOLVERS)           ")
+    print("=" * 80)
+
+    # 1. Compare standard summation
+    sample = [5, 10, 15, 20, 25, 30]
+    print(f"\n[1] Basic Recursive Summation for {sample}:")
+    print(f"    - Recursive Slice     : {sum_list_recursive_slice(sample)}")
+    print(f"    - Recursive Index     : {sum_list_recursive_index(sample)}")
+    print(f"    - Tail Recursive      : {sum_list_tail_recursive(sample)}")
+    print(f"    - Divide & Conquer    : {sum_list_divide_and_conquer(sample)}")
+    print(f"    - Pairwise Summation  : {sum_list_pairwise(sample)}")
+    print(f"    - Builtin sum()       : {sum(sample)}")
+
+    # 2. Arbitrarily Nested Lists
+    nested = [1, [2, [3, 4], 5], [[6]], 7]
+    print(f"\n[2] Deep Arbitrarily Nested List Summation:")
+    print(f"    Nested Structure : {nested}")
+    print(f"    Max Depth        : {max_nesting_depth(nested)}")
+    print(f"    Element Count    : {count_nested_elements(nested)}")
+    print(f"    Flat Total Sum   : {sum_nested_list(nested)}")
+
+    # 3. LeetCode 339 & 364 Depth Weighted Sums
+    weighted_sample = [[1, 1], 2, [1, 1]]
+    print(f"\n[3] LeetCode Depth-Weighted Nested Sums for {weighted_sample}:")
+    print(f"    - Standard Weighted (LC 339) : {sum_nested_list_weighted(weighted_sample)}")
+    print(f"    - Inverse Weighted  (LC 364) : {sum_nested_list_inverse_weighted(weighted_sample)}")
+
+    # 4. Recursion Tree Visualizer
+    print("\n[4] Divide-and-Conquer Binary Call Tree (arr = [1, 2, 3, 4, 5, 6]):")
+    print(visualize_recursion_tree([1, 2, 3, 4, 5, 6]))
+
+    # 5. Benchmark
+    print("\n[5] Multi-Algorithm Benchmark Comparison:")
+    bench = benchmark_sum_algorithms([10, 50, 200, 1000], iterations=30)
+    print(format_benchmark_table(bench))
+
+    print("\n" + "=" * 80)
+    print("                      DEMONSTRATION COMPLETE                                   ")
+    print("=" * 80)
+
+
+if __name__ == "__main__":
+    main()

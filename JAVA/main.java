@@ -1796,6 +1796,27 @@ import java.util.*;
 //     }
 // }
 
+// Java Sum of List (Recursion) Practice (Day 90)
+// class SumListRecursionPractice {
+//     // Index-based recursion: O(n) time, O(n) space
+//     public static long sumRecursive(int[] arr, int index) {
+//         if (index >= arr.length) return 0;
+//         return arr[index] + sumRecursive(arr, index + 1);
+//     }
+//     // Divide-and-conquer binary split: O(n) time, O(log n) stack space
+//     public static long sumDivideConquer(int[] arr, int low, int high) {
+//         if (low > high) return 0;
+//         if (low == high) return arr[low];
+//         int mid = (low + high) / 2;
+//         return sumDivideConquer(arr, low, mid) + sumDivideConquer(arr, mid + 1, high);
+//     }
+//     public static void main(String[] args) {
+//         int[] sample = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+//         System.out.println("Sum (Linear Recursive): " + sumRecursive(sample, 0));
+//         System.out.println("Sum (Divide & Conquer): " + sumDivideConquer(sample, 0, sample.length - 1));
+//     }
+// }
+
 public class main{
 
 
