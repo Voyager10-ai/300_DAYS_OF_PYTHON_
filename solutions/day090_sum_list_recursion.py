@@ -160,3 +160,101 @@ def sum_list_with_metrics(
         "algorithm": "Index-based Linear Recursion O(n)",
     }
     return (total, metrics)
+
+
+
+# ─── 2. Divide-and-Conquer Logarithmic & Pairwise Summation ───────────────────
+
+
+def sum_list_divide_and_conquer(
+    arr: List[Union[int, float]],
+    low: int = 0,
+    high: Optional[int] = None,
+) -> Union[int, float]:
+    """
+    Computes list sum using divide-and-conquer binary splitting.
+
+    Divides the array into two equal halves recursively:
+        sum(arr[low..high]) = sum(arr[low..mid]) + sum(arr[mid+1..high])
+
+    Reduces call stack depth from O(n) to O(log n), allowing summation of lists
+    with hundreds of thousands of elements without triggering RecursionError.
+
+    Time Complexity: O(n) additions.
+    Space Complexity: O(log n) call stack frames.
+
+    Args:
+        arr: List of numbers.
+        low: Starting index (inclusive).
+        high: Ending index (inclusive). Defaults to len(arr) - 1.
+
+    Returns:
+        Sum of elements within [low, high].
+
+    Raises:
+        TypeError: If elements are non-numeric.
+    """
+    if not isinstance(arr, list):
+        raise TypeError(f"arr must be a list, got {type(arr).__name__}")
+
+    if not arr:
+        return 0
+
+    if high is None:
+        high = len(arr) - 1
+
+    if low > high:
+        return 0
+    if low == high:
+        val = arr[low]
+        if not isinstance(val, (int, float)) or isinstance(val, bool):
+            raise TypeError(f"Element at index {low} must be numeric, got {type(val).__name__}")
+        return val
+
+    mid = (low + high) // 2
+    left_sum = sum_list_divide_and_conquer(arr, low, mid)
+    right_sum = sum_list_divide_and_conquer(arr, mid + 1, high)
+    return left_sum + right_sum
+
+
+def sum_list_pairwise(
+    arr: List[Union[int, float]],
+    block_size: int = 16,
+) -> Union[int, float]:
+    """
+    Computes list sum using high-precision pairwise summation.
+
+    Pairwise summation is the algorithm adopted in high-performance computing
+    (including NumPy and Julia) to significantly reduce floating-point roundoff errors.
+    While naive accumulation accumulates error O(n * eps), pairwise summation
+    bounds error to O(eps * log n).
+
+    Args:
+        arr: List of floating point or integer numbers.
+        block_size: Base case threshold for iterative chunk summation (defaults to 16).
+
+    Returns:
+        High-precision accumulated sum.
+    """
+    if not isinstance(arr, list):
+        raise TypeError(f"arr must be a list, got {type(arr).__name__}")
+
+    n = len(arr)
+    if n == 0:
+        return 0
+
+    def _pairwise_helper(start: int, length: int) -> Union[int, float]:
+        if length <= block_size:
+            # Base case: linear sum for small blocks
+            total: Union[int, float] = 0
+            for i in range(start, start + length):
+                val = arr[i]
+                if not isinstance(val, (int, float)) or isinstance(val, bool):
+                    raise TypeError(f"Element at index {i} must be numeric, got {type(val).__name__}")
+                total += val
+            return total
+
+        half = length // 2
+        return _pairwise_helper(start, half) + _pairwise_helper(start + half, length - half)
+
+    return _pairwise_helper(0, n)
