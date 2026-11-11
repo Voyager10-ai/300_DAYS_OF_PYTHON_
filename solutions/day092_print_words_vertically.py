@@ -142,3 +142,129 @@ class Solution:
     def printVertically(self, s: str) -> List[str]:
         """Returns words vertically without trailing whitespace."""
         return print_vertically_zip(s)
+
+
+
+# ─── 2. Streaming Generator, Grid Transformations & Round-Trip Reconstruction ───
+
+
+def print_vertically_generator(s: str) -> Generator[str, None, None]:
+    """
+    Lazily yields each vertical word column one at a time.
+
+    Avoids materializing the full transposed matrix in memory at once.
+
+    Args:
+        s: Space-separated input string.
+
+    Yields:
+        One stripped vertical column string per column index.
+    """
+    if not isinstance(s, str):
+        raise TypeError(f"s must be a string, got {type(s).__name__}")
+
+    words = s.split()
+    if not words:
+        return
+
+    max_len = max(len(w) for w in words)
+    for col_idx in range(max_len):
+        # Find last word index that has a character at col_idx to avoid building trailing spaces
+        last_valid = -1
+        for w_idx in range(len(words) - 1, -1, -1):
+            if col_idx < len(words[w_idx]):
+                last_valid = w_idx
+                break
+
+        if last_valid == -1:
+            yield ""
+        else:
+            chars = [
+                words[i][col_idx] if col_idx < len(words[i]) else " "
+                for i in range(last_valid + 1)
+            ]
+            yield "".join(chars)
+
+
+def print_vertically_bottom_up(s: str) -> List[str]:
+    """
+    Prints words vertically with word order reversed (bottom-to-top per column).
+
+    Equivalent to rotating the word grid 90 degrees clockwise.
+
+    Args:
+        s: Space-separated string.
+
+    Returns:
+        List of bottom-up vertical column strings with trailing whitespace stripped.
+    """
+    if not isinstance(s, str):
+        raise TypeError(f"s must be a string, got {type(s).__name__}")
+
+    words = s.split()
+    if not words:
+        return []
+
+    reversed_words = words[::-1]
+    return ["".join(col).rstrip() for col in zip_longest(*reversed_words, fillvalue=" ")]
+
+
+def print_diagonal_words(s: str) -> List[str]:
+    """
+    Extracts anti-diagonal character streams across the rectangular word matrix.
+
+    Diagonals follow the invariant: row + col == k for k = 0..(R + C - 2).
+
+    Args:
+        s: Space-separated string.
+
+    Returns:
+        List of anti-diagonal character strings with trailing whitespace removed.
+    """
+    if not isinstance(s, str):
+        raise TypeError(f"s must be a string, got {type(s).__name__}")
+
+    words = s.split()
+    if not words:
+        return []
+
+    rows = len(words)
+    cols = max(len(w) for w in words)
+    diagonals: List[str] = []
+
+    for d in range(rows + cols - 1):
+        chars: List[str] = []
+        for r in range(rows):
+            c = d - r
+            if 0 <= c < cols:
+                chars.append(words[r][c] if c < len(words[r]) else " ")
+        diagonals.append("".join(chars).rstrip())
+
+    return diagonals
+
+
+def reconstruct_sentence_from_vertical(columns: List[str]) -> str:
+    """
+    Inverse operation: reconstructs the original horizontal sentence from vertical columns.
+
+    Args:
+        columns: List of vertical strings produced by print_vertically_*.
+
+    Returns:
+        Reconstructed space-separated sentence string.
+    """
+    if not isinstance(columns, list):
+        raise TypeError(f"columns must be a list of strings, got {type(columns).__name__}")
+    if not columns:
+        return ""
+
+    num_words = max(len(col) for col in columns)
+    word_buffers: List[List[str]] = [[] for _ in range(num_words)]
+
+    for col in columns:
+        for w_idx in range(num_words):
+            if w_idx < len(col):
+                word_buffers[w_idx].append(col[w_idx])
+
+    words = ["".join(buf).strip() for buf in word_buffers]
+    return " ".join(w for w in words if w)
