@@ -470,3 +470,41 @@ class TestPrintWordsVertically(unittest.TestCase):
                 print_vertically_zip(bad)  # type: ignore
             with self.assertRaises(TypeError):
                 list(print_vertically_generator(bad))  # type: ignore
+
+
+
+# ─── 5. Interactive CLI Demonstration ────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates vertical word printing, grid visualization, and benchmarks."""
+    print("=" * 80)
+    print("              DAY 92: PRINT WORDS VERTICALLY (LEETCODE 1324)            ")
+    print("=" * 80)
+
+    sample = "CONTEST IS COMING"
+    print(f"\n[1] Basic Output Comparison for '{sample}':")
+    print(f"    - Column Scan    : {print_vertically_scan(sample)}")
+    print(f"    - zip_longest    : {print_vertically_zip(sample)}")
+    print(f"    - Lazy Generator : {list(print_vertically_generator(sample))}")
+
+    print("\n[2] Transformations & Round-Trip Reconstruction:")
+    cols = print_vertically_zip(sample)
+    print(f"    - Bottom-Up 90° Clockwise : {print_vertically_bottom_up(sample)}")
+    print(f"    - Anti-Diagonal Stream    : {print_diagonal_words(sample)}")
+    print(f"    - Reconstructed Sentence  : '{reconstruct_sentence_from_vertical(cols)}'")
+
+    print("\n[3] ASCII Matrix Grid & Whitespace Visualization:")
+    print(visualize_vertical_grid("TO BE OR NOT TO BE"))
+
+    print("\n[4] Multi-Algorithm Performance Benchmark:")
+    bench = benchmark_vertical_algorithms([10, 50, 200, 1000], iterations=15)
+    print(format_benchmark_table(bench))
+
+    print("\n" + "=" * 80)
+    print("                      DEMONSTRATION COMPLETE                                   ")
+    print("=" * 80)
+
+
+if __name__ == "__main__":
+    main()

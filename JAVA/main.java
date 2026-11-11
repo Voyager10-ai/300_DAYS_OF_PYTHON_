@@ -1848,6 +1848,32 @@ import java.util.*;
 //     }
 // }
 
+// Java Print Words Vertically Practice (Day 92)
+// class PrintWordsVerticallyPractice {
+//     public static List<String> printVertically(String s) {
+//         String[] words = s.trim().split("\\s+");
+//         int maxLen = 0;
+//         for (String w : words) {
+//             maxLen = Math.max(maxLen, w.length());
+//         }
+//         List<String> res = new ArrayList<>();
+//         for (int col = 0; col < maxLen; col++) {
+//             StringBuilder sb = new StringBuilder();
+//             for (String w : words) {
+//                 sb.append(col < w.length() ? w.charAt(col) : ' ');
+//             }
+//             // Strip strictly trailing whitespace
+//             int end = sb.length() - 1;
+//             while (end >= 0 && sb.charAt(end) == ' ') end--;
+//             res.add(sb.substring(0, end + 1));
+//         }
+//         return res;
+//     }
+//     public static void main(String[] args) {
+//         System.out.println(printVertically("TO BE OR NOT TO BE"));
+//     }
+// }
+
 public class main{
 
 
