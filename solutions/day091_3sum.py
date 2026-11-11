@@ -536,3 +536,94 @@ def format_benchmark_table(benchmark_data: Dict[str, Any]) -> str:
 
     lines.append("=" * 84)
     return "\n".join(lines)
+
+
+
+# ─── 5. Comprehensive Unit Test Suite ────────────────────────────────────────
+
+
+class TestThreeSumImplementations(unittest.TestCase):
+    """Exhaustive unit test suite verifying 3Sum algorithms and variants."""
+
+    def test_standard_cases(self) -> None:
+        """Verifies all 3Sum engines agree on standard LeetCode inputs."""
+        cases = [
+            ([-1, 0, 1, 2, -1, -4], [[-1, -1, 2], [-1, 0, 1]]),
+            ([0, 1, 1], []),
+            ([0, 0, 0], [[0, 0, 0]]),
+            ([0, 0, 0, 0], [[0, 0, 0]]),
+            ([-2, 0, 0, 2, 2], [[-2, 0, 2]]),
+            ([], []),
+            ([1, -1], []),
+        ]
+        sol = Solution()
+        for nums, expected in cases:
+            self.assertEqual(three_sum_brute_force(nums), expected)
+            self.assertEqual(three_sum_hashset(nums), expected)
+            self.assertEqual(three_sum_two_pointer(nums), expected)
+            self.assertEqual(sol.threeSum(nums), expected)
+            self.assertEqual(k_sum(nums, 0, 3), expected)
+
+    def test_custom_target_and_ksum(self) -> None:
+        """Tests non-zero target and 4Sum via k_sum."""
+        nums = [1, 0, -1, 0, -2, 2]
+        expected_4sum = [[-2, -1, 1, 2], [-2, 0, 0, 2], [-1, 0, 0, 1]]
+        self.assertEqual(k_sum(nums, 0, 4), expected_4sum)
+        self.assertEqual(three_sum_two_pointer([1, 2, 3, 4], target=7), [[1, 2, 4]])
+
+    def test_three_sum_closest(self) -> None:
+        """Tests LeetCode 16: 3Sum Closest."""
+        self.assertEqual(three_sum_closest([-1, 2, 1, -4], 1), 2)
+        self.assertEqual(three_sum_closest([0, 0, 0], 1), 0)
+        with self.assertRaises(ValueError):
+            three_sum_closest([1, 2], 0)
+
+    def test_three_sum_smaller(self) -> None:
+        """Tests LeetCode 259: 3Sum Smaller."""
+        self.assertEqual(three_sum_smaller([-2, 0, 1, 3], 2), 2)
+        self.assertEqual(three_sum_smaller([], 0), 0)
+        self.assertEqual(three_sum_smaller([0], 0), 0)
+
+    def test_type_validation(self) -> None:
+        """Ensures invalid inputs raise TypeError."""
+        with self.assertRaises(TypeError):
+            three_sum_two_pointer("not a list")  # type: ignore
+        with self.assertRaises(TypeError):
+            three_sum_two_pointer([1, "a", 3])  # type: ignore
+
+
+# ─── 6. Interactive CLI Demonstration ────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates 3Sum implementations, variants, trace, and benchmark."""
+    print("=" * 80)
+    print("                     DAY 91: 3SUM & K-SUM SUITE                         ")
+    print("=" * 80)
+
+    nums = [-1, 0, 1, 2, -1, -4]
+    print(f"\n[1] Algorithm Consistency for nums = {nums}:")
+    print(f"    - Brute Force O(n^3) : {three_sum_brute_force(nums)}")
+    print(f"    - Hash-Set O(n^2)    : {three_sum_hashset(nums)}")
+    print(f"    - Two-Pointer O(n^2) : {three_sum_two_pointer(nums)}")
+    print(f"    - Generalized kSum   : {k_sum(nums, 0, 3)}")
+
+    print("\n[2] 3Sum Variants & 4Sum:")
+    print(f"    - 3Sum Closest([-1, 2, 1, -4], target=1) : {three_sum_closest([-1, 2, 1, -4], 1)}")
+    print(f"    - 3Sum Smaller([-2, 0, 1, 3], target=2)  : {three_sum_smaller([-2, 0, 1, 3], 2)}")
+    print(f"    - 4Sum([1, 0, -1, 0, -2, 2], target=0)   : {k_sum([1, 0, -1, 0, -2, 2], 0, 4)}")
+
+    print("\n[3] Step-by-Step Two-Pointer Trace:")
+    print(visualize_three_sum_trace(nums))
+
+    print("\n[4] Multi-Algorithm Benchmark Comparison:")
+    bench = benchmark_three_sum_algorithms([20, 60, 120, 300], iterations=2)
+    print(format_benchmark_table(bench))
+
+    print("\n" + "=" * 80)
+    print("                      DEMONSTRATION COMPLETE                                   ")
+    print("=" * 80)
+
+
+if __name__ == "__main__":
+    main()

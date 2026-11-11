@@ -106,7 +106,7 @@
     {"day": 88, "title": "Factorial", "status": "done"},
     {"day": 89, "title": "Greatest GCD", "status": "done"},
     {"day": 90, "title": "Sum of List (Recursion)", "status": "done"},
-    {"day": 91, "title": "3Sum", "status": "pending"},
+    {"day": 91, "title": "3Sum", "status": "done"},
     {"day": 92, "title": "Print Words Vertically", "status": "pending"},
     {"day": 93, "title": "Reshape the Matrix", "status": "pending"},
     {"day": 94, "title": "Longest Common Prefix", "status": "pending"},
