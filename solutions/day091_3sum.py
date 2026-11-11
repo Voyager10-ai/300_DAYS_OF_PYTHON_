@@ -221,3 +221,151 @@ class Solution:
     def threeSum(self, nums: List[int]) -> List[List[int]]:
         """Finds all unique triplets in nums which give the sum of zero."""
         return three_sum_two_pointer(nums, target=0)
+
+
+
+# ─── 3. 3Sum Variants & Generalized kSum Solver ───────────────────────────────
+
+
+def three_sum_closest(nums: List[int], target: int) -> int:
+    """
+    LeetCode 16: 3Sum Closest.
+    Finds three integers in nums such that their sum is closest to target.
+
+    Time Complexity: O(n^2).
+    Space Complexity: O(1) auxiliary space (after sort).
+
+    Args:
+        nums: List of integers (length >= 3).
+        target: Target integer.
+
+    Returns:
+        Sum of the three integers closest to target.
+
+    Raises:
+        ValueError: If len(nums) < 3.
+    """
+    if len(nums) < 3:
+        raise ValueError("nums must contain at least 3 elements")
+
+    arr = sorted(nums)
+    n = len(arr)
+    closest = arr[0] + arr[1] + arr[2]
+
+    for i in range(n - 2):
+        if i > 0 and arr[i] == arr[i - 1]:
+            continue
+
+        left, right = i + 1, n - 1
+        while left < right:
+            curr_sum = arr[i] + arr[left] + arr[right]
+            if curr_sum == target:
+                return target
+
+            if abs(curr_sum - target) < abs(closest - target):
+                closest = curr_sum
+
+            if curr_sum < target:
+                left += 1
+            else:
+                right -= 1
+
+    return closest
+
+
+def three_sum_smaller(nums: List[int], target: int) -> int:
+    """
+    LeetCode 259: 3Sum Smaller.
+    Counts index triplets (i, j, k) with 0 <= i < j < k < n satisfying:
+        nums[i] + nums[j] + nums[k] < target
+
+    Time Complexity: O(n^2).
+    Space Complexity: O(1) auxiliary space.
+
+    Args:
+        nums: List of integers.
+        target: Exclusive upper bound integer.
+
+    Returns:
+        Count of valid index triplets.
+    """
+    if len(nums) < 3:
+        return 0
+
+    arr = sorted(nums)
+    n = len(arr)
+    count = 0
+
+    for i in range(n - 2):
+        left, right = i + 1, n - 1
+        while left < right:
+            if arr[i] + arr[left] + arr[right] < target:
+                # Every element between left+1 and right also satisfies < target
+                count += right - left
+                left += 1
+            else:
+                right -= 1
+
+    return count
+
+
+def k_sum(nums: List[int], target: int, k: int) -> List[List[int]]:
+    """
+    Generalized k-Sum solver finding all unique k-tuples summing to target.
+
+    Supports k >= 2 (2Sum, 3Sum, 4Sum, ...).
+    Uses recursive dimensionality reduction down to O(n) two-pointer 2Sum.
+
+    Time Complexity: O(n^(k-1)) for k >= 2.
+
+    Args:
+        nums: List of integers.
+        target: Target tuple sum.
+        k: Number of elements per tuple (k >= 2).
+
+    Returns:
+        List of unique sorted k-tuples summing to target.
+    """
+    if k < 2:
+        raise ValueError(f"k must be >= 2, got {k}")
+    if len(nums) < k:
+        return []
+
+    arr = sorted(nums)
+
+    def _two_sum(start: int, tgt: int) -> List[List[int]]:
+        res: List[List[int]] = []
+        lo, hi = start, len(arr) - 1
+        while lo < hi:
+            curr = arr[lo] + arr[hi]
+            if curr < tgt or (lo > start and arr[lo] == arr[lo - 1]):
+                lo += 1
+            elif curr > tgt or (hi < len(arr) - 1 and arr[hi] == arr[hi + 1]):
+                hi -= 1
+            else:
+                res.append([arr[lo], arr[hi]])
+                lo += 1
+                hi -= 1
+        return res
+
+    def _ksum_helper(start: int, tgt: int, k_rem: int) -> List[List[int]]:
+        res: List[List[int]] = []
+        if start >= len(arr):
+            return res
+
+        # Early termination pruning using average bounds
+        avg_val = tgt // k_rem
+        if arr[start] > avg_val or arr[-1] < avg_val:
+            return res
+
+        if k_rem == 2:
+            return _two_sum(start, tgt)
+
+        for i in range(start, len(arr) - k_rem + 1):
+            if i == start or arr[i] != arr[i - 1]:
+                for subset in _ksum_helper(i + 1, tgt - arr[i], k_rem - 1):
+                    res.append([arr[i]] + subset)
+
+        return res
+
+    return _ksum_helper(0, target, k)
