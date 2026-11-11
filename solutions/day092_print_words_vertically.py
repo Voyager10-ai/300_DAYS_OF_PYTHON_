@@ -268,3 +268,131 @@ def reconstruct_sentence_from_vertical(columns: List[str]) -> str:
 
     words = ["".join(buf).strip() for buf in word_buffers]
     return " ".join(w for w in words if w)
+
+
+
+# ─── 3. ASCII Matrix Visualizer & Performance Benchmarking ────────────────────
+
+
+def visualize_vertical_grid(s: str) -> str:
+    """
+    Renders an ASCII matrix showing word grid padding and vertical transposition.
+
+    Args:
+        s: Space-separated input string.
+
+    Returns:
+        Formatted ASCII string diagram.
+    """
+    words = s.split()
+    if not words:
+        return "Empty input string."
+
+    max_len = max(len(w) for w in words)
+    lines: List[str] = []
+    lines.append(f"Vertical Grid Transposition for: '{s}'")
+    lines.append("=" * 68)
+    lines.append("1. Input Words Matrix ('.' indicates internal/trailing pad space):")
+
+    col_header = "        " + " ".join(f"C{c}" for c in range(max_len))
+    lines.append(col_header)
+    lines.append("       +" + "--" * max_len + "+")
+
+    for r, w in enumerate(words):
+        row_cells = [w[c] if c < len(w) else "." for c in range(max_len)]
+        lines.append(f"  W{r:<3} | " + " ".join(row_cells) + " |")
+
+    lines.append("       +" + "--" * max_len + "+")
+    lines.append("\n2. Transposed Vertical Columns (trailing spaces stripped):")
+    cols = print_vertically_zip(s)
+    for idx, col in enumerate(cols):
+        lines.append(f"  Col {idx:<2}: \"{col}\"")
+
+    lines.append("=" * 68)
+    return "\n".join(lines)
+
+
+def benchmark_vertical_algorithms(
+    word_counts: Optional[List[int]] = None,
+    word_len: int = 12,
+    iterations: int = 20,
+) -> Dict[str, Any]:
+    """
+    Benchmarks vertical word printing algorithms across varying input sizes.
+
+    Args:
+        word_counts: List of word counts to test.
+        word_len: Maximum word length used in generated sentences.
+        iterations: Runs per benchmark point.
+
+    Returns:
+        Structured benchmark metrics dictionary.
+    """
+    if word_counts is None:
+        word_counts = [10, 50, 200, 1000]
+
+    records: List[Dict[str, Any]] = []
+
+    for count in word_counts:
+        # Build synthetic test sentence with alternating lengths
+        words = [("PYTHON" * 3)[: (i % word_len) + 1] for i in range(count)]
+        sentence = " ".join(words)
+        row: Dict[str, Any] = {"word_count": count}
+
+        # 1. Column-Scan approach
+        times: List[float] = []
+        for _ in range(iterations):
+            t0 = time.perf_counter()
+            print_vertically_scan(sentence)
+            times.append(time.perf_counter() - t0)
+        row["scan"] = min(times)
+
+        # 2. zip_longest approach
+        times = []
+        for _ in range(iterations):
+            t0 = time.perf_counter()
+            print_vertically_zip(sentence)
+            times.append(time.perf_counter() - t0)
+        row["zip_longest"] = min(times)
+
+        # 3. Streaming generator
+        times = []
+        for _ in range(iterations):
+            t0 = time.perf_counter()
+            list(print_vertically_generator(sentence))
+            times.append(time.perf_counter() - t0)
+        row["generator"] = min(times)
+
+        records.append(row)
+
+    return {"records": records, "word_len": word_len, "iterations": iterations}
+
+
+def format_benchmark_table(benchmark_data: Dict[str, Any]) -> str:
+    """Formats the benchmark dictionary into an ASCII comparison table."""
+    lines: List[str] = []
+    lines.append("Print Words Vertically Performance Benchmark")
+    lines.append("=" * 72)
+    header = (
+        f"{'Words':>8} | {'Column Scan':>18} | {'zip_longest':>18} | {'Lazy Generator':>18}"
+    )
+    lines.append(header)
+    lines.append("-" * 72)
+
+    def _fmt(val: float) -> str:
+        us = val * 1_000_000.0
+        if us < 1000.0:
+            return f"{us:.2f} µs"
+        return f"{us / 1000.0:.2f} ms"
+
+    for r in benchmark_data["records"]:
+        line = (
+            f"{r['word_count']:>8} | "
+            f"{_fmt(r['scan']):>18} | "
+            f"{_fmt(r['zip_longest']):>18} | "
+            f"{_fmt(r['generator']):>18}"
+        )
+        lines.append(line)
+
+    lines.append("=" * 72)
+    return "\n".join(lines)
