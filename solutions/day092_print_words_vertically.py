@@ -396,3 +396,77 @@ def format_benchmark_table(benchmark_data: Dict[str, Any]) -> str:
 
     lines.append("=" * 72)
     return "\n".join(lines)
+
+
+
+# ─── 4. Comprehensive Unit Test Suite ────────────────────────────────────────
+
+
+class TestPrintWordsVertically(unittest.TestCase):
+    """Exhaustive unit test suite verifying vertical printing, inversion & edge cases."""
+
+    def test_leetcode_examples(self) -> None:
+        """Verifies all implementations match official LeetCode 1324 test cases."""
+        cases = [
+            ("HOW ARE YOU", ["HAY", "ORO", "WEU"]),
+            ("TO BE OR NOT TO BE", ["TBONTB", "OEROOE", "   T"]),
+            ("CONTEST IS COMING", ["CIC", "OSO", "N M", "T I", "E N", "S G", "T"]),
+        ]
+        sol = Solution()
+        for s, expected in cases:
+            self.assertEqual(print_vertically_scan(s), expected)
+            self.assertEqual(print_vertically_zip(s), expected)
+            self.assertEqual(list(print_vertically_generator(s)), expected)
+            self.assertEqual(sol.printVertically(s), expected)
+
+    def test_single_word_and_empty(self) -> None:
+        """Tests edge cases: empty string, whitespace-only, single word, single char."""
+        self.assertEqual(print_vertically_scan(""), [])
+        self.assertEqual(print_vertically_zip("   "), [])
+        self.assertEqual(list(print_vertically_generator("")), [])
+        self.assertEqual(print_vertically_zip("PYTHON"), ["P", "Y", "T", "H", "O", "N"])
+        self.assertEqual(print_vertically_zip("A B C"), ["ABC"])
+
+    def test_no_trailing_spaces(self) -> None:
+        """Ensures no column contains trailing spaces."""
+        s = "SHORT LONGERWORD A"
+        cols = print_vertically_zip(s)
+        for col in cols:
+            self.assertEqual(col, col.rstrip())
+
+    def test_round_trip_reconstruction(self) -> None:
+        """Verifies sentence reconstruction restores original horizontal sentence."""
+        sentences = [
+            "HOW ARE YOU",
+            "TO BE OR NOT TO BE",
+            "CONTEST IS COMING",
+            "A",
+            "ONE TWO THREE FOUR FIVE",
+        ]
+        for s in sentences:
+            cols = print_vertically_zip(s)
+            self.assertEqual(reconstruct_sentence_from_vertical(cols), s)
+        self.assertEqual(reconstruct_sentence_from_vertical([]), "")
+
+    def test_bottom_up_and_diagonals(self) -> None:
+        """Tests bottom-up rotation and anti-diagonal traversal."""
+        self.assertEqual(print_vertically_bottom_up("HOW ARE YOU"), ["YAH", "ORO", "UEW"])
+        self.assertEqual(print_diagonal_words("AB CD"), ["A", "BC", "D"])
+
+    def test_metrics_structure(self) -> None:
+        """Verifies metrics dictionary accuracy."""
+        cols, m = print_vertically_with_metrics("TO BE OR NOT TO BE")
+        self.assertEqual(cols, ["TBONTB", "OEROOE", "   T"])
+        self.assertEqual(m["word_count"], 6)
+        self.assertEqual(m["max_word_length"], 3)
+        self.assertEqual(m["trailing_spaces_trimmed"], 2)
+
+    def test_type_validation(self) -> None:
+        """Ensures non-string input raises TypeError."""
+        for bad in [123, ["HOW"], None, True]:
+            with self.assertRaises(TypeError):
+                print_vertically_scan(bad)  # type: ignore
+            with self.assertRaises(TypeError):
+                print_vertically_zip(bad)  # type: ignore
+            with self.assertRaises(TypeError):
+                list(print_vertically_generator(bad))  # type: ignore
