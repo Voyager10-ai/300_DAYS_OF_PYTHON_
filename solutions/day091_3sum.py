@@ -369,3 +369,170 @@ def k_sum(nums: List[int], target: int, k: int) -> List[List[int]]:
         return res
 
     return _ksum_helper(0, target, k)
+
+
+
+# ─── 4. Two-Pointer Trace Visualizer & Performance Benchmarking ───────────────
+
+
+def visualize_three_sum_trace(nums: List[int], target: int = 0) -> str:
+    """
+    Renders an ASCII trace table showing two-pointer convergence for 3Sum.
+
+    Args:
+        nums: Input list of integers.
+        target: Target sum (defaults to 0).
+
+    Returns:
+        Formatted ASCII trace string.
+    """
+    if len(nums) < 3:
+        return "Array too short (< 3 elements) for 3Sum trace."
+
+    arr = sorted(nums)
+    n = len(arr)
+    lines: List[str] = []
+    lines.append(f"3Sum Two-Pointer Convergence Trace (Sorted: {arr}, Target = {target})")
+    lines.append("=" * 84)
+    header = f"{'Anchor i':>10} | {'Left L':>10} | {'Right R':>10} | {'Triplet':>16} | {'Sum':>6} | {'Action':>18}"
+    lines.append(header)
+    lines.append("-" * 84)
+
+    found: List[List[int]] = []
+
+    for i in range(n - 2):
+        if i > 0 and arr[i] == arr[i - 1]:
+            lines.append(f"{f'{i}({arr[i]})':>10} | {'-':>10} | {'-':>10} | {'-':>16} | {'-':>6} | SKIP DUPLICATE i")
+            continue
+
+        left, right = i + 1, n - 1
+        while left < right:
+            s = arr[i] + arr[left] + arr[right]
+            triplet_str = f"[{arr[i]}, {arr[left]}, {arr[right]}]"
+            l_str = f"{left}({arr[left]})"
+            r_str = f"{right}({arr[right]})"
+            i_str = f"{i}({arr[i]})"
+
+            if s < target:
+                lines.append(f"{i_str:>10} | {l_str:>10} | {r_str:>10} | {triplet_str:>16} | {s:>6} | s < tgt -> L++")
+                left += 1
+            elif s > target:
+                lines.append(f"{i_str:>10} | {l_str:>10} | {r_str:>10} | {triplet_str:>16} | {s:>6} | s > tgt -> R--")
+                right -= 1
+            else:
+                lines.append(f"{i_str:>10} | {l_str:>10} | {r_str:>10} | {triplet_str:>16} | {s:>6} | MATCH FOUND!")
+                found.append([arr[i], arr[left], arr[right]])
+                while left < right and arr[left] == arr[left + 1]:
+                    left += 1
+                while left < right and arr[right] == arr[right - 1]:
+                    right -= 1
+                left += 1
+                right -= 1
+
+    lines.append("=" * 84)
+    lines.append(f"Total Unique Triplets Found: {found}")
+    return "\n".join(lines)
+
+
+def benchmark_three_sum_algorithms(
+    sizes: Optional[List[int]] = None,
+    iterations: int = 3,
+) -> Dict[str, Any]:
+    """
+    Benchmarks 3Sum algorithms across increasing array sizes.
+
+    Algorithms:
+      - Naive Brute Force O(n^3) (tested up to n = 120)
+      - Hash-Set 2Sum Reduction O(n^2)
+      - Optimal Sorted Two-Pointer O(n^2)
+      - Generalized kSum (k = 3)
+
+    Args:
+        sizes: List of input array lengths.
+        iterations: Runs per benchmark point.
+
+    Returns:
+        Structured benchmark metrics dictionary.
+    """
+    if sizes is None:
+        sizes = [20, 60, 120, 300, 600]
+
+    rng = random.Random(42)
+    records: List[Dict[str, Any]] = []
+
+    for n in sizes:
+        data = [rng.randint(-n // 2, n // 2) for _ in range(n)]
+        row: Dict[str, Any] = {"n": n}
+
+        # 1. Brute Force (n <= 120)
+        if n <= 120:
+            times: List[float] = []
+            for _ in range(iterations):
+                t0 = time.perf_counter()
+                three_sum_brute_force(data)
+                times.append(time.perf_counter() - t0)
+            row["brute_force"] = min(times)
+        else:
+            row["brute_force"] = None
+
+        # 2. Hash-Set
+        times = []
+        for _ in range(iterations):
+            t0 = time.perf_counter()
+            three_sum_hashset(data)
+            times.append(time.perf_counter() - t0)
+        row["hashset"] = min(times)
+
+        # 3. Sorted Two-Pointer
+        times = []
+        for _ in range(iterations):
+            t0 = time.perf_counter()
+            three_sum_two_pointer(data)
+            times.append(time.perf_counter() - t0)
+        row["two_pointer"] = min(times)
+
+        # 4. Generalized kSum (k=3)
+        times = []
+        for _ in range(iterations):
+            t0 = time.perf_counter()
+            k_sum(data, 0, 3)
+            times.append(time.perf_counter() - t0)
+        row["ksum"] = min(times)
+
+        records.append(row)
+
+    return {"records": records, "iterations": iterations}
+
+
+def format_benchmark_table(benchmark_data: Dict[str, Any]) -> str:
+    """Formats the 3Sum benchmark output into an ASCII table."""
+    lines: List[str] = []
+    lines.append("3Sum Algorithms Performance Benchmark")
+    lines.append("=" * 84)
+    header = (
+        f"{'n':>7} | {'Brute Force O(n^3)':>19} | {'Hash-Set O(n^2)':>17} | "
+        f"{'Two-Pointer O(n^2)':>19} | {'kSum (k=3)':>13}"
+    )
+    lines.append(header)
+    lines.append("-" * 84)
+
+    def _fmt(val: Optional[float]) -> str:
+        if val is None:
+            return "N/A (>100ms)"
+        ms = val * 1000.0
+        if ms < 1.0:
+            return f"{ms * 1000.0:.2f} µs"
+        return f"{ms:.2f} ms"
+
+    for r in benchmark_data["records"]:
+        line = (
+            f"{r['n']:>7} | "
+            f"{_fmt(r['brute_force']):>19} | "
+            f"{_fmt(r['hashset']):>17} | "
+            f"{_fmt(r['two_pointer']):>19} | "
+            f"{_fmt(r['ksum']):>13}"
+        )
+        lines.append(line)
+
+    lines.append("=" * 84)
+    return "\n".join(lines)
