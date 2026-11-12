@@ -267,3 +267,153 @@ def matrix_spiral_flatten(mat: List[List[int]]) -> List[int]:
             left += 1
 
     return result
+
+
+
+# ─── 3. ASCII Matrix Visualizer & Performance Benchmarking ────────────────────
+
+
+def _render_ascii_matrix(mat: List[List[int]], title: str) -> List[str]:
+    """Helper rendering a clean boxed ASCII grid for a 2D integer matrix."""
+    width = max(len(str(val)) for row in mat for val in row) + 1
+    out: List[str] = [title]
+    border = "+" + "-" * (len(mat[0]) * (width + 1) + 1) + "+"
+    out.append(border)
+    for row in mat:
+        cells = " ".join(f"{val:>{width}}" for val in row)
+        out.append(f"| {cells} |")
+    out.append(border)
+    return out
+
+
+def visualize_matrix_reshape(
+    mat: List[List[int]],
+    r: int,
+    c: int,
+) -> str:
+    """
+    Renders an ASCII diagram illustrating original matrix, flat traversal, and target shape.
+
+    Args:
+        mat: Original m x n integer matrix.
+        r: Target row count.
+        c: Target column count.
+
+    Returns:
+        Formatted ASCII string diagram.
+    """
+    m, n = _validate_matrix(mat, r, c)
+    lines: List[str] = []
+    lines.append(f"Matrix Reshape Visualization: ({m}x{n}) -> ({r}x{c})")
+    lines.append("=" * 68)
+    lines.extend(_render_ascii_matrix(mat, f"Original Matrix ({m}x{n}):"))
+
+    if m * n != r * c:
+        lines.append(f"\n[!] Incompatible dimensions: {m}*{n} ({m*n}) != {r}*{c} ({r*c})")
+        lines.append("    Returning copy of original matrix unchanged.")
+    else:
+        flat = [val for row in mat for val in row]
+        lines.append(f"\nLinear Row-Major Stream: {flat}")
+        reshaped = matrix_reshape_divmod(mat, r, c)
+        lines.append("")
+        lines.extend(_render_ascii_matrix(reshaped, f"Reshaped Matrix ({r}x{c}):"))
+
+    lines.append("=" * 68)
+    return "\n".join(lines)
+
+
+def benchmark_reshape_algorithms(
+    shapes: Optional[List[Tuple[int, int, int, int]]] = None,
+    iterations: int = 10,
+) -> Dict[str, Any]:
+    """
+    Benchmarks matrix reshape strategies across varying matrix dimensions.
+
+    Args:
+        shapes: List of (m, n, r, c) tuples. Defaults to common scaling shapes.
+        iterations: Runs per test point.
+
+    Returns:
+        Structured benchmark metrics dictionary.
+    """
+    if shapes is None:
+        shapes = [
+            (10, 10, 5, 20),
+            (50, 50, 25, 100),
+            (200, 200, 100, 400),
+            (400, 400, 800, 200),
+        ]
+
+    records: List[Dict[str, Any]] = []
+
+    for m, n, r, c in shapes:
+        mat = [[(i * n + j) for j in range(n)] for i in range(m)]
+        row: Dict[str, Any] = {"shape_str": f"{m}x{n}->{r}x{c}", "elements": m * n}
+
+        # 1. Flatten Buffer
+        times: List[float] = []
+        for _ in range(iterations):
+            t0 = time.perf_counter()
+            matrix_reshape_flatten(mat, r, c)
+            times.append(time.perf_counter() - t0)
+        row["flatten"] = min(times)
+
+        # 2. Divmod Single-Pass
+        times = []
+        for _ in range(iterations):
+            t0 = time.perf_counter()
+            matrix_reshape_divmod(mat, r, c)
+            times.append(time.perf_counter() - t0)
+        row["divmod"] = min(times)
+
+        # 3. Column-Major
+        times = []
+        for _ in range(iterations):
+            t0 = time.perf_counter()
+            matrix_reshape_column_major(mat, r, c)
+            times.append(time.perf_counter() - t0)
+        row["col_major"] = min(times)
+
+        # 4. Lazy Generator
+        times = []
+        for _ in range(iterations):
+            t0 = time.perf_counter()
+            list(matrix_reshape_generator(mat, r, c))
+            times.append(time.perf_counter() - t0)
+        row["generator"] = min(times)
+
+        records.append(row)
+
+    return {"records": records, "iterations": iterations}
+
+
+def format_benchmark_table(benchmark_data: Dict[str, Any]) -> str:
+    """Formats the reshape benchmark dictionary into an ASCII table."""
+    lines: List[str] = []
+    lines.append("Matrix Reshape Algorithms Performance Benchmark")
+    lines.append("=" * 84)
+    header = (
+        f"{'Transform':>16} | {'Cells':>8} | {'Flatten Buffer':>15} | "
+        f"{'Divmod Map':>12} | {'Col-Major':>11} | {'Generator':>11}"
+    )
+    lines.append(header)
+    lines.append("-" * 84)
+
+    def _fmt(val: float) -> str:
+        us = val * 1_000_000.0
+        if us < 1000.0:
+            return f"{us:.2f} µs"
+        return f"{us / 1000.0:.2f} ms"
+
+    for r in benchmark_data["records"]:
+        line = (
+            f"{r['shape_str']:>16} | {r['elements']:>8} | "
+            f"{_fmt(r['flatten']):>15} | "
+            f"{_fmt(r['divmod']):>12} | "
+            f"{_fmt(r['col_major']):>11} | "
+            f"{_fmt(r['generator']):>11}"
+        )
+        lines.append(line)
+
+    lines.append("=" * 84)
+    return "\n".join(lines)
