@@ -176,3 +176,128 @@ def lcp_with_metrics(strs: List[str]) -> Tuple[str, Dict[str, Any]]:
         "algorithm": "Vertical Column Scan O(S)",
     }
     return (result, metrics)
+
+
+
+# ─── 2. Binary Search, Lexicographical Sort, Trie & LeetCode Solution ─────────
+
+
+def lcp_binary_search(strs: List[str]) -> str:
+    """
+    Finds Longest Common Prefix via binary search over the prefix length space.
+
+    Searches length mid in [1, min_len]. If all strings share prefix[:mid],
+    searches upper half [mid + 1, high]; otherwise searches lower half.
+
+    Time Complexity: O(S * log(minLen)) where S is total characters.
+    Space Complexity: O(1) auxiliary space.
+
+    Args:
+        strs: List of strings.
+
+    Returns:
+        Longest common prefix string.
+    """
+    _validate_str_list(strs)
+    if not strs:
+        return ""
+
+    min_len = min(len(s) for s in strs)
+    if min_len == 0:
+        return ""
+
+    def _is_common_prefix(length: int) -> bool:
+        candidate = strs[0][:length]
+        return all(s.startswith(candidate) for s in strs[1:])
+
+    low, high = 1, min_len
+    while low <= high:
+        mid = (low + high) // 2
+        if _is_common_prefix(mid):
+            low = mid + 1
+        else:
+            high = mid - 1
+
+    return strs[0][: (low + high) // 2]
+
+
+def lcp_sort_endpoints(strs: List[str]) -> str:
+    """
+    Finds Longest Common Prefix by lexicographically sorting and comparing extremes.
+
+    In a lexicographically sorted array, the two strings with maximum divergence
+    are guaranteed to be the very first and very last elements. Any prefix shared
+    between strs[0] and strs[-1] is shared by all strings between them.
+
+    Time Complexity: O(N * L * log N) dominated by string sorting.
+    Space Complexity: O(N) for sorted list reference copy.
+
+    Args:
+        strs: List of strings.
+
+    Returns:
+        Longest common prefix string.
+    """
+    _validate_str_list(strs)
+    if not strs:
+        return ""
+
+    ordered = sorted(strs)
+    return _common_prefix_pair(ordered[0], ordered[-1])
+
+
+class _TrieNode:
+    """Internal Trie node tracking child branches and word termination."""
+
+    def __init__(self) -> None:
+        self.children: Dict[str, "_TrieNode"] = {}
+        self.is_end: bool = False
+
+
+def lcp_trie(strs: List[str]) -> str:
+    """
+    Finds Longest Common Prefix using a Prefix Tree (Trie).
+
+    Inserts all strings into a Trie, then walks down from the root while each
+    node has strictly 1 child and is not a word termination boundary.
+
+    Time Complexity: O(S) to build and walk the Trie.
+    Space Complexity: O(S) for Trie node storage.
+
+    Args:
+        strs: List of strings.
+
+    Returns:
+        Longest common prefix string.
+    """
+    _validate_str_list(strs)
+    if not strs:
+        return ""
+
+    root = _TrieNode()
+    for word in strs:
+        if word == "":
+            return ""
+        node = root
+        for ch in word:
+            if ch not in node.children:
+                node.children[ch] = _TrieNode()
+            node = node.children[ch]
+        node.is_end = True
+
+    prefix_chars: List[str] = []
+    curr = root
+    while len(curr.children) == 1 and not curr.is_end:
+        ch, next_node = next(iter(curr.children.items()))
+        prefix_chars.append(ch)
+        curr = next_node
+
+    return "".join(prefix_chars)
+
+
+class Solution:
+    """LeetCode 14: Longest Common Prefix solution wrapper."""
+
+    def longestCommonPrefix(self, strs: List[str]) -> str:
+        """Returns the longest common prefix string among strs."""
+        return lcp_sort_endpoints(strs)
