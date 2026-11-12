@@ -556,3 +556,42 @@ class TestLongestCommonPrefix(unittest.TestCase):
             lcp_vertical_scan("not a list")  # type: ignore
         with self.assertRaises(TypeError):
             lcp_vertical_scan(["ok", 123])  # type: ignore
+
+
+
+# ─── 5. Interactive CLI Demonstration ────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates LCP algorithms, extensions, visualizer, and benchmarks."""
+    print("=" * 80)
+    print("              DAY 94: LONGEST COMMON PREFIX (LEETCODE 14)               ")
+    print("=" * 80)
+
+    words = ["flower", "flow", "flight"]
+    print(f"\n[1] Algorithm Consistency for {words}:")
+    print(f"    - Horizontal Scan     : '{lcp_horizontal_scan(words)}'")
+    print(f"    - Vertical Scan       : '{lcp_vertical_scan(words)}'")
+    print(f"    - Divide & Conquer    : '{lcp_divide_and_conquer(words)}'")
+    print(f"    - Binary Search       : '{lcp_binary_search(words)}'")
+    print(f"    - Sort Endpoints      : '{lcp_sort_endpoints(words)}'")
+    print(f"    - Prefix Tree (Trie)  : '{lcp_trie(words)}'")
+
+    print("\n[2] Extensions (Suffix & k-String Prefix):")
+    print(f"    - Longest Common Suffix(['running', 'jogging', 'walking']) -> '{longest_common_suffix(['running', 'jogging', 'walking'])}'")
+    print(f"    - Prefix shared by >= 3 of ['apple', 'app', 'apricot', 'banana'] -> '{longest_common_prefix_k_strings(['apple', 'app', 'apricot', 'banana'], 3)}'")
+
+    print("\n[3] Vertical Alignment & Divergence Visualizer:")
+    print(visualize_lcp_vertical_scan(words))
+
+    print("\n[4] Multi-Algorithm Performance Benchmark:")
+    bench = benchmark_lcp_algorithms([20, 100, 500, 1500], prefix_len=20, iterations=5)
+    print(format_benchmark_table(bench))
+
+    print("\n" + "=" * 80)
+    print("                      DEMONSTRATION COMPLETE                                   ")
+    print("=" * 80)
+
+
+if __name__ == "__main__":
+    main()
