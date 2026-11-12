@@ -150,3 +150,120 @@ class Solution:
     def matrixReshape(self, mat: List[List[int]], r: int, c: int) -> List[List[int]]:
         """Reshapes mat to r x c if total elements match, otherwise returns mat."""
         return matrix_reshape_flatten(mat, r, c)
+
+
+
+# ─── 2. Column-Major Reshape, Streaming Generator & 2D Transformations ─────────
+
+
+def matrix_reshape_column_major(
+    mat: List[List[int]],
+    r: int,
+    c: int,
+) -> List[List[int]]:
+    """
+    Reshapes mat using Fortran/MATLAB-style column-major traversal order.
+
+    Reads elements top-to-bottom column-by-column and populates the target r x c
+    matrix column-by-column.
+
+    Args:
+        mat: Original m x n integer matrix.
+        r: Target row count.
+        c: Target column count.
+
+    Returns:
+        Column-major reshaped matrix, or copy of mat if m * n != r * c.
+    """
+    m, n = _validate_matrix(mat, r, c)
+    if m * n != r * c:
+        return [row[:] for row in mat]
+
+    reshaped: List[List[int]] = [[0] * c for _ in range(r)]
+    total = m * n
+
+    for k in range(total):
+        # Column-major coordinate mapping
+        src_c, src_r = divmod(k, m)
+        dst_c, dst_r = divmod(k, r)
+        reshaped[dst_r][dst_c] = mat[src_r][src_c]
+
+    return reshaped
+
+
+def matrix_reshape_generator(
+    mat: List[List[int]],
+    r: int,
+    c: int,
+) -> Generator[List[int], None, None]:
+    """
+    Lazily yields reshaped matrix rows one at a time without materializing the full grid.
+
+    Space Complexity: O(c) buffer per yielded row.
+
+    Args:
+        mat: Original m x n matrix.
+        r: Target rows.
+        c: Target columns.
+
+    Yields:
+        Rows of length c (or original rows if incompatible).
+    """
+    m, n = _validate_matrix(mat, r, c)
+    if m * n != r * c:
+        for row in mat:
+            yield row[:]
+        return
+
+    row_buf: List[int] = []
+    for row in mat:
+        for val in row:
+            row_buf.append(val)
+            if len(row_buf) == c:
+                yield row_buf
+                row_buf = []
+
+
+def matrix_transpose(mat: List[List[int]]) -> List[List[int]]:
+    """Returns the matrix transpose (m x n -> n x m)."""
+    if not mat or not mat[0]:
+        return []
+    return [list(col) for col in zip(*mat)]
+
+
+def matrix_rotate_90_cw(mat: List[List[int]]) -> List[List[int]]:
+    """Rotates an m x n matrix 90 degrees clockwise."""
+    if not mat or not mat[0]:
+        return []
+    return [list(row) for row in zip(*mat[::-1])]
+
+
+def matrix_spiral_flatten(mat: List[List[int]]) -> List[int]:
+    """Traverses and flattens a 2D matrix in clockwise spiral order."""
+    if not mat or not mat[0]:
+        return []
+
+    top, bottom = 0, len(mat) - 1
+    left, right = 0, len(mat[0]) - 1
+    result: List[int] = []
+
+    while top <= bottom and left <= right:
+        for c in range(left, right + 1):
+            result.append(mat[top][c])
+        top += 1
+
+        for r in range(top, bottom + 1):
+            result.append(mat[r][right])
+        right -= 1
+
+        if top <= bottom:
+            for c in range(right, left - 1, -1):
+                result.append(mat[bottom][c])
+            bottom -= 1
+
+        if left <= right:
+            for r in range(bottom, top - 1, -1):
+                result.append(mat[r][left])
+            left += 1
+
+    return result
