@@ -1874,6 +1874,25 @@ import java.util.*;
 //     }
 // }
 
+// Java Reshape the Matrix Practice (Day 93)
+// class ReshapeMatrixPractice {
+//     // Single-Pass Divmod Mapping: O(m*n) time, O(1) auxiliary space
+//     public static int[][] matrixReshape(int[][] mat, int r, int c) {
+//         int m = mat.length, n = mat[0].length;
+//         if (m * n != r * c) return mat;
+//         int[][] res = new int[r][c];
+//         for (int i = 0; i < m * n; i++) {
+//             res[i / c][i % c] = mat[i / n][i % n];
+//         }
+//         return res;
+//     }
+//     public static void main(String[] args) {
+//         int[][] mat = {{1, 2}, {3, 4}};
+//         int[][] reshaped = matrixReshape(mat, 1, 4);
+//         System.out.println(Arrays.deepToString(reshaped));
+//     }
+// }
+
 public class main{
 
 

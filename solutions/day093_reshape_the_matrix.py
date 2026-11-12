@@ -483,3 +483,41 @@ class TestReshapeTheMatrix(unittest.TestCase):
             matrix_reshape_flatten([[1, 2]], 0, 2)
         with self.assertRaises(ValueError):
             matrix_reshape_flatten([], 1, 1)
+
+
+
+# ─── 5. Interactive CLI Demonstration ────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates matrix reshaping, transformations, visualizer, and benchmarks."""
+    print("=" * 80)
+    print("               DAY 93: RESHAPE THE MATRIX (LEETCODE 566)                 ")
+    print("=" * 80)
+
+    mat = [[1, 2, 3], [4, 5, 6]]
+    print(f"\n[1] Reshaping {mat} to (3, 2):")
+    print(f"    - Flatten Buffer : {matrix_reshape_flatten(mat, 3, 2)}")
+    print(f"    - Divmod Mapping : {matrix_reshape_divmod(mat, 3, 2)}")
+    print(f"    - Lazy Generator : {list(matrix_reshape_generator(mat, 3, 2))}")
+    print(f"    - Column-Major   : {matrix_reshape_column_major(mat, 3, 2)}")
+
+    print("\n[2] Additional 2D Matrix Operations:")
+    print(f"    - Transpose         : {matrix_transpose(mat)}")
+    print(f"    - Rotate 90° CW     : {matrix_rotate_90_cw(mat)}")
+    print(f"    - Spiral Flatten    : {matrix_spiral_flatten(mat)}")
+
+    print("\n[3] ASCII Matrix Transformation Visualizer:")
+    print(visualize_matrix_reshape(mat, 3, 2))
+
+    print("\n[4] Multi-Algorithm Performance Benchmark:")
+    bench = benchmark_reshape_algorithms([(10, 10, 5, 20), (50, 50, 25, 100), (200, 200, 100, 400)], iterations=5)
+    print(format_benchmark_table(bench))
+
+    print("\n" + "=" * 80)
+    print("                      DEMONSTRATION COMPLETE                                   ")
+    print("=" * 80)
+
+
+if __name__ == "__main__":
+    main()
