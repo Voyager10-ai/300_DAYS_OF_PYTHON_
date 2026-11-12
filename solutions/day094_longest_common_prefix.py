@@ -491,3 +491,68 @@ def format_benchmark_table(benchmark_data: Dict[str, Any]) -> str:
 
     lines.append("=" * 94)
     return "\n".join(lines)
+
+
+
+# ─── 4. Comprehensive Unit Test Suite ────────────────────────────────────────
+
+
+class TestLongestCommonPrefix(unittest.TestCase):
+    """Exhaustive unit test suite verifying all 6 LCP engines and extensions."""
+
+    def test_consistency_across_all_engines(self) -> None:
+        """Verifies all LCP implementations return identical results across test cases."""
+        cases = [
+            (["flower", "flow", "flight"], "fl"),
+            (["dog", "racecar", "car"], ""),
+            (["interspecies", "interstellar", "interstate"], "inters"),
+            (["a"], "a"),
+            (["ab", "a"], "a"),
+            (["", "b"], ""),
+            (["same", "same", "same"], "same"),
+            ([], ""),
+        ]
+        sol = Solution()
+        engines = [
+            lcp_horizontal_scan,
+            lcp_vertical_scan,
+            lcp_divide_and_conquer,
+            lcp_binary_search,
+            lcp_sort_endpoints,
+            lcp_trie,
+            sol.longestCommonPrefix,
+        ]
+        for strs, expected in cases:
+            for engine in engines:
+                with self.subTest(strs=strs, engine=engine.__name__):
+                    self.assertEqual(engine(strs), expected)
+
+    def test_longest_common_suffix(self) -> None:
+        """Tests longest common suffix extraction."""
+        self.assertEqual(longest_common_suffix(["running", "jogging", "walking"]), "ing")
+        self.assertEqual(longest_common_suffix(["cat", "dog"]), "")
+        self.assertEqual(longest_common_suffix([]), "")
+
+    def test_lcp_k_strings(self) -> None:
+        """Tests k-string shared prefix discovery."""
+        words = ["apple", "app", "apricot", "banana", "band"]
+        self.assertEqual(longest_common_prefix_k_strings(words, 3), "ap")
+        self.assertIn(longest_common_prefix_k_strings(words, 2), ["app", "ban"])
+        self.assertEqual(longest_common_prefix_k_strings(words, 6), "")
+        with self.assertRaises(ValueError):
+            longest_common_prefix_k_strings(words, 0)
+
+    def test_metrics_structure(self) -> None:
+        """Verifies metrics dictionary accuracy."""
+        res, m = lcp_with_metrics(["flower", "flow", "flight"])
+        self.assertEqual(res, "fl")
+        self.assertEqual(m["lcp_length"], 2)
+        self.assertEqual(m["num_strings"], 3)
+        self.assertGreater(m["comparisons"], 0)
+
+    def test_type_validation(self) -> None:
+        """Ensures non-list or non-string elements raise TypeError."""
+        with self.assertRaises(TypeError):
+            lcp_vertical_scan("not a list")  # type: ignore
+        with self.assertRaises(TypeError):
+            lcp_vertical_scan(["ok", 123])  # type: ignore
