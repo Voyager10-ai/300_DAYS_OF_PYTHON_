@@ -417,3 +417,69 @@ def format_benchmark_table(benchmark_data: Dict[str, Any]) -> str:
 
     lines.append("=" * 84)
     return "\n".join(lines)
+
+
+
+# ─── 4. Comprehensive Unit Test Suite ────────────────────────────────────────
+
+
+class TestReshapeTheMatrix(unittest.TestCase):
+    """Exhaustive unit test suite verifying matrix reshape variants and edge cases."""
+
+    def test_standard_reshape(self) -> None:
+        """Verifies row-major reshape outputs match expected shapes."""
+        mat = [[1, 2], [3, 4]]
+        sol = Solution()
+        self.assertEqual(matrix_reshape_flatten(mat, 1, 4), [[1, 2, 3, 4]])
+        self.assertEqual(matrix_reshape_divmod(mat, 1, 4), [[1, 2, 3, 4]])
+        self.assertEqual(list(matrix_reshape_generator(mat, 1, 4)), [[1, 2, 3, 4]])
+        self.assertEqual(sol.matrixReshape(mat, 1, 4), [[1, 2, 3, 4]])
+
+        mat2 = [[1, 2, 3], [4, 5, 6]]
+        expected2 = [[1, 2], [3, 4], [5, 6]]
+        self.assertEqual(matrix_reshape_flatten(mat2, 3, 2), expected2)
+        self.assertEqual(matrix_reshape_divmod(mat2, 3, 2), expected2)
+        self.assertEqual(list(matrix_reshape_generator(mat2, 3, 2)), expected2)
+
+    def test_incompatible_dimensions(self) -> None:
+        """Ensures incompatible target dimensions return original matrix copy."""
+        mat = [[1, 2], [3, 4]]
+        res = matrix_reshape_divmod(mat, 2, 4)
+        self.assertEqual(res, mat)
+        self.assertIsNot(res, mat)
+
+    def test_column_major_reshape(self) -> None:
+        """Tests Fortran-style column-major order reshaping."""
+        mat = [[1, 2, 3], [4, 5, 6]]
+        self.assertEqual(matrix_reshape_column_major(mat, 3, 2), [[1, 5], [4, 3], [2, 6]])
+
+    def test_2d_transformations(self) -> None:
+        """Tests transpose, 90-degree clockwise rotation, and spiral flatten."""
+        mat = [[1, 2, 3], [4, 5, 6]]
+        self.assertEqual(matrix_transpose(mat), [[1, 4], [2, 5], [3, 6]])
+        self.assertEqual(matrix_rotate_90_cw([[1, 2], [3, 4]]), [[3, 1], [4, 2]])
+        self.assertEqual(
+            matrix_spiral_flatten([[1, 2, 3], [4, 5, 6], [7, 8, 9]]),
+            [1, 2, 3, 6, 9, 8, 7, 4, 5],
+        )
+
+    def test_metrics_structure(self) -> None:
+        """Verifies metrics dictionary accuracy."""
+        mat = [[1, 2, 3], [4, 5, 6]]
+        res, m = matrix_reshape_with_metrics(mat, 3, 2)
+        self.assertEqual(res, [[1, 2], [3, 4], [5, 6]])
+        self.assertTrue(m["compatible"])
+        self.assertEqual(m["original_shape"], (2, 3))
+        self.assertEqual(m["actual_shape"], (3, 2))
+        self.assertEqual(m["total_elements"], 6)
+
+    def test_validation_errors(self) -> None:
+        """Ensures malformed matrices and invalid dimensions raise ValueError/TypeError."""
+        with self.assertRaises(TypeError):
+            matrix_reshape_flatten("not a matrix", 1, 1)  # type: ignore
+        with self.assertRaises(ValueError):
+            matrix_reshape_flatten([[1, 2], [3]], 1, 3)
+        with self.assertRaises(ValueError):
+            matrix_reshape_flatten([[1, 2]], 0, 2)
+        with self.assertRaises(ValueError):
+            matrix_reshape_flatten([], 1, 1)
