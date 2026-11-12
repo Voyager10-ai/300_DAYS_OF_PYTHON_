@@ -301,3 +301,193 @@ class Solution:
     def longestCommonPrefix(self, strs: List[str]) -> str:
         """Returns the longest common prefix string among strs."""
         return lcp_sort_endpoints(strs)
+
+
+
+# ─── 3. Extensions, Visualizer & Performance Benchmarking ─────────────────────
+
+
+def longest_common_suffix(strs: List[str]) -> str:
+    """
+    Finds the Longest Common Suffix across a list of strings.
+
+    Args:
+        strs: List of strings.
+
+    Returns:
+        Longest common suffix string.
+    """
+    _validate_str_list(strs)
+    if not strs:
+        return ""
+
+    reversed_strs = [s[::-1] for s in strs]
+    return lcp_vertical_scan(reversed_strs)[::-1]
+
+
+def longest_common_prefix_k_strings(strs: List[str], k: int) -> str:
+    """
+    Finds the longest prefix shared by at least k strings in strs.
+
+    Uses a frequency-annotated Trie to find the deepest node visited >= k times.
+
+    Args:
+        strs: List of strings.
+        k: Minimum number of strings sharing the prefix (1 <= k <= len(strs)).
+
+    Returns:
+        Longest prefix string shared by >= k strings.
+    """
+    _validate_str_list(strs)
+    if k <= 0:
+        raise ValueError(f"k must be positive, got {k}")
+    if len(strs) < k:
+        return ""
+
+    # Node structure: [children_dict, visit_count]
+    root: Dict[str, Any] = {"children": {}, "count": 0}
+    for word in strs:
+        node = root
+        for ch in word:
+            if ch not in node["children"]:
+                node["children"][ch] = {"children": {}, "count": 0}
+            node = node["children"][ch]
+            node["count"] += 1
+
+    best_prefix = ""
+
+    def _dfs(node: Dict[str, Any], path: List[str]) -> None:
+        nonlocal best_prefix
+        if len(path) > len(best_prefix):
+            best_prefix = "".join(path)
+        for ch, child in node["children"].items():
+            if child["count"] >= k:
+                path.append(ch)
+                _dfs(child, path)
+                path.pop()
+
+    _dfs(root, [])
+    return best_prefix
+
+
+def visualize_lcp_vertical_scan(strs: List[str]) -> str:
+    """
+    Renders an ASCII vertical alignment diagram highlighting matching prefix vs divergence.
+
+    Args:
+        strs: List of strings to visualize.
+
+    Returns:
+        Formatted ASCII diagram string.
+    """
+    _validate_str_list(strs)
+    if not strs:
+        return "Empty string list."
+
+    lcp = lcp_vertical_scan(strs)
+    lcp_len = len(lcp)
+    max_len = max(len(s) for s in strs)
+
+    lines: List[str] = []
+    lines.append(f"Longest Common Prefix Alignment (Result: '{lcp}', Length: {lcp_len})")
+    lines.append("=" * 68)
+
+    idx_header = "        " + " ".join(f"{i:<2}" for i in range(max_len))
+    lines.append(idx_header)
+    lines.append("       +" + "---" * max_len + "+")
+
+    for r, word in enumerate(strs):
+        padded = "  ".join(word[c] if c < len(word) else "." for c in range(max_len))
+        lines.append(f"  S{r:<3} | {padded}  |")
+
+    lines.append("       +" + "---" * max_len + "+")
+    marker_cells = [
+        "==" if c < lcp_len else ("^^" if c == lcp_len else "  ")
+        for c in range(max_len)
+    ]
+    lines.append("  Match  " + " ".join(marker_cells))
+    lines.append("=" * 68)
+    return "\n".join(lines)
+
+
+def benchmark_lcp_algorithms(
+    dataset_sizes: Optional[List[int]] = None,
+    prefix_len: int = 20,
+    iterations: int = 10,
+) -> Dict[str, Any]:
+    """
+    Benchmarks all 6 LCP strategies across datasets of growing sizes.
+
+    Args:
+        dataset_sizes: List of string counts per dataset.
+        prefix_len: Shared prefix length in synthetic dataset.
+        iterations: Trials per data point.
+
+    Returns:
+        Structured benchmark metrics dictionary.
+    """
+    if dataset_sizes is None:
+        dataset_sizes = [20, 100, 500, 2000]
+
+    records: List[Dict[str, Any]] = []
+    shared = "a" * prefix_len
+
+    for count in dataset_sizes:
+        # Synthetic strings with shared prefix and varying suffix
+        words = [f"{shared}suffix_{i % 50}_{'x' * (i % 10)}" for i in range(count)]
+        row: Dict[str, Any] = {"count": count}
+
+        algos = [
+            ("horizontal", lcp_horizontal_scan),
+            ("vertical", lcp_vertical_scan),
+            ("dnc", lcp_divide_and_conquer),
+            ("binary_search", lcp_binary_search),
+            ("sort_endpoints", lcp_sort_endpoints),
+            ("trie", lcp_trie),
+        ]
+
+        for key, fn in algos:
+            times: List[float] = []
+            for _ in range(iterations):
+                t0 = time.perf_counter()
+                fn(words)
+                times.append(time.perf_counter() - t0)
+            row[key] = min(times)
+
+        records.append(row)
+
+    return {"records": records, "prefix_len": prefix_len, "iterations": iterations}
+
+
+def format_benchmark_table(benchmark_data: Dict[str, Any]) -> str:
+    """Formats the LCP benchmark output into an ASCII table."""
+    lines: List[str] = []
+    lines.append("Longest Common Prefix Algorithms Performance Benchmark")
+    lines.append("=" * 94)
+    header = (
+        f"{'Strings':>8} | {'Horiz':>11} | {'Vertical':>11} | {'Div & Conq':>12} | "
+        f"{'BinSearch':>11} | {'SortEnds':>11} | {'Trie':>11}"
+    )
+    lines.append(header)
+    lines.append("-" * 94)
+
+    def _fmt(val: float) -> str:
+        us = val * 1_000_000.0
+        if us < 1000.0:
+            return f"{us:.2f} µs"
+        return f"{us / 1000.0:.2f} ms"
+
+    for r in benchmark_data["records"]:
+        line = (
+            f"{r['count']:>8} | "
+            f"{_fmt(r['horizontal']):>11} | "
+            f"{_fmt(r['vertical']):>11} | "
+            f"{_fmt(r['dnc']):>12} | "
+            f"{_fmt(r['binary_search']):>11} | "
+            f"{_fmt(r['sort_endpoints']):>11} | "
+            f"{_fmt(r['trie']):>11}"
+        )
+        lines.append(line)
+
+    lines.append("=" * 94)
+    return "\n".join(lines)
