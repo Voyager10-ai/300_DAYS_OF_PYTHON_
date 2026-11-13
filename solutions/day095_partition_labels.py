@@ -492,3 +492,40 @@ class TestPartitionLabels(unittest.TestCase):
                 partition_labels_greedy(bad)  # type: ignore
             with self.assertRaises(TypeError):
                 partition_labels_intervals(bad)  # type: ignore
+
+
+
+# ─── 5. Interactive CLI Demonstration ────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates Partition Labels algorithms, timeline visualizer, and benchmarks."""
+    print("=" * 80)
+    print("                 DAY 95: PARTITION LABELS (LEETCODE 763)                ")
+    print("=" * 80)
+
+    s = "ababcbacadefegdehijhklij"
+    print(f"\n[1] Partitioning string: '{s}':")
+    print(f"    - Greedy Two-Pointer : {partition_labels_greedy(s)}")
+    print(f"    - Interval Merging   : {partition_labels_intervals(s)}")
+    print(f"    - Substrings         : {partition_labels_substrings(s)}")
+
+    print("\n[2] Disjoint Sets & K-Partitioning:")
+    print(f"    - Disjoint Char Sets : {partition_labels_disjoint_sets(s)}")
+    print(f"    - Can partition into 2 parts? {can_partition_into_k(s, 2)}")
+    print(f"    - Merged into 2 parts: {merge_partitions_to_k(s, 2)}")
+
+    print("\n[3] ASCII Interval Timeline Visualizer:")
+    print(visualize_partition_labels(s))
+
+    print("\n[4] Multi-Algorithm Performance Benchmark:")
+    bench = benchmark_partition_algorithms([100, 1000, 5000, 20000], iterations=10)
+    print(format_benchmark_table(bench))
+
+    print("\n" + "=" * 80)
+    print("                      DEMONSTRATION COMPLETE                                   ")
+    print("=" * 80)
+
+
+if __name__ == "__main__":
+    main()

@@ -97,6 +97,7 @@ Tracking my consistency and growth in Python problem solving — one problem a d
 - Day 92: Print Words Vertically
 - Day 93: Reshape the Matrix
 - Day 94: Longest Common Prefix
+- Day 95: Partition Labels
 
 
 
