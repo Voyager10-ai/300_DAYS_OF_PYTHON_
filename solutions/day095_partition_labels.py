@@ -412,3 +412,83 @@ def format_benchmark_table(benchmark_data: Dict[str, Any]) -> str:
 
     lines.append("=" * 64)
     return "\n".join(lines)
+
+
+
+# ─── 4. Comprehensive Unit Test Suite ────────────────────────────────────────
+
+
+class TestPartitionLabels(unittest.TestCase):
+    """Exhaustive unit test suite verifying Partition Labels algorithms and extensions."""
+
+    def test_leetcode_examples(self) -> None:
+        """Tests standard LeetCode 763 cases."""
+        s1 = "ababcbacadefegdehijhklij"
+        sol = Solution()
+        self.assertEqual(partition_labels_greedy(s1), [9, 7, 8])
+        self.assertEqual(partition_labels_intervals(s1), [9, 7, 8])
+        self.assertEqual(sol.partitionLabels(s1), [9, 7, 8])
+
+        s2 = "eccbbbbdec"
+        self.assertEqual(partition_labels_greedy(s2), [10])
+        self.assertEqual(partition_labels_intervals(s2), [10])
+        self.assertEqual(sol.partitionLabels(s2), [10])
+
+    def test_all_unique_characters(self) -> None:
+        """When all characters are unique, every character forms its own partition of size 1."""
+        s = "abcdef"
+        self.assertEqual(partition_labels_greedy(s), [1, 1, 1, 1, 1, 1])
+        self.assertEqual(partition_labels_intervals(s), [1, 1, 1, 1, 1, 1])
+        self.assertEqual(partition_labels_substrings(s), ["a", "b", "c", "d", "e", "f"])
+
+    def test_single_character_and_empty(self) -> None:
+        """Tests boundary conditions: single char, repeated single char, empty string."""
+        self.assertEqual(partition_labels_greedy("a"), [1])
+        self.assertEqual(partition_labels_greedy("aaaaa"), [5])
+        self.assertEqual(partition_labels_greedy(""), [])
+        self.assertEqual(partition_labels_substrings(""), [])
+
+    def test_substrings_and_disjointness(self) -> None:
+        """Verifies substring reconstruction and disjoint character sets invariant."""
+        s = "ababcbacadefegdehijhklij"
+        subs = partition_labels_substrings(s)
+        self.assertEqual(subs, ["ababcbaca", "defegde", "hijhklij"])
+        self.assertEqual("".join(subs), s)
+
+        sets = partition_labels_disjoint_sets(s)
+        self.assertEqual(len(sets), 3)
+        self.assertTrue(sets[0].isdisjoint(sets[1]))
+        self.assertTrue(sets[1].isdisjoint(sets[2]))
+        self.assertTrue(sets[0].isdisjoint(sets[2]))
+
+    def test_k_partition_feasibility(self) -> None:
+        """Tests k-partition checks and merge logic."""
+        s = "ababcbacadefegdehijhklij"
+        self.assertTrue(can_partition_into_k(s, 1))
+        self.assertTrue(can_partition_into_k(s, 2))
+        self.assertTrue(can_partition_into_k(s, 3))
+        self.assertFalse(can_partition_into_k(s, 4))
+
+        merged_2 = merge_partitions_to_k(s, 2)
+        self.assertIsNotNone(merged_2)
+        self.assertEqual(len(merged_2), 2)  # type: ignore
+        self.assertEqual(sum(merged_2), len(s))  # type: ignore
+
+        self.assertIsNone(merge_partitions_to_k(s, 5))
+
+    def test_metrics_structure(self) -> None:
+        """Verifies metrics dictionary structure and values."""
+        res, m = partition_labels_with_metrics("ababcbacadefegdehijhklij")
+        self.assertEqual(res, [9, 7, 8])
+        self.assertEqual(m["string_length"], 24)
+        self.assertEqual(m["partition_count"], 3)
+        self.assertEqual(m["max_partition_size"], 9)
+        self.assertEqual(m["min_partition_size"], 7)
+
+    def test_type_validation(self) -> None:
+        """Ensures non-string types raise TypeError."""
+        for bad in [123, ["a", "b"], None, True]:
+            with self.assertRaises(TypeError):
+                partition_labels_greedy(bad)  # type: ignore
+            with self.assertRaises(TypeError):
+                partition_labels_intervals(bad)  # type: ignore
