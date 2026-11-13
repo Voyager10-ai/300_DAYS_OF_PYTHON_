@@ -279,3 +279,136 @@ def merge_partitions_to_k(s: str, k: int) -> Optional[List[int]]:
         parts.pop(min_idx + 1)
 
     return parts
+
+
+
+# ─── 3. ASCII Interval Visualizer & Performance Benchmarking ──────────────────
+
+
+def visualize_partition_labels(s: str) -> str:
+    """
+    Renders an ASCII visual timeline diagram of character intervals and partition cuts.
+
+    Args:
+        s: Input string (recommended length <= 40 for terminal display).
+
+    Returns:
+        Formatted ASCII diagram string.
+    """
+    _validate_input_string(s)
+    if not s:
+        return "Empty string."
+
+    lines: List[str] = []
+    lines.append(f"Partition Labels Timeline Trace for: '{s}' (len = {len(s)})")
+    lines.append("=" * 72)
+
+    # 1. Index ruler
+    n = len(s)
+    tens = "".join(str(i // 10) if i >= 10 else " " for i in range(n))
+    ones = "".join(str(i % 10) for i in range(n))
+    lines.append("Index:  " + ones if n < 10 else f"Tens:   {tens}\nOnes:   {ones}")
+    lines.append("Chars:  " + " ".join(s) if n <= 24 else f"Chars:  {s}")
+
+    # 2. Partition segments
+    partitions = partition_labels_greedy(s)
+    cut_line = list("." * n)
+    curr = 0
+    for sz in partitions:
+        curr += sz
+        if curr < n:
+            cut_line[curr - 1] = "|"
+    lines.append("Cuts:   " + "".join(cut_line))
+
+    # 3. Partition breakdown
+    lines.append("\nDisjoint Partitions:")
+    idx = 0
+    for p_num, sz in enumerate(partitions, 1):
+        sub = s[idx : idx + sz]
+        chars_used = sorted(set(sub))
+        lines.append(f"  Part {p_num}: [{idx:>2}..{idx + sz - 1:>2}] len={sz:<2} sub='{sub}' chars={chars_used}")
+        idx += sz
+
+    lines.append("=" * 72)
+    return "\n".join(lines)
+
+
+def benchmark_partition_algorithms(
+    sizes: Optional[List[int]] = None,
+    alphabet_size: int = 12,
+    iterations: int = 20,
+) -> Dict[str, Any]:
+    """
+    Benchmarks Partition Labels algorithms across increasing string lengths.
+
+    Algorithms:
+      - Greedy Two-Pointer with Last-Occurrence Map O(n)
+      - Interval Creation and Interval Merging O(n)
+
+    Args:
+        sizes: List of string lengths to test.
+        alphabet_size: Number of unique alphabet letters to distribute.
+        iterations: Number of runs per benchmark point.
+
+    Returns:
+        Structured benchmark metrics dictionary.
+    """
+    if sizes is None:
+        sizes = [100, 1000, 5000, 25000]
+
+    import random
+    rng = random.Random(42)
+    alphabet = [chr(ord('a') + i) for i in range(min(alphabet_size, 26))]
+
+    records: List[Dict[str, Any]] = []
+
+    for n in sizes:
+        s = "".join(rng.choice(alphabet) for _ in range(n))
+        row: Dict[str, Any] = {"length": n}
+
+        # 1. Greedy Two-Pointer
+        times: List[float] = []
+        for _ in range(iterations):
+            t0 = time.perf_counter()
+            partition_labels_greedy(s)
+            times.append(time.perf_counter() - t0)
+        row["greedy"] = min(times)
+
+        # 2. Interval Merging
+        times = []
+        for _ in range(iterations):
+            t0 = time.perf_counter()
+            partition_labels_intervals(s)
+            times.append(time.perf_counter() - t0)
+        row["intervals"] = min(times)
+
+        records.append(row)
+
+    return {"records": records, "iterations": iterations}
+
+
+def format_benchmark_table(benchmark_data: Dict[str, Any]) -> str:
+    """Formats the Partition Labels benchmark dictionary into an ASCII table."""
+    lines: List[str] = []
+    lines.append("Partition Labels Algorithms Performance Benchmark")
+    lines.append("=" * 64)
+    header = f"{'Length':>10} | {'Greedy Two-Pointer':>22} | {'Interval Merge':>22}"
+    lines.append(header)
+    lines.append("-" * 64)
+
+    def _fmt(val: float) -> str:
+        us = val * 1_000_000.0
+        if us < 1000.0:
+            return f"{us:.2f} µs"
+        return f"{us / 1000.0:.2f} ms"
+
+    for r in benchmark_data["records"]:
+        line = (
+            f"{r['length']:>10} | "
+            f"{_fmt(r['greedy']):>22} | "
+            f"{_fmt(r['intervals']):>22}"
+        )
+        lines.append(line)
+
+    lines.append("=" * 64)
+    return "\n".join(lines)
