@@ -177,3 +177,136 @@ class Solution:
     def canJump(self, nums: List[int]) -> bool:
         """Returns True if you can reach the last index from index 0."""
         return can_jump_greedy(nums)
+
+
+
+# ─── 2. Jump Game II (Min Jumps), Path Reconstruction & Jump Game III ─────────
+
+
+def jump_game_ii_min_jumps(nums: List[int]) -> int:
+    """
+    LeetCode 45: Jump Game II.
+    Computes the minimum number of jumps required to reach the last index.
+
+    Greedy Range Extension (BFS in O(1) space):
+      Maintains `cur_end` (end of current jump range) and `farthest` (farthest reach
+      possible from any point inside current jump range). When index hits `cur_end`,
+      we must make another jump and set `cur_end = farthest`.
+
+    Time Complexity: O(n).
+    Space Complexity: O(1).
+
+    Args:
+        nums: List of non-negative integers.
+
+    Returns:
+        Minimum jump count to reach len(nums) - 1, or -1 if unreachable.
+    """
+    n = _validate_nums(nums)
+    if n <= 1:
+        return 0
+
+    jumps = 0
+    cur_end = 0
+    farthest = 0
+
+    for i in range(n - 1):
+        if i > farthest:
+            return -1  # Unreachable
+
+        farthest = max(farthest, i + nums[i])
+        if i == cur_end:
+            jumps += 1
+            cur_end = farthest
+            if cur_end >= n - 1:
+                break
+
+    return jumps if cur_end >= n - 1 else -1
+
+
+def reconstruct_jump_path(nums: List[int]) -> Optional[List[int]]:
+    """
+    Finds and reconstructs a minimal-jump path from index 0 to len(nums) - 1.
+
+    Args:
+        nums: List of non-negative integers.
+
+    Returns:
+        List of 0-based indices representing the jump path (e.g. [0, 1, 4]),
+        or None if destination is unreachable.
+    """
+    n = _validate_nums(nums)
+    if n == 1:
+        return [0]
+    if nums[0] == 0:
+        return None
+
+    # BFS to track parent pointers for shortest path reconstruction
+    queue: deque = deque([0])
+    parent: Dict[int, int] = {0: -1}
+    visited: Set[int] = {0}
+    max_reached = 0
+
+    while queue:
+        curr = queue.popleft()
+        reach = curr + nums[curr]
+
+        if reach >= n - 1:
+            # Reconstruct path backwards
+            path = [n - 1]
+            p = curr
+            while p != -1:
+                path.append(p)
+                p = parent[p]
+            return path[::-1]
+
+        # Only queue newly reachable unexplored indices to retain O(n) runtime
+        start_probe = max(curr + 1, max_reached + 1)
+        end_probe = min(reach, n - 1)
+        for nxt in range(start_probe, end_probe + 1):
+            if nxt not in visited:
+                visited.add(nxt)
+                parent[nxt] = curr
+                queue.append(nxt)
+
+        max_reached = max(max_reached, reach)
+
+    return None
+
+
+def jump_game_iii_reach_zero(arr: List[int], start: int) -> bool:
+    """
+    LeetCode 1306: Jump Game III.
+    Given an array of non-negative integers arr and a starting index, determine
+    if you can reach any index with value 0.
+    At index i, you can jump to i + arr[i] or i - arr[i] if valid.
+
+    Time Complexity: O(n).
+    Space Complexity: O(n) for BFS queue and visited set.
+
+    Args:
+        arr: List of non-negative integers.
+        start: 0-based starting index.
+
+    Returns:
+        True if an index with value 0 is reachable, False otherwise.
+    """
+    if not isinstance(arr, list):
+        raise TypeError("arr must be a list")
+    if not (0 <= start < len(arr)):
+        raise ValueError(f"start index {start} out of bounds for len {len(arr)}")
+
+    queue: deque = deque([start])
+    visited: Set[int] = {start}
+
+    while queue:
+        node = queue.popleft()
+        if arr[node] == 0:
+            return True
+
+        for next_node in (node + arr[node], node - arr[node]):
+            if 0 <= next_node < len(arr) and next_node not in visited:
+                visited.add(next_node)
+                queue.append(next_node)
+
+    return False
