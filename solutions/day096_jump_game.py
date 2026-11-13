@@ -459,3 +459,83 @@ def format_benchmark_table(benchmark_data: Dict[str, Any]) -> str:
 
     lines.append("=" * 76)
     return "\n".join(lines)
+
+
+
+# ─── 4. Comprehensive Unit Test Suite ────────────────────────────────────────
+
+
+class TestJumpGame(unittest.TestCase):
+    """Exhaustive unit test suite verifying Jump Game variants, traps, and paths."""
+
+    def test_leetcode_55_reachability(self) -> None:
+        """Tests standard reachability cases for LeetCode 55."""
+        sol = Solution()
+
+        # Reachable
+        reachable = [2, 3, 1, 1, 4]
+        self.assertTrue(can_jump_greedy(reachable))
+        self.assertTrue(can_jump_backward(reachable))
+        self.assertTrue(can_jump_dp(reachable))
+        self.assertTrue(sol.canJump(reachable))
+
+        # Unreachable trap
+        trapped = [3, 2, 1, 0, 4]
+        self.assertFalse(can_jump_greedy(trapped))
+        self.assertFalse(can_jump_backward(trapped))
+        self.assertFalse(can_jump_dp(trapped))
+        self.assertFalse(sol.canJump(trapped))
+
+    def test_single_element_and_zeros(self) -> None:
+        """Tests boundary edge cases."""
+        self.assertTrue(can_jump_greedy([0]))
+        self.assertTrue(can_jump_backward([0]))
+        self.assertTrue(can_jump_greedy([2, 0, 0]))
+        self.assertFalse(can_jump_greedy([1, 0, 2]))
+        self.assertTrue(can_jump_greedy([2, 5, 0, 0]))
+
+    def test_jump_game_ii_min_jumps(self) -> None:
+        """Tests minimum jumps calculation (LeetCode 45)."""
+        self.assertEqual(jump_game_ii_min_jumps([2, 3, 1, 1, 4]), 2)
+        self.assertEqual(jump_game_ii_min_jumps([2, 3, 0, 1, 4]), 2)
+        self.assertEqual(jump_game_ii_min_jumps([0]), 0)
+        self.assertEqual(jump_game_ii_min_jumps([1, 2, 3]), 2)
+        self.assertEqual(jump_game_ii_min_jumps([3, 2, 1, 0, 4]), -1)
+
+    def test_path_reconstruction(self) -> None:
+        """Verifies reconstruct_jump_path yields valid continuous jumping sequence."""
+        nums = [2, 3, 1, 1, 4]
+        path = reconstruct_jump_path(nums)
+        self.assertIsNotNone(path)
+        self.assertEqual(path[0], 0)  # type: ignore
+        self.assertEqual(path[-1], len(nums) - 1)  # type: ignore
+
+        # Verify each jump in path was within bounds
+        for i in range(len(path) - 1):  # type: ignore
+            curr_idx = path[i]  # type: ignore
+            next_idx = path[i + 1]  # type: ignore
+            self.assertLessEqual(next_idx - curr_idx, nums[curr_idx])
+
+        self.assertIsNone(reconstruct_jump_path([3, 2, 1, 0, 4]))
+
+    def test_jump_game_iii_reach_zero(self) -> None:
+        """Tests bidirectional jump reachability to zero (LeetCode 1306)."""
+        self.assertTrue(jump_game_iii_reach_zero([4, 2, 3, 0, 3, 1, 2], 5))
+        self.assertTrue(jump_game_iii_reach_zero([4, 2, 3, 0, 3, 1, 2], 0))
+        self.assertFalse(jump_game_iii_reach_zero([3, 0, 2, 1, 2], 2))
+
+    def test_metrics_structure(self) -> None:
+        """Verifies metrics structure and collected parameters."""
+        reach, m = can_jump_with_metrics([2, 3, 1, 1, 4])
+        self.assertTrue(reach)
+        self.assertEqual(m["length"], 5)
+        self.assertGreaterEqual(m["max_reach_attained"], 4)
+
+    def test_type_validation(self) -> None:
+        """Ensures non-list or invalid entries raise TypeError/ValueError."""
+        with self.assertRaises(TypeError):
+            can_jump_greedy("not a list")  # type: ignore
+        with self.assertRaises(ValueError):
+            can_jump_greedy([])
+        with self.assertRaises(ValueError):
+            can_jump_greedy([1, -2, 3])
