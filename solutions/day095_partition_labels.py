@@ -166,3 +166,116 @@ class Solution:
     def partitionLabels(self, s: str) -> List[int]:
         """Returns partition lengths such that each letter appears in at most one part."""
         return partition_labels_greedy(s)
+
+
+
+# ─── 2. Substring Partitions, Disjoint Sets & K-Partitioning ──────────────────
+
+
+def partition_labels_substrings(s: str) -> List[str]:
+    """
+    Returns the actual substring slices corresponding to the maximum partition labels.
+
+    Args:
+        s: Input string.
+
+    Returns:
+        List of substring partitions (e.g. ['ababcbaca', 'defegde', 'hijhklij']).
+    """
+    _validate_input_string(s)
+    if not s:
+        return []
+
+    sizes = partition_labels_greedy(s)
+    substrings: List[str] = []
+    idx = 0
+    for sz in sizes:
+        substrings.append(s[idx : idx + sz])
+        idx += sz
+    return substrings
+
+
+def partition_labels_disjoint_sets(s: str) -> List[Set[str]]:
+    """
+    Extracts the character sets for each partition and verifies pairwise disjointness.
+
+    Property: For all i != j, partition_set[i] & partition_set[j] == empty_set.
+
+    Args:
+        s: Input string.
+
+    Returns:
+        List of sets of characters belonging to each partition.
+    """
+    substrings = partition_labels_substrings(s)
+    char_sets = [set(sub) for sub in substrings]
+
+    # Verify disjointness invariant
+    for i in range(len(char_sets)):
+        for j in range(i + 1, len(char_sets)):
+            overlap = char_sets[i] & char_sets[j]
+            if overlap:
+                raise ValueError(f"Partitions {i} and {j} share characters: {overlap}")
+
+    return char_sets
+
+
+def can_partition_into_k(s: str, k: int) -> bool:
+    """
+    Determines if string s can be partitioned into at least k valid disjoint segments.
+
+    Since partition_labels_greedy finds the MAXIMUM possible number of valid parts,
+    any smaller number of parts k can be formed by merging adjacent segments.
+
+    Args:
+        s: Input string.
+        k: Target partition count (k >= 1).
+
+    Returns:
+        True if s can be partitioned into k or more valid parts, False otherwise.
+    """
+    if k <= 0:
+        raise ValueError(f"k must be positive, got {k}")
+    if not s:
+        return k == 0
+
+    max_parts = len(partition_labels_greedy(s))
+    return max_parts >= k
+
+
+def merge_partitions_to_k(s: str, k: int) -> Optional[List[int]]:
+    """
+    Merges adjacent fundamental partition labels to yield exactly k valid parts.
+
+    Merges adjacent partitions starting from the shortest until exactly k parts remain.
+
+    Args:
+        s: Input string.
+        k: Target number of parts (1 <= k <= max_partitions).
+
+    Returns:
+        List of k partition lengths, or None if k exceeds maximum possible partitions.
+    """
+    if k <= 0:
+        raise ValueError(f"k must be positive, got {k}")
+
+    parts = partition_labels_greedy(s)
+    if k > len(parts):
+        return None
+    if k == len(parts):
+        return parts
+
+    # Merge rightmost adjacent parts until len(parts) == k
+    while len(parts) > k:
+        # Merge the two adjacent parts that minimize resultant size
+        min_idx = 0
+        min_sum = parts[0] + parts[1]
+        for i in range(1, len(parts) - 1):
+            if parts[i] + parts[i + 1] < min_sum:
+                min_sum = parts[i] + parts[i + 1]
+                min_idx = i
+
+        parts[min_idx] += parts[min_idx + 1]
+        parts.pop(min_idx + 1)
+
+    return parts
