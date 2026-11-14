@@ -539,3 +539,46 @@ class TestJumpGame(unittest.TestCase):
             can_jump_greedy([])
         with self.assertRaises(ValueError):
             can_jump_greedy([1, -2, 3])
+
+
+
+# ─── 5. Interactive CLI Demonstration ────────────────────────────────────────
+
+
+def main() -> None:
+    """Demonstrates Jump Game algorithms, visualizer, and benchmarks."""
+    print("=" * 80)
+    print("                 DAY 96: JUMP GAME (LEETCODE 55 & 45)                   ")
+    print("=" * 80)
+
+    nums = [2, 3, 1, 1, 4]
+    print(f"\n[1] Evaluating reachability for nums = {nums}:")
+    print(f"    - Forward Greedy Reach   : {can_jump_greedy(nums)}")
+    print(f"    - Backward Target Shift  : {can_jump_backward(nums)}")
+    print(f"    - Dynamic Programming    : {can_jump_dp(nums)}")
+    print(f"    - Min Jumps (Jump Game II): {jump_game_ii_min_jumps(nums)}")
+    print(f"    - Jump Path Indices      : {reconstruct_jump_path(nums)}")
+
+    trap = [3, 2, 1, 0, 4]
+    print(f"\n[2] Evaluating trap array nums = {trap}:")
+    print(f"    - Forward Greedy Reach   : {can_jump_greedy(trap)}")
+    print(f"    - Jump Path              : {reconstruct_jump_path(trap)}")
+
+    print("\n[3] Jump Game III (Reach Zero):")
+    arr = [4, 2, 3, 0, 3, 1, 2]
+    print(f"    - reach_zero({arr}, start=5) -> {jump_game_iii_reach_zero(arr, 5)}")
+
+    print("\n[4] ASCII Jump Trajectory Visualizer:")
+    print(visualize_jump_trajectory(nums))
+
+    print("\n[5] Multi-Algorithm Performance Benchmark:")
+    bench = benchmark_jump_algorithms([100, 1000, 5000, 20000], iterations=10)
+    print(format_benchmark_table(bench))
+
+    print("\n" + "=" * 80)
+    print("                      DEMONSTRATION COMPLETE                                   ")
+    print("=" * 80)
+
+
+if __name__ == "__main__":
+    main()
